@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>思特瑞 WMS 项目调研汇报</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<style>
+:root {
+  --bg: #f4f6f9;
+  --panel: #ffffff;
+  --panel2: #f0f3f7;
+  --border: #d8dee8;
+  --text: #1a2332;
+  --muted: #5b6b7c;
+  --accent: #2563eb;
+  --accent2: #059669;
+  --warn: #d97706;
+  --warn-bg: #fff7ed;
+  --asis: #2563eb;
+  --tobe: #059669;
+  --sidebar-w: 280px;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(26,35,50,.08);
+  font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
+body { display: flex; min-height: 100vh; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  flex: 0 0 var(--sidebar-w);
+  background: #ffffff;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
+}
+.brand {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.brand h1 {
+  margin: 0; font-size: 16px; font-weight: 700; letter-spacing: .02em;
+  color: #0f172a;
+}
+.brand p { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+.nav {
+  overflow: auto; padding: 10px 10px 24px; flex: 1;
+}
+.nav-group {
+  margin-top: 14px; padding: 0 8px 6px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+}
+.nav button {
+  width: 100%; text-align: left; border: 0; background: transparent;
+  color: var(--text); padding: 9px 10px; border-radius: 8px;
+  font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: flex-start;
+}
+.nav button:hover { background: var(--panel2); }
+.nav button.active {
+  background: #eff6ff; color: #1e40af;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.nav .idx {
+  flex: 0 0 20px; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+
+.main {
+  flex: 1; min-width: 0; overflow: auto;
+  background:
+    radial-gradient(1000px 500px at 0% 0%, rgba(37,99,235,.06), transparent 50%),
+    radial-gradient(800px 400px at 100% 0%, rgba(5,150,105,.05), transparent 45%),
+    var(--bg);
+}
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,.92);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.topbar h2 { margin: 0; font-size: 18px; font-weight: 650; }
+.topbar .meta { font-size: 12px; color: var(--muted); }
+.content { padding: 16px 20px 40px; max-width: none; }
+.content.scene-mode { display: flex; flex-direction: column; min-height: calc(100vh - 70px); }
+.card.diagram-card { flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+.card h3 { margin: 0 0 12px; font-size: 16px; }
+.muted { color: var(--muted); font-size: 13px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 980px) {
+  body { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+th, td {
+  border-bottom: 1px solid var(--border); padding: 10px 8px; text-align: left; vertical-align: top;
+}
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+.status-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px;
+  background: #eef2f7; color: #334155;
+}
+.status-pill.doing { background: #fff7ed; color: #c2410c; }
+.status-pill.done { background: #ecfdf5; color: #047857; }
+.status-pill.todo { background: #eff6ff; color: #1d4ed8; }
+
+.qs {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid var(--warn);
+  border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+}
+.qs h4 { margin: 0 0 8px; color: #b45309; font-size: 13px; }
+.qs ul { margin: 0; padding-left: 18px; }
+.qs li { margin: 4px 0; font-size: 13px; }
+
+.tabs {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.tabs button {
+  border: 1px solid var(--border); background: var(--panel2); color: var(--text);
+  border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 13px;
+}
+.tabs button.active.asis { border-color: var(--asis); background: #dbeafe; color: #1e40af; }
+.tabs button.active.tobe { border-color: var(--tobe); background: #d1fae5; color: #065f46; }
+.tabs button.active { outline: none; }
+
+.diagram-toolbar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.diagram-toolbar button, .diagram-toolbar label {
+  border: 1px solid var(--border); background: var(--panel2); color: var(--text);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 12px;
+}
+.diagram-frame {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  overflow: hidden;
+  flex: 1;
+  min-height: calc(100vh - 240px);
+  height: calc(100vh - 240px);
+  padding: 0;
+  position: relative;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+.diagram-frame:active, .diagram-frame.dragging { cursor: grabbing; }
+.diagram-frame .mermaid-stage {
+  position: absolute;
+  left: 0; top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.diagram-frame .mermaid {
+  width: max-content;
+  min-width: 100%;
+  padding: 24px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.diagram-frame .mermaid svg,
+.diagram-frame .mermaid svg * {
+  max-width: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+.diagram-frame .mermaid svg {
+  height: auto !important;
+}
+/* 泳道（subgraph）线框加粗加深 */
+.diagram-frame .mermaid .cluster rect,
+.fs-stage .mermaid .cluster rect {
+  stroke: #334155 !important;
+  stroke-width: 2.5px !important;
+  rx: 6px;
+  ry: 6px;
+  fill: #f1f5f9 !important;
+  fill-opacity: 0.95 !important;
+}
+.diagram-frame .mermaid .cluster-label,
+.diagram-frame .mermaid .cluster span,
+.fs-stage .mermaid .cluster-label,
+.fs-stage .mermaid .cluster span {
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+.diagram-frame .mermaid .cluster-label foreignObject div,
+.fs-stage .mermaid .cluster-label foreignObject div {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+.diagram-hint {
+  font-size: 12px; color: var(--muted); margin-top: 8px;
+}
+.diagram-toolbar .primary {
+  background: #dbeafe;
+  border-color: var(--accent);
+  color: #1e40af;
+  font-weight: 600;
+}
+/* 全屏浮层 */
+.fs-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #eef2f7;
+  display: none;
+  flex-direction: column;
+}
+.fs-overlay.open { display: flex; }
+.fs-bar {
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+}
+.fs-bar .title { font-size: 14px; font-weight: 600; }
+.fs-bar .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.fs-bar button {
+  border: 1px solid var(--border); background: var(--panel2); color: var(--text);
+  border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 13px;
+}
+.fs-stage-wrap {
+  flex: 1; min-height: 0; position: relative;
+  overflow: hidden; cursor: grab; background: #f8fafc;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fs-stage-wrap:active, .fs-stage-wrap.dragging { cursor: grabbing; }
+.fs-stage {
+  position: absolute; left: 0; top: 0;
+  transform-origin: 0 0; will-change: transform;
+  padding: 32px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fs-stage .mermaid svg { max-width: none !important; height: auto !important; }
+.fs-stage .mermaid svg * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+.fs-tip { font-size: 12px; color: var(--muted); }
+.prose p, .prose li { font-size: 14px; line-height: 1.65; color: #d5dde8; }
+.prose ul, .prose ol { padding-left: 1.25rem; }
+.prose strong { color: #0f172a; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; padding: 3px 8px; border-radius: 6px;
+  background: var(--panel2); color: var(--muted); border: 1px solid var(--border);
+}
+.scene-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hidden { display: none !important; }
+.loading { color: var(--muted); font-size: 13px; padding: 24px; }
+.overview-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+}
+.overview-card {
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; cursor: pointer; transition: .15s ease;
+}
+.overview-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.overview-card .n { color: var(--accent); font-size: 12px; margin-bottom: 4px; }
+.overview-card .t { font-size: 13px; font-weight: 600; }
+
+/* 甘特图 */
+.gantt-wrap { margin-top: 20px; }
+.gantt-wrap h4 { margin: 0 0 12px; font-size: 14px; color: var(--text); }
+.gantt {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.gantt-head, .gantt-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+.gantt-row:last-child { border-bottom: 0; }
+.gantt-head { background: #f8fafc; font-size: 12px; color: var(--muted); font-weight: 600; }
+.gantt-label {
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+  display: flex; align-items: center;
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.gantt-track {
+  position: relative;
+  height: 44px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(100% / 33 - 1px),
+    #e8edf3 calc(100% / 33 - 1px),
+    #e8edf3 calc(100% / 33)
+  );
+}
+.gantt-axis {
+  position: relative;
+  height: 28px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.gantt-axis-inner { position: relative; height: 100%; margin: 0; }
+.gantt-tick {
+  position: absolute; top: 6px; transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gantt-bar {
+  position: absolute;
+  top: 10px; height: 24px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
+  box-shadow: 0 1px 3px rgba(15,23,42,.12);
+  min-width: 4px;
+}
+.gantt-bar.done { background: linear-gradient(90deg, #059669, #10b981); }
+.gantt-bar.doing { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.gantt-bar.todo { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+.gantt-bar.milestone { background: linear-gradient(90deg, #b45309, #ea580c); }
+.gantt-today {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: #ef4444; z-index: 2; pointer-events: none;
+}
+.gantt-today::after {
+  content: '今天';
+  position: absolute; top: 2px; left: 4px;
+  font-size: 10px; color: #ef4444; font-weight: 700;
+}
+.gantt-legend {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 10px; font-size: 12px; color: var(--muted);
+}
+.gantt-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.gantt-legend i {
+  width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <h1>思特瑞 WMS 调研汇报</h1>
+    <p>As-Is / To-Be · 交互浏览</p>
+  </div>
+  <nav class="nav" id="nav"></nav>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h2 id="pageTitle">加载中…</h2>
+      <div class="meta">2026-07-24 · 对齐蓝图确认 8/17 · 十月初验 / 十一月终验</div>
+    </div>
+    <div class="badge">拖拽移动 · 滚轮缩放 · 支持全屏</div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<div class="fs-overlay" id="fsOverlay" aria-hidden="true">
+  <div class="fs-bar">
+    <div>
+      <div class="title" id="fsTitle">流程图全屏</div>
+      <div class="fs-tip">拖拽移动 · 滚轮缩放 · Esc 退出</div>
+    </div>
+    <div class="actions">
+      <button type="button" id="fsZoomOut">缩小</button>
+      <button type="button" id="fsZoomReset">复位</button>
+      <button type="button" id="fsZoomIn">放大</button>
+      <button type="button" id="fsClose">退出全屏</button>
+    </div>
+  </div>
+  <div class="fs-stage-wrap" id="fsStageWrap">
+    <div class="fs-stage" id="fsStage"></div>
+  </div>
+</div>
+
+
+<script type="application/json" id="scene-data">[{"id":"s1","title":"场景一：来料入库（正常采购 / 委外采购 / 受托加工 / 备品备件）","qs":["入库时是否必须关联过磅单、现场照片等附件？","混检不合格后，质检在 WMS 变更条码质检状态的规则？","备品备件按批号+数量入库的批号/流水码规则是否已定？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[OA]:::oa\n        L3[Lims]:::lims\n        L4[线下/人工]:::manual\n    end\n    subgraph 采购业务[\"采购/业务\"]\n        A1[OA申请或ERP建受托订单]:::oa\n        A2[ERP采购/委外/受托订单]:::erp\n        A3{配送方式}\n        A4[OA派车申请]:::oa\n        A5[OA下推来料通知单]:::oa\n        A6[对方送达/客户自送]:::manual\n    end\n    subgraph 物流仓管[\"物流/装卸/仓管\"]\n        B1[卸车移至库房-线下记录]:::manual\n        B2{收货形态}\n        B3[贴待检标签/核对数量]:::manual\n        B4[贴合格标签]:::manual\n        B5[通知业务入库]:::manual\n        B6[槽车打入储罐]:::manual\n        B7[ERP按数量出入库-备品备件]:::erp\n        A9[\"ERP采购/委外/受托入<br/>库过账\"]:::erp\n    end\n    subgraph 质检[\"质检\"]\n        D1[取样质检-混检/逐袋检]:::manual\n        D2[槽车一车一检取样]:::manual\n        D3[Lims录入质检]:::lims\n    end\n    A1 --> A2\n    A2 --> A3\n    A3 -->|我方配送/提货| A4\n    A4 --> A5\n    A5 --> B1\n    A3 -->|对方配送/客户自送| A6\n    A6 --> B1\n    B1 --> B2\n    B2 -->|包装类含受托| B3\n    B3 --> B5\n    B5 --> A9\n    B2 -->|包装类含受托| D1\n    D1 --> D3\n    D3 -->|合格| B4\n    B2 -->|槽车-仅正常采购| D2\n    D2 --> D3\n    B2 -->|槽车-仅正常采购| B6\n    B6 --> B5\n    B2 -->|备品备件| B7\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        LEG1[ERP]:::erp\n        LEG2[WMS]:::wms\n        LEG3[Lims]:::lims\n        LEG4[线下/人工]:::manual\n    end\n\n    subgraph sgBiz[\"业务/采购\"]\n        A1[\"在ERP新增请购单-采购<br/>或备件\"]:::erp\n        A2[在ERP新增采购订单]:::erp\n        A2w[在ERP新增委外采购订单]:::erp\n        A3[在ERP新增受托加工订单]:::erp\n        S1[\"ERP推送采购/委外/受<br/>托订单至WMS\"]:::erp\n        A4{配送方式?}\n        A5[在WMS新增派车申请]:::wms\n        A6[在WMS新增来料通知单]:::wms\n    end\n\n    subgraph sgLog[\"物流部\"]\n        L1[执行派车审批并确认承运]:::wms\n        L2[在WMS下推来料通知单]:::wms\n    end\n\n    subgraph sgWh[\"库管/装卸工\"]\n        B1[完成了卸车并移至库房]:::manual\n        B2[在WMS登记装卸单]:::wms\n        B3{收货形态?}\n        B4[在WMS打印并粘贴条码]:::wms\n        B5[\"执行扫码入库生成采购/委<br/>外/受托入库单\"]:::wms\n        B6[完成了槽车物料打入储罐]:::manual\n        B7[\"在WMS办理槽车入库并选<br/>择储罐与数量\"]:::wms\n        B8[\"在WMS按批号登记备品备<br/>件数量入库\"]:::wms\n    end\n\n    subgraph sgQc[\"质检员\"]\n        C1[\"执行取样质检混检或不合格<br/>逐袋检\"]:::manual\n        C2[执行槽车一车一检取样]:::manual\n        C3[在Lims录入质检结果]:::lims\n    end\n\n    subgraph sgSys[\"系统自动\"]\n        S2[WMS推送入库数据至ERP]:::wms\n        S3[Lims推送质检结果至WMS]:::lims\n    end\n\n    A1 --> A2\n    A2 --> S1\n    A2w --> S1\n    A3 --> S1\n    S1 --> A4\n    A4 -->|我方配送/提货| A5\n    A4 -->|对方配送/客户自送| A6\n    A5 --> L1\n    L1 --> L2\n    L2 --> B1\n    A6 --> B1\n    B1 --> B2\n    B2 --> B3\n    B3 -->|包装类含受托| B4\n    B4 --> B5\n    B5 --> S2\n    B4 --> C1\n    C1 --> C3\n    C3 --> S3\n    B3 -->|槽车仅正常采购| B6\n    B6 --> B7\n    B7 --> S2\n    B3 -->|槽车仅正常采购| C2\n    C2 --> C3\n    B3 -->|备品备件| B8\n    B8 --> S2\n\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef mes fill:#ede9fe,stroke:#8b5cf6;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ol>\n<li>建单：正常采购/备品备件在 OA 提交采购需求后采购部 ERP 下采购订单；委外采购在 OA 提交委外申请后 ERP 下委外采购订单；<strong>受托加工由业务/销售在 ERP 直接创建受托加工订单</strong>。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送/提货：采购或业务在 OA 发起派车需求，物流部与承运商确定运输内容后，下推来料通知；</p>\n<p>   - 对方配送（供应商/加工厂/客户自送）：对方按计划送达；。</p>\n<ol>\n<li>货物到场后，装卸工卸车并移至库房（受托入<strong>受托来料仓</strong>），线下记录装卸情况。</li>\n<li>收货形态分支：</li>\n</ol>\n<p>   - 包装类（吨袋/小包装/半成品/受托原料等）：库管粘贴待检标签（吨袋）后，仓管通知业务/采购在 ERP 办理入库过账（<strong>采购入库 / 委外入库 / 受托来料入库</strong>）；同步质检员取样质检（混检，不合格再逐袋检；Lims），合格后粘贴合格标签（入库与质检并行，不等待质检结果）。</p>\n<p>   - 槽车（仅正常采购）：质检员按一车一检取样并在 Lims 录入；同时现场工人打入储罐，仓管通知采购在 ERP 办理入库过账（入库与质检并行）。</p>\n<p>   - 备品备件：不贴码、不质检；仓管/采购在 ERP 直接按数量办理入库；领用等出库亦在 ERP 按数量办理。</p>","tobeHtml":"<ol>\n<li><strong>建单</strong>：正常采购/备品备件——需求部门在 <strong>ERP 提请购单</strong>，采购在 ERP 新增采购订单；委外采购——业务/销售在 ERP 新增委外采购订单；受托加工——业务/销售在 ERP 新增受托加工订单。</li>\n<li><strong>订单同步</strong>：ERP 推送采购/委外/受托订单至 WMS（<strong>无 MES</strong>，不推送 MES）。</li>\n<li><strong>配送 / 到货通知</strong>：</li>\n</ol>\n<p>   - 我方配送/提货：业务/采购在 WMS 新增派车申请 → 物流部执行审批并确认承运 → 物流部在 WMS 下推来料通知单（关联对应订单）；</p>\n<p>   - 对方配送/客户自送：业务/采购在 WMS 直接新增来料通知单。</p>\n<ol>\n<li><strong>到厂收货</strong>：装卸工完成卸车并移至库房（受托入受托来料仓）→ 在 WMS 登记装卸单。</li>\n<li><strong>收货形态</strong>（入库与质检并行，不等待质检结果）：</li>\n</ol>\n<p>   - <strong>包装类</strong>（含受托原料）：库管在 WMS 打印并粘贴条码（须在扫码入库前完成）→ 执行扫码入库生成对应入库单 → WMS 推送入库数据至 ERP；同步质检员执行取样质检 → 在 Lims 录入 → Lims 推送质检结果至 WMS 条码档案。</p>\n<p>   - <strong>槽车</strong>（仅正常采购）：质检员执行一车一检取样并在 Lims 录入；现场完成打入储罐；库管在 WMS 办理槽车入库（选储罐+数量）→ WMS 推送至 ERP；Lims 事后推送结果至 WMS。</p>\n<p>   - <strong>备品备件</strong>：不质检；在 WMS <strong>按批号维度登记数量入库</strong> → WMS 推送至 ERP（非最小包装扫码入库）。</p>\n<p>| 业务类型 | ERP前置/订单 | 来料通知 | WMS/ERP入库单据 | 目标仓 |</p>\n<p>| --- | --- | --- | --- | --- |</p>\n<p>| 正常采购 | 请购单 → 采购订单 | 来料通知单 | 采购入库 | 原辅料仓/储罐 |</p>\n<p>| 委外采购 | 委外采购订单 | 来料通知单 | 委外入库 | 半成品/成品仓 |</p>\n<p>| 受托加工 | 受托加工订单 | 来料通知单 | 受托来料入库 | 受托加工来料仓 |</p>\n<p>| 备品备件 | 请购单 → 采…</p>"},{"id":"s2","title":"场景二：采购类退料（正常采购退料 / 委外采购退料）","qs":["采购换货再入库：挂原采购订单还是新订单？","是否应等质检合格后再做采购入库，避免再退货？","线下换货后条码不变动时，如何保证账物一致？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[OA]:::oa\n        L3[线下/人工]:::manual\n    end\n    subgraph 质量业务[\"质量/业务\"]\n        A1[\"线下不合格评审或OA原材<br/>料投诉\"]:::manual\n        A2{评审结论}\n    end\n    subgraph 仓库对方[\"仓库/供应商或三方\"]\n        B1[对方重新发货-换货]:::manual\n        B2[ERP不做库存帐变动]:::manual\n        B3[让步-直接使用]:::manual\n        B4[正常采购降级-ERP形态转化]:::erp\n    end\n    A1 --> A2\n    A2 -->|退换货| B1\n    B1 --> B2\n    A2 -->|让步| B3\n    A2 -->|降级仅正常采购| B4\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[线下/人工]:::manual\n    end\n    subgraph sgQa[\"质量/业务\"]\n        A1[执行不合格评审或原材料投诉]:::manual\n        A2{评审结论?}\n    end\n    subgraph sgQc[\"质检部\"]\n        C1[\"在WMS将条码检验状态改<br/>为合格\"]:::wms\n        C2[可继续领料使用]:::wms\n    end\n    subgraph sgWh[\"库管\"]\n        B1[在WMS新增采购退料通知单]:::wms\n        B2[执行扫码出库退供应商或三方]:::wms\n    end\n    subgraph sgVendor[\"对方/再入库\"]\n        E1[对方重新发货]:::manual\n        E2[\"执行场景一对应来料入库完<br/>整流程\"]:::wms\n    end\n    A1 --> A2\n    A2 -->|退货| B1\n    B1 --> B2\n    A2 -->|换货| B1\n    B2 -->|换货继续| E1\n    E1 --> E2\n    A2 -->|让步| C1\n    C1 --> C2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ul>\n<li><strong>正常采购</strong>：线下执行原材料不合格评审；退换货由供应商重新发货，不走 ERP 库存帐；让步直接使用；降级在 ERP 走形态转化。</li>\n<li><strong>委外采购</strong>：在 OA 发起原材料投诉并走换货，ERP 不做库存变动。</li>\n</ul>","tobeHtml":"<ol>\n<li><strong>退货</strong>：在 WMS 新增采购退料通知单 → 仓管扫码出库退回供应商/三方（走完采购退料即可）。</li>\n<li><strong>换货</strong>：先走完采购退料 → 对方重新发货后，再走<strong>场景一对应来料入库完整流程</strong>（正常采购→采购入库；委外→委外入库）。</li>\n<li><strong>让步</strong>：<strong>质检部</strong>在 WMS 将条码检验状态改为合格后，可继续领料使用。</li>\n</ol>\n<p>（无降级处理分支。）</p>\n<p>| 业务类型 | 退料对象 | 退料单据 | 换货后再入库 |</p>\n<p>| --- | --- | --- | --- |</p>\n<p>| 正常采购 | 供应商 | 采购退料通知单 → 扫码出库 | 场景一采购入库全流程 |</p>\n<p>| 委外采购 | 三方加工厂 | 采购退料通知单 → 扫码出库 | 场景一委外入库全流程 |</p>"},{"id":"s3","title":"场景三：领料（生产领料至线边仓 / 备品备件领用）","qs":["备品备件领用：确认采用方案二（门禁验人+账号扫码，无预开申请）？","装卸单是否一律由出入库通知单/申请单下推？","门禁与 WMS 用户名单对接方式？"],"diagrams":[{"label":"现状·生产领料（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[线下/人工]:::manual\n    end\n    subgraph 生产\n        P1[线下提出生产领料单]:::manual\n        P2[在领料区使用原料]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[货物移至领料区-线边仓]:::manual\n        C1[在ERP办理领料出库]:::erp\n    end\n    P1 --> B1\n    B1 --> C1\n    C1 --> P2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be·生产领料","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 生产\n        P1[在WMS提交生产领料申请单]:::wms\n        P2[在线边仓使用原料]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        K1[在WMS扫码领料出库]:::wms\n        B1[按出库内容移至线边仓]:::manual\n        B2[在WMS登记装卸单]:::wms\n    end\n    subgraph 系统自动\n        E1[\"WMS推送领料出库至ER<br/>P过账\"]:::wms\n    end\n    P1 --> K1\n    K1 --> E1\n    E1 --> B1\n    B1 --> B2\n    B2 --> P2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"现状·备品备件（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[线下/人工]:::manual\n    end\n    subgraph 领用人\n        A1[无法预知料号难开申请]:::manual\n        A2[现场领完料看见料号后登记领走]:::manual\n    end\n    subgraph 仓管或经办\n        B1[事后统一在ERP开单过账]:::erp\n    end\n    A1 --> A2\n    A2 --> B1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be 方案一（先申请+门禁校验申请单）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[门禁]:::oa\n        L4[线下/人工]:::manual\n    end\n    subgraph 领用人\n        A1[在WMS下备品备件领料申请单]:::wms\n        A3[进门后扫批号码领取]:::wms\n    end\n    subgraph 门禁\n        G1[\"扫脸校验WMS是否存在该<br/>员工申请单\"]:::oa\n        G2{存在有效申请单?}\n        G3[允许开门]:::oa\n        G4[拒绝开门]:::oa\n    end\n    subgraph 系统自动\n        E1[\"WMS推送领料过账数据至<br/>ERP\"]:::wms\n    end\n    A1 --> G1\n    G1 --> G2\n    G2 -->|是| G3\n    G2 -->|否| G4\n    G3 --> A3\n    A3 --> E1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be 方案二（门禁验人+账号扫码）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[门禁]:::oa\n        L4[线下/人工]:::manual\n    end\n    subgraph 门禁\n        G1[\"扫脸校验用户是否在WMS<br/>用户列表或门禁名单\"]:::oa\n        G2{人员存在?}\n        G3[允许开门领取]:::oa\n        G4[拒绝开门]:::oa\n    end\n    subgraph 领用人\n        A1[登录本人WMS账号]:::wms\n        A2[扫码领料备品备件]:::wms\n        A3[WMS记录员工时间物料]:::wms\n    end\n    subgraph 系统自动\n        E1[\"WMS推送领料过账数据至<br/>ERP\"]:::wms\n    end\n    G1 --> G2\n    G2 -->|是| G3\n    G2 -->|否| G4\n    G3 --> A1\n    A1 --> A2\n    A2 --> A3\n    A3 --> E1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>见 As-Is 流程图。</p>","tobeHtml":"<p>见 To-Be 流程图。</p>"},{"id":"s4","title":"场景四：生产直接投罐区料至车间反应（罐区）","qs":["储罐投料后「及时」开生产领料单的时效与责任岗位？","罐区领料数量如何计量、与储罐台账如何对齐？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[线下/人工]:::manual\n    end\n    subgraph 罐区生产[\"罐区/生产\"]\n        A1[储罐直接投料给生产使用]:::manual\n    end\n    subgraph 经办库管[\"经办/库管\"]\n        B1[罐区原辅料统一后置开单]:::erp\n    end\n    A1 --> B1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 罐区生产[\"罐区/生产\"]\n        A1[完成储罐投料]:::manual\n        A2[及时在WMS开生产领料单]:::wms\n    end\n    subgraph 系统自动\n        E1[\"WMS推送生产领料过账至<br/>ERP\"]:::wms\n    end\n    A1 --> A2\n    A2 --> E1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>见 As-Is 流程图。</p>","tobeHtml":"<p>见 To-Be 流程图。</p>"},{"id":"s5","title":"场景五：生产入库","qs":["生产入库后的转仓，与场景十二仓库间调拨是否共用能力？","成品条码建档与贴码责任（质检/生产）边界？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[Lims]:::lims\n        L3[线下/人工]:::manual\n    end\n    subgraph 质检部门[\"质检部门\"]\n        D1[Lims完成成品质检]:::lims\n        D2[合格后通知库管]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        C1[ERP办理生产入库]:::erp\n        C2[ERP办理转仓]:::erp\n    end\n    D1 --> D2\n    D2 --> C1\n    C1 --> C2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[WMS]:::wms\n        L3[Lims]:::lims\n        L4[线下/人工]:::manual\n    end\n    subgraph 质检部门[\"质检部门\"]\n        D1[在Lims完成成品质检]:::lims\n        D2[合格批号条码推送WMS建档]:::lims\n        D3[\"在WMS发起生产入库申请<br/>并勾选条码\"]:::wms\n    end\n    subgraph 生产[\"生产\"]\n        P1[打印并粘贴条码至成品吨袋]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[完成货物转移]:::manual\n        B2[在WMS登记装卸单]:::wms\n        C1[在WMS扫码确认入库]:::wms\n        E1[\"WMS推送入库数据至ER<br/>P过账\"]:::wms\n        C3[在WMS新增转仓申请单]:::wms\n        C4[扫码办理转仓]:::wms\n        E2[\"WMS推送转仓数据至ER<br/>P更新库存\"]:::wms\n    end\n    D1 --> D2\n    D2 --> P1\n    P1 --> D3\n    D3 --> B1\n    B1 --> B2\n    B2 --> C1\n    C1 --> E1\n    E1 --> C3\n    C3 --> C4\n    C4 --> E2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>质检在Lims完成质检数据工作，成品合格后由质量部通知库管在ERP办理生产入库，再办理转仓。</p>","tobeHtml":"<ol>\n<li>质检在Lims完成质检数据工作，成品合格后推送WMS合格的批号条码，自动创建成品条码档案数据。</li>\n<li>生产打印并粘贴条码至成品吨袋上。</li>\n<li>质检部在WMS发起生产入库申请，勾选可入库的条码。</li>\n<li>装卸工完成货物转移，并在WMS完成装卸单登记。</li>\n<li>库管在WMS扫码确认后，WMS推送入库数据至ERP过账。</li>\n<li>库管在WMS新增转仓申请单；再扫码办理转仓；WMS推送转仓数据至ERP更新库存。</li>\n</ol>"},{"id":"s6","title":"场景六：生产退料","qs":["备品备件领用后是否允许退料？","若退料，ERP 用其他入库还是其他单据？如何保证线上线下一致？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[线下/人工]:::manual\n    end\n    subgraph 生产库管[\"生产/库管\"]\n        A1[月底盘点]:::manual\n        A2[在ERP做生产退料单据]:::erp\n    end\n    A1 --> A2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 生产\n        P1[在WMS发起生产退料申请单]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[完成货物转移]:::manual\n        B2[在WMS登记装卸单]:::wms\n        C1[在WMS扫码办理入库]:::wms\n        E1[\"WMS推送退料入库至ER<br/>P过账\"]:::wms\n    end\n    P1 --> B1\n    B1 --> B2\n    B2 --> C1\n    C1 --> E1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>月底盘点直接在ERP做生产退料单据。</p>","tobeHtml":"<p>生产在WMS发起生产退料申请单；库管/装卸工完成货物转移后在WMS完成装卸单登记，再扫码办理入库；WMS推送退料入库数据至ERP过账。</p>"},{"id":"s7","title":"场景七：销售发货-自产/受托加工（SO1 主流程）","qs":["订单备货：生产挑选条码、一发货一备货单等规则确认？","出门单更名为「出门条」、按出库单打印是否确认？","客户自提门禁与交接方式？","「单独派车」行为如何纳入 WMS（与发货单/运单关系）？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[OA]:::oa\n        L3[线下/人工]:::manual\n    end\n    subgraph 销售\n        A1[在ERP创建销售订单]:::erp\n        A2[在OA做订单备货1:n]:::oa\n        A3{配送方式}\n        A4[在OA发起派车申请1车1单]:::oa\n        A5[在OA下推销售发货通知单]:::oa\n    end\n    subgraph 库管装卸[\"装卸工/仓管\"]\n        B1[按通知发货出库]:::manual\n        B2[办理出门手续]:::manual\n    end\n    A1 --> A2\n    A2 --> A3\n    A3 -->|我方配送| A4\n    A4 --> A5\n    A3 -->|客户自提| A5\n    A5 --> B1\n    B1 --> B2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[WMS]:::wms\n        L3[线下/人工]:::manual\n    end\n    subgraph 销售\n        A1[在ERP创建销售订单]:::erp\n        A2[在WMS下发订单备货]:::wms\n        A4{配送方式}\n        A5[在WMS发起派车申请]:::wms\n        A6[手动新增销售发货通知单]:::wms\n    end\n    subgraph 物流\n        LG1[派车申请审批通过]:::wms\n        LG2[\"在WMS创建发货单-1装<br/>货点1卸货点\"]:::wms\n        LG3[发货单组成运单]:::wms\n        LG4[运单自动生成销售发货通知单]:::wms\n    end\n    subgraph 库管装卸[\"装卸工/仓管\"]\n        C1[挑选条码并完成备货绑定]:::wms\n        C2[\"按销售发货通知单扫码出库<br/>并校验备货条码\"]:::wms\n        C2b[在WMS完成装卸单登记]:::wms\n        C3[在WMS打印出门单]:::wms\n        C4[完成装货]:::manual\n    end\n    subgraph 承运司机[\"承运商/司机\"]\n        D1[完成装货确认]:::wms\n        D2{是否多次装货}\n        D3[出门进入在途]:::wms\n        D4[每日更新在途状态]:::wms\n        D5[到达卸货点完成卸货确认]:::wms\n        D6{是否多次卸货}\n        D7[全部装卸货点确认-运单完成]:::wms\n        D8[\"WMS推送ERP生成采购<br/>单-运输费用\"]:::wms\n    end\n    A1 --> A2\n    A2 --> C1\n    A2 --> A4\n    A4 -->|我方配送| A5\n    A5 --> LG1\n    LG1 --> LG2\n    LG2 --> LG3\n    LG3 --> LG4\n    LG4 --> C2\n    A4 -->|客户自提| A6\n    A6 --> C2\n    C1 --> C2\n    C2 --> C2b\n    C2b --> C3\n    C3 --> C4\n    C4 --> D1\n    D1 --> D2\n    D2 -->|是-下一发货单| C2\n    D2 -->|装货完成| D3\n    D3 --> D4\n    D4 --> D5\n    D5 --> D6\n    D6 -->|是-下一卸货点| D5\n    D6 -->|全部完成| D7\n    D7 --> D8\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ol>\n<li>ERP 创建销售订单（如按吨计量）。</li>\n<li>OA 做订单备货（订单与备货 1:n）。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送：OA 发起派车申请（<strong>1车1单</strong>）；</p>\n<p>   - 客户自提：不做派车，直接进入发货通知。</p>\n<ol>\n<li>OA 下推销售发货通知单。</li>\n<li>仓库按通知发货出库（线下/ERP 过账方式：待确认），车辆离厂相关出门手续在 OA/线下办理。</li>\n</ol>","tobeHtml":"<ol>\n<li>ERP 创建销售订单。</li>\n<li><strong>订单备货</strong>在 WMS 下发后，仓管按备货内容<strong>挑选条码并完成备货绑定</strong>。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送：<strong>WMS 发起派车申请</strong>；审批通过后，由<strong>物流部在 WMS 创建发货单</strong>，<strong>发货单组成运单</strong>。<strong>一个发货单 = 一个装货点 + 一个卸货点</strong>（一车多点则对应多张发货单归入同一运单）；<strong>运单组成后自动生成销售发货通知单</strong>；</p>\n<p>   - 客户自提：跳过派车/发货单/运单；由<strong>销售在 WMS 手动新增销售发货通知单</strong>（门禁与交接方式：待确认）。</p>\n<ol>\n<li>库管根据<strong>销售发货通知单</strong>办理 <strong>销售扫码出库</strong>；若为订单备货物料，须<strong>校验扫码条码与备货绑定条码一致</strong>。</li>\n<li>装卸工在 WMS <strong>完成装卸单登记</strong>。</li>\n<li>在 <strong>WMS 打印出门单</strong>交门卫核对放行。</li>\n<li>仓库办完出库后，由装卸工完成装货，由<strong>司机完成装货确认</strong>；若<strong>多次装货</strong>，则按发货单循环「出库扫码 → 装卸单登记 → 装货确认」直至装货完成。</li>\n<li>司机出门后进入<strong>在途状态</strong>，须<strong>每日在 WMS 更新在途状态信息</strong>。</li>\n<li>司机到达卸货点后，完成<strong>卸货确认</strong>；若<strong>多次卸货</strong>，则按发货单循环卸货确认直至卸货完成。</li>\n<li><strong>所有装货点、卸货点均确认完成后</strong>，运单完成；WMS <strong>推送 ERP 生成采购单（运输费用）</strong>（客户自提无运单则跳过本步）。</li>\n</ol>"},{"id":"s8","title":"场景八：销售退货（自产）","qs":["退货「我方派车提货 / 客户配送」两种方式现场细则是否齐全？","退货运单与销售退货通知单自动生成规则？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 销售\n        A1[在OA发起客诉-退货]:::oa\n        A2{退货配送方式}\n        A3[线下约定我方提货或客户送来]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[在ERP办理销售退货入库]:::erp\n    end\n    A1 --> A2\n    A2 --> A3\n    A3 --> B1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[WMS]:::wms\n        L3[ERP]:::erp\n    end\n    subgraph 销售\n        A1[在OA发起客诉-退货]:::oa\n        A3{退货配送方式}\n        A4[在WMS发起派车申请]:::wms\n    end\n    subgraph 物流\n        LG1[派车申请审批通过]:::wms\n        LG2[创建发货单并组成运单]:::wms\n        LG3[运单自动生成销售退货通知单]:::wms\n    end\n    subgraph 质检\n        A2[手动新增销售退货通知单]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[按退货通知单扫码入库]:::wms\n        B1b[在WMS完成装卸单登记]:::wms\n        B2[WMS推送ERP退货入库过账]:::wms\n    end\n    A1 --> A3\n    A3 -->|我方派车提货| A4\n    A4 --> LG1\n    LG1 --> LG2\n    LG2 --> LG3\n    LG3 --> B1\n    A3 -->|客户配送| A2\n    A2 --> B1\n    B1 --> B1b\n    B1b --> B2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>OA 发起客诉-退货流程，由库管在 ERP 办理销售退货入库；退货如何到厂（我方提货/客户送来）多为线下约定。</p>","tobeHtml":"<ol>\n<li>OA 发起客诉-退货流程。</li>\n<li><strong>配送方式分支</strong>（退货如何回厂）：</li>\n</ol>\n<p>   - <strong>我方派车提货</strong>：销售在 WMS 发起<strong>派车申请</strong> → 物流审批通过后创建发货单并组成运单 → <strong>运单自动生成销售退货通知单</strong>；</p>\n<p>   - <strong>客户配送</strong>（客户送回本厂）：跳过派车/发货单/运单；由质检（或销售）在 WMS <strong>手动新增销售退货通知单</strong>。</p>\n<ol>\n<li>库管/装卸工根据销售退货通知单办理<strong>扫码入库</strong>，并完成<strong>装卸单登记</strong>；WMS 推送 ERP 完成退货入库过账。</li>\n</ol>"},{"id":"s9","title":"场景九：销售退换货（常见）","qs":["先补货后退货且跨会计期时，系统与财务最优操作口径？","同批号复用规则、条码档案与 ERP/WMS 校验？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 销售\n        A1[在OA发起客诉-退货]:::oa\n        A2[线下约定退补货配送方式]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[\"在ERP办理销售退换货-<br/>同批号直接平库存\"]:::erp\n    end\n    A1 --> A2\n    A2 --> B1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"情况一：货已退回厂内，同步发新成品（先退货入库，再 SO1 出库）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[WMS]:::wms\n        L3[ERP]:::erp\n    end\n    subgraph 销售\n        A1[在OA发起客诉-退货]:::oa\n        R1{退货配送方式}\n        R2[在WMS发起派车申请-提退货]:::wms\n        S1{补货配送方式}\n        S2[按场景七我方派车或客户自提]:::wms\n    end\n    subgraph 物流\n        LG1[\"审批并组成运单-自动生成<br/>退货通知单\"]:::wms\n    end\n    subgraph 质检\n        A2[\"客户配送时手动新增销售退<br/>货通知单\"]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[退货扫码入库并登记装卸单]:::wms\n        B2[WMS推送ERP退货入库过账]:::wms\n        B3[按场景七SO1同批号销售出库]:::wms\n    end\n    A1 --> R1\n    R1 -->|我方派车提货| R2\n    R2 --> LG1\n    LG1 --> B1\n    R1 -->|客户配送| A2\n    A2 --> B1\n    B1 --> B2\n    B2 --> S1\n    S1 --> S2\n    S2 --> B3\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"情况二：货未到厂，先发货给客户（先 SO1 出库，后退货入库）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[WMS]:::wms\n        L3[ERP]:::erp\n        L4[线下/人工]:::manual\n    end\n    subgraph 销售\n        A1[\"OA客诉-退换货-先补货<br/>后退货\"]:::oa\n        S1{补货配送方式}\n        S2[WMS派车申请-补货]:::wms\n        S3[手动新增销售发货通知单]:::wms\n        R1{退货配送方式}\n        R2[WMS派车申请-提退货]:::wms\n    end\n    subgraph 物流\n        LG1[\"审批组成运单-自动生成销<br/>售发货通知单\"]:::wms\n        LG2[\"审批组成运单-自动生成销<br/>售退货通知单\"]:::wms\n    end\n    subgraph 质检\n        R3[手动新增销售退货通知单]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        B1[\"按发货通知单扫码出库并登<br/>记装卸单\"]:::wms\n        B1b[WMS推送ERP销售出库过账]:::wms\n        Bw[等待客户换货到厂]:::manual\n        B2[\"按退货通知单扫码入库并登<br/>记装卸单\"]:::wms\n        B3[WMS推送ERP退货入库过账]:::wms\n    end\n    subgraph 财务\n        F1[核对是否跨帐期并处理对账开票]:::manual\n    end\n    A1 --> S1\n    S1 -->|我方派车| S2\n    S2 --> LG1\n    LG1 --> B1\n    S1 -->|客户自提| S3\n    S3 --> B1\n    B1 --> B1b\n    B1b --> Bw\n    Bw --> R1\n    R1 -->|我方派车提货| R2\n    R2 --> LG2\n    LG2 --> B2\n    R1 -->|客户配送| R3\n    R3 --> B2\n    B2 --> B3\n    B3 --> F1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<p>OA 发起客诉-退货流程，由库管在 ERP 办理销售退换货（<strong>同批号</strong>），直接平库存；退/补货配送方式多为线下。</p>","tobeHtml":"<p>| 情况 | 触发条件 | 顺序 | 退货回厂配送 | 补货发出配送 | 财务注意 |</p>\n<p>| --- | --- | --- | --- | --- | --- |</p>\n<p>| 情况一 | 客户货<strong>已退回厂内</strong>，并同步发出新成品 | <strong>先</strong>销售退货扫码入库 → <strong>再</strong>同批号走 SO1 出库 | 我方派车提货 / 客户配送（同场景八） | 我方派车 / 客户自提（同场景七） | 一般同期间可对齐 |</p>\n<p>| 情况二 | 客户货<strong>尚未到厂</strong>，需<strong>提前发货</strong> | <strong>先</strong> SO1 出库 → 到厂后<strong>再</strong>退货入库 | <strong>我方派车提货</strong> / <strong>客户配送</strong>（同场景八全文） | <strong>我方派车</strong> / <strong>客户自提</strong>（同场景七全文） | <strong>跨帐期</strong>需财务关注 |</p>"},{"id":"s10","title":"场景十：委外路径退货","qs":["路径2：销售退货单与委外退料单如何追溯关联？","路径3：客户直退三方、本厂不做库存——业务备案范围？","路径3 虚拟条码/无装货单出门单约定？"],"diagrams":[{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[WMS]:::wms\n        L3[ERP]:::erp\n    end\n    subgraph 销售\n        A1[OA客诉-退货]:::oa\n        A3{退货回厂配送}\n        A4[WMS派车申请-提退货]:::wms\n    end\n    subgraph 质检\n        A2[\"客户配送时手动新增销售退<br/>货通知单\"]:::wms\n    end\n    subgraph 物流\n        LG1[运单自动生成销售退货通知单]:::wms\n        LG2[\"退三方时派车申请审批并出<br/>库通知\"]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        A5[销售退货扫码入库]:::wms\n        A6[推送ERP退货入库过账]:::wms\n        B2[WMS采购退料通知单]:::wms\n        B3[扫码出库退三方]:::wms\n        B4[换货则再走场景一委外入库]:::wms\n    end\n    subgraph 业务采购[\"业务/采购\"]\n        B0{退三方配送方式}\n        B1[按场景二发起采购退料]:::wms\n        B1b[三方自提直接下退料通知]:::wms\n    end\n    A1 --> A3\n    A3 -->|我方派车提货| A4\n    A4 --> LG1\n    LG1 --> A5\n    A3 -->|客户配送| A2\n    A2 --> A5\n    A5 --> A6\n    A6 --> B1\n    B1 --> B0\n    B0 -->|我方派车送三方| LG2\n    LG2 --> B2\n    B0 -->|三方自提| B1b\n    B1b --> B2\n    B2 --> B3\n    B3 --> B4\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"10.2 路径3退货（客户直接退还给三方加工厂）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[OA]:::oa\n        L2[线下/人工]:::manual\n    end\n    subgraph 本厂销售[\"销售\"]\n        A1[OA客户投诉流程-仅备案]:::oa\n    end\n    subgraph 客户与三方\n        B0[客户与三方自行约定配送]:::manual\n        B1[客户直接退货给三方加工厂]:::manual\n        B2[三方线下换货完成]:::manual\n    end\n    A1 -.->|不入本厂仓/不派车/不推WMS库存| B0\n    B0 --> B1\n    B1 --> B2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ol>\n<li>OA 发起客诉/退货；</li>\n<li>库管在 ERP 办理销售退货入库（货退回本厂）；退货到厂配送方式多为线下；</li>\n<li>再通过 OA 原材料投诉/线下沟通，将物料退回三方加工厂（我方送 / 三方自提等线下约定）；委外侧库存变动现状较弱（参见场景二，ERP 往往不做库存变动）。</li>\n</ol>","tobeHtml":"<ol>\n<li><strong>先走销售退货</strong>（同场景八，含配送分支）：</li>\n</ol>\n<p>   - <strong>我方派车提货</strong>：派车申请 → 运单 → 自动生成销售退货通知单 → 扫码入库；</p>\n<p>   - <strong>客户配送</strong>：手动新增销售退货通知单 → 扫码入库；</p>\n<p>   - WMS 推送 ERP 退货入库过账。</p>\n<ol>\n<li><strong>再走委外采购退料</strong>（同场景二，含配送分支）：</li>\n</ol>\n<p>   - <strong>我方派车送三方</strong>：WMS 派车申请 → 物流组成运单/出库通知 → 扫码出库退三方；</p>\n<p>   - <strong>三方自提/对方配送</strong>：跳过派车，直接采购退料通知单 → 扫码出库退三方；</p>\n<p>   - 换货则退料后再走场景一委外入库全流程（场景一亦含我方配送/对方配送）。</p>\n<ol>\n<li>两段单据需可追溯关联（销售退货单 ↔ 委外退料单）：待确认。</li>\n</ol>\n<p><strong>To-Be</strong></p>\n<p>```mermaid</p>\n<p>flowchart TB</p>\n<p>    subgraph 系统颜色说明</p>\n<p>        direction LR</p>\n<p>        L1[OA]:::oa</p>\n<p>        L2[WMS]:::wms</p>\n<p>        L3[ERP]:::erp</p>\n<p>    end</p>\n<p>    subgraph 销售</p>\n<p>        A1[OA客诉-退货]:::oa</p>\n<p>        A3{退货回厂配送}</p>\n<p>        A4[WMS派车申请-提退货]:::wms</p>\n<p>    end</p>\n<p>    subgraph 质检</p>\n<p>        A2[客户配送时手动新增销售退货通知单]:::wms</p>\n<p>    end</p>\n<p>    subgraph 物流</p>\n<p>        LG1[运单自动生成销售退货通知单]:::wms</p>\n<p>        LG2[退三方时派车申请审批并出库通知]:::wms</p>\n<p>    end</p>\n<p>    subgraph 库管装卸[&quot;库管/装卸工&quot;]</p>\n<p>        A5[销售退货扫码入库]:::wms</p>\n<p>        A6[推送ERP退货入库过账]:::wms</p>\n<p>        B2[WMS采购退料通知单]:::wms</p>\n<p>        B3[扫码出库退三方]:::wms</p>\n<p>        B4[换货则再走场景一委外入库]:::wm…</p>"},{"id":"s11","title":"场景十一：委外发料出库（原材料投料-三方加工）","qs":["委外发料是否完整复用 SO1 运单/在途能力？","路径3 虚拟条码、无出门单是否落地？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[OA]:::oa\n        L3[线下/人工]:::manual\n    end\n    subgraph 业务销售[\"业务/销售\"]\n        A1[在ERP创建委外采购订单]:::erp\n        A2{配送方式}\n        A3[在OA发起派车申请]:::oa\n    end\n    subgraph 物流\n        A4[审批并安排车辆]:::oa\n        A5[OA下推委外出库通知单]:::oa\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        A6[三方到厂自提交接]:::manual\n        B1[在ERP办理委外出库过账]:::erp\n        B2[装车发往三方-线下]:::manual\n    end\n    A1 --> A2\n    A2 -->|我方配送| A3\n    A3 --> A4\n    A4 --> A5\n    A5 --> B1\n    A2 -->|三方自提| A6\n    A6 --> B1\n    B1 --> B2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[ERP]:::erp\n        L2[WMS]:::wms\n        L3[线下/人工]:::manual\n    end\n    subgraph 业务销售[\"业务/销售\"]\n        A1[在ERP创建委外采购订单]:::erp\n        A1b[ERP推送订单至WMS]:::erp\n        A2{配送方式}\n        A3[在WMS发起派车申请]:::wms\n        A5[手动新增委外出库通知单]:::wms\n    end\n    subgraph 物流\n        LG1[派车申请审批通过]:::wms\n        LG2[创建发货单并组成运单]:::wms\n        LG3[运单自动生成委外出库通知单]:::wms\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        C1[按通知单扫码出库]:::wms\n        C2[在WMS登记装卸单]:::wms\n        C5[WMS推送ERP委外出库过账]:::wms\n        C3[打印出门单]:::wms\n        C4[完成装货]:::manual\n    end\n    subgraph 承运司机[\"承运商/司机\"]\n        D1[装货确认-在途-卸货确认]:::wms\n        D2[运单完成-可选推送运费采购单]:::wms\n    end\n    A1 --> A1b\n    A1b --> A2\n    A2 -->|我方配送| A3\n    A3 --> LG1\n    LG1 --> LG2\n    LG2 --> LG3\n    LG3 --> C1\n    A2 -->|三方自提| A5\n    A5 --> C1\n    C1 --> C2\n    C2 --> C5\n    C5 --> C3\n    C3 --> C4\n    C4 --> D1\n    D1 --> D2\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ol>\n<li>业务/销售在 ERP 创建<strong>委外采购订单</strong>。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - <strong>我方配送</strong>：业务/采购在 OA 发起派车申请 → 物流部安排车辆并审批 → OA 下推<strong>委外出库通知单</strong> → 车辆到厂装车发往三方；</p>\n<p>   - <strong>三方自提</strong>：不走 OA 派车，三方到厂提货。</p>\n<ol>\n<li>仓库按通知/订单在 <strong>ERP 办理委外出库过账</strong>，配合装车；装卸、在途多为线下记录。</li>\n</ol>","tobeHtml":"<ol>\n<li>业务/销售在 ERP 创建委外采购订单，<strong>ERP 推送至 WMS</strong>。</li>\n<li><strong>配送方式分支</strong>：</li>\n</ol>\n<p>   - <strong>我方配送</strong>：业务/销售在 <strong>WMS 发起派车申请</strong> → 物流审批通过后创建发货单并组成运单（<strong>1 发货单 = 1 装货点 + 1 卸货点</strong>）→ <strong>运单自动生成委外出库通知单</strong>；</p>\n<p>   - <strong>三方自提</strong>：跳过派车/发货单/运单；业务/销售在 <strong>WMS 手动新增委外出库通知单</strong>。</p>\n<ol>\n<li>库管/装卸工根据委外出库通知单办理 <strong>扫码出库</strong>；完成后在 WMS <strong>登记装卸单</strong>；WMS <strong>推送 ERP 办理委外出库过账</strong>。</li>\n<li>在 WMS <strong>打印出门单</strong>交门卫放行（路径3 若约定无出门单则跳过）。</li>\n<li>装卸工完成装货，<strong>司机装货确认</strong>；我方配送时司机更新在途、到三方后卸货确认；运单完成后可按需推送 ERP 运费采购单（同场景七）。</li>\n</ol>"},{"id":"s12","title":"场景十二：仓库间调拨","qs":["仓间调拨是否统一走 WMS 出入库并推 ERP 过账？","与场景五转仓单据是否合并或独立？","原辅料/成品/备件调拨分别扫码还是数量？"],"diagrams":[{"label":"现状（As-Is）","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[线下/人工]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        A1[仓库间发生实物转移]:::manual\n        A2[不办理出入库-不更新库存账]:::manual\n    end\n    subgraph 物流\n        B1[仅做物流记录-派车装卸或台账]:::manual\n    end\n    A1 --> A2\n    A1 --> B1\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"},{"label":"To-Be","code":"%%{init: {'theme':'base','flowchart':{'htmlLabels':true,'wrappingWidth':140,'nodeSpacing':50,'rankSpacing':55,'padding':12},'themeVariables':{'fontSize':'14px'}}}%%\nflowchart TB\n    subgraph 系统颜色说明\n        direction LR\n        L1[WMS]:::wms\n        L2[ERP]:::erp\n        L3[线下/人工]:::manual\n    end\n    subgraph 库管装卸[\"库管/装卸工\"]\n        A1[在WMS新增调拨申请单]:::wms\n        A2{是否派车}\n        C1[调出仓扫码出库]:::wms\n        C2[登记装卸单-调出]:::wms\n        C3[调入仓扫码入库]:::wms\n        C4[登记装卸单-调入]:::wms\n        C5[WMS推送ERP调拨过账]:::wms\n    end\n    subgraph 物流\n        LG1[派车申请审批并组成运单]:::wms\n    end\n    A1 --> A2\n    A2 -->|跨厂区派车| LG1\n    LG1 --> C1\n    A2 -->|厂内短驳不派车| C1\n    C1 --> C2\n    C2 --> C3\n    C3 --> C4\n    C4 --> C5\n    classDef erp fill:#cfe2ff,stroke:#3b82f6;\n    classDef oa fill:#e5e7eb,stroke:#6b7280;\n    classDef wms fill:#d1fae5,stroke:#10b981;\n    classDef lims fill:#ffedd5,stroke:#f97316;\n    classDef manual fill:#ffffff,stroke:#9ca3af;"}],"statusHtml":"<ol>\n<li>仓库间发生实物调拨时，<strong>不走出入库管理、不更新仓库库存账</strong>（ERP/线下库存账往往不随调拨变动）。</li>\n<li>仅保留<strong>物流侧记录</strong>（如派车、装卸、台账或纸质交接），账实易不一致。</li>\n<li>与场景五「生产入库后转仓」不同：转仓已在成品入库链路中过账；本场景指日常仓与仓之间的调拨，现状未纳入同一套出入库。</li>\n</ol>","tobeHtml":"<ol>\n<li>库管（或业务）在 <strong>WMS 新增调拨申请单</strong>（明确调出仓、调入仓、物料/条码）。</li>\n<li><strong>转移方式分支</strong>：</li>\n</ol>\n<p>   - <strong>需派车</strong>（跨厂区/外运）：在 WMS 发起派车申请 → 物流组成运单 → 可自动/关联生成调拨出库通知；</p>\n<p>   - <strong>厂内短驳/不派车</strong>：跳过派车，直接按调拨申请执行。</p>\n<ol>\n<li><strong>调出仓</strong>：库管/装卸工扫码出库（或按数量），并 <strong>登记装卸单</strong>。</li>\n<li><strong>调入仓</strong>：库管/装卸工扫码入库（或按数量），并 <strong>登记装卸单</strong>。</li>\n<li>WMS <strong>推送 ERP 调拨过账</strong>，调出/调入库存账同步更新，与物流记录一致。</li>\n</ol>\n<p>| 待确认 | 说明 |</p>\n<p>| --- | --- |</p>\n<p>| 是否必须推 ERP | 建议推送；若仅 WMS 台账需书面确认 |</p>\n<p>| 与场景五转仓 | 成品入库后转仓是否并入本调拨能力，或保持转仓单据独立 |</p>\n<p>| 条码/数量 | 原辅料、成品是否一律扫码；备品备件是否按批号数量调拨 |</p>"}]</script>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+mermaid.initialize({
+  startOnLoad: false,
+  securityLevel: 'loose',
+  theme: 'base',
+  themeVariables: {
+    fontSize: '14px',
+    fontFamily: 'IBM Plex Sans, PingFang SC, Noto Sans SC, sans-serif',
+    primaryColor: '#d1fae5',
+    primaryBorderColor: '#10b981',
+    primaryTextColor: '#064e3b',
+    lineColor: '#64748b',
+    secondaryColor: '#cfe2ff',
+    tertiaryColor: '#f8fafc',
+  },
+  flowchart: {
+    htmlLabels: true,
+    curve: 'basis',
+    padding: 16,
+    nodeSpacing: 55,
+    rankSpacing: 60,
+    wrappingWidth: 140,
+    useMaxWidth: false,
+  },
+});
+
+const scenes = JSON.parse(document.getElementById('scene-data').textContent);
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+const pageTitle = document.getElementById('pageTitle');
+
+const staticPages = [
+  { id: 'progress', group: '开篇', label: '项目进度' },
+  { id: 'overview', group: '开篇', label: '场景总览' },
+  { id: 'problems', group: '收尾', label: '问题清单' },
+  { id: 'plan', group: '收尾', label: '后续计划' },
+];
+
+function buildNav() {
+  let html = '';
+  html += `<div class="nav-group">开篇</div>`;
+  html += `<button data-page="progress"><span class="idx">01</span><span>项目进度</span></button>`;
+  html += `<button data-page="overview"><span class="idx">02</span><span>场景总览</span></button>`;
+  html += `<div class="nav-group">入库流程</div>`;
+  scenes.slice(0,6).forEach((s,i) => {
+    html += `<button data-page="${s.id}"><span class="idx">${String(i+1).padStart(2,'0')}</span><span>${s.title.replace(/^场景/, '')}</span></button>`;
+  });
+  html += `<div class="nav-group">发货流程</div>`;
+  scenes.slice(6).forEach((s,i) => {
+    html += `<button data-page="${s.id}"><span class="idx">${String(i+7).padStart(2,'0')}</span><span>${s.title.replace(/^场景/, '')}</span></button>`;
+  });
+  html += `<div class="nav-group">收尾</div>`;
+  html += `<button data-page="problems"><span class="idx">P</span><span>问题清单</span></button>`;
+  html += `<button data-page="plan"><span class="idx">N</span><span>后续计划</span></button>`;
+  nav.innerHTML = html;
+  nav.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.page));
+  });
+}
+
+function setActive(page) {
+  nav.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+}
+
+function renderProgress() {
+  pageTitle.textContent = '一、项目进度';
+  // 甘特：2026-07-20 ～ 2026-08-21，共 33 天（含起止）
+  const origin = new Date(2026, 6, 20); // Jul 20
+  const totalDays = 33;
+  const dayPct = (d) => (d / totalDays) * 100;
+  const offsetDays = (y, m, d) => {
+    const t = new Date(y, m - 1, d);
+    return Math.round((t - origin) / 86400000);
+  };
+  const bars = [
+    { name: '项目启动', start: offsetDays(2026,7,20), end: offsetDays(2026,7,20), cls: 'done', tip: '7.20' },
+    { name: '需求调研', start: offsetDays(2026,7,21), end: offsetDays(2026,7,31), cls: 'doing', tip: '7.21～7.31' },
+    { name: '蓝图设计', start: offsetDays(2026,8,3), end: offsetDays(2026,8,14), cls: 'todo', tip: '8.03～8.14' },
+    { name: '蓝图确认', start: offsetDays(2026,8,17), end: offsetDays(2026,8,21), cls: 'milestone', tip: '8.17～8.21' },
+  ];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let todayOff = Math.round((today - origin) / 86400000);
+  if (todayOff < 0) todayOff = 0;
+  if (todayOff > totalDays - 1) todayOff = totalDays - 1;
+  const todayLeft = dayPct(todayOff + 0.5);
+
+  const axisTicks = [
+    { d: 0, label: '7/20' },
+    { d: 11, label: '7/31' },
+    { d: 14, label: '8/03' },
+    { d: 25, label: '8/14' },
+    { d: 28, label: '8/17' },
+    { d: 32, label: '8/21' },
+  ].map(t => `<span class="gantt-tick" style="left:${dayPct(t.d + 0.5)}%">${t.label}</span>`).join('');
+
+  const rows = bars.map(b => {
+    const span = Math.max(1, b.end - b.start + 1);
+    const left = dayPct(b.start);
+    const width = dayPct(span);
+    return `<div class="gantt-row">
+      <div class="gantt-label">${b.name}</div>
+      <div class="gantt-track">
+        <div class="gantt-today" style="left:${todayLeft}%"></div>
+        <div class="gantt-bar ${b.cls}" style="left:${left}%;width:${width}%" title="${b.tip}">${b.tip}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  content.innerHTML = `
+  <div class="card">
+    <h3>调研阶段计划</h3>
+    <table>
+      <thead><tr><th>任务</th><th>计划起止</th><th>工期</th><th>成果物</th><th>责任</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>项目启动</td><td>2026.7.20～7.20</td><td>1</td><td>《启动会文档》《内部启动会文档》</td><td>项目</td><td><span class="status-pill done">已完成</span></td></tr>
+        <tr><td>需求调研</td><td>2026.7.21～7.31</td><td>9</td><td>《调研大纲》</td><td>产品</td><td><span class="status-pill doing">进行中</span></td></tr>
+        <tr><td>蓝图设计</td><td>2026.8.03～8.14</td><td>10</td><td>《项目业务蓝图/原型》</td><td>产品</td><td><span class="status-pill todo">未开始</span></td></tr>
+        <tr><td>蓝图确认</td><td><strong>2026.8.17～8.21</strong></td><td>5</td><td>《蓝图与验收标准确认书》</td><td>产品</td><td><span class="status-pill todo">未开始</span></td></tr>
+      </tbody>
+    </table>
+    <div class="gantt-wrap">
+      <h4>调研阶段甘特图（2026.7.20～8.21）</h4>
+      <div class="gantt">
+        <div class="gantt-head">
+          <div class="gantt-label">任务</div>
+          <div class="gantt-axis"><div class="gantt-axis-inner">${axisTicks}</div></div>
+        </div>
+        ${rows}
+      </div>
+      <div class="gantt-legend">
+        <span><i style="background:#10b981"></i>已完成</span>
+        <span><i style="background:#f59e0b"></i>进行中</span>
+        <span><i style="background:#3b82f6"></i>未开始</span>
+        <span><i style="background:#ea580c"></i>蓝图确认（关键）</span>
+        <span style="color:#ef4444;font-weight:600">｜ 今天</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:12px">本次汇报对齐目标：<strong style="color:#b45309">8 月 17 日进入蓝图确认</strong>。远期：十月底初步验收（无数据）；十一月底最终验收（带数据）。</p>
+  </div>`;
+}
+
+function renderOverview() {
+  pageTitle.textContent = '二、业务流程总览';
+  const cards = scenes.map((s,i) => `
+    <div class="overview-card" data-go="${s.id}">
+      <div class="n">场景 ${['一','二','三','四','五','六','七','八','九','十','十一','十二'][i]}</div>
+      <div class="t">${s.title.replace(/^场景[一二三四五六七八九十]+：/, '')}</div>
+      <div class="muted" style="margin-top:8px">${s.diagrams.length} 张流程图 · ${s.qs.length} 个待讨论</div>
+    </div>`).join('');
+  content.innerHTML = `<div class="card"><h3>12 场景全覆盖</h3><div class="overview-grid">${cards}</div></div>`;
+  content.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.go)));
+}
+
+function renderProblems() {
+  pageTitle.textContent = '问题清单';
+  content.innerHTML = `
+  <div class="card">
+    <h3>待确认 / 待讨论问题</h3>
+    <p class="muted" style="margin-top:0">以下为汇报重点讨论项（摘自问题清单）。</p>
+    <table>
+      <thead><tr><th style="width:140px">问题类型</th><th>问题描述</th><th style="width:88px">状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>仓库调拨管理</td>
+          <td>仓库间调拨目前不做出入库账管理，仅做物流记录。后续是否需要统一为标准出入库流程待确认。</td>
+          <td><span class="status-pill doing">待确认</span></td>
+        </tr>
+        <tr>
+          <td>采购退换货流程</td>
+          <td>换货退回物料在 ERP 做入库时，入库单应关联原采购订单还是新订单？是否应等质检合格再做采购入库，避免质量问题导致再退货。线下换货后条码不变，账物能否保持一致，相关方案需讨论。</td>
+          <td><span class="status-pill doing">待讨论</span></td>
+        </tr>
+        <tr>
+          <td>销售退换货流程</td>
+          <td>遇到先补货后客户退回换货且跨会计期时，如何在系统中操作最优？目前系统未处理相关业务。</td>
+          <td><span class="status-pill doing">待讨论</span></td>
+        </tr>
+        <tr>
+          <td>备品备件退料管理</td>
+          <td>备品备件须条码管理入库，领用后退料是否能通过 ERP 实现其他入库，如何保证物料线上线下一致性。</td>
+          <td><span class="status-pill doing">待确认</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderPlan() {
+  pageTitle.textContent = '五、后续计划安排';
+  content.innerHTML = `
+  <div class="card">
+    <h3>对齐 8 月 17 日蓝图确认</h3>
+    <table>
+      <thead><tr><th>时间</th><th>事项</th><th>产出</th></tr></thead>
+      <tbody>
+        <tr><td>～7.31</td><td>需求调研收口、问题优先级会签</td><td>调研大纲 / 本汇报定稿</td></tr>
+        <tr><td>8.03～8.14</td><td>蓝图设计（按已确认 To-Be）</td><td>《项目业务蓝图/原型》</td></tr>
+        <tr><td><strong>8.17～8.21</strong></td><td><strong>蓝图确认</strong></td><td>《蓝图与验收标准确认书》</td></tr>
+        <tr><td>未关闭问题</td><td>列入确认书附录</td><td>问题跟踪表</td></tr>
+        <tr><td>10 月底</td><td>系统初步验收（无数据）</td><td>初验纪要</td></tr>
+        <tr><td>11 月底</td><td>系统最终验收（带数据）</td><td>终验纪要</td></tr>
+      </tbody>
+    </table>
+    <div class="qs" style="margin-top:16px">
+      <h4>建议会前优先拍板（阻塞蓝图）</h4>
+      <ul>
+        <li>采购/销售退换货单据与跨帐期口径</li>
+        <li>备品备件领用（方案二）与是否退料</li>
+        <li>仓间调拨是否过库存账</li>
+        <li>订单备货 / 出门条 / 单独派车</li>
+      </ul>
+    </div>
+  </div>`;
+}
+
+let view = { scale: 1, x: 24, y: 24 };
+let currentSvgHtml = '';
+let currentDiagLabel = '';
+let currentSceneTitle = '';
+
+function bindPanZoom(container, stage, getView, setView) {
+  let dragging = false;
+  let lastX = 0, lastY = 0;
+  const apply = () => {
+    const v = getView();
+    stage.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.scale})`;
+  };
+  setView.apply = apply;
+  container.onselectstart = (e) => { e.preventDefault(); return false; };
+  container.oncopy = (e) => { e.preventDefault(); return false; };
+  container.ondragstart = (e) => { e.preventDefault(); return false; };
+  container.onpointerdown = (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    window.getSelection()?.removeAllRanges();
+    dragging = true;
+    container.classList.add('dragging');
+    lastX = e.clientX; lastY = e.clientY;
+    container.setPointerCapture(e.pointerId);
+  };
+  container.onpointermove = (e) => {
+    if (!dragging) return;
+    e.preventDefault();
+    window.getSelection()?.removeAllRanges();
+    const v = getView();
+    v.x += e.clientX - lastX;
+    v.y += e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    apply();
+  };
+  const end = () => { dragging = false; container.classList.remove('dragging'); };
+  container.onpointerup = end;
+  container.onpointercancel = end;
+  container.onwheel = (e) => {
+    e.preventDefault();
+    const v = getView();
+    const rect = container.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const prev = v.scale;
+    const next = Math.min(3, Math.max(0.25, prev * (e.deltaY < 0 ? 1.1 : 0.9)));
+    // zoom toward cursor
+    v.x = mx - (mx - v.x) * (next / prev);
+    v.y = my - (my - v.y) * (next / prev);
+    v.scale = next;
+    apply();
+  };
+  apply();
+  return apply;
+}
+
+function openFullscreen() {
+  const overlay = document.getElementById('fsOverlay');
+  const stage = document.getElementById('fsStage');
+  const wrap = document.getElementById('fsStageWrap');
+  document.getElementById('fsTitle').textContent = `${currentSceneTitle} · ${currentDiagLabel}`;
+  stage.innerHTML = `<div class="mermaid">${currentSvgHtml}</div>`;
+  stage.querySelectorAll('.cluster rect').forEach((r) => {
+    r.setAttribute('stroke', '#334155');
+    r.setAttribute('stroke-width', '2.5');
+    r.style.stroke = '#334155';
+    r.style.strokeWidth = '2.5px';
+  });
+  const fsView = { scale: Math.max(0.5, view.scale), x: 40, y: 40 };
+  const apply = bindPanZoom(wrap, stage, () => fsView, fsView);
+  document.getElementById('fsZoomIn').onclick = () => { fsView.scale = Math.min(3, fsView.scale + 0.15); apply(); };
+  document.getElementById('fsZoomOut').onclick = () => { fsView.scale = Math.max(0.25, fsView.scale - 0.15); apply(); };
+  document.getElementById('fsZoomReset').onclick = () => { fsView.scale = 1; fsView.x = 40; fsView.y = 40; apply(); };
+  document.getElementById('fsClose').onclick = closeFullscreen;
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+function closeFullscreen() {
+  const overlay = document.getElementById('fsOverlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeFullscreen();
+});
+
+async function renderScene(scene) {
+  pageTitle.textContent = scene.title;
+  currentSceneTitle = scene.title;
+  content.classList.add('scene-mode');
+  const qs = (scene.qs || []).map(q => `<li>${q}</li>`).join('');
+  const tabBtns = scene.diagrams.map((d,i) => {
+    const isAsis = /As-Is|现状/.test(d.label);
+    const cls = isAsis ? 'asis' : 'tobe';
+    return `<button class="${i===0?'active ':''}${cls}" data-di="${i}">${d.label}</button>`;
+  }).join('');
+
+  content.innerHTML = `
+  <div class="card diagram-card">
+    <div class="scene-title" style="margin-bottom:10px">
+      <span class="badge">${scene.diagrams.length} 张流程图</span>
+      <span class="muted">拖拽移动 · 滚轮缩放</span>
+    </div>
+    <div class="tabs" id="diagTabs">${tabBtns}</div>
+    <div class="diagram-toolbar">
+      <button type="button" id="zoomOut">缩小</button>
+      <button type="button" id="zoomReset">复位</button>
+      <button type="button" id="zoomIn">放大</button>
+      <button type="button" class="primary" id="btnFullscreen">全屏显示</button>
+    </div>
+    <div class="diagram-frame" id="diagFrame"><div class="loading">正在渲染流程图…</div></div>
+    ${qs ? `<div class="qs" style="margin-top:12px;flex:0 0 auto"><h4>本场景待讨论</h4><ul>${qs}</ul></div>` : ''}
+  </div>`;
+
+  view = { scale: 0.85, x: 24, y: 24 };
+  const frame = document.getElementById('diagFrame');
+  const tabs = document.getElementById('diagTabs');
+  let stageEl = null;
+  let applyView = () => {};
+
+  async function showDiag(i) {
+    tabs.querySelectorAll('button').forEach((b,idx) => b.classList.toggle('active', idx===i));
+    const d = scene.diagrams[i];
+    currentDiagLabel = d.label;
+    frame.innerHTML = `<div class="mermaid-stage" id="mmdStage"><div class="mermaid" id="mmd"></div></div>`;
+    stageEl = document.getElementById('mmdStage');
+    const el = document.getElementById('mmd');
+    try {
+      const id = 'm' + Date.now();
+      const { svg } = await mermaid.render(id, d.code);
+      el.innerHTML = svg;
+      currentSvgHtml = svg;
+      el.querySelectorAll('.cluster rect').forEach((r) => {
+        r.setAttribute('stroke', '#334155');
+        r.setAttribute('stroke-width', '2.5');
+        r.style.stroke = '#334155';
+        r.style.strokeWidth = '2.5px';
+      });
+      view = { scale: 0.85, x: 24, y: 24 };
+      applyView = bindPanZoom(frame, stageEl, () => view, view);
+    } catch (e) {
+      el.innerHTML = `<pre style="white-space:pre-wrap;color:#b91c1c;padding:16px">${String(e)}</pre>`;
+      currentSvgHtml = el.innerHTML;
+    }
+  }
+
+  tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => showDiag(+b.dataset.di)));
+  document.getElementById('zoomIn').onclick = () => { view.scale = Math.min(3, view.scale + 0.12); applyView(); };
+  document.getElementById('zoomOut').onclick = () => { view.scale = Math.max(0.25, view.scale - 0.12); applyView(); };
+  document.getElementById('zoomReset').onclick = () => { view.scale = 0.85; view.x = 24; view.y = 24; applyView(); };
+  document.getElementById('btnFullscreen').onclick = openFullscreen;
+  await showDiag(0);
+}
+
+async function navigate(page) {
+  setActive(page);
+  location.hash = page;
+  content.classList.remove('scene-mode');
+  closeFullscreen();
+  if (page === 'progress') return renderProgress();
+  if (page === 'overview') return renderOverview();
+  if (page === 'problems') return renderProblems();
+  if (page === 'plan') return renderPlan();
+  const scene = scenes.find(s => s.id === page);
+  if (scene) await renderScene(scene);
+}
+
+buildNav();
+const initial = (location.hash || '#progress').slice(1);
+navigate(scenes.some(s => s.id === initial) || ['progress','overview','problems','plan'].includes(initial) ? initial : 'progress');
+</script>
+</body>
+</html>
