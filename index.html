@@ -50,22 +50,60 @@ a:hover { text-decoration: underline; }
 .nav {
   overflow: auto; padding: 10px 10px 24px; flex: 1;
 }
-.nav-group {
-  margin-top: 14px; padding: 0 8px 6px;
-  font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+.nav-folder {
+  margin-top: 6px;
 }
+.nav-folder-header {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-radius: 8px;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-folder-header:hover {
+  background: var(--panel2);
+  color: var(--text);
+}
+.nav-folder-title {
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-folder-arrow {
+  font-size: 11px;
+  transition: transform 0.2s ease;
+  color: var(--muted);
+}
+.nav-folder.collapsed .nav-folder-arrow {
+  transform: rotate(-90deg);
+}
+.nav-folder-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 2px;
+  margin-top: 2px;
+}
+.nav-folder.collapsed .nav-folder-body {
+  display: none;
+}
+
 .nav button {
   width: 100%; text-align: left; border: 0; background: transparent;
-  color: var(--text); padding: 9px 10px; border-radius: 8px;
-  font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: flex-start;
+  color: var(--text); padding: 8px 10px; border-radius: 8px;
+  font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: center;
 }
 .nav button:hover { background: var(--panel2); }
 .nav button.active {
   background: #eff6ff; color: #1e40af;
-  box-shadow: inset 3px 0 0 var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent); font-weight: 600;
 }
 .nav .idx {
-  flex: 0 0 20px; color: var(--muted); font-variant-numeric: tabular-nums;
+  flex: 0 0 20px; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px;
 }
 
 .main {
@@ -433,30 +471,87 @@ const staticPages = [
 ];
 
 function buildNav() {
+  const groups = [
+    {
+      title: '项目概览',
+      icon: '📊',
+      collapsed: false,
+      items: [
+        { id: 'progress', idx: '01', name: '项目进度' },
+        { id: 'proto', idx: '02', name: '原型进度' },
+        { id: 'blueprint', idx: '03', name: '蓝图确认计划' },
+        { id: 'overview', idx: '04', name: '场景总览' }
+      ]
+    },
+    {
+      title: '入库流程 (场景1~6)',
+      icon: '📥',
+      collapsed: true,
+      items: scenes.slice(0, 6).map((s, i) => ({
+        id: s.id,
+        idx: String(i + 1).padStart(2, '0'),
+        name: s.title.replace(/^场景[一二三四五六七八九十]+：/, '')
+      }))
+    },
+    {
+      title: '发货与退货 (场景7~12)',
+      icon: '📤',
+      collapsed: true,
+      items: scenes.slice(6).map((s, i) => ({
+        id: s.id,
+        idx: String(i + 7).padStart(2, '0'),
+        name: s.title.replace(/^场景[一二三四五六七八九十]+：/, '')
+      }))
+    },
+    {
+      title: '收尾与规划',
+      icon: '🏁',
+      collapsed: false,
+      items: [
+        { id: 'plan', idx: 'N', name: '后续计划' }
+      ]
+    }
+  ];
+
   let html = '';
-  html += `<div class="nav-group">项目概览</div>`;
-  html += `<button data-page="progress"><span class="idx">01</span><span>项目进度</span></button>`;
-  html += `<button data-page="proto"><span class="idx">02</span><span>原型进度</span></button>`;
-  html += `<button data-page="blueprint"><span class="idx">03</span><span>蓝图确认计划</span></button>`;
-  html += `<button data-page="overview"><span class="idx">04</span><span>场景总览</span></button>`;
-  html += `<div class="nav-group">入库流程</div>`;
-  scenes.slice(0,6).forEach((s,i) => {
-    html += `<button data-page="${s.id}"><span class="idx">${String(i+1).padStart(2,'0')}</span><span>${s.title.replace(/^场景/, '')}</span></button>`;
+  groups.forEach((g, gIdx) => {
+    html += `
+    <div class="nav-folder ${g.collapsed ? 'collapsed' : ''}" data-group="${gIdx}">
+      <div class="nav-folder-header" onclick="toggleFolder(${gIdx})">
+        <span class="nav-folder-title"><span>${g.icon}</span> <span>${g.title}</span></span>
+        <span class="nav-folder-arrow">▾</span>
+      </div>
+      <div class="nav-folder-body">`;
+    
+    g.items.forEach(item => {
+      html += `<button data-page="${item.id}"><span class="idx">${item.idx}</span><span>${item.name}</span></button>`;
+    });
+
+    html += `
+      </div>
+    </div>`;
   });
-  html += `<div class="nav-group">发货流程</div>`;
-  scenes.slice(6).forEach((s,i) => {
-    html += `<button data-page="${s.id}"><span class="idx">${String(i+7).padStart(2,'0')}</span><span>${s.title.replace(/^场景/, '')}</span></button>`;
-  });
-  html += `<div class="nav-group">收尾</div>`;
-  html += `<button data-page="plan"><span class="idx">N</span><span>后续计划</span></button>`;
+
   nav.innerHTML = html;
   nav.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => navigate(btn.dataset.page));
   });
 }
 
+function toggleFolder(gIdx) {
+  const folder = nav.querySelector(`.nav-folder[data-group="${gIdx}"]`);
+  if (folder) folder.classList.toggle('collapsed');
+}
+
 function setActive(page) {
-  nav.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  nav.querySelectorAll('button').forEach(b => {
+    const isCurrent = b.dataset.page === page;
+    b.classList.toggle('active', isCurrent);
+    if (isCurrent) {
+      const parentFolder = b.closest('.nav-folder');
+      if (parentFolder) parentFolder.classList.remove('collapsed');
+    }
+  });
 }
 
 function renderProgress() {
