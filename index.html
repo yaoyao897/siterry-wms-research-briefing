@@ -517,7 +517,7 @@ function buildNav() {
   groups.forEach((g, gIdx) => {
     html += `
     <div class="nav-folder ${g.collapsed ? 'collapsed' : ''}" data-group="${gIdx}">
-      <div class="nav-folder-header" onclick="toggleFolder(${gIdx})">
+      <div class="nav-folder-header">
         <span class="nav-folder-title"><span>${g.icon}</span> <span>${g.title}</span></span>
         <span class="nav-folder-arrow">▾</span>
       </div>
@@ -533,8 +533,22 @@ function buildNav() {
   });
 
   nav.innerHTML = html;
+
+  // 直接在 DOM 上绑定文件夹标题的点击展开/折叠事件
+  nav.querySelectorAll('.nav-folder-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const folder = header.closest('.nav-folder');
+      if (folder) folder.classList.toggle('collapsed');
+    });
+  });
+
+  // 绑定菜单按钮点击事件
   nav.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.page));
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigate(btn.dataset.page);
+    });
   });
 }
 
