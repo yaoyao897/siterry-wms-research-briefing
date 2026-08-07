@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>思特瑞 WMS 项目调研汇报</title>
+<title>思特瑞 WMS 项目总览（更新中）</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <style>
 :root {
@@ -357,8 +357,8 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 <body>
 <aside class="sidebar">
   <div class="brand">
-    <h1>思特瑞 WMS 调研汇报</h1>
-    <p>As-Is / To-Be · 调研问题已关闭</p>
+    <h1>思特瑞 WMS 项目总览（更新中）</h1>
+    <p>业务流程 · 原型进度 · 蓝图确认计划</p>
   </div>
   <nav class="nav" id="nav"></nav>
 </aside>
@@ -434,9 +434,11 @@ const staticPages = [
 
 function buildNav() {
   let html = '';
-  html += `<div class="nav-group">开篇</div>`;
+  html += `<div class="nav-group">项目概览</div>`;
   html += `<button data-page="progress"><span class="idx">01</span><span>项目进度</span></button>`;
-  html += `<button data-page="overview"><span class="idx">02</span><span>场景总览</span></button>`;
+  html += `<button data-page="proto"><span class="idx">02</span><span>原型进度</span></button>`;
+  html += `<button data-page="blueprint"><span class="idx">03</span><span>蓝图确认计划</span></button>`;
+  html += `<button data-page="overview"><span class="idx">04</span><span>场景总览</span></button>`;
   html += `<div class="nav-group">入库流程</div>`;
   scenes.slice(0,6).forEach((s,i) => {
     html += `<button data-page="${s.id}"><span class="idx">${String(i+1).padStart(2,'0')}</span><span>${s.title.replace(/^场景/, '')}</span></button>`;
@@ -536,7 +538,7 @@ function renderProgress() {
 }
 
 function renderOverview() {
-  pageTitle.textContent = '二、业务流程总览';
+  pageTitle.textContent = '四、业务流程总览';
   const cards = scenes.map((s,i) => `
     <div class="overview-card" data-go="${s.id}">
       <div class="n">场景 ${['一','二','三','四','五','六','七','八','九','十','十一','十二'][i]}</div>
@@ -545,6 +547,324 @@ function renderOverview() {
     </div>`).join('');
   content.innerHTML = `<div class="card"><h3>12 场景全覆盖</h3><div class="overview-grid">${cards}</div></div>`;
   content.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.go)));
+}
+
+// 蓝图确认计划与甘特图渲染
+function renderBlueprintPlan() {
+  pageTitle.textContent = '三、蓝图确认计划与甘特图';
+  
+  const planTasks = [
+    { id: 1, topic: '基础资料模块核对', module: 'PC/APP 基础数据（物料、客户、供应商、仓库、包材档案、标签配置等）', roles: '仓库管理员、系统管理员、质检员', start: '2026-08-17', end: '2026-08-17', status: '🟡 待核对', dStart: 0, dEnd: 0, cls: 'todo' },
+    { id: 2, topic: '仓储核心出入库核对', module: 'PC/APP 仓储管理（采购入库/退料、销售发货/退货、委外收发退）', roles: '仓库主管、仓库操作员、采购员、销售员', start: '2026-08-18', end: '2026-08-18', status: '🟡 待核对', dStart: 1, dEnd: 1, cls: 'todo' },
+    { id: 3, topic: '仓储库内及物流模块核对', module: 'PC/APP 库内转移/转序/盘点、受托加工、物流管理（派车/运单/门卫）', roles: '仓库操作员、质检员、物流管理员、门卫', start: '2026-08-19', end: '2026-08-19', status: '🟡 待核对', dStart: 2, dEnd: 2, cls: 'todo' },
+    { id: 4, topic: '移动端(APP/PDA)全流程走查', module: 'APP端包材建档、仓储扫码作业、PDA现场操作及特殊场景', roles: '仓库一线操作员、装卸工、现场物流员', start: '2026-08-20', end: '2026-08-20', status: '🟡 待核对', dStart: 3, dEnd: 3, cls: 'doing' },
+    { id: 5, topic: '全流程跨模块串联走查', module: '跨系统（ERP-WMS-LIMS）与全业务主线串联，问题集中收集与调整', roles: '项目组、各业务部门关键用户', start: '2026-08-20', end: '2026-08-21', status: '🟡 待核对', dStart: 3, dEnd: 4, cls: 'doing' },
+    { id: 6, topic: '蓝图终审与确认签署', module: '召开蓝图与原型最终确认汇报会，定稿签署《蓝图与验收标准确认书》', roles: '项目领导、部门主管、关键用户', start: '2026-08-21', end: '2026-08-21', status: '🚩 里程碑', dStart: 4, dEnd: 4, cls: 'milestone' }
+  ];
+
+  const totalDays = 5;
+  const dayPct = (d) => (d / totalDays) * 100;
+  
+  const ticksHtml = [
+    { d: 0, l: '8/17 周一' },
+    { d: 1, l: '8/18 周二' },
+    { d: 2, l: '8/19 周三' },
+    { d: 3, l: '8/20 周四' },
+    { d: 4, l: '8/21 周五' }
+  ].map(t => `<span class="gantt-tick" style="left:${(t.d + 0.5) * 20}%">${t.l}</span>`).join('');
+
+  const ganttRows = planTasks.map(t => {
+    const left = t.dStart * 20;
+    const width = (t.dEnd - t.dStart + 1) * 20;
+    return `
+    <div class="gantt-row">
+      <div class="gantt-label">${t.topic}</div>
+      <div class="gantt-track" style="background: repeating-linear-gradient(90deg, transparent, transparent calc(20% - 1px), #e8edf3 calc(20% - 1px), #e8edf3 20%);">
+        <div class="gantt-bar ${t.cls}" style="left:${left}%;width:${width}%;margin-left:2px;margin-right:2px;" title="${t.topic} (${t.start})">${t.topic} (${t.start === t.end ? t.start.slice(5) : t.start.slice(5)+'~'+t.end.slice(5)})</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const tableRows = planTasks.map(t => `
+    <tr>
+      <td>${t.id}</td>
+      <td><strong>${t.topic}</strong></td>
+      <td>${t.module}</td>
+      <td>${t.roles}</td>
+      <td>${t.start}</td>
+      <td>${t.end}</td>
+      <td><span class="status-pill ${t.cls === 'milestone' ? 'done' : 'todo'}">${t.status}</span></td>
+    </tr>
+  `).join('');
+
+  content.innerHTML = `
+  <div class="card">
+    <h3>蓝图核对周计划安排（2026.08.17 ～ 2026.08.21）</h3>
+    <p class="muted" style="margin-bottom:14px">下下周项目组将正式启动【系统原型与蓝图核对】工作，计划于周五完成《蓝图与验收标准确认书》的签署。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>主题</th>
+          <th>模块</th>
+          <th>相关岗位</th>
+          <th>计划开始</th>
+          <th>计划结束</th>
+          <th>状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+    
+    <div class="gantt-wrap">
+      <h4>蓝图核对周任务甘特图</h4>
+      <div class="gantt">
+        <div class="gantt-head">
+          <div class="gantt-label">核对主题</div>
+          <div class="gantt-axis"><div class="gantt-axis-inner">${ticksHtml}</div></div>
+        </div>
+        ${ganttRows}
+      </div>
+      <div class="gantt-legend">
+        <span><i style="background:#2563eb"></i>单模块核对</span>
+        <span><i style="background:#f59e0b"></i>多模块串联/走查</span>
+        <span><i style="background:#ea580c"></i>蓝图终审签署（里程碑）</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// 原型进度跟踪渲染
+function renderProtoProgress() {
+  pageTitle.textContent = '二、原型进度跟踪';
+
+  const pcList = [
+    { id:1, side:'PC', m1:'基础数据', m2:'基础资料', m3:'物料列表', desc:'物料主数据维护与查询', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:2, side:'PC', m1:'基础数据', m2:'基础资料', m3:'物料单位换算', desc:'物料多单位换算关系维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:3, side:'PC', m1:'基础数据', m2:'基础资料', m3:'客户列表', desc:'客户档案维护与查询', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:4, side:'PC', m1:'基础数据', m2:'基础资料', m3:'供应商列表', desc:'供应商档案维护与查询', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:5, side:'PC', m1:'基础数据', m2:'基础资料', m3:'单位列表', desc:'计量单位基础数据维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:6, side:'PC', m1:'基础数据', m2:'基础资料', m3:'数据字典', desc:'系统公用数据字典维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:7, side:'PC', m1:'基础数据', m2:'仓储资料', m3:'仓库列表', desc:'仓库/库区/库位信息维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:8, side:'PC', m1:'基础数据', m2:'仓储资料', m3:'库存预警', desc:'库存上下限预警规则设置', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:9, side:'PC', m1:'基础数据', m2:'仓储资料', m3:'检查工序', desc:'入库质检工序定义', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'质检员', time:'2026-08-07' },
+    { id:10, side:'PC', m1:'基础数据', m2:'仓储资料', m3:'检查工艺', desc:'入库质检工艺流程定义', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'质检员', time:'2026-08-07' },
+    { id:11, side:'PC', m1:'基础数据', m2:'物流资料', m3:'承运商列表', desc:'承运商档案维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:12, side:'PC', m1:'基础数据', m2:'物流资料', m3:'车辆列表', desc:'运输车辆档案维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:13, side:'PC', m1:'基础数据', m2:'物流资料', m3:'司机列表', desc:'驾驶员档案维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:14, side:'PC', m1:'基础数据', m2:'物流资料', m3:'运费参照表', desc:'运费单价基准维护', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:15, side:'PC', m1:'基础数据', m2:'订单资料', m3:'采购订单', desc:'采购订单查看与同步', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'采购员', time:'2026-08-07' },
+    { id:16, side:'PC', m1:'基础数据', m2:'订单资料', m3:'销售订单', desc:'销售订单查看与同步', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'销售员', time:'2026-08-07' },
+    { id:17, side:'PC', m1:'基础数据', m2:'包材资料', m3:'流水码档案', desc:'流水码包材建档与管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:18, side:'PC', m1:'基础数据', m2:'包材资料', m3:'固定包材档案', desc:'固定包材（含储罐）建档管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:19, side:'PC', m1:'基础数据', m2:'包材资料', m3:'APP信息查看配置', desc:'APP端包材信息字段展示配置', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:20, side:'PC', m1:'基础数据', m2:'包材资料', m3:'包材工序', desc:'包材质检工序定义', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'质检员', time:'2026-08-07' },
+    { id:21, side:'PC', m1:'基础数据', m2:'包材资料', m3:'包材工艺', desc:'包材质检工艺流程定义', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'质检员', time:'2026-08-07' },
+    { id:22, side:'PC', m1:'基础数据', m2:'外包材档案', m3:'流水外包材档案', desc:'流水外包材建档与管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:23, side:'PC', m1:'基础数据', m2:'外包材档案', m3:'固定外包材档案', desc:'固定外包材建档与管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:24, side:'PC', m1:'基础数据', m2:'标签配置', m3:'标签数据源', desc:'标签打印数据源配置', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:25, side:'PC', m1:'基础数据', m2:'标签配置', m3:'标签配置', desc:'标签模板设计与配置', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:26, side:'PC', m1:'基础数据', m2:'标签配置', m3:'打印任务', desc:'标签打印任务管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:27, side:'PC', m1:'基础数据', m2:'表单配置', m3:'表单数据源', desc:'表单报表数据源配置', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:28, side:'PC', m1:'基础数据', m2:'表单配置', m3:'表单设计器', desc:'表单报表模板设计', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'系统管理员', time:'2026-08-07' },
+    { id:29, side:'PC', m1:'仓储管理', m2:'采购', m3:'采购入库', desc:'采购到货入库单据管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:30, side:'PC', m1:'仓储管理', m2:'采购', m3:'采购退料', desc:'采购来料不合格退料处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:31, side:'PC', m1:'仓储管理', m2:'委外', m3:'委外发料', desc:'委外加工物料发出管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:32, side:'PC', m1:'仓储管理', m2:'委外', m3:'委外退料', desc:'委外物料退回处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:33, side:'PC', m1:'仓储管理', m2:'委外', m3:'委外收货', desc:'委外成品收货入库', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:34, side:'PC', m1:'仓储管理', m2:'委外', m3:'委外退货', desc:'委外成品退货处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:35, side:'PC', m1:'仓储管理', m2:'生产', m3:'生产领料', desc:'生产工单物料领取管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:36, side:'PC', m1:'仓储管理', m2:'生产', m3:'生产退料', desc:'生产多余物料退回仓库', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:37, side:'PC', m1:'仓储管理', m2:'生产', m3:'生产入库', desc:'生产成品入库单据管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:38, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托收料', desc:'受托加工物料接收', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:39, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托退料', desc:'受托物料退回处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:40, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托入库', desc:'受托加工成品入库', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:41, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售备货', desc:'销售订单备货拣货管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:42, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售发货', desc:'销售出库发货单据管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:43, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售退货', desc:'销售退货入库处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:44, side:'PC', m1:'仓储管理', m2:'其他', m3:'其他入库', desc:'非标准流程入库处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:45, side:'PC', m1:'仓储管理', m2:'其他', m3:'其他出库', desc:'非标准流程出库处理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:46, side:'PC', m1:'仓储管理', m2:'装卸', m3:'装卸货', desc:'装卸货作业管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'装卸工', time:'2026-08-07' },
+    { id:47, side:'PC', m1:'仓储管理', m2:'库内', m3:'库内转移', desc:'库位间货物移动', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:48, side:'PC', m1:'仓储管理', m2:'库内', m3:'库内转序', desc:'物料质检状态流转', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:49, side:'PC', m1:'仓储管理', m2:'盘点', m3:'库存全盘', desc:'库存实物盘点作业', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:50, side:'PC', m1:'仓储管理', m2:'报表统计', m3:'仓库库存', desc:'实时库存查询与统计', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:51, side:'PC', m1:'物流管理', m2:'—', m3:'派车申请单', desc:'运输用车申请与审批', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:52, side:'PC', m1:'物流管理', m2:'—', m3:'物流订单', desc:'物流运输订单创建与管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:53, side:'PC', m1:'物流管理', m2:'—', m3:'发货单', desc:'发货通知与发货管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:54, side:'PC', m1:'物流管理', m2:'—', m3:'运单', desc:'运单全流程跟踪管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:55, side:'PC', m1:'物流管理', m2:'—', m3:'提货单', desc:'客户/承运商提货管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:56, side:'PC', m1:'物流管理', m2:'—', m3:'签收单', desc:'货物送达签收确认', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:57, side:'PC', m1:'物流管理', m2:'门卫管理', m3:'出门条', desc:'出厂放行凭证管理', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'门卫', time:'2026-08-07' },
+    { id:58, side:'PC', m1:'物流管理', m2:'承运商管理', m3:'承运商事件', desc:'承运商异常事件记录', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:59, side:'PC', m1:'物流管理', m2:'承运商管理', m3:'承运商考核', desc:'承运商绩效考核评价', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'物流管理员', time:'2026-08-07' },
+    { id:60, side:'PC', m1:'条码管理', m2:'—', m3:'固定包材流转履历', desc:'固定包材全生命周期追溯', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:61, side:'PC', m1:'条码管理', m2:'流水码拆组', m3:'流水码拆分', desc:'大包装拆分为小包装', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:62, side:'PC', m1:'条码管理', m2:'流水码拆组', m3:'流水码合并', desc:'小包装合并为大包装', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:63, side:'PC', m1:'条码管理', m2:'外包材拆组', m3:'外包材拆组', desc:'外包材拆分与合并操作', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库操作员', time:'2026-08-07' },
+    { id:64, side:'PC', m1:'条码管理', m2:'报废处理', m3:'待报废清单', desc:'待报废物料清单查看', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:65, side:'PC', m1:'条码管理', m2:'报废处理', m3:'报废处理', desc:'物料/包材报废执行', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:66, side:'PC', m1:'条码管理', m2:'异常冻结', m3:'冻结中清单', desc:'冻结中物料清单查看', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:67, side:'PC', m1:'条码管理', m2:'异常冻结', m3:'异常冻结', desc:'异常物料冻结操作', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' },
+    { id:68, side:'PC', m1:'条码管理', m2:'异常冻结', m3:'冻结解除', desc:'解除物料冻结状态', dStatus:'✅ 已完成', cStatus:'🟡 待确认', role:'仓库管理员', time:'2026-08-07' }
+  ];
+
+  const appList = [
+    { id:69, side:'APP', m1:'首页', m2:'—', m3:'登录', desc:'用户登录与身份验证', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'全部', time:'2026-08-14' },
+    { id:70, side:'APP', m1:'首页', m2:'—', m3:'首页', desc:'APP功能入口与快捷导航', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'全部', time:'2026-08-14' },
+    { id:71, side:'APP', m1:'首页', m2:'—', m3:'消息', desc:'系统通知与消息中心', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'全部', time:'2026-08-14' },
+    { id:72, side:'APP', m1:'首页', m2:'—', m3:'我的', desc:'个人信息与设置', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'全部', time:'2026-08-14' },
+    { id:73, side:'APP', m1:'包材资料', m2:'—', m3:'包材建档', desc:'现场包材信息采集与建档', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:74, side:'APP', m1:'包材资料', m2:'—', m3:'信息查询', desc:'扫码查询包材详细信息', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:75, side:'APP', m1:'仓储管理', m2:'采购', m3:'采购入库-流水码', desc:'流水码物料采购扫码入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:76, side:'APP', m1:'仓储管理', m2:'采购', m3:'采购入库-罐区', desc:'罐区液体物料采购入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:77, side:'APP', m1:'仓储管理', m2:'采购', m3:'采购入库-计数', desc:'计数物料采购手工入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:78, side:'APP', m1:'仓储管理', m2:'采购', m3:'退料出库-流水码', desc:'流水码物料采购退料', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:79, side:'APP', m1:'仓储管理', m2:'采购', m3:'退料出库-计数', desc:'计数物料采购退料', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:80, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产领料-流水码', desc:'流水码物料生产领料', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:81, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产领料-计数', desc:'计数物料生产领料', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:82, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产领料-罐区', desc:'罐区物料生产领料', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:83, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产退料-流水码', desc:'流水码物料生产退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:84, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产退料-计数', desc:'计数物料生产退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:85, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产退料-罐区', desc:'罐区物料生产退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:86, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产入库-流水码', desc:'流水码成品生产入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:87, side:'APP', m1:'仓储管理', m2:'生产', m3:'生产入库-计数', desc:'计数成品生产入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:88, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外发料-流水码', desc:'流水码物料委外发出', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:89, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外发料-计数', desc:'计数物料委外发出', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:90, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外退料-流水码', desc:'流水码物料委外退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:91, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外退料-计数', desc:'计数物料委外退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:92, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外收货-流水码', desc:'流水码成品委外收货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:93, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外收货-计数', desc:'计数成品委外收货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:94, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外收货-罐区', desc:'罐区物料委外收货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:95, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外退货-流水码', desc:'流水码成品委外退货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:96, side:'APP', m1:'仓储管理', m2:'委外', m3:'委外退货-计数', desc:'计数成品委外退货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:97, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托收料-流水码', desc:'流水码物料受托接收', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:98, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托收料-计数', desc:'计数物料受托接收', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:99, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托收料-罐区', desc:'罐区物料受托接收', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:100, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托退料-流水码', desc:'流水码物料受托退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:101, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托退料-计数', desc:'计数物料受托退回', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:102, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托入库-流水码', desc:'流水码成品受托入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:103, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托入库-计数', desc:'计数成品受托入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:104, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售发货-流水码', desc:'流水码物料销售扫码发货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:105, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售发货-计数', desc:'计数物料销售发货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:106, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售退货-流水码', desc:'流水码物料销售退货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:107, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售退货-计数', desc:'计数物料销售退货', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:108, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他入库-流水码', desc:'流水码物料非标准入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:109, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他入库-计数', desc:'计数物料非标准入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:110, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他入库-罐区', desc:'罐区物料非标准入库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:111, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他出库-流水码', desc:'流水码物料非标准出库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:112, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他出库-计数', desc:'计数物料非标准出库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:113, side:'APP', m1:'仓储管理', m2:'其他', m3:'其他出库-罐区', desc:'罐区物料非标准出库', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:114, side:'APP', m1:'仓储管理', m2:'库内', m3:'物料转序', desc:'移动端物料质检状态流转', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:115, side:'APP', m1:'仓储管理', m2:'库内', m3:'货物移库', desc:'移动端库位间货物转移', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:116, side:'APP', m1:'仓储管理', m2:'盘点', m3:'库存盘点', desc:'移动端扫码/计数盘点', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:117, side:'APP', m1:'仓储管理', m2:'装卸', m3:'装卸货', desc:'移动端装卸货作业执行', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'装卸工', time:'2026-08-14' },
+    { id:118, side:'APP', m1:'物流管理', m2:'运单', m3:'运单管理', desc:'移动端运单查看与在途跟踪', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'司机/物流员', time:'2026-08-14' },
+    { id:119, side:'APP', m1:'物流管理', m2:'运单', m3:'运单签收', desc:'移动端运输签收确认', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'司机/物流员', time:'2026-08-14' },
+    { id:120, side:'APP', m1:'物流管理', m2:'运单', m3:'运单提货', desc:'移动端提货操作执行', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'司机/物流员', time:'2026-08-14' },
+    { id:121, side:'APP', m1:'物流管理', m2:'提货单', m3:'提货单管理', desc:'移动端提货单据管理', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'司机/物流员', time:'2026-08-14' },
+    { id:122, side:'APP', m1:'物流管理', m2:'签收单', m3:'签收单管理', desc:'移动端签收单据管理', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'司机/物流员', time:'2026-08-14' },
+    { id:123, side:'APP', m1:'包材管理', m2:'流水码拆组', m3:'流水码拆分', desc:'移动端大包装拆小包装', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:124, side:'APP', m1:'包材管理', m2:'流水码拆组', m3:'流水码合并', desc:'移动端小包装合大包装', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:125, side:'APP', m1:'包材管理', m2:'外包材拆组', m3:'外包材拆组', desc:'移动端外包材拆分合并', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库操作员', time:'2026-08-14' },
+    { id:126, side:'APP', m1:'包材管理', m2:'报废处理', m3:'报废处理', desc:'移动端物料/包材报废', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库管理员', time:'2026-08-14' },
+    { id:127, side:'APP', m1:'包材管理', m2:'异常冻结', m3:'解除冻结', desc:'移动端冻结物料解除', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库管理员', time:'2026-08-14' },
+    { id:128, side:'APP', m1:'包材管理', m2:'异常冻结', m3:'异常冻结', desc:'移动端异常物料冻结', dStatus:'🔵 进行中', cStatus:'⬜ 未确认', role:'仓库管理员', time:'2026-08-14' }
+  ];
+
+  const allData = [...pcList, ...appList];
+
+  let activeTab = 'all';
+
+  function renderTable(filterSide = 'all') {
+    activeTab = filterSide;
+    const list = filterSide === 'all' ? allData : allData.filter(d => d.side === filterSide);
+    
+    const rows = list.map(d => `
+      <tr>
+        <td>${d.id}</td>
+        <td><span class="status-pill ${d.side==='PC'?'done':'doing'}">${d.side}</span></td>
+        <td>${d.m1}</td>
+        <td>${d.m2}</td>
+        <td><strong>${d.m3}</strong></td>
+        <td>${d.desc}</td>
+        <td>${d.dStatus}</td>
+        <td>${d.cStatus}</td>
+        <td>${d.role}</td>
+        <td>${d.time}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('protoTableBody').innerHTML = rows;
+  }
+
+  content.innerHTML = `
+  <div class="card">
+    <h3>原型设计整体进度看板</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="background:var(--panel2);padding:12px 16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted)">总功能点数</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent)">128</div>
+      </div>
+      <div style="background:var(--panel2);padding:12px 16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted)">PC端功能点（设计已完成）</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent2)">68 <span style="font-size:12px;font-weight:normal;color:var(--muted)">(100%)</span></div>
+      </div>
+      <div style="background:var(--panel2);padding:12px 16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted)">APP端功能点（设计进行中）</div>
+        <div style="font-size:22px;font-weight:700;color:var(--warn)">60 <span style="font-size:12px;font-weight:normal;color:var(--muted)">(截至8.14)</span></div>
+      </div>
+      <div style="background:var(--panel2);padding:12px 16px;border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted)">待业务核对确认</div>
+        <div style="font-size:22px;font-weight:700;color:#2563eb">68 <span style="font-size:12px;font-weight:normal;color:var(--muted)">(8.17~8.21)</span></div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:12px">
+      <button type="button" class="active" id="btnTabAll">全部 (128)</button>
+      <button type="button" id="btnTabPC">PC端 (68)</button>
+      <button type="button" id="btnTabAPP">APP端 (60)</button>
+    </div>
+
+    <table style="font-size:12px">
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>端</th>
+          <th>一级模块</th>
+          <th>二级模块</th>
+          <th>三级模块</th>
+          <th>描述</th>
+          <th>设计状态</th>
+          <th>确认状态</th>
+          <th>相关岗位</th>
+          <th>计划完成</th>
+        </tr>
+      </thead>
+      <tbody id="protoTableBody">
+      </tbody>
+    </table>
+  </div>`;
+
+  renderTable('all');
+
+  document.getElementById('btnTabAll').onclick = function() {
+    this.parentNode.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderTable('all');
+  };
+  document.getElementById('btnTabPC').onclick = function() {
+    this.parentNode.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderTable('PC');
+  };
+  document.getElementById('btnTabAPP').onclick = function() {
+    this.parentNode.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderTable('APP');
+  };
 }
 
 function renderPlan() {
@@ -725,6 +1045,8 @@ async function navigate(page) {
   content.classList.remove('scene-mode');
   closeFullscreen();
   if (page === 'progress') return renderProgress();
+  if (page === 'proto') return renderProtoProgress();
+  if (page === 'blueprint') return renderBlueprintPlan();
   if (page === 'overview') return renderOverview();
   if (page === 'plan') return renderPlan();
   const scene = scenes.find(s => s.id === page);
@@ -733,7 +1055,7 @@ async function navigate(page) {
 
 buildNav();
 const initial = (location.hash || '#progress').slice(1);
-navigate(scenes.some(s => s.id === initial) || ['progress','overview','plan'].includes(initial) ? initial : 'progress');
+navigate(scenes.some(s => s.id === initial) || ['progress','proto','blueprint','overview','plan'].includes(initial) ? initial : 'progress');
 </script>
 </body>
 </html>
