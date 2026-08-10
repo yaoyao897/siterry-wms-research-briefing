@@ -7045,11 +7045,6 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
-            },
-            {
               "field": "_actions",
               "title": "操作",
               "width": 80,
@@ -7797,11 +7792,6 @@ window.WMS_PAGE_CONFIGS = {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
-            },
-            {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
             },
             {
               "field": "_actions",
@@ -9289,11 +9279,6 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
-            },
-            {
               "field": "_actions",
               "title": "操作",
               "width": 80,
@@ -10777,11 +10762,6 @@ window.WMS_PAGE_CONFIGS = {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
-            },
-            {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
             },
             {
               "field": "_actions",
@@ -12720,11 +12700,6 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
-            },
-            {
               "field": "_actions",
               "title": "操作",
               "width": 80,
@@ -14174,11 +14149,6 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
-            },
-            {
               "field": "_actions",
               "title": "操作",
               "width": 80,
@@ -14854,11 +14824,6 @@ window.WMS_PAGE_CONFIGS = {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
-            },
-            {
-              "field": "容积",
-              "title": "容积",
-              "width": 80
             },
             {
               "field": "_actions",
