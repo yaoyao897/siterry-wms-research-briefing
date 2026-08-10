@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>思特瑞 WMS Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/style.css" />
+<style>
+
+[v-cloak]{display:none}
+:root{
+  --color-btn-primary:#1A4099;--color-btn-primary-hover:#2B56B0;--color-btn-primary-active:#15357F;
+  --color-btn-danger:#CF1322;--color-btn-danger-hover:#D4383D;--color-btn-danger-active:#A8071A;
+  --color-btn-link:#1A4099;--color-btn-link-hover:#2B56B0;--color-btn-link-active:#15357F;
+  --color-primary:var(--color-btn-primary);--color-primary-hover:var(--color-btn-primary-hover);--color-primary-active:var(--color-btn-primary-active);
+  --color-success:#52C41A;--color-warning:#FA8C16;--color-danger:#FF4D4F;
+  --color-danger-hover:#FF7875;--color-danger-active:#CF1322;
+  --color-text-main:#262626;--color-text-normal:#595959;--color-text-secondary:#8C8C8C;
+  --color-text-placeholder:#BFBFBF;--color-bg-page:#F0F2F5;--color-bg-card:#FFFFFF;
+  --color-overlay:rgba(0,0,0,.45);--color-border:#E8E8E8;--color-border-input:#D9D9D9;
+  --color-header-bg:#FAFAFA;--color-row-hover:#EEF2F8;--color-row-stripe:#FAFAFA;--color-row-selected:#FFF8E1;
+  --color-badge:#FF4D4F;--color-btn-disabled-bg:#F5F5F5;--color-btn-disabled-text:#BFBFBF;
+  --color-menu-text:#262626;--color-menu-parent-open:#1A4099;--color-menu-active-bg:#F0F4F8;--color-menu-active-text:#1A4099;
+  --el-color-primary:#1A4099;--el-color-primary-light-3:#2B56B0;--el-color-primary-light-5:#4A6BB8;--el-color-primary-light-7:#8BA3D4;--el-color-primary-light-8:#C5D4EB;--el-color-primary-light-9:#EEF2F8;--el-color-primary-dark-2:#15357F;
+  --el-color-danger:#FF4D4F;--el-border-radius-base:4px;
+}
+/* §3 按钮 */
+.el-button{--el-button-font-weight:400}
+.el-button--primary{--el-button-bg-color:var(--color-btn-primary);--el-button-border-color:var(--color-btn-primary);--el-button-hover-bg-color:var(--color-btn-primary-hover);--el-button-hover-border-color:var(--color-btn-primary-hover);--el-button-active-bg-color:var(--color-btn-primary-active);--el-button-active-border-color:var(--color-btn-primary-active)}
+.el-button--default{--el-button-text-color:var(--color-text-normal);--el-button-bg-color:#fff;--el-button-border-color:var(--color-border-input);--el-button-hover-text-color:var(--color-btn-link-hover);--el-button-hover-border-color:var(--color-btn-link-hover);--el-button-active-text-color:var(--color-btn-link-active);--el-button-active-border-color:var(--color-btn-link-active)}
+.el-button--danger{--el-button-bg-color:var(--color-btn-danger);--el-button-border-color:var(--color-btn-danger);--el-button-hover-bg-color:var(--color-btn-danger-hover);--el-button-hover-border-color:var(--color-btn-danger-hover);--el-button-active-bg-color:var(--color-btn-danger-active);--el-button-active-border-color:var(--color-btn-danger-active)}
+.el-button.is-link,.el-button.is-link.el-button--primary{--el-button-text-color:var(--color-btn-link);--el-button-hover-link-text-color:var(--color-btn-link-hover);--el-button-active-color:var(--color-btn-link-active)}
+/* 分页：当前页深蓝方块，其他页文字按钮风格 */
+.el-pagination .el-pager li{min-width:28px;height:28px;line-height:26px}
+.el-pagination .el-pager li.is-active{background-color:var(--color-btn-primary);color:#fff;border-radius:4px}
+.el-pagination .el-pager li:hover{color:var(--color-btn-link)}
+.list-pager .el-pagination{--el-pagination-font-size:13px}
+.list-pager .el-pagination .el-pagination__total{color:var(--color-text-normal);margin-left:8px}
+.row-op .row-op-more::after{content:'∨';font-size:10px;margin-left:2px;vertical-align:1px}
+/* §6 输入框 */
+.el-input__wrapper{box-shadow:0 0 0 1px var(--color-border-input) inset}
+.el-input__wrapper:hover{box-shadow:0 0 0 1px var(--color-btn-link-hover) inset}
+.el-input__wrapper.is-focus{box-shadow:0 0 0 1px var(--color-btn-link) inset,0 0 0 2px rgba(26,64,153,.2)}
+.el-form-item__label{color:var(--color-text-normal)}
+/* 布局 §8 */
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color:var(--color-text-normal);background:var(--color-bg-page)}
+#app{height:100vh}
+.app-shell{display:flex;height:100vh}
+.app-aside{width:240px;flex-shrink:0;height:100%;min-height:0;background:#fff;border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow:hidden}
+.app-aside__logo{padding:16px 20px;font-size:15px;font-weight:600;color:var(--color-text-main);border-bottom:1px solid var(--color-border);flex-shrink:0}
+.app-aside__scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+.app-aside__scroll::-webkit-scrollbar{width:6px}
+.app-aside__scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:3px}
+.app-aside__scroll::-webkit-scrollbar-track{background:transparent}
+/* §7.1 侧栏菜单 */
+.app-aside .el-menu{border-right:none;padding:8px 0;--el-menu-bg-color:#fff;--el-menu-text-color:var(--color-menu-text);--el-menu-active-color:var(--color-menu-active-text);--el-menu-hover-bg-color:transparent}
+.app-aside .el-menu-item,.app-aside .el-sub-menu__title{height:44px;line-height:44px;margin:2px 8px;border-radius:8px;color:var(--color-menu-text)}
+.app-aside .el-menu-item:hover,.app-aside .el-sub-menu__title:hover{background:rgba(0,0,0,.04)}
+.app-aside .el-menu-item.is-active{color:var(--color-menu-active-text);background:var(--color-menu-active-bg);font-weight:500}
+.app-aside .el-sub-menu.is-opened>.el-sub-menu__title,.app-aside .el-sub-menu.is-active>.el-sub-menu__title{color:var(--color-menu-parent-open)}
+.app-aside .el-menu-item .el-menu-tooltip__trigger,.app-aside .el-sub-menu__title{display:flex;align-items:center}
+.menu-item-label{display:inline-flex;align-items:center;gap:0;min-width:0}
+.menu-icon{width:16px;height:16px;margin-right:8px;flex-shrink:0;stroke:currentColor;fill:none}
+.menu-badge{color:var(--color-badge);font-size:12px;margin-left:2px;font-weight:400}
+.app-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.app-header{height:52px;padding:0 20px;background:#fff;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between}
+.app-header .el-breadcrumb{margin-bottom:0;padding:0}
+.app-header .el-breadcrumb__inner{font-size:13px;color:var(--color-text-secondary);font-weight:400}
+.app-header .el-breadcrumb__item:last-child .el-breadcrumb__inner{color:var(--color-text-main);font-weight:500}
+.app-header__actions{display:flex;gap:8px;align-items:center}
+.app-header__icon{width:32px;height:32px;border:1px solid var(--color-border);border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--color-text-normal)}
+.app-header__icon:hover,.app-header__icon.on{border-color:var(--color-btn-link);color:var(--color-btn-link)}
+.app-header__icon.on{background:var(--color-menu-active-bg)}
+.mode-switch{display:inline-flex;border:1px solid var(--color-border);border-radius:4px;overflow:hidden}
+.mode-switch a{padding:6px 14px;font-size:13px;text-decoration:none;color:var(--color-text-normal);background:#fff;line-height:1.2}
+.mode-switch a:hover{color:var(--color-btn-link)}
+.mode-switch a.on{background:var(--color-btn-primary);color:#fff}
+.remarks-toggle{position:fixed;top:10px;right:168px;z-index:3100;width:auto;min-width:104px;padding:0 12px;gap:6px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.remarks-toggle.on{color:#fff!important;background:var(--color-btn-primary)!important;border-color:var(--color-btn-primary)!important}
+.app-body{flex:1;min-height:0;padding:12px 12px 16px;overflow:hidden;background:var(--color-bg-page);display:flex;flex-direction:column}
+.page-panel{background:#fff;flex:1;min-height:0;display:flex;flex-direction:column}
+.app-breadcrumb{margin-bottom:12px;font-size:13px;padding:0 8px}
+.page-tabs{margin-bottom:0;background:transparent;border:none;border-radius:0;padding:0 20px;border-bottom:1px solid var(--color-border);flex-shrink:0}
+.page-tabs .el-tabs__header{margin-bottom:0}
+.page-tabs .el-tabs__nav-wrap::after{display:none}
+.page-tabs .el-tabs__item{color:var(--color-text-normal);height:44px;line-height:44px;font-size:14px}
+.page-tabs .el-tabs__item.is-active{color:var(--color-btn-link);font-weight:500}
+.page-tabs .el-tabs__active-bar{height:2px;background-color:var(--color-btn-link)}
+.tab-count{margin-left:2px}
+.tab-count--alert{color:var(--color-badge)}
+.query-area,.list-area,.query-card,.list-card{background:transparent;border:none;border-radius:0;box-shadow:none}
+.query-area,.query-card{padding:16px 20px 12px;margin-bottom:0;flex-shrink:0}
+.query-area__row,.query-card__row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.query-area__fields,.query-card__fields{flex:1;min-width:0}
+.query-area__actions,.query-card__actions{display:flex;gap:8px;flex-shrink:0;padding-top:4px;align-items:center;align-self:flex-start}
+.query-area__actions .el-dropdown .el-button-group,.query-card__actions .el-dropdown .el-button-group{display:inline-flex}
+.query-area__actions .el-dropdown .el-button-group>.el-button--primary:first-child,.query-card__actions .el-dropdown .el-button-group>.el-button--primary:first-child{border-top-right-radius:0;border-bottom-right-radius:0}
+.query-area__actions .el-dropdown .el-button-group>.el-button--primary:last-child,.query-card__actions .el-dropdown .el-button-group>.el-button--primary:last-child{border-top-left-radius:0;border-bottom-left-radius:0;padding:8px 10px}
+.query-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:16px;row-gap:4px;width:100%;align-items:start}
+.query-form.el-form--inline .el-form-item{display:flex;align-items:center;margin:0;width:100%;min-width:0;height:32px}
+.query-form .el-form-item__label{width:var(--query-label-width,118px)!important;padding-right:8px;justify-content:flex-end;flex-shrink:0;height:32px;line-height:32px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.query-form .el-form-item__content{flex:1;min-width:0;line-height:32px}
+.query-form .el-input,.query-form .el-select,.query-form .el-date-editor.el-input,.query-form .el-date-editor.el-input__wrapper{width:100%!important}
+.list-area,.list-card{flex:1;min-height:0;display:flex;flex-direction:column}
+.flow-guide{margin:0 20px 12px;border:1px solid #D6E4FF;border-radius:4px;background:#fff;flex-shrink:0;overflow:hidden}
+.flow-guide .el-collapse{border:0}
+.flow-guide .el-collapse-item__header{height:42px;padding:0 12px;border:0;background:#EEF2F8;color:var(--color-text-main);font-size:13px}
+.flow-guide .el-collapse-item__wrap{border:0}
+.flow-guide .el-collapse-item__content{padding:12px}
+.flow-guide__title{font-weight:600;color:var(--color-btn-primary)}
+.flow-guide__subtitle{margin-left:8px;color:var(--color-text-secondary);font-size:12px;font-weight:400}
+.flow-guide__scroll{max-height:24vh;overflow:auto}
+.flow-guide__steps{display:flex;align-items:center;gap:8px;margin-bottom:12px;white-space:nowrap}
+.flow-guide__step{padding:5px 12px;border:1px solid #ADC6FF;border-radius:14px;background:#F0F5FF;color:var(--color-btn-primary);font-size:13px}
+.flow-guide__arrow{color:var(--color-text-secondary)}
+.list-toolbar{display:flex;justify-content:space-between;align-items:center;padding:4px 20px 12px;border-bottom:none;gap:12px;flex-wrap:wrap;flex-shrink:0}
+.list-toolbar__info{display:flex;align-items:baseline;gap:12px;flex-shrink:0}
+.list-toolbar__title{font-size:14px;font-weight:500;color:var(--color-text-main)}
+.list-toolbar__sel{font-size:13px;color:var(--color-text-secondary)}
+.list-toolbar__actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.list-toolbar__icons{display:flex;gap:4px;margin-left:4px}
+.icon-btn{width:32px;height:32px;border:1px solid var(--color-border);border-radius:50%;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-normal);font-size:14px}
+.icon-btn:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
+.list-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 20px 12px}
+.list-body>demo-vxe-grid{flex:1;min-height:0;display:flex;flex-direction:column}
+.list-body .demo-vxe-wrap{margin-top:0}
+.list-area--remarks .list-body{flex:0 0 190px;min-height:190px;overflow:hidden}
+.remarks-board{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px 14px;min-height:0;overflow-y:auto;flex:1 1 auto;border-top:1px solid var(--color-border);background:#fff}
+.remarks-column{min-width:0}
+.remarks-block{margin-top:12px;border:1px solid var(--color-border);border-radius:4px;overflow:hidden;background:#fff}
+.remarks-block__title{position:sticky;top:0;z-index:2;margin:0;padding:9px 12px;font-size:13px;font-weight:600;background:#EEF2F8;color:var(--color-btn-primary);border-bottom:1px solid var(--color-border)}
+.remarks-block--data .remarks-block__title{background:#FFF7E6;color:#D46B08}
+.remarks-block--field .remarks-block__title{background:#F6FFED;color:#389E0D}
+.remarks-block--flow .remarks-block__title{background:#F9F0FF;color:#722ED1}
+.remarks-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.5}
+.remarks-table th,.remarks-table td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--color-border)}
+.remarks-table th{width:132px;color:var(--color-text-main);font-weight:500;background:#FAFAFA}
+.remarks-table tr:last-child th,.remarks-table tr:last-child td{border-bottom:none}
+.demo-vxe-grid .vxe-table--border-wrapper{border-top:none!important}
+.demo-vxe-grid .vxe-table--header-wrapper{border-top:none!important}
+.list-pager{flex-shrink:0;padding:8px 0 4px;display:flex;justify-content:flex-end}
+/* §4 VXE */
+.demo-vxe-wrap{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.demo-vxe-wrap .demo-vxe-grid{flex:1;min-height:0}
+.demo-vxe-wrap .el-empty{flex:1;display:flex;align-items:center;justify-content:center}
+.demo-vxe-grid,.vxe-table--render-default{font-size:13px;color:var(--color-text-normal);
+  --vxe-ui-font-primary-color:var(--color-btn-primary);
+  --vxe-ui-font-primary-darken-color:var(--color-btn-primary-active);
+  --vxe-ui-font-primary-lighten-color:var(--color-btn-primary-hover);
+  --vxe-ui-table-border-color:var(--color-border);
+  --vxe-ui-table-row-striped-background-color:var(--color-row-stripe);
+  --vxe-ui-table-row-hover-background-color:var(--color-row-hover);
+  --vxe-ui-table-row-hover-striped-background-color:var(--color-row-hover);
+  --vxe-ui-table-row-checkbox-checked-background-color:var(--color-row-selected);
+  --vxe-ui-table-row-hover-checkbox-checked-background-color:var(--color-row-selected)}
+/* 行横线 + 列竖线均用 inset box-shadow（选中行、固定列缝也不断线） */
+.demo-vxe-grid .vxe-header--column{background:var(--color-header-bg);color:var(--color-text-main);font-weight:500;border:none!important;box-shadow:inset -1px 0 0 var(--color-border),inset 0 -1px 0 var(--color-border)}
+.demo-vxe-grid .vxe-body--column{border:none!important;box-shadow:inset -1px 0 0 var(--color-border),inset 0 -1px 0 var(--color-border)}
+/* 各分区最右列不重复画竖线，避免与表格外框叠线（左固定列最右列除外，见下） */
+.demo-vxe-grid .vxe-table--main-wrapper .vxe-header--column:last-child,
+.demo-vxe-grid .vxe-table--main-wrapper .vxe-body--column:last-child,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-header--column:last-child,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-body--column:last-child{box-shadow:inset 0 -1px 0 var(--color-border)}
+/* 左固定列右缘 / 右固定列左缘：分界竖线（勿改 fixed-wrapper 的 position，否则固定列不显示） */
+.demo-vxe-grid .vxe-table--fixed-left-wrapper{box-shadow:inset -1px 0 0 var(--color-border);z-index:4}
+.demo-vxe-grid .vxe-table--fixed-left-wrapper .vxe-header--column:last-child,
+.demo-vxe-grid .vxe-table--fixed-left-wrapper .vxe-body--column:last-child{box-shadow:inset -1px 0 0 var(--color-border),inset 0 -1px 0 var(--color-border)!important}
+.demo-vxe-grid .vxe-table--fixed-right-wrapper{box-shadow:inset 1px 0 0 var(--color-border),-2px 0 6px rgba(0,0,0,.04);z-index:4}
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-header--column:first-child,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-body--column:first-child{box-shadow:inset 1px 0 0 var(--color-border),inset -1px 0 0 var(--color-border),inset 0 -1px 0 var(--color-border)!important}
+.demo-vxe-grid .vxe-body--row.row--stripe:not(.row--checked):not(.row--hover)>.vxe-body--column,
+.demo-vxe-grid .vxe-table--body-inner-wrapper .vxe-body--row:nth-child(even):not(.row--checked):not(.row--hover)>.vxe-body--column{background:var(--color-row-stripe)!important}
+.demo-vxe-grid .vxe-table--fixed-left-wrapper .vxe-body--row.row--stripe:not(.row--checked):not(.row--hover)>.vxe-body--column,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-body--row.row--stripe:not(.row--checked):not(.row--hover)>.vxe-body--column,
+.demo-vxe-grid .vxe-table--fixed-left-wrapper .vxe-body--row:nth-child(even):not(.row--checked):not(.row--hover)>.vxe-body--column,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-body--row:nth-child(even):not(.row--checked):not(.row--hover)>.vxe-body--column{background:var(--color-row-stripe)!important}
+.demo-vxe-grid .vxe-body--row.row--hover:not(.row--checked)>.vxe-body--column{background:var(--color-row-hover)}
+.demo-vxe-grid .vxe-body--row.row--checked>.vxe-body--column,
+.demo-vxe-grid .vxe-body--row.row--checked.row--hover>.vxe-body--column{background:var(--color-row-selected)!important}
+.demo-vxe-grid .vxe-table--fixed-left-wrapper .vxe-body--row.row--checked>.vxe-body--column,
+.demo-vxe-grid .vxe-table--fixed-right-wrapper .vxe-body--row.row--checked>.vxe-body--column{background:var(--color-row-selected)!important}
+/* 勾选框：VXE4 用 icon 的 color 着色，选中/半选为深蓝 #1A4099 */
+.demo-vxe-grid .vxe-checkbox .vxe-checkbox--icon{color:var(--vxe-ui-input-border-color)}
+.demo-vxe-grid .vxe-checkbox.is--checked .vxe-checkbox--icon,
+.demo-vxe-grid .vxe-checkbox.is--indeterminate .vxe-checkbox--icon{color:var(--color-btn-primary)!important}
+.demo-vxe-grid .vxe-checkbox:not(.is--disabled):not(.is--checked):not(.is--indeterminate):hover .vxe-checkbox--icon{color:var(--color-btn-primary-hover)}
+/* §4.1 弹窗/明细 el-table 与列表 VXE 视觉统一 */
+.demo-data-table{font-size:13px;color:var(--color-text-normal);--el-table-border-color:var(--color-border);--el-table-header-bg-color:var(--color-header-bg);--el-table-header-text-color:var(--color-text-main);--el-table-text-color:var(--color-text-normal);--el-table-row-hover-bg-color:var(--color-row-hover);--el-table-current-row-bg-color:var(--color-row-selected);--el-table-bg-color:#fff;--el-fill-color-lighter:var(--color-row-stripe);--el-table-tr-bg-color:#fff}
+.demo-data-table.el-table--border,.demo-data-table.el-table--group{border-color:var(--color-border)}
+.demo-data-table.el-table--border::before,.demo-data-table.el-table--border::after,.demo-data-table .el-table__inner-wrapper::before{background-color:var(--color-border)}
+.demo-data-table .el-table__border-left-patch{background-color:var(--color-border)}
+.demo-data-table th.el-table__cell{background:var(--color-header-bg)!important;color:var(--color-text-main);font-weight:500;font-size:13px;border-bottom-color:var(--color-border)!important;border-right-color:var(--color-border)!important}
+.demo-data-table td.el-table__cell{border-bottom-color:var(--color-border)!important;border-right-color:var(--color-border)!important;font-size:13px}
+.demo-data-table .el-table__header-wrapper th.el-table__cell.is-leaf{border-bottom-color:var(--color-border)!important}
+.demo-data-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell{background:var(--color-row-stripe)}
+.demo-data-table .el-table__body tr:hover>td.el-table__cell{background:var(--color-row-hover)!important}
+.demo-data-table .el-table__body tr.current-row>td.el-table__cell,
+.demo-data-table .el-table__body tr.el-table__row.current-row>td.el-table__cell{background:var(--color-row-selected)!important}
+.demo-data-table .el-table__body tr.el-table__row--striped.current-row>td.el-table__cell{background:var(--color-row-selected)!important}
+.demo-data-table .el-checkbox__input.is-checked .el-checkbox__inner,
+.demo-data-table .el-checkbox__input.is-indeterminate .el-checkbox__inner{background-color:var(--color-btn-primary);border-color:var(--color-btn-primary)}
+.demo-data-table .el-checkbox__inner:hover{border-color:var(--color-btn-primary-hover)}
+.demo-data-table .el-table__empty-text{color:var(--color-text-secondary);font-size:13px}
+.demo-data-table .el-table__fixed-right::before,.demo-data-table .el-table__fixed::before{background-color:var(--color-border)}
+.cell-link{color:var(--color-btn-link);cursor:pointer}
+.cell-link:hover{color:var(--color-btn-link-hover)}
+.row-op{display:flex;gap:4px;flex-wrap:wrap}
+.row-op .el-dropdown .el-button.is-link{padding:0 4px;height:auto;vertical-align:baseline}
+/* §5 标签 */
+.tag{display:inline-block;padding:0 8px;height:22px;line-height:20px;font-size:12px;border-radius:4px;border:1px solid transparent}
+.tag-b{color:#1A4099;background:#EEF2F8;border-color:#C5D4EB}
+.tag-p{color:#C41D7F;background:#FFF0F6;border-color:#FFADD2}
+.tag-o{color:#FA8C16;background:#FFF7E6;border-color:#FFD591}
+.tag-g{color:#52C41A;background:#F6FFED;border-color:#B7EB8F}
+.tag-r{color:#FF4D4F;background:#FFF1F0;border-color:#FFA39E}
+.tag-w{color:#FA541C;background:#FFF2E8;border-color:#FFBB96}
+.tag-gr{color:#8C8C8C;background:#FAFAFA;border-color:#D9D9D9}
+/* §8.1 弹窗 */
+.demo-dialog--biz .el-dialog__body{padding:16px 20px;overflow:auto;max-height:min(78vh,720px)}
+.demo-dialog--biz .el-dialog__header{margin-right:0;padding-bottom:12px;border-bottom:none}
+.demo-dialog--biz .el-dialog__footer{padding-top:8px;border-top:none}
+.demo-form-section__title{display:flex;align-items:center;margin:24px 0 16px;font-size:14px;font-weight:600;color:var(--color-btn-primary);line-height:1}
+.demo-form-section__title::before,.demo-form-section__title::after{content:'';flex:1;height:1px;background:var(--color-border)}
+.demo-form-section__title>span{padding:0 16px;background:var(--color-bg-card);white-space:nowrap}
+.demo-form-section__title:first-child{margin-top:0}
+.demo-form-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:0 24px}
+.demo-form-grid .el-form-item{min-width:0}
+.demo-form-grid .el-form-item__content{min-width:0}
+.demo-form-grid .span-2{grid-column:1/-1}
+.field-remark{width:100%;margin-top:5px;padding:6px 8px;font-size:12px;line-height:1.45;color:#8C6D1F;background:#FFFBE6;border-left:3px solid #FAAD14;border-radius:2px}
+.dialog-remarks-summary{max-height:22vh;overflow-y:auto;margin-top:12px;padding:10px 12px;background:#F7F9FC;border:1px solid var(--color-border);border-radius:4px;font-size:12px;line-height:1.6}
+.dialog-remarks-summary__title{position:sticky;top:-10px;margin:-10px -12px 8px;padding:8px 12px;background:#EEF2F8;color:var(--color-btn-primary);font-size:13px;font-weight:600}
+@media (max-width:900px){.remarks-board{grid-template-columns:1fr}.remarks-toggle{right:152px}.demo-form-grid{grid-template-columns:1fr}}
+/* 时长/有效期：数值 + 单位下拉（flex 并排；禁止 append 内嵌 select） */
+.demo-valid-period{display:flex;width:100%;min-width:0;align-items:stretch;gap:0;overflow:visible}
+.demo-valid-period__value,
+.demo-valid-period>.el-input,
+.demo-valid-period>.el-input-number{flex:1 1 0;min-width:0;width:auto!important}
+.demo-valid-period__value .el-input__wrapper,
+.demo-valid-period>.el-input .el-input__wrapper,
+.demo-valid-period>.el-input-number .el-input__wrapper{border-top-right-radius:0;border-bottom-right-radius:0}
+.demo-valid-period__unit,
+.demo-valid-period>.el-select{flex:0 0 88px;width:88px!important;min-width:88px!important;max-width:88px!important}
+.demo-valid-period__unit .el-select__wrapper,
+.demo-valid-period>.el-select .el-select__wrapper{width:100%!important;border-top-left-radius:0;border-bottom-left-radius:0;margin-left:-1px}
+.demo-valid-period__suffix{flex:0 0 auto;display:flex;align-items:center;padding:0 12px;background:#fafafa;border:1px solid var(--color-border-input);border-left:none;border-radius:0 4px 4px 0;font-size:13px;color:var(--color-text-secondary);white-space:nowrap}
+.demo-valid-period-popper{z-index:4000!important}
+.demo-readonly{color:var(--color-text-secondary)}
+.demo-picker-input,.demo-picker-input .el-input__wrapper{cursor:pointer}
+.picker-query{margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.picker-query .el-input{width:220px}
+.ai-panel{position:fixed;right:20px;bottom:20px;width:400px;max-width:calc(100vw - 40px);height:480px;max-height:calc(100vh - 100px);background:#fff;border:1px solid var(--color-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2550;display:flex;flex-direction:column}
+.ai-panel__hd{padding:12px 16px;border-bottom:1px solid var(--color-border);font-weight:600;display:flex;justify-content:space-between}
+.ai-panel__bd{flex:1;padding:16px;overflow:auto;font-size:13px}
+.ai-bubble-user{display:inline-block;padding:8px 12px;background:var(--color-btn-primary);color:#fff;border-radius:8px;margin-bottom:8px;max-width:85%}
+.ai-bubble-bot{display:inline-block;padding:8px 12px;background:#F5F5F5;border-radius:8px;max-width:85%}
+
+.stub-tip{margin:0 20px 8px;padding:8px 12px;background:#FFFBE6;border:1px solid #FFE58F;border-radius:4px;color:#AD6800;font-size:12px}
+/* 数据字典：左类型树 + 右列表 */
+.page-panel--dict{flex-direction:row;align-items:stretch}
+.dict-type-panel{width:260px;flex-shrink:0;border-right:1px solid var(--color-border);display:flex;flex-direction:column;background:#fff;min-height:0}
+.dict-type-panel__hd{padding:12px;border-bottom:1px solid var(--color-border);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.dict-type-panel__hd .el-input{width:100%}
+.dict-type-panel__title{font-size:13px;font-weight:600;color:var(--color-text-main);display:flex;align-items:center;justify-content:space-between}
+.dict-type-panel__body{flex:1;min-height:0;overflow:auto;padding:8px}
+.dict-type-node{display:flex;align-items:center;gap:4px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--color-text-normal)}
+.dict-type-node:hover{background:rgba(0,0,0,.04)}
+.dict-type-node.is-active{background:var(--color-menu-active-bg);color:var(--color-menu-active-text);font-weight:500}
+.dict-type-node__name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dict-type-node__ops{display:none;gap:2px;flex-shrink:0}
+.dict-type-node:hover .dict-type-node__ops,.dict-type-node.is-active .dict-type-node__ops{display:inline-flex}
+.dict-type-children{padding-left:16px}
+.dict-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.dict-empty-tip{padding:48px 20px;text-align:center;color:var(--color-text-secondary);font-size:13px}
+
+/* craft / design / batch dialogs */
+.craft-layout{display:flex;gap:12px;min-height:420px}
+.craft-side{width:200px;flex-shrink:0;border:1px solid var(--color-border);border-radius:4px;padding:10px;background:#fafafa;display:flex;flex-direction:column;gap:8px}
+.craft-side__search{margin-bottom:4px}
+.craft-proc{padding:8px 10px;margin-bottom:6px;background:#fff;border:1px solid var(--color-border);border-radius:4px;cursor:grab;font-size:13px;user-select:none}
+.craft-proc:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
+.craft-tools{display:flex;gap:4px;margin-top:auto}
+.craft-canvas{flex:1;min-width:0;border:1px solid var(--color-border);border-radius:4px;background:
+  radial-gradient(circle, #d9d9d9 1px, transparent 1px) 0 0/16px 16px #fcfcfc;position:relative;overflow:hidden}
+.craft-node{position:absolute;min-width:96px;padding:8px 12px;background:#fff;border:1.5px solid var(--color-btn-primary);border-radius:6px;font-size:13px;text-align:center;box-shadow:0 1px 4px rgba(26,64,153,.12);cursor:default}
+.craft-edge{position:absolute;height:2px;background:#8BA3D4;transform-origin:0 50%;pointer-events:none}
+.design-layout{display:flex;gap:10px;min-height:520px;height:min(68vh,640px)}
+.design-palette{width:200px;flex-shrink:0;border:1px solid var(--color-border);border-radius:4px;padding:10px;background:#fafafa;overflow:auto}
+.design-palette__group{font-size:12px;font-weight:600;color:var(--color-text-main);margin:10px 0 6px}
+.design-palette__group:first-child{margin-top:0}
+.design-palette__item{padding:7px 10px;margin-bottom:6px;background:#fff;border:1px dashed var(--color-border);border-radius:4px;font-size:13px;cursor:pointer}
+.design-palette__item:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
+.design-canvas{flex:1;min-width:0;border:1px solid var(--color-border);border-radius:4px;padding:12px 14px;background:#fff;overflow:auto}
+.design-canvas__title{font-size:15px;font-weight:600;color:var(--color-text-main);text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--color-border)}
+.design-field{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--color-border);border-radius:4px;background:#fafafa;cursor:pointer}
+.design-field.is-active{border-color:var(--color-btn-primary);background:#EEF2F8;box-shadow:0 0 0 1px rgba(26,64,153,.15)}
+.design-field__main{flex:1;min-width:0}
+.design-field__label{font-size:13px;color:var(--color-text-main);margin-bottom:6px}
+.design-field__label .req{color:#FF4D4F;margin-right:2px}
+.design-field__type{font-size:12px;color:var(--color-text-secondary)}
+.design-field__ops{display:flex;gap:2px;flex-shrink:0}
+.design-sub{margin:8px 0 0;padding:8px;border:1px dashed #C5D4EB;border-radius:4px;background:#fff}
+.design-sub__hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;color:var(--color-btn-primary)}
+.design-sub-row{display:flex;align-items:center;gap:8px;padding:6px 8px;margin-bottom:4px;border:1px solid var(--color-border);border-radius:4px;font-size:12px}
+.design-props{width:240px;flex-shrink:0;border:1px solid var(--color-border);border-radius:4px;padding:12px;background:#fafafa;overflow:auto}
+.design-props__title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--color-text-main)}
+.design-props .el-form-item{margin-bottom:12px}
+.btn-preview{--el-button-bg-color:#FA8C16;--el-button-border-color:#FA8C16;--el-button-hover-bg-color:#FFA940;--el-button-hover-border-color:#FFA940;--el-button-active-bg-color:#D46B08;--el-button-active-border-color:#D46B08;--el-button-text-color:#fff;--el-button-hover-text-color:#fff}
+.job-proc-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.job-proc-tab{padding:6px 14px;border:1px solid #ADC6FF;border-radius:14px;background:#F0F5FF;color:var(--color-btn-primary);font-size:13px;cursor:pointer}
+.job-proc-tab.is-active{background:var(--color-btn-primary);color:#fff;border-color:var(--color-btn-primary)}
+.batch-line-toolbar{display:flex;gap:8px;margin:8px 0 10px}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="app-shell">
+    <aside class="app-aside">
+      <div class="app-aside__logo">思特瑞 WMS Demo</div>
+      <div class="app-aside__scroll">
+        <el-menu :default-active="activeMenu" :default-openeds="defaultOpeneds" background-color="#FFFFFF" text-color="#262626" active-text-color="#1A4099" @select="onSelectMenu">
+          <template v-for="m1 in menu" :key="m1.index">
+            <el-sub-menu v-if="m1.children" :index="m1.index">
+              <template #title>
+                <menu-icon :name="({ '基础数据':'database', '仓储管理':'grid', '物流管理':'truck', '条码管理':'qr' })[m1.title] || 'grid'"></menu-icon>
+                <span class="menu-item-label">{{ m1.title }}</span>
+              </template>
+              <template v-for="m2 in m1.children" :key="m2.index">
+                <el-sub-menu v-if="m2.children" :index="m2.index">
+                  <template #title><span class="menu-item-label">{{ m2.title }}</span></template>
+                  <template v-for="m3 in m2.children" :key="m3.index">
+                    <el-sub-menu v-if="m3.children" :index="m3.index">
+                      <template #title><span class="menu-item-label">{{ m3.title }}</span></template>
+                      <el-menu-item v-for="leaf in m3.children" :key="leaf.index" :index="leaf.index">{{ leaf.title }}</el-menu-item>
+                    </el-sub-menu>
+                    <el-menu-item v-else :index="m3.index">{{ m3.title }}</el-menu-item>
+                  </template>
+                </el-sub-menu>
+                <el-menu-item v-else :index="m2.index">{{ m2.title }}</el-menu-item>
+              </template>
+            </el-sub-menu>
+          </template>
+        </el-menu>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <el-breadcrumb separator="/">
+          <el-breadcrumb-item v-for="(b,i) in breadcrumb" :key="i">{{ b }}</el-breadcrumb-item>
+        </el-breadcrumb>
+        <div class="app-header__actions">
+          <div class="mode-switch">
+            <a href="./pc.html" class="on">PC</a>
+            <a href="./app.html">APP</a>
+          </div>
+          <el-tooltip content="按 PRD 对齐的可点击预览；无真实接口"><button type="button" class="app-header__icon" style="width:auto;padding:0 10px;font-size:12px">Demo</button></el-tooltip>
+        </div>
+      </header>
+
+      <div class="app-body">
+        <div class="page-panel" :class="{ 'page-panel--dict': page && page.layout==='dict-split' }" v-if="page">
+          <!-- 数据字典左侧：字典类型树 -->
+          <aside v-if="page.layout==='dict-split'" class="dict-type-panel">
+            <div class="dict-type-panel__hd">
+              <div class="dict-type-panel__title">
+                <span>字典类型</span>
+                <el-button type="primary" size="small" @click="openDictTypeForm('add')">新增</el-button>
+              </div>
+              <el-input v-model="dictTypeKw" clearable placeholder="搜索字典类型名称" size="small"></el-input>
+            </div>
+            <div class="dict-type-panel__body">
+              <div v-if="!filteredDictTypeTree.length" class="dict-empty-tip">暂无匹配的字典类型</div>
+              <template v-else>
+                <dict-type-tree-nodes
+                  :nodes="filteredDictTypeTree"
+                  :active-id="dictTypeId"
+                  @select="selectDictType"
+                  @edit="(n)=>openDictTypeForm('edit', n)"
+                  @remove="removeDictType"
+                ></dict-type-tree-nodes>
+              </template>
+            </div>
+          </aside>
+
+          <div :class="page.layout==='dict-split' ? 'dict-main' : ''" style="display:flex;flex-direction:column;flex:1;min-width:0;min-height:0">
+          <div class="page-tabs" v-if="page.tabs && page.tabs.length">
+            <el-tabs v-model="activeTab" @tab-change="onTabChange">
+              <el-tab-pane v-for="t in page.tabs" :key="t.name" :name="t.name" :label="t.label"></el-tab-pane>
+            </el-tabs>
+          </div>
+
+          <div v-if="page.stub" class="stub-tip">该页 PRD 字段仍在完善中；当前按已有字段清单/占位展示。</div>
+
+          <section class="query-area">
+            <div class="query-area__row">
+              <div class="query-area__fields">
+                <el-form :inline="true" class="query-form">
+                  <el-form-item v-for="f in visibleQueryFields" :key="f.name" :label="f.name">
+                    <el-select v-if="f.type==='select'" v-model="query[f.name]" clearable placeholder="全部" style="width:100%">
+                      <el-option label="全部" value=""></el-option>
+                      <el-option v-for="o in (f.options||[])" :key="o" :label="o" :value="o"></el-option>
+                    </el-select>
+                    <el-date-picker v-else-if="f.type==='daterange'" v-model="query[f.name]" type="daterange" value-format="YYYY-MM-DD" start-placeholder="开始日期" end-placeholder="结束日期" style="width:100%"></el-date-picker>
+                    <el-date-picker v-else-if="f.type==='date'" v-model="query[f.name]" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%"></el-date-picker>
+                    <el-input v-else v-model="query[f.name]" clearable placeholder="请输入"></el-input>
+                  </el-form-item>
+                </el-form>
+              </div>
+              <div class="query-area__actions">
+                <el-button type="primary" @click="onQuery">查询</el-button>
+                <el-button @click="onResetQuery">重置</el-button>
+                <el-button v-if="hasMoreQuery" link type="primary" @click="queryExpanded=!queryExpanded">{{ queryExpanded ? '收起' : '更多' }}</el-button>
+              </div>
+            </div>
+          </section>
+
+          <section class="list-area">
+            <div class="list-toolbar">
+              <div class="list-toolbar__info">
+                <span class="list-toolbar__title">{{ page.title }}{{ currentTabLabel ? ' · ' + currentTabLabel : '' }}{{ dictTypeTitle ? ' · ' + dictTypeTitle : '' }}</span>
+                <span class="list-toolbar__sel">已选: {{ selectedIds.length }}</span>
+              </div>
+              <div class="list-toolbar__actions">
+                <el-button v-for="btn in (tabView.toolbar||[])" :key="btn.name"
+                  :type="btn.type==='primary'?'primary':(btn.type==='danger'?'danger':'default')"
+                  :disabled="page.layout==='dict-split' && !dictTypeId && (btn.name==='新增'||btn.name==='导入')"
+                  @click="onToolbar(btn)">{{ btn.name }}</el-button>
+                <div class="list-toolbar__icons">
+                  <el-tooltip content="刷新"><button type="button" class="icon-btn" @click="ElMessage.success('已刷新')">⟳</button></el-tooltip>
+                </div>
+              </div>
+            </div>
+            <div class="list-body">
+              <div v-if="page.layout==='dict-split' && !dictTypeId" class="dict-empty-tip">请先在左侧选择字典类型</div>
+              <template v-else>
+              <demo-vxe-grid :data="pagedData" :columns="vxeColumns" :selected-ids="selectedIds" @update:selected-ids="selectedIds=$event">
+                <template #tag="{ row, column }">
+                  <span class="tag" :class="tagClass(row[column.field])">{{ row[column.field] }}</span>
+                </template>
+                <template #row_actions="{ row }">
+                  <div class="row-op">
+                    <el-button v-for="op in (tabView.rowOps||[])" :key="op.name" link type="primary" @click="onRowOp(op, row)">{{ op.name }}</el-button>
+                    <span v-if="!(tabView.rowOps&&tabView.rowOps.length)" class="demo-readonly">—</span>
+                  </div>
+                </template>
+              </demo-vxe-grid>
+              <div class="list-pager">
+                <el-pagination
+                  v-model:current-page="pageNum"
+                  v-model:page-size="pageSize"
+                  :total="tableData.length"
+                  :page-sizes="[20,50,100]"
+                  layout="prev, pager, next, sizes, jumper, ->, total">
+                  <template #total="{ total }">共 {{ total }} 条记录</template>
+                </el-pagination>
+              </div>
+              </template>
+            </div>
+          </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增/编辑 字典项 -->
+  <el-dialog v-model="formVisible" class="demo-dialog--biz" :title="formDialogTitle" :width="formDialogWidth" top="6vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="128px" v-if="page">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>{{ pageId==='dict' ? '字典项信息' : (page.formFlat ? '表单信息' : '头信息') }}</span></h4>
+        <el-alert v-if="(page.formTips||[]).length" type="warning" :closable="false" style="margin-bottom:12px" :title="(page.formTips||[])[0]"></el-alert>
+        <div class="demo-form-grid" v-if="activeFormFields.length">
+          <el-form-item v-for="f in activeFormFields" :key="f.name" :label="f.name" :required="f.required">
+            <el-input v-if="f.type==='readonly'" :model-value="(f.ctrl||'').includes('系统')?'系统自动生成':'自动带入'" disabled></el-input>
+            <el-select v-else-if="f.type==='select'" v-model="formModel[f.name]" placeholder="请选择" style="width:100%">
+              <el-option v-for="opt in ((f.options&&f.options.length)?f.options:['示例选项'])" :key="opt" :label="opt" :value="opt"></el-option>
+            </el-select>
+            <div v-else-if="f.type==='number-unit'" style="display:flex;gap:8px;width:100%">
+              <el-input placeholder="请输入" style="flex:1"></el-input>
+              <el-select :model-value="(f.defaultUnit||'天')" style="width:96px">
+                <el-option v-for="u in (f.options||['天','月','年'])" :key="u" :label="u" :value="u"></el-option>
+              </el-select>
+            </div>
+            <el-date-picker v-else-if="f.type==='date'" v-model="formModel[f.name]" :type="(f.ctrl||'').includes('时分')||f.name.includes('计划开始')?'datetime':'date'" :value-format="(f.ctrl||'').includes('时分')||f.name.includes('计划开始')?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="(f.ctrl||'').includes('时分')||f.name.includes('计划开始')?'选择日期时间':'选择日期'" style="width:100%"></el-date-picker>
+            <el-input v-else-if="f.type==='picker'" :model-value="formModel[f.name]||''" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
+            <el-switch v-else-if="f.type==='switch'" v-model="formSwitch[f.name]" active-text="启用" inactive-text="禁用"></el-switch>
+            <el-input v-else v-model="formModel[f.name]" placeholder="请输入"></el-input>
+          </el-form-item>
+        </div>
+        <el-empty v-else description="本页暂无新增编辑字段配置（或 PRD 仍为 stub）"></el-empty>
+      </section>
+      <section class="demo-form-section" v-if="!page.formFlat && activeFormLineFields.length">
+        <el-alert v-if="page.formLineTip" type="info" :closable="false" style="margin-bottom:10px" :title="page.formLineTip"></el-alert>
+        <el-tabs>
+          <el-tab-pane :label="page.formLineTabLabel || '物料'">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap" v-if="(page.formLineActions||[]).length">
+              <el-button v-for="a in page.formLineActions" :key="(a && a.name)||a" size="small" :type="String((a && a.name)||a).includes('删除')?'danger':'default'" @click="onFormLineAction((a && a.name)||a)">{{ (a && a.name)||a }}</el-button>
+            </div>
+            <el-table class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
+              <el-table-column type="selection" width="48"></el-table-column>
+              <el-table-column type="index" label="序号" width="56"></el-table-column>
+              <el-table-column v-for="f in activeFormLineFields" :key="f.name" :label="f.name" :min-width="f.name.includes('物料')?180:110" show-overflow-tooltip>
+                <template #default="{ row }">
+                  <el-input v-if="f.type==='readonly' || (f.name==='物料信息' && row[f.name])" :model-value="row[f.name]||'自动带入'" disabled size="small"></el-input>
+                  <el-select v-else-if="f.type==='select'" placeholder="请选择" size="small" style="width:100%"><el-option label="示例选项" value="demo"></el-option></el-select>
+                  <el-date-picker v-else-if="f.type==='date'" type="date" value-format="YYYY-MM-DD" placeholder="日期" size="small" style="width:100%"></el-date-picker>
+                  <el-input v-else-if="f.type==='picker'" readonly size="small" placeholder="请选择" @click="openPicker(f.name)"></el-input>
+                  <el-input v-else size="small" :model-value="row[f.name]||''" placeholder="请输入"></el-input>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+      </section>
+      <section class="demo-form-section" v-if="(page.formBarcodeFields||[]).length">
+        <h4 class="demo-form-section__title"><span>{{ page.formBarcodeTabLabel || '条码详情' }}</span></h4>
+        <el-table class="demo-data-table demo-data-table--striped" :data="formBarcodeRows" border stripe style="width:100%" max-height="240">
+          <el-table-column type="selection" width="48"></el-table-column>
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="f in page.formBarcodeFields" :key="f.name" :prop="f.name" :label="f.name" :min-width="f.name.includes('物料')?120:100" show-overflow-tooltip></el-table-column>
+        </el-table>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="formVisible=false">取消</el-button>
+      <el-button type="primary" @click="onFormOk">确定</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 新增/编辑 字典类型 -->
+  <el-dialog v-model="dictTypeFormVisible" class="demo-dialog--biz" :title="(dictTypeFormMode==='add'?'新增':'编辑') + '字典类型'" width="560px" top="10vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="108px">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>字典类型信息</span></h4>
+        <div class="demo-form-grid" style="grid-template-columns:1fr">
+          <el-form-item v-for="f in visibleTypeFormFields" :key="f.name" :label="f.name" :required="f.required">
+            <el-select v-if="f.name==='上级字典'" v-model="dictTypeForm['上级字典']" clearable placeholder="不选则为顶级" style="width:100%">
+              <el-option v-for="t in dictTypeOptions" :key="t.id" :label="t.名称" :value="t.id" :disabled="dictTypeFormMode==='edit' && t.id===dictTypeForm.id"></el-option>
+            </el-select>
+            <el-switch v-else-if="f.type==='switch'" v-model="dictTypeForm['系统开发']" disabled active-text="是" inactive-text="否"></el-switch>
+            <el-input v-else v-model="dictTypeForm[f.name]" :placeholder="'请输入'+f.name"></el-input>
+          </el-form-item>
+        </div>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="dictTypeFormVisible=false">取消</el-button>
+      <el-button type="primary" @click="onDictTypeFormOk">确认</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 详情 -->
+  <el-dialog v-model="detailVisible" class="demo-dialog--biz" :title="'详情 · ' + (page?page.title:'')" :width="pageId==='lg-waybill'?'1100px':'960px'" top="6vh" align-center destroy-on-close append-to-body>
+    <template v-if="page">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>头信息（只读）</span></h4>
+        <div class="demo-form-grid" v-if="page.detailFields && page.detailFields.length">
+          <el-form-item v-for="f in page.detailFields" :key="f.name || f" :label="f.name || f">
+            <span class="demo-readonly">{{ detailRow[f.name || f] || '—' }}</span>
+          </el-form-item>
+        </div>
+        <div class="demo-form-grid" v-else>
+          <el-form-item v-for="(v,k) in detailRowFiltered" :key="k" :label="k">
+            <span class="demo-readonly">{{ v }}</span>
+          </el-form-item>
+        </div>
+      </section>
+      <section class="demo-form-section" v-if="detailLineFields.length">
+        <h4 class="demo-form-section__title"><span>{{ page.detailLineTitle || '明细' }}</span></h4>
+        <div style="display:flex;gap:8px;margin-bottom:10px" v-if="(page.detailLineActions||[]).length">
+          <el-button v-for="a in page.detailLineActions" :key="a" size="small" :type="a.includes('解绑')||a.includes('删除')?'danger':'primary'" @click="onDetailLineAction(a)">{{ a }}</el-button>
+        </div>
+        <el-table class="demo-data-table demo-data-table--striped" :data="detailLineRows" border stripe style="width:100%" max-height="320">
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="f in detailLineFields" :key="f.name" :prop="f.name" :label="f.name" :min-width="f.name.includes('物料')?160:100" show-overflow-tooltip></el-table-column>
+          <el-table-column v-if="pageId==='po' || pageId==='so'" label="操作" width="80" fixed="right">
+            <template #default>
+              <el-button link type="primary" @click="ElMessage.success('明细行已关闭')">关闭</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </section>
+      <section class="demo-form-section" v-if="(page.detailEnrouteFields||[]).length">
+        <h4 class="demo-form-section__title"><span>{{ page.detailEnrouteTitle || '在途信息（APP 上报）' }}</span></h4>
+        <p style="margin:0 0 10px;color:#64748b;font-size:12px">数据来自 APP「更新在途信息」，按记录时间倒序；点击左侧箭头可展开经纬度 / 照片 / 工序摘要。PC 仅只读查看。</p>
+        <el-empty v-if="!detailEnrouteRows.length" description="暂无在途信息（司机在 APP 更新后将在此展示）" :image-size="64"></el-empty>
+        <el-table v-else class="demo-data-table demo-data-table--striped" :data="detailEnrouteRows" border stripe style="width:100%" max-height="360">
+          <el-table-column type="expand">
+            <template #default="{ row }">
+              <div style="padding:10px 20px;line-height:1.8;color:#334155;font-size:13px">
+                <div><b>当前位置经纬度：</b>{{ row['经纬度'] || '定位失败' }}</div>
+                <div><b>沿途照片：</b>{{ Number(row['照片']||0) > 0 ? (row['照片'] + ' 张（Demo 缩略预览）') : '—' }}</div>
+                <div v-if="row['工序摘要']"><b>工序执行摘要：</b>{{ row['工序摘要'] }}</div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="f in page.detailEnrouteFields" :key="f.name" :prop="f.name" :label="f.name" :min-width="f.name==='当前位置'?160:(f.name==='备注'?140:110)" show-overflow-tooltip>
+            <template #default="{ row }">
+              <span v-if="f.name==='行驶状态'" class="tag" :class="tagClass(row['行驶状态'])">{{ row['行驶状态'] || '—' }}</span>
+              <span v-else>{{ row[f.name] ?? '—' }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </section>
+    </template>
+    <template #footer>
+      <el-button v-if="pageId==='so'" type="primary" plain @click="ElMessage.success('已打开下推销售备货单弹窗（Demo）')">下推销售备货单</el-button>
+      <el-button type="primary" @click="detailVisible=false">关闭</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 批量新增 -->
+  <el-dialog v-model="batchVisible" class="demo-dialog--biz" :title="batchTitle" width="1100px" top="4vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="120px" v-if="page">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>表头信息</span></h4>
+        <div class="demo-form-grid">
+          <el-form-item v-for="f in (page.batchAddFields||[])" :key="f.name" :label="f.name" :required="f.required">
+            <el-input v-if="f.type==='readonly'" model-value="自动带入" disabled></el-input>
+            <el-select v-else-if="f.type==='select'" v-model="batchForm[f.name]" placeholder="请选择" style="width:100%"><el-option label="示例选项" value="demo"></el-option></el-select>
+            <div v-else-if="f.type==='number-unit'" style="display:flex;gap:8px;width:100%">
+              <el-input v-model="batchForm[f.name]" placeholder="请输入" style="flex:1"></el-input>
+              <el-select :model-value="(f.defaultUnit||'天')" style="width:96px"><el-option v-for="u in (f.options||['天','月','年'])" :key="u" :label="u" :value="u"></el-option></el-select>
+            </div>
+            <el-date-picker v-else-if="f.type==='date'" v-model="batchForm[f.name]" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%"></el-date-picker>
+            <el-input v-else-if="f.type==='picker'" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
+            <el-input v-else v-model="batchForm[f.name]" :placeholder="f.name==='条码生成个数'?'请输入正整数':'请输入'"></el-input>
+          </el-form-item>
+        </div>
+      </section>
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>批量生成</span></h4>
+        <div class="batch-line-toolbar">
+          <el-button type="primary" size="small" @click="onGenerateBatch">生成条码</el-button>
+          <el-button type="danger" size="small" plain @click="onBatchDeleteLines">批量删除</el-button>
+        </div>
+        <el-table class="demo-data-table demo-data-table--striped" :data="batchLines" border stripe style="width:100%" max-height="280" @selection-change="rows=>batchSelected=rows">
+          <el-table-column type="selection" width="48"></el-table-column>
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="c in (page.batchAddLineColumns||[])" :key="c" :label="c" :min-width="c.includes('条码')||c.includes('物料')?140:100" show-overflow-tooltip>
+            <template #default="{ row }"><el-input v-model="row[c]" size="small"></el-input></template>
+          </el-table-column>
+        </el-table>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="batchVisible=false">取消</el-button>
+      <el-button type="primary" @click="onBatchOk">确认</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 工艺配置 -->
+  <el-dialog v-model="craftVisible" class="demo-dialog--biz" :title="craftTitle" width="1080px" top="4vh" align-center destroy-on-close append-to-body>
+    <div class="craft-layout">
+      <aside class="craft-side">
+        <el-input v-model="craftKw" size="small" clearable placeholder="工序名称搜索" class="craft-side__search"></el-input>
+        <div style="flex:1;overflow:auto">
+          <div v-for="p in filteredCraftProcs" :key="p" class="craft-proc" draggable="true" @dragstart="onCraftDragStart(p)" @dblclick="addCraftNode(p)">{{ p }}</div>
+        </div>
+        <div class="craft-tools">
+          <el-button size="small" @click="craftZoom=Math.min(1.4,craftZoom+0.1)">+</el-button>
+          <el-button size="small" @click="craftZoom=Math.max(0.7,craftZoom-0.1)">-</el-button>
+          <el-button size="small" @click="craftZoom=1">适配</el-button>
+          <el-button size="small" :type="craftLocked?'warning':'default'" @click="craftLocked=!craftLocked">{{ craftLocked?'已锁':'锁定' }}</el-button>
+        </div>
+      </aside>
+      <div class="craft-canvas" @dragover.prevent @drop="onCraftDrop" :style="{transform:'scale('+craftZoom+')',transformOrigin:'0 0'}">
+        <div v-for="n in craftNodes" :key="n.id" class="craft-node" :style="{left:n.x+'px',top:n.y+'px'}" @click="openCraftProc(n)">{{ n.name }}</div>
+        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+          <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8BA3D4"/></marker></defs>
+          <line v-for="(e,i) in craftEdgeLines" :key="i" :x1="e.x1" :y1="e.y1" :x2="e.x2" :y2="e.y2" stroke="#8BA3D4" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+        </svg>
+      </div>
+    </div>
+    <template #footer>
+      <el-button @click="craftVisible=false">取消</el-button>
+      <el-button type="primary" @click="onCraftOk">确定</el-button>
+    </template>
+  </el-dialog>
+
+
+  <!-- 工艺节点 · 通用工序填报 -->
+  <el-dialog v-model="craftProcVisible" class="demo-dialog--biz" title="工序信息" width="640px" top="12vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="108px" v-if="craftProcForm">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>工序填报</span></h4>
+        <div class="demo-form-grid" style="grid-template-columns:1fr">
+          <el-form-item label="工序名称"><el-input :model-value="craftProcForm.name" disabled></el-input></el-form-item>
+          <el-form-item label="检查说明"><el-input v-model="craftProcForm.desc" type="textarea" :rows="2" placeholder="请输入检查说明"></el-input></el-form-item>
+          <el-form-item label="数值项"><el-input v-model="craftProcForm.num" placeholder="请输入"></el-input></el-form-item>
+          <el-form-item label="检查日期"><el-date-picker v-model="craftProcForm.date" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%"></el-date-picker></el-form-item>
+          <el-form-item label="结果判定">
+            <el-select v-model="craftProcForm.result" placeholder="请选择" style="width:100%">
+              <el-option label="合格" value="合格"></el-option>
+              <el-option label="不合格" value="不合格"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注"><el-input v-model="craftProcForm.remark" placeholder="选填"></el-input></el-form-item>
+        </div>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="craftProcVisible=false">取消</el-button>
+      <el-button type="primary" @click="onCraftProcOk">确定</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 表单设计 -->
+  <el-dialog v-model="designVisible" class="demo-dialog--biz" :title="designTitle" width="1180px" top="3vh" align-center destroy-on-close append-to-body>
+    <div class="design-layout">
+      <aside class="design-palette">
+        <div class="design-palette__group">基础组件</div>
+        <div v-for="t in designBasic" :key="t" class="design-palette__item" draggable="true" @dragstart="designDragType=t" @click="addDesignField(t)">{{ t }}</div>
+        <div class="design-palette__group">高级组件</div>
+        <div v-for="t in designAdvanced" :key="'a'+t" class="design-palette__item" draggable="true" @dragstart="designDragType=t" @click="addDesignField(t)">{{ t }}</div>
+      </aside>
+      <div class="design-canvas" @dragover.prevent @drop="onDesignDrop">
+        <div class="design-canvas__title">{{ designFormTitle }}</div>
+        <div
+          v-for="(f,i) in designCanvas" :key="f.id||i"
+          class="design-field" :class="{'is-active': designActive===i}"
+          @click="selectDesignField(i)"
+        >
+          <div class="design-field__main">
+            <div class="design-field__label"><span v-if="f.required" class="req">*</span>{{ f.label }}</div>
+            <div class="design-field__type">{{ f.type }}</div>
+            <div v-if="f.children && f.children.length" class="design-sub">
+              <div class="design-sub__hd">
+                <span>{{ f.type==='子表（表格）'?'表格列':'子表字段' }}</span>
+                <el-button v-if="f.type==='子表（表单）'" link type="primary" size="small" @click.stop="ElMessage.success('已新增一条子表单记录')">新增</el-button>
+              </div>
+              <div v-for="(c,ci) in f.children" :key="ci" class="design-sub-row">
+                <span style="flex:1"><span v-if="c.required" style="color:#FF4D4F">*</span>{{ c.label }} · {{ c.type }}</span>
+                <el-button link type="danger" size="small" @click.stop="removeDesignChild(i,ci)">删除</el-button>
+              </div>
+            </div>
+          </div>
+          <div class="design-field__ops" @click.stop>
+            <el-button link size="small" :disabled="i===0" @click="moveDesignField(i,-1)">↑</el-button>
+            <el-button link size="small" :disabled="i===designCanvas.length-1" @click="moveDesignField(i,1)">↓</el-button>
+            <el-button link size="small" @click="copyDesignField(i)">复制</el-button>
+            <el-button link type="danger" size="small" @click="removeDesignField(i)">删除</el-button>
+          </div>
+        </div>
+        <el-empty v-if="!designCanvas.length" description="从左侧拖拽或点击组件添加到画布" :image-size="56"></el-empty>
+      </div>
+      <aside class="design-props">
+        <div class="design-props__title">设置{{ designActiveField ? ' · '+designActiveField.type : '' }}</div>
+        <template v-if="designActiveField">
+          <el-form label-position="top" size="small">
+            <el-form-item label="标题名称"><el-input v-model="designActiveField.label" placeholder="默认为标题名称的原名称"></el-input></el-form-item>
+            <el-form-item label="占位内容"><el-input v-model="designActiveField.placeholder" placeholder="请输入占位提示"></el-input></el-form-item>
+            <el-form-item label="必填"><el-switch v-model="designActiveField.required"></el-switch></el-form-item>
+            <template v-if="designActiveField.type==='文字'">
+              <el-divider content-position="left">组件属性</el-divider>
+              <el-form-item label="字号">
+                <el-select v-model="designActiveField.fontSize" style="width:100%">
+                  <el-option v-for="n in [12,13,14,16,18]" :key="n" :label="n+'号'" :value="n"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="颜色"><el-color-picker v-model="designActiveField.color"></el-color-picker></el-form-item>
+              <el-form-item label="加粗字体"><el-checkbox v-model="designActiveField.bold">加粗</el-checkbox></el-form-item>
+            </template>
+            <p v-else style="font-size:12px;color:var(--color-text-secondary);margin:0;line-height:1.6">切换选中其他控件时，此处展示对应校验、数据联动等专属配置（Demo 示意）。</p>
+          </el-form>
+        </template>
+        <el-empty v-else description="选中画布组件后配置属性" :image-size="48"></el-empty>
+      </aside>
+    </div>
+    <template #footer>
+      <div style="display:flex;width:100%;justify-content:space-between;align-items:center">
+        <el-button class="btn-preview" type="warning" @click="openFormPreview">预览</el-button>
+        <div>
+          <el-button @click="onDesignCancel">取消</el-button>
+          <el-button type="primary" @click="onDesignOk">确定</el-button>
+        </div>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 表单预览 -->
+  <el-dialog v-model="formPreviewVisible" class="demo-dialog--biz" title="表单预览" width="560px" align-center destroy-on-close append-to-body>
+    <div style="font-size:15px;font-weight:600;text-align:center;margin-bottom:16px">{{ designFormTitle }}</div>
+    <el-form label-width="140px">
+      <template v-for="(f,i) in designCanvas" :key="'pv'+i">
+        <el-form-item v-if="!(f.children&&f.children.length)" :label="f.label" :required="f.required">
+          <el-input v-if="f.type.includes('文本')||f.type==='扫码文本'" :placeholder="f.placeholder||'请输入'"></el-input>
+          <el-input v-else-if="f.type==='数字输入'" placeholder="请输入数字"></el-input>
+          <el-date-picker v-else-if="f.type==='日期选择'" type="date" placeholder="选择日期" style="width:100%"></el-date-picker>
+          <el-select v-else-if="f.type==='下拉选择'" placeholder="请选择" style="width:100%"><el-option label="选项A" value="a"></el-option></el-select>
+          <el-radio-group v-else-if="f.type==='单/多选框'"><el-radio value="1">选项1</el-radio><el-radio value="2">选项2</el-radio></el-radio-group>
+          <div v-else-if="f.type==='签字'" class="sign-box" style="height:64px;border:1px dashed #D9D9D9;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#BFBFBF;cursor:pointer" @click="ElMessage.info('手写签字板')">点击签字</div>
+          <el-button v-else-if="f.type.includes('上传')" size="small">上传</el-button>
+          <span v-else class="demo-readonly">{{ f.type }}</span>
+        </el-form-item>
+        <div v-else style="margin-bottom:16px;padding:12px;border:1px solid var(--color-border);border-radius:4px">
+          <div style="font-weight:500;margin-bottom:8px">{{ f.label }}</div>
+          <el-form-item v-for="(c,ci) in f.children" :key="ci" :label="c.label" :required="c.required">
+            <el-input placeholder="预览填写"></el-input>
+          </el-form-item>
+        </div>
+      </template>
+    </el-form>
+    <template #footer>
+      <el-button type="primary" @click="formPreviewVisible=false">关闭</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 导入 -->
+  <el-dialog v-model="importVisible" class="demo-dialog--biz" title="导入数据" width="520px" align-center destroy-on-close append-to-body>
+    <p style="margin:0 0 12px;color:var(--color-text-secondary);font-size:13px">请先下载导入模板，按模板填写后上传文件。系统将校验数据合规性。</p>
+    <el-upload drag action="#" :auto-upload="false" :limit="1" accept=".xlsx,.xls,.csv">
+      <div style="padding:20px 0">将文件拖到此处，或<em>点击上传</em></div>
+      <template #tip><div class="el-upload__tip">支持 .xlsx / .xls / .csv</div></template>
+    </el-upload>
+    <template #footer>
+      <el-button @click="ElMessage.success('导入模板已开始下载')">下载导入模板</el-button>
+      <el-button @click="importVisible=false">取消</el-button>
+      <el-button type="primary" @click="importVisible=false;ElMessage.success('导入成功')">导入数据文件</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 导出 -->
+  <el-dialog v-model="exportVisible" class="demo-dialog--biz" title="导出数据" width="480px" align-center destroy-on-close append-to-body>
+    <p style="margin:0;color:var(--color-text-normal);font-size:14px;line-height:1.7">
+      {{ selectedIds.length ? ('将导出已勾选的 '+selectedIds.length+' 条数据。') : '未勾选数据，将导出当前筛选条件下的全部列表数据。' }}
+    </p>
+    <template #footer>
+      <el-button @click="exportVisible=false">取消</el-button>
+      <el-button type="primary" @click="exportVisible=false;ElMessage.success('导出成功')">确定导出数据</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 打印标签 -->
+  <el-dialog v-model="printVisible" class="demo-dialog--biz" title="打印样品条码" width="640px" align-center destroy-on-close append-to-body>
+    <el-form label-width="100px">
+      <el-form-item label="标签模板"><el-select model-value="demo" style="width:100%"><el-option label="标准条码模板" value="demo"></el-option><el-option label="储罐标签模板" value="tank"></el-option></el-select></el-form-item>
+      <el-form-item label="打印机"><el-select model-value="HP1001" style="width:100%"><el-option label="HP1001" value="HP1001"></el-option></el-select></el-form-item>
+      <el-form-item label="预览">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div v-for="n in Math.min(selectedIds.length||1,6)" :key="n" style="width:100px;height:60px;border:1px dashed var(--color-border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-text-secondary)">条码预览{{n}}</div>
+        </div>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="printVisible=false">取消</el-button>
+      <el-button type="primary" @click="printVisible=false;ElMessage.success('已发送打印任务')">打印</el-button>
+    </template>
+  </el-dialog>
+
+
+  <!-- 派车 → 新增物流订单 -->
+  <el-dialog v-model="dispatchVisible" class="demo-dialog--biz" title="派车 · 填写物流订单车辆信息" width="640px" align-center destroy-on-close append-to-body>
+    <el-form label-width="120px">
+      <el-form-item label="派车申请单号"><el-input :model-value="dispatchRow['派车申请单号']||''" disabled></el-input></el-form-item>
+      <el-form-item label="承运公司" required><el-input v-model="dispatchForm.承运公司" placeholder="请输入承运公司"></el-input></el-form-item>
+      <el-form-item label="提货车辆" required><el-input v-model="dispatchForm.提货车辆" placeholder="车牌号"></el-input></el-form-item>
+      <el-form-item label="司机" required><el-input v-model="dispatchForm.司机" placeholder="司机姓名"></el-input></el-form-item>
+      <el-form-item label="司机联系电话" required><el-input v-model="dispatchForm.司机联系电话" placeholder="手机号"></el-input></el-form-item>
+      <el-form-item label="核定载重量"><el-input v-model="dispatchForm.核定载重量" placeholder="吨"></el-input></el-form-item>
+      <el-form-item label="预计发车时间"><el-date-picker v-model="dispatchForm.预计发车时间" type="datetime" value-format="YYYY-MM-DD HH:mm:ss" style="width:100%"></el-date-picker></el-form-item>
+      <el-form-item label="运输备注"><el-input v-model="dispatchForm.运输备注" type="textarea"></el-input></el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="dispatchVisible=false">取消</el-button>
+      <el-button type="primary" @click="onDispatchOk">提交派车</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 选单弹窗 -->
+  <el-dialog v-model="pickerVisible" class="demo-dialog--biz" :title="'选择 · '+pickerTitle" width="720px" align-center destroy-on-close append-to-body>
+    <el-input v-model="pickerKw" clearable placeholder="关键词搜索" style="margin-bottom:12px;max-width:280px"></el-input>
+    <el-table class="demo-data-table demo-data-table--striped" :data="pickerRows" border stripe highlight-current-row @current-change="r=>pickerCurrent=r" max-height="320" style="width:100%">
+      <el-table-column type="index" width="56" label="序号"></el-table-column>
+      <el-table-column prop="编码" label="编码" width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="名称" label="名称" min-width="160" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="规格" label="规格" width="120" show-overflow-tooltip></el-table-column>
+    </el-table>
+    <template #footer>
+      <el-button @click="pickerVisible=false">取消</el-button>
+      <el-button type="primary" @click="onPickerOk">确定</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 作业详情 / 盘点详情 -->
+  <el-dialog v-model="jobVisible" class="demo-dialog--biz" :title="jobTitle" width="960px" top="5vh" align-center destroy-on-close append-to-body>
+    <section class="demo-form-section">
+      <h4 class="demo-form-section__title"><span>单据信息</span></h4>
+      <div class="demo-form-grid">
+        <el-form-item v-for="(v,k) in jobHead" :key="k" :label="k"><span class="demo-readonly">{{ v }}</span></el-form-item>
+      </div>
+    </section>
+    <template v-if="jobStockMode">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>库存详情</span></h4>
+        <el-alert v-if="jobInvTip" type="info" :closable="false" style="margin-bottom:10px" :title="jobInvTip"></el-alert>
+        <el-table class="demo-data-table demo-data-table--striped" :data="jobInvRows" border stripe style="width:100%" max-height="240">
+          <el-table-column type="selection" width="48"></el-table-column>
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="c in jobInvCols" :key="c" :prop="c" :label="c" :min-width="c.includes('物料')?120:100" show-overflow-tooltip></el-table-column>
+        </el-table>
+      </section>
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>条码详情</span></h4>
+        <el-table class="demo-data-table demo-data-table--striped" :data="jobBarcodeRows" border stripe style="width:100%" max-height="240">
+          <el-table-column type="selection" width="48"></el-table-column>
+          <el-table-column type="index" label="序号" width="56"></el-table-column>
+          <el-table-column v-for="c in jobBarcodeCols" :key="c" :prop="c" :label="c" :min-width="c.includes('物料')?120:100" show-overflow-tooltip></el-table-column>
+        </el-table>
+      </section>
+    </template>
+    <section class="demo-form-section" v-else-if="jobProcs.length">
+      <h4 class="demo-form-section__title"><span>作业详情</span></h4>
+      <div class="job-proc-tabs">
+        <div v-for="(p,i) in jobProcs" :key="i" class="job-proc-tab" :class="{'is-active':jobProcIdx===i}" @click="jobProcIdx=i">{{ p.name }}</div>
+      </div>
+      <div v-if="jobProcs[jobProcIdx]" style="border:1px solid var(--color-border);border-radius:4px;padding:12px">
+        <div style="margin-bottom:10px;font-size:13px;color:var(--color-text-secondary)">工序提交时间：{{ jobProcs[jobProcIdx].submitTime }}　提交人：{{ jobProcs[jobProcIdx].submitter }}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>{{ jobProcs[jobProcIdx].formTitle }}</strong>
+          <el-button size="small" @click="ElMessage.success('PDF 已开始下载')">下载PDF</el-button>
+        </div>
+        <div class="demo-form-grid">
+          <el-form-item v-for="(pair,i) in jobProcs[jobProcIdx].fields" :key="i" :label="pair[0]"><span class="demo-readonly">{{ pair[1] }}</span></el-form-item>
+        </div>
+      </div>
+    </section>
+    <template #footer>
+      <el-button type="primary" @click="jobVisible=false">关闭</el-button>
+    </template>
+  </el-dialog>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
+<script src="https://unpkg.com/element-plus"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
+<script src="./js/page-configs.js"></script>
+<script src="./js/mock-rows.js"></script>
+<script>
+const { createApp, ref, computed, reactive, watch, onMounted, onBeforeUnmount, nextTick } = Vue;
+const { ElMessage } = ElementPlus;
+if (typeof VXETable !== 'undefined') {
+  VXETable.setConfig({ zIndex: 2500, table: { border: true, showOverflow: 'tooltip', rowConfig: { isHover: true } } });
+}
+const MENU_ICON_PATHS = {
+  database: 'M4 6h16v3H4V6zm0 5h16v3H4v-3zm0 5h16v3H4v-3z M6 6v12 M18 6v12',
+  grid: 'M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z',
+  truck: 'M3 7h11v10H3V7zm11 3h4l3 3v4h-7V10zM6 19a2 2 0 100-4 2 2 0 000 4zm11 0a2 2 0 100-4 2 2 0 000 4z',
+  qr: 'M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 2h2v2h-2v-2zm4-2h2v6h-6v-2h4v-4z',
+};
+const MenuIcon = {
+  name: 'MenuIcon', props: { name: { type: String, required: true } },
+  template: '<svg class="menu-icon" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true"><path :d="MENU_ICON_PATHS[name]||MENU_ICON_PATHS.grid" /></svg>',
+  setup(){ return { MENU_ICON_PATHS }; }
+};
+const DemoVxeGrid = {
+  name: 'DemoVxeGrid',
+  props: { data:{type:Array,default:()=>[]}, columns:{type:Array,default:()=>[]}, selectedIds:{type:Array,default:()=>[]}, emptyText:{type:String,default:'暂无数据'} },
+  emits: ['update:selectedIds'],
+  template: `<div ref="wrapRef" class="demo-vxe-wrap">
+    <vxe-grid v-if="data.length" ref="gridRef" class="demo-vxe-grid" border stripe show-overflow="tooltip"
+      scroll-x="max-content" :height="gridHeight" :row-config="rowConfig" :column-config="columnConfig"
+      :checkbox-config="checkboxConfig" :columns="columns" :data="data"
+      @checkbox-change="sync" @checkbox-all="sync">
+      <template v-for="(_, name) in $slots" #[name]="scope"><slot :name="name" v-bind="scope||{}"></slot></template>
+    </vxe-grid>
+    <el-empty v-else :description="emptyText" />
+  </div>`,
+  setup(props,{emit}){
+    const gridRef=ref(null), wrapRef=ref(null), gridHeight=ref(280);
+    let ro=null;
+    const rowConfig={keyField:'id',isHover:true}, columnConfig={resizable:true};
+    const checkboxConfig=computed(()=>({highlight:true,reserve:true,checkRowKeys:[...props.selectedIds]}));
+    function sync(){ const rows=gridRef.value?.getCheckboxRecords?.()||[]; emit('update:selectedIds', rows.map(r=>r.id)); }
+    function updateH(){ if(!wrapRef.value)return; gridHeight.value=Math.max(200,wrapRef.value.clientHeight); nextTick(()=>gridRef.value?.recalculate?.()); }
+    onMounted(()=>{ updateH(); ro=new ResizeObserver(updateH); if(wrapRef.value)ro.observe(wrapRef.value); window.addEventListener('resize',updateH); });
+    watch(()=>props.data,()=>nextTick(()=>gridRef.value?.recalculate?.()));
+    watch(()=>props.columns,()=>nextTick(()=>gridRef.value?.recalculate?.()),{deep:true});
+    onBeforeUnmount(()=>{ ro?.disconnect(); window.removeEventListener('resize',updateH); });
+    return {gridRef,wrapRef,gridHeight,rowConfig,columnConfig,checkboxConfig,sync};
+  }
+};
+
+const DictTypeTreeNodes = {
+  name: 'DictTypeTreeNodes',
+  props: { nodes: { type: Array, default: () => [] }, activeId: String },
+  emits: ['select', 'edit', 'remove'],
+  template: `<div>
+    <div v-for="n in nodes" :key="n.id">
+      <div class="dict-type-node" :class="{ 'is-active': activeId===n.id }" @click="$emit('select', n)">
+        <span class="dict-type-node__name">{{ n.名称 }}</span>
+        <span class="dict-type-node__ops" @click.stop>
+          <el-button link type="primary" size="small" @click="$emit('edit', n)">编辑</el-button>
+          <el-button link type="danger" size="small" @click="$emit('remove', n)">删除</el-button>
+        </span>
+      </div>
+      <div v-if="n.children && n.children.length" class="dict-type-children">
+        <dict-type-tree-nodes :nodes="n.children" :active-id="activeId" @select="$emit('select', $event)" @edit="$emit('edit', $event)" @remove="$emit('remove', $event)"></dict-type-tree-nodes>
+      </div>
+    </div>
+  </div>`
+};
+
+const CFG = window.WMS_PAGE_CONFIGS || { menu:[], pages:{} };
+const MOCK = window.WMS_MOCK_ROWS || {};
+
+const app = createApp({
+  components: { DemoVxeGrid, MenuIcon, DictTypeTreeNodes },
+  setup(){
+    const menu = CFG.menu || [];
+    const firstId = CFG.pageList?.[0]?.id || 'mat-list';
+    const activeMenu = ref(firstId);
+    const pageId = ref(firstId);
+    const page = computed(()=> CFG.pages[pageId.value]);
+    const activeTab = ref('tab1');
+    const queryExpanded = ref(false);
+    const query = reactive({});
+    const selectedIds = ref([]);
+    const pageNum = ref(1);
+    const pageSize = ref(20);
+    const formVisible = ref(false);
+    const formMode = ref('add');
+    const formSwitch = reactive({ '启用状态': true });
+    const formModel = reactive({});
+    const poMatPool = ref([]); // 当前采购订单可选物料
+    const formLineSelected = ref([]);
+    const dispatchVisible = ref(false);
+    const dispatchRow = ref({});
+    const dispatchForm = reactive({ 承运公司:'', 提货车辆:'', 司机:'', 司机联系电话:'', 核定载重量:'', 预计发车时间:'', 运输备注:'' });
+    const detailVisible = ref(false);
+    const detailRow = ref({});
+    const dictTypeKw = ref('');
+    const dictTypeId = ref('');
+    const dictTypes = ref([...(MOCK.dict?.types || [])]);
+    const dictTypeFormVisible = ref(false);
+    const dictTypeFormMode = ref('add');
+    const dictTypeForm = reactive({ id:'', 编码:'', 名称:'', 上级字典:'', 备注:'', 系统开发:false });
+
+    const batchVisible = ref(false);
+    const batchForm = reactive({});
+    const batchLines = ref([]);
+    const batchSelected = ref([]);
+    const craftVisible = ref(false);
+    const craftProcVisible = ref(false);
+    const craftProcForm = ref(null);
+    const craftProcNodeId = ref(null);
+    const craftRow = ref(null);
+    const craftKw = ref('');
+    const craftZoom = ref(1);
+    const craftLocked = ref(false);
+    const craftNodes = ref([]);
+    const craftEdges = ref([]);
+    const craftDragProc = ref('');
+    const designVisible = ref(false);
+    const designCanvas = ref([]);
+    const designFormName = ref('');
+    const designFormTitle = ref('过程检查记录');
+    const designActive = ref(-1);
+    const designDragType = ref('');
+    const designDirty = ref(false);
+    const formPreviewVisible = ref(false);
+    const importVisible = ref(false);
+    const exportVisible = ref(false);
+    const printVisible = ref(false);
+    const pickerVisible = ref(false);
+    const pickerTitle = ref('');
+    const pickerKw = ref('');
+    const pickerCurrent = ref(null);
+    const jobVisible = ref(false);
+    const jobTitle = ref('作业详情');
+    const jobHead = ref({});
+    const jobProcs = ref([]);
+    const jobStockMode = ref(false);
+    const jobInvTip = ref('');
+    const jobInvCols = ref([]);
+    const jobBarcodeCols = ref([]);
+    const jobInvRows = ref([]);
+    const jobBarcodeRows = ref([]);
+    const formBarcodeRows = ref([]);
+    const jobProcIdx = ref(0);
+    const detailLineRows = ref([]);
+    const detailEnrouteRows = ref([]);
+
+
+    const defaultOpeneds = computed(() => []);
+
+    const tabView = computed(()=>{
+      const p = page.value; if(!p) return { toolbar:[], columns:[], queryFields:[], rowOps:[] };
+      const views = p.tabViews || [];
+      if(!views.length) return { toolbar:[], columns:[], queryFields:[], rowOps:[] };
+      if(p.tabs && p.tabs.length){
+        return views.find(v=>v.name===activeTab.value) || views[0];
+      }
+      return views[0];
+    });
+
+    const currentTabLabel = computed(()=>{
+      const p=page.value; if(!p||!p.tabs?.length) return '';
+      return (p.tabs.find(t=>t.name===activeTab.value)||{}).label||'';
+    });
+
+    const breadcrumb = computed(()=> page.value?.breadcrumb || []);
+    const activeFormFields = computed(()=> (tabView.value?.formFields && tabView.value.formFields.length) ? tabView.value.formFields : (page.value?.formFields || []));
+    const activeFormLineFields = computed(()=> page.value?.formLineFields || []);
+    const formLineRows = ref([{ _i:1 }, { _i:2 }]);
+    const formDialogTitle = computed(()=>{
+      if(pageId.value==='dict') return (formMode.value==='add'?'新增':(formMode.value==='copy'?'复制':'编辑')) + '字典项';
+      return (formMode.value==='add'?'新增':'编辑') + ' · ' + (page.value?.title||'');
+    });
+    const formDialogWidth = computed(()=>{
+      const n = (activeFormFields.value||[]).length;
+      const hasLines = (activeFormLineFields.value||[]).length>0;
+      if(hasLines || n>8) return '960px';
+      if(n>4) return '720px';
+      return '640px';
+    });
+    const detailLineFields = computed(()=> page.value?.detailLineFields || []);
+    const detailRowFiltered = computed(()=>{
+      const row = detailRow.value || {};
+      const skip = new Set(['id','_actions','typeId']);
+      const out = {};
+      Object.keys(row).forEach(k=>{ if(!skip.has(k)) out[k]=row[k]; });
+      return out;
+    });
+    const batchTitle = computed(()=>{
+      if(pageId.value==='serial-arch') return '批量新增流水码';
+      if(pageId.value==='outer-serial') return '批量新增外包材档案';
+      return '批量新增';
+    });
+    const craftTitle = computed(()=>{
+      const r = craftRow.value || {};
+      const code = r['工艺编码'] || r['编码'] || '';
+      const name = r['工艺名称'] || r['名称'] || '';
+      return code || name ? `工艺配置 · ${code} ${name}`.trim() : '工艺配置';
+    });
+    const designTitle = computed(()=> '表单设计 · ' + (designFormName.value||''));
+    const designBasic = computed(()=> page.value?.designBasic || ['文字','扫码文本','单行文本','数字输入','日期选择','下拉选择','单/多选框','签字','图片上传','附件上传']);
+    const designAdvanced = computed(()=> page.value?.designAdvanced || ['子表（表单）','子表（表格）']);
+    const designActiveField = computed(()=> designActive.value>=0 ? designCanvas.value[designActive.value] : null);
+    const filteredCraftProcs = computed(()=>{
+      const list = page.value?.craftProcs || [];
+      const kw = craftKw.value.trim();
+      return kw ? list.filter(x=>x.includes(kw)) : list;
+    });
+    const craftEdgeLines = computed(()=>{
+      const map = Object.fromEntries((craftNodes.value||[]).map(n=>[n.id,n]));
+      return (craftEdges.value||[]).map(([a,b])=>{
+        const n1=map[a], n2=map[b];
+        if(!n1||!n2) return null;
+        return { x1:n1.x+48, y1:n1.y+16, x2:n2.x+48, y2:n2.y+16 };
+      }).filter(Boolean);
+    });
+    const PO_MAT_MAP = {
+      'PO001': [
+        {编码:'M001',名称:'钢瓶',规格:'φ219',供应商:'苏州气体供应商'},
+        {编码:'M002',名称:'铝瓶',规格:'φ165',供应商:'苏州气体供应商'},
+        {编码:'M003',名称:'阀门',规格:'DN25',供应商:'苏州气体供应商'},
+      ],
+      'PO002': [
+        {编码:'M001',名称:'钢瓶',规格:'φ219',供应商:'上海包材供应商'},
+        {编码:'M004',名称:'软管',规格:'1.5m',供应商:'上海包材供应商'},
+      ],
+    };
+    const pickerRows = computed(()=>{
+      const t = pickerTitle.value || '';
+      let all = [];
+      if(t.includes('采购订单') || t.includes('委外加工单')){
+        all = [
+          {编码:'PO001',名称:'采购订单-钢瓶铝瓶',规格:'供应商：苏州气体供应商'},
+          {编码:'PO002',名称:'采购订单-软管钢瓶',规格:'供应商：上海包材供应商'},
+        ];
+      } else if(t.includes('供应商')){
+        all = [
+          {编码:'S001',名称:'苏州气体供应商',规格:'—'},
+          {编码:'S002',名称:'上海包材供应商',规格:'—'},
+        ];
+      } else if(t.includes('物流订单')){
+        all = [
+          {编码:'LO001',名称:'物流订单-沪苏线',规格:'承运商A'},
+          {编码:'LO002',名称:'物流订单-苏锡线',规格:'承运商B'},
+        ];
+      } else if(t.includes('物料') && ['wh-po-in','wh-os-issue','wh-os-recv','wh-os-ret-mat','wh-os-ret-goods'].includes(pageId.value) && (poMatPool.value||[]).length){
+        const used = new Set((formLineRows.value||[]).map(r=> (r.物料信息||'').split(' / ')[0]));
+        all = poMatPool.value.filter(m=> !used.has(m.编码));
+      } else {
+        all = [
+          {编码:'M001',名称:'钢瓶',规格:'φ219'},
+          {编码:'M002',名称:'铝瓶',规格:'φ165'},
+          {编码:'M003',名称:'阀门',规格:'DN25'},
+          {编码:'PO001',名称:'采购订单示例',规格:'—'},
+          {编码:'SO001',名称:'销售订单示例',规格:'—'},
+        ];
+      }
+      const kw = pickerKw.value.trim();
+      return kw ? all.filter(r=> (r.编码+r.名称+(r.规格||'')).includes(kw)) : all;
+    });
+
+    const visibleTypeFormFields = computed(()=> (page.value?.typeFormFields||[]).filter(f=> !(f.editOnly && dictTypeFormMode.value==='add')));
+    const dictTypeOptions = computed(()=> dictTypes.value);
+    const dictTypeTitle = computed(()=> (dictTypes.value.find(x=>x.id===dictTypeId.value)||{}).名称 || '');
+    function buildTypeTree(list, kw){
+      const map = {};
+      list.forEach(t=>{ map[t.id] = { ...t, children: [] }; });
+      const roots = [];
+      list.forEach(t=>{
+        const node = map[t.id];
+        if(t.上级字典 && map[t.上级字典]) map[t.上级字典].children.push(node);
+        else roots.push(node);
+      });
+      if(!kw) return roots;
+      const match = (n)=>{
+        const self = (n.名称||'').includes(kw);
+        const kids = (n.children||[]).map(match).filter(Boolean);
+        if(self || kids.length) return { ...n, children: kids.length ? kids : (self ? (n.children||[]) : []) };
+        return null;
+      };
+      return roots.map(match).filter(Boolean);
+    }
+    const filteredDictTypeTree = computed(()=> buildTypeTree(dictTypes.value, dictTypeKw.value.trim()));
+
+    const hasMoreQuery = computed(()=> (tabView.value.queryMore||[]).length>0 || (tabView.value.queryFields||[]).length>4);
+
+    const visibleQueryFields = computed(()=>{
+      const all = tabView.value.queryFields || [];
+      const defaults = tabView.value.queryDefault || [];
+      const mores = tabView.value.queryMore || [];
+      if(!defaults.length && !mores.length){
+        return queryExpanded.value ? all : all.slice(0,4);
+      }
+      const defSet = new Set(defaults);
+      const moreSet = new Set(mores);
+      const primary = all.filter(f=>defSet.has(f.name));
+      const rest = all.filter(f=>!defSet.has(f.name));
+      const base = primary.length ? primary : all.slice(0,4);
+      if(!queryExpanded.value) return base;
+      const more = rest.filter(f=> moreSet.size? moreSet.has(f.name): true);
+      const names = new Set(base.map(f=>f.name));
+      return base.concat(more.filter(f=>!names.has(f.name)));
+    });
+
+    const tableData = computed(()=>{
+      const rows = (MOCK[pageId.value]||{})[tabView.value.name] || [];
+      if(page.value?.layout==='dict-split'){
+        if(!dictTypeId.value) return [];
+        return rows.filter(r=> r.typeId===dictTypeId.value);
+      }
+      return rows;
+    });
+
+    const pagedData = computed(()=>{
+      const s=(pageNum.value-1)*pageSize.value;
+      return tableData.value.slice(s,s+pageSize.value);
+    });
+
+    const vxeColumns = computed(()=>{
+      const cols = [
+        { type:'checkbox', width:48, fixed:'left' },
+        { type:'seq', title:'序号', width:60, fixed:'left' },
+      ];
+      for(const c of (tabView.value.columns||[])){
+        if(c.field==='_actions' || c.slot==='row_actions' || c.title==='操作'){
+          cols.push({
+            field: '_actions',
+            title: c.title||'操作',
+            width: c.width||150,
+            minWidth: c.width||150,
+            fixed: 'right',
+            slots: { default: 'row_actions' },
+          });
+        } else if(c.slot==='tag'){
+          cols.push({ field:c.field, title:c.title, width:c.width||120, minWidth:c.width||100, fixed:c.fixed||null, slots:{ default:'tag' } });
+        } else {
+          const col = { field:c.field, title:c.title, width:c.width||120, minWidth:c.width||100 };
+          if(c.fixed==='left' || c.fixed==='right') col.fixed = c.fixed;
+          cols.push(col);
+        }
+      }
+      return cols;
+    });
+
+    function resetQueryModel(){
+      Object.keys(query).forEach(k=> delete query[k]);
+      (tabView.value.queryFields||[]).forEach(f=>{ query[f.name]=''; });
+    }
+
+    function loadPage(id){
+      pageId.value = id;
+      activeMenu.value = id;
+      const p = CFG.pages[id];
+      if(p?.tabs?.length){
+        activeTab.value = p.tabs[0].name;
+      } else if(p?.tabViews?.length){
+        activeTab.value = p.tabViews[0].name;
+      } else {
+        activeTab.value = 'main';
+      }
+      queryExpanded.value=false;
+      selectedIds.value=[];
+      pageNum.value=1;
+      dictTypeId.value='';
+      dictTypeKw.value='';
+      nextTick(resetQueryModel);
+    }
+
+    function onSelectMenu(index){
+      if(CFG.pages[index]) loadPage(index);
+    }
+    function onTabChange(){
+      selectedIds.value=[]; pageNum.value=1; queryExpanded.value=false; nextTick(resetQueryModel);
+    }
+    function onQuery(){ pageNum.value=1; ElMessage.success('已查询（Mock，无真实过滤）'); }
+    function onResetQuery(){ resetQueryModel(); queryExpanded.value=false; pageNum.value=1; }
+    function openForm(mode){
+      formMode.value = mode || 'add';
+      formSwitch['启用状态']=true;
+      Object.keys(formModel).forEach(k=> delete formModel[k]);
+      poMatPool.value = [];
+      const lines = (activeFormLineFields.value||[]).length;
+      formLineSelected.value = [];
+      const osPo = ['wh-os-issue','wh-os-recv','wh-os-ret-mat','wh-os-ret-goods'].includes(pageId.value);
+      // 选单带入类：选订单后再带入物料行；生产领料等可先空行再新增；储罐档案新增不带物料行
+      if(pageId.value==='tank-arch') formLineRows.value = [];
+      else if(pageId.value==='wh-po-in' || osPo) formLineRows.value = [];
+      else if(pageId.value==='wh-prod-issue') formLineRows.value = [];
+      else if(pageId.value==='wh-stocktake'){
+        const inv = (MOCK['wh-stocktake']||{}).stockInvLines || [];
+        const bc = (MOCK['wh-stocktake']||{}).stockBarcodeLines || [];
+        formLineRows.value = inv.map((r,i)=>({_i:i+1, ...r}));
+        formBarcodeRows.value = bc.map(r=>({...r}));
+      }
+      else formLineRows.value = lines ? [{_i:1},{_i:2}] : [];
+      if(pageId.value!=='wh-stocktake') formBarcodeRows.value = [];
+      formVisible.value=true;
+    }
+    function openDetail(row){
+      detailRow.value = { ...row };
+      const mockLines = (MOCK[pageId.value]||{}).detailLines;
+      if(mockLines && mockLines.length){
+        detailLineRows.value = mockLines.map(r=>({...r}));
+      } else if((page.value?.detailLineFields||[]).length){
+        detailLineRows.value = [{},{}].map((_,i)=>{
+          const o={};
+          (page.value.detailLineFields||[]).forEach(f=>{
+            o[f.name] = f.name.includes('物料') ? `M00${i+1} / 示例物料` : (f.name.includes('数量')?'10':(f.name.includes('状态')?'待执行':'—'));
+          });
+          return o;
+        });
+      } else {
+        detailLineRows.value = [];
+      }
+      // 在途信息：APP 上报；待发运通常为空
+      if((page.value?.detailEnrouteFields||[]).length){
+        const st = row?.['状态'] || '';
+        const enroute = (MOCK[pageId.value]||{}).enrouteLines || [];
+        detailEnrouteRows.value = (st === '待发运' || st === '已取消') ? [] : enroute.map(r=>({...r}));
+      } else {
+        detailEnrouteRows.value = [];
+      }
+      detailVisible.value=true;
+    }
+    function onToolbar(btn){
+      if(page.value?.layout==='dict-split' && (btn.name==='新增'||btn.name==='导入') && !dictTypeId.value){
+        ElMessage.warning('请先选择字典类型'); return;
+      }
+      if(btn.name==='新增' || btn.name==='添加仓库' || btn.name==='添加物料'){
+        openForm('add'); return;
+      }
+      if(btn.name==='批量新增'){
+        if(!(page.value?.batchAddFields||[]).length){
+          ElMessage.warning('本页暂无批量新增配置'); return;
+        }
+        Object.keys(batchForm).forEach(k=>delete batchForm[k]);
+        (page.value.batchAddFields||[]).forEach(f=>{ batchForm[f.name] = f.name==='条码生成个数' ? '3' : ''; });
+        batchLines.value=[]; batchSelected.value=[];
+        batchVisible.value=true; return;
+      }
+      if(btn.name==='打印标签' || btn.name==='打印'){
+        if(btn.name==='打印标签' && !selectedIds.value.length){ ElMessage.warning('请先勾选需要打印的数据'); return; }
+        printVisible.value=true; return;
+      }
+      if(btn.name.includes('删除') || btn.name==='关闭' || btn.name==='删除勾选'){
+        if(!selectedIds.value.length){ ElMessage.warning('请先勾选数据'); return; }
+        const title = btn.name.includes('关闭') ? '关闭确认' : '删除确认';
+        const tip = btn.name.includes('关闭') ? '确认关闭所选单据？' : '确认删除所选数据？被业务引用的数据不可删除。';
+        ElementPlus.ElMessageBox.confirm(tip, title, { confirmButtonText:'确认', cancelButtonText:'取消', type:'warning' })
+          .then(()=> ElMessage.success(btn.name.includes('关闭')?'已关闭':'已删除')).catch(()=>{});
+        return;
+      }
+      if(btn.name==='导入'){ importVisible.value=true; return; }
+      if(btn.name==='导出'){ exportVisible.value=true; return; }
+      if(btn.name==='下推'){ ElMessage.success('已打开下推弹窗'); return; }
+      ElMessage.info(btn.name);
+    }
+    function onRowOp(op, row){
+      if(op.name==='详情'){ openDetail(row); return; }
+      if(op.name==='编辑' || op.name==='复制'){
+        openForm(op.name==='复制' ? 'copy' : 'edit');
+        formSwitch['启用状态'] = row['启用状态']!=='禁用';
+        return;
+      }
+      if(op.name==='工艺配置'){
+        craftRow.value = row;
+        craftKw.value=''; craftZoom.value=1; craftLocked.value=false;
+        const p = page.value || {};
+        craftNodes.value = (p.craftNodes||[]).map(n=>({...n}));
+        craftEdges.value = (p.craftEdges||[]).map(e=>[...e]);
+        craftVisible.value=true; return;
+      }
+      if(op.name==='表单设计' || op.name==='设计'){
+        designFormName.value = row['表单名称'] || row['名称'] || '未命名表单';
+        designFormTitle.value = page.value?.designFormTitle || designFormName.value || '过程检查记录';
+        designCanvas.value = JSON.parse(JSON.stringify(page.value?.designCanvas || []));
+        designActive.value = designCanvas.value.length ? 0 : -1;
+        designDirty.value = false;
+        designVisible.value=true; return;
+      }
+      if(op.name==='预览' && pageId.value==='form-designer'){
+        designFormName.value = row['表单名称'] || row['名称'] || '未命名表单';
+        designFormTitle.value = page.value?.designFormTitle || designFormName.value || '过程检查记录';
+        designCanvas.value = JSON.parse(JSON.stringify(page.value?.designCanvas || []));
+        formPreviewVisible.value=true; return;
+      }
+      if(op.name==='作业详情' || op.name==='盘点详情'){
+        const jd = page.value?.jobDetail || {};
+        jobTitle.value = `${op.name} — ${row['盘点单号']||row['单号']||row['单据号']||row['装卸货单号']||row['转序单号']||row.id||''}`;
+        const head = {};
+        Object.keys(row).forEach(k=>{ if(!['id','_actions'].includes(k)) head[k]=row[k]; });
+        jobHead.value = head;
+        jobStockMode.value = jd.mode === 'stocktake';
+        if(jobStockMode.value){
+          jobInvTip.value = jd.invTip || '';
+          jobInvCols.value = jd.invColumns || [];
+          jobBarcodeCols.value = jd.barcodeColumns || [];
+          const mock = MOCK[pageId.value] || {};
+          jobInvRows.value = (mock.stockInvLines || []).map(r=>({...r}));
+          jobBarcodeRows.value = (mock.stockBarcodeLines || []).map(r=>({...r}));
+          jobProcs.value = [];
+        } else {
+          jobInvTip.value = '';
+          jobInvCols.value = [];
+          jobBarcodeCols.value = [];
+          jobInvRows.value = [];
+          jobBarcodeRows.value = [];
+          jobProcs.value = (jd.procs||[]).map(p=>({...p, fields:[...(p.fields||[])]}));
+        }
+        jobProcIdx.value = 0;
+        jobVisible.value=true; return;
+      }
+      if(op.name==='重打'){
+        printVisible.value=true; return;
+      }
+      if(op.name==='禁用' || op.name==='启用'){
+        ElMessage.success(op.name==='禁用'?'已禁用':'已启用'); return;
+      }
+      if(op.name==='发起审核'){
+        if(row['审核状态']==='审核中' || row['审核状态']==='已通过'){
+          ElMessage.warning('当前审核状态不可再次发起'); return;
+        }
+        row['审核状态'] = '审核中';
+        ElMessage.success('已发起审核'); return;
+      }
+      if(op.name==='派车'){
+        if(row['审核状态']!=='已通过'){ ElMessage.warning('审核通过后方可派车'); return; }
+        if(row['单据状态']==='已派车'){ ElMessage.warning('该申请单已派车'); return; }
+        dispatchRow.value = row;
+        Object.assign(dispatchForm, { 承运公司:'', 提货车辆:'', 司机:'', 司机联系电话:'', 核定载重量:'', 预计发车时间:'', 运输备注:'' });
+        dispatchVisible.value = true; return;
+      }
+      ElMessage.info(op.name);
+    }
+    function onDispatchOk(){
+      if(!dispatchForm.承运公司 || !dispatchForm.提货车辆 || !dispatchForm.司机 || !dispatchForm.司机联系电话){
+        ElMessage.warning('请填写承运公司、提货车辆、司机及联系电话'); return;
+      }
+      const no = 'LG-ORDER-'+String(Date.now()).slice(-6);
+      const list = (MOCK['lg-order'] = MOCK['lg-order'] || {});
+      const rows = list.main = list.main || [];
+      rows.unshift({
+        id: String(rows.length+1),
+        物流订单号: no,
+        状态: '待执行',
+        关联派车申请单号: dispatchRow.value['派车申请单号'],
+        发货单位: dispatchRow.value['发货单位'],
+        收货单位: dispatchRow.value['收货单位'],
+        承运公司: dispatchForm.承运公司,
+        车牌号: dispatchForm.提货车辆,
+        司机: dispatchForm.司机,
+        实发重量: dispatchForm.核定载重量 || '—',
+      });
+      dispatchRow.value['单据状态'] = '已派车';
+      dispatchVisible.value = false;
+      ElMessage.success('已生成物流订单 '+no+'，派车申请单状态已更新为已派车');
+    }
+    function isOsPoPage(){
+      return ['wh-os-issue','wh-os-recv','wh-os-ret-mat','wh-os-ret-goods'].includes(pageId.value);
+    }
+    function onFormLineAction(name){
+      if(name==='新增' || name==='新增行' || name==='选择物料'){
+        if(pageId.value==='wh-po-in'){
+          if(!formModel['关联采购订单']){ ElMessage.warning('请先选择关联采购订单'); return; }
+          openPicker('物料信息'); return;
+        }
+        if(isOsPoPage()){
+          if(!formModel['关联委外加工单']){ ElMessage.warning('请先选择关联委外加工单'); return; }
+          openPicker('物料信息'); return;
+        }
+        // 仓储通用：打开物料选单，确定后追加明细行
+        openPicker('物料信息');
+        return;
+      }
+      if(String(name).includes('删除')){
+        const selected = formLineSelected.value || [];
+        if(String(name).includes('批量') || selected.length){
+          if(!selected.length){ ElMessage.warning('请先勾选要删除的明细行'); return; }
+          const set = new Set(selected);
+          const next = formLineRows.value.filter(r=> !set.has(r));
+          if(!next.length && pageId.value!=='wh-po-in' && !isOsPoPage()){ ElMessage.warning('至少保留 1 行明细'); return; }
+          formLineRows.value = next;
+          formLineSelected.value = [];
+          ElMessage.success('已删除勾选明细行');
+          return;
+        }
+        if(!formLineRows.value.length){ ElMessage.warning('暂无明细行'); return; }
+        formLineRows.value = formLineRows.value.slice(0,-1);
+        ElMessage.success('已删除明细行');
+        return;
+      }
+      ElMessage.info(name);
+    }
+    function onFormOk(){
+      formVisible.value=false;
+      if(pageId.value==='dict'){
+        ElMessage.success(formMode.value==='copy'?'字典项已复制新增':(formMode.value==='add'?'字典项已新增':'字典项已保存'));
+        return;
+      }
+      ElMessage.success(formMode.value==='add'?'新增成功':'保存成功');
+    }
+    function openPicker(title){
+      pickerTitle.value = title || '选单';
+      pickerKw.value=''; pickerCurrent.value=null;
+      pickerVisible.value=true;
+    }
+    function onPickerOk(){
+      if(!pickerCurrent.value){ ElMessage.warning('请选择一条数据'); return; }
+      const row = pickerCurrent.value;
+      const t = pickerTitle.value || '';
+      const label = row.编码+' / '+row.名称;
+      if(t.includes('采购订单') || t.includes('委外加工单')){
+        if(t.includes('委外加工单') || isOsPoPage()){
+          formModel['关联委外加工单'] = label;
+        } else {
+          formModel['关联采购订单'] = label;
+        }
+        const mats = (PO_MAT_MAP[row.编码]||[]).map(m=>({...m}));
+        poMatPool.value = mats;
+        if(mats[0] && mats[0].供应商) formModel['供应商名称'] = mats[0].供应商;
+        formLineRows.value = mats.map((m,i)=>({
+          _i: i+1,
+          物料信息: m.编码+' / '+m.名称,
+          库存单位: '个',
+          管理方式: '条码管理',
+          计划件数: '10',
+          计划数量: '100',
+        }));
+        ElMessage.success(t.includes('委外')||isOsPoPage()?'已带入委外加工单及物料明细':'已带入采购订单及物料明细');
+      } else if(t.includes('供应商')){
+        formModel['供应商名称'] = row.名称;
+        ElMessage.success('已选择供应商：'+row.名称);
+      } else if(t.includes('物流订单')){
+        formModel['关联物流订单'] = label;
+        ElMessage.success('已选择物流订单：'+label);
+      } else if(t.includes('物料')){
+        formLineRows.value = formLineRows.value.concat([{
+          _i: formLineRows.value.length+1,
+          物料信息: label,
+          库存单位: '个',
+          管理方式: '条码管理',
+          计划件数: '10',
+          计划数量: '100',
+        }]);
+        ElMessage.success('已添加物料：'+label);
+      } else {
+        formModel[t] = label;
+        ElMessage.success('已选择：'+label);
+      }
+      pickerVisible.value=false;
+    }
+    function onGenerateBatch(){
+      const cnt = parseInt(batchForm['条码生成个数'],10);
+      if(!cnt || cnt<1){ ElMessage.error('请填写条码生成个数'); return; }
+      const cols = page.value?.batchAddLineColumns || [];
+      const prefix = pageId.value==='outer-serial' ? 'TM' : 'BR';
+      const today = '20250806';
+      batchLines.value = Array.from({length: Math.min(cnt,50)}, (_,i)=>{
+        const row = {};
+        cols.forEach(c=>{
+          if(c==='条码号') row[c] = `${prefix}${today}${String(i+1).padStart(4,'0')}`;
+          else if(batchForm[c]!==undefined && batchForm[c]!=='') row[c]=batchForm[c];
+          else if(c.includes('物料')) row[c]= batchForm['物料信息'] || 'M001 / 钢瓶';
+          else row[c]= batchForm[c] || '自动带入';
+        });
+        return row;
+      });
+      ElMessage.success(`已生成 ${batchLines.value.length} 条条码`);
+    }
+    function onBatchDeleteLines(){
+      if(!batchSelected.value.length){ ElMessage.warning('请先勾选明细行'); return; }
+      const set = new Set(batchSelected.value);
+      batchLines.value = batchLines.value.filter(r=>!set.has(r));
+      batchSelected.value=[];
+      ElMessage.success('已删除勾选明细');
+    }
+    function onBatchOk(){
+      if(!batchLines.value.length){ ElMessage.warning('请先生成条码'); return; }
+      batchVisible.value=false;
+      ElMessage.success(`已批量新增 ${batchLines.value.length} 条档案`);
+    }
+    function onCraftDragStart(name){ craftDragProc.value=name; }
+    function addCraftNode(name){
+      if(craftLocked.value){ ElMessage.warning('画布已锁定'); return; }
+      const id='n'+Date.now()+Math.floor(Math.random()*100);
+      craftNodes.value = craftNodes.value.concat([{id, name, x:40+craftNodes.value.length*24, y:40+craftNodes.value.length*28}]);
+    }
+    function onCraftDrop(e){
+      if(craftLocked.value){ ElMessage.warning('画布已锁定'); return; }
+      const name = craftDragProc.value; if(!name) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const id='n'+Date.now();
+      craftNodes.value = craftNodes.value.concat([{id, name, x: Math.max(10,e.clientX-rect.left-40), y: Math.max(10,e.clientY-rect.top-12)}]);
+      craftDragProc.value='';
+    }
+
+    function openCraftProc(n) {
+      craftProcNodeId.value = n.id;
+      craftProcForm.value = {
+        name: n.name,
+        desc: n.desc || '',
+        num: n.num || '',
+        date: n.date || '2025-08-06',
+        result: n.result || '合格',
+        remark: n.remark || '',
+      };
+      craftProcVisible.value = true;
+    }
+    function onCraftProcOk() {
+      const n = craftNodes.value.find(x => x.id === craftProcNodeId.value);
+      if (n && craftProcForm.value) {
+        Object.assign(n, {
+          desc: craftProcForm.value.desc,
+          num: craftProcForm.value.num,
+          date: craftProcForm.value.date,
+          result: craftProcForm.value.result,
+          remark: craftProcForm.value.remark,
+          configured: true,
+        });
+      }
+      craftProcVisible.value = false;
+      ElMessage.success('工序信息已保存');
+    }
+
+    function onCraftOk(){
+      if(craftNodes.value.length<1){ ElMessage.error('工艺配置数据不合规，请检查后确认'); return; }
+      craftVisible.value=false;
+      ElMessage.success('工艺配置保存成功');
+    }
+    function uid(){ return 'f'+Date.now()+Math.floor(Math.random()*1000); }
+    function makeDesignField(type){
+      const base = { id:uid(), label:type, type, required:false, placeholder:'', fontSize:13, color:'#1A4099', bold:false };
+      if(type==='子表（表单）' || type==='子表（表格）'){
+        base.children = [
+          {label:'第一次取样时间', type:'日期选择', required:true},
+          {label:'中间釜编号', type:'下拉选择', required:false},
+        ];
+      }
+      return base;
+    }
+    function addDesignField(type){
+      designCanvas.value = designCanvas.value.concat([makeDesignField(type)]);
+      designActive.value = designCanvas.value.length-1;
+      designDirty.value = true;
+      ElMessage.success('组件已添加至表单');
+    }
+    function onDesignDrop(){
+      if(!designDragType.value) return;
+      addDesignField(designDragType.value);
+      designDragType.value='';
+    }
+    function selectDesignField(i){ designActive.value=i; }
+    function moveDesignField(i, dir){
+      const j=i+dir; if(j<0||j>=designCanvas.value.length) return;
+      const arr=[...designCanvas.value];
+      const t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+      designCanvas.value=arr; designActive.value=j; designDirty.value=true;
+    }
+    function copyDesignField(i){
+      const src=designCanvas.value[i];
+      const copy=JSON.parse(JSON.stringify(src)); copy.id=uid(); copy.label=(copy.label||'')+'(副本)';
+      const arr=[...designCanvas.value]; arr.splice(i+1,0,copy);
+      designCanvas.value=arr; designActive.value=i+1; designDirty.value=true;
+      ElMessage.success('字段复制完成');
+    }
+    function removeDesignField(i){
+      ElementPlus.ElMessageBox.confirm('是否确认删除该表单字段，删除后配置将清空？','删除确认',{
+        confirmButtonText:'确认删除', cancelButtonText:'取消', type:'warning'
+      }).then(()=>{
+        designCanvas.value = designCanvas.value.filter((_,idx)=>idx!==i);
+        designActive.value = designCanvas.value.length ? Math.min(i, designCanvas.value.length-1) : -1;
+        designDirty.value=true;
+        ElMessage.success('字段已移除');
+      }).catch(()=>{});
+    }
+    function removeDesignChild(i, ci){
+      ElementPlus.ElMessageBox.confirm('是否确认删除该表单字段，删除后配置将清空？','删除确认',{
+        confirmButtonText:'确认删除', cancelButtonText:'取消', type:'warning'
+      }).then(()=>{
+        const f={...designCanvas.value[i], children:[...(designCanvas.value[i].children||[])]};
+        f.children.splice(ci,1);
+        const arr=[...designCanvas.value]; arr[i]=f; designCanvas.value=arr;
+        designDirty.value=true; ElMessage.success('字段已移除');
+      }).catch(()=>{});
+    }
+    function openFormPreview(){ formPreviewVisible.value=true; }
+    function onDesignCancel(){
+      if(!designDirty.value){ designVisible.value=false; ElMessage.success('已放弃本次表单修改'); return; }
+      ElementPlus.ElMessageBox.confirm('当前表单存在未保存的设计变更，离开将丢失修改，是否继续？','放弃修改确认',{
+        confirmButtonText:'确认离开', cancelButtonText:'继续编辑', type:'warning'
+      }).then(()=>{ designVisible.value=false; ElMessage.success('已放弃本次表单修改'); }).catch(()=>{});
+    }
+    function onDesignOk(){
+      const bad = designCanvas.value.some(f=> (f.children||[]).some(c=>c.required && !c.label));
+      if(bad){ ElMessage.error('请完善表单必填配置后再保存'); return; }
+      designVisible.value=false; designDirty.value=false;
+      ElMessage.success('表单设计配置已保存生效');
+    }
+    function onDetailLineAction(name){
+      if(name==='新增'){ openPicker('包材档案'); ElMessage.success('已新增绑定明细行'); detailLineRows.value = detailLineRows.value.concat([{包材编号:'BK-NEW',档案类型:'流水码',包材类型:'钢瓶',库存位置:'A-01-01',使用状态:'在用',物料信息:'M001 / 钢瓶',物料批号:'B001',当前数量:'1',库存单位:'个',绑定时间:'2025-08-06 12:00:00'}]); return; }
+      if(name.includes('解绑')){
+        if(!detailLineRows.value.length){ ElMessage.warning('暂无绑定明细'); return; }
+        detailLineRows.value = [];
+        ElMessage.success('已批量解绑');
+        return;
+      }
+      ElMessage.info(name);
+    }
+    function selectDictType(n){
+      dictTypeId.value = dictTypeId.value===n.id ? '' : n.id;
+      selectedIds.value=[]; pageNum.value=1; resetQueryModel();
+    }
+    function openDictTypeForm(mode, node){
+      dictTypeFormMode.value = mode;
+      if(mode==='edit' && node){
+        Object.assign(dictTypeForm, { id:node.id, 编码:node.编码, 名称:node.名称, 上级字典:node.上级字典||'', 备注:node.备注||'', 系统开发:!!node.系统开发 });
+      } else {
+        Object.assign(dictTypeForm, { id:'', 编码:'', 名称:'', 上级字典:'', 备注:'', 系统开发:false });
+      }
+      dictTypeFormVisible.value = true;
+    }
+    function onDictTypeFormOk(){
+      if(!dictTypeForm.编码){ ElMessage.error('请填写编码'); return; }
+      if(!dictTypeForm.名称){ ElMessage.error('请填写名称'); return; }
+      dictTypeFormVisible.value=false;
+      ElMessage.success(dictTypeFormMode.value==='add'?'字典类型已新增':'字典类型已保存');
+    }
+    function removeDictType(n){
+      if(n.系统开发){ ElMessage.error('系统内置数据不可删除'); return; }
+      const hasItems = ((MOCK.dict?.main)||[]).some(r=>r.typeId===n.id);
+      if(hasItems){ ElMessage.error('该字典类型下存在字典项，无法删除'); return; }
+      ElementPlus.ElMessageBox.confirm('确认删除所选字典类型？若该类型下存在字典项，则无法删除。','删除确认',{
+        confirmButtonText:'确认删除', cancelButtonText:'取消', type:'warning'
+      }).then(()=> ElMessage.success('已删除')).catch(()=>{});
+    }
+    function tagClass(s){
+      return {
+        '待执行':'tag-b','执行中':'tag-p','已完成':'tag-g','已关闭':'tag-gr',
+        '待入库':'tag-b','入库中':'tag-p','待发料':'tag-b','发料中':'tag-p',
+        '启用':'tag-g','禁用':'tag-gr','在用':'tag-g','冻结':'tag-p','报废':'tag-gr',
+        '已绑定':'tag-g','未绑定':'tag-gr','仓库':'tag-b','线边仓':'tag-p','厂外':'tag-gr',
+        '正常':'tag-g','合格':'tag-g','不合格':'tag-gr','待检':'tag-p',
+        '待完善':'tag-b',
+        '待派车':'tag-p','已派车':'tag-g',
+        '待审核':'tag-b','审核中':'tag-p','已通过':'tag-g','已拒绝':'tag-gr',
+        '待发运':'tag-b','运输中':'tag-p','已到达':'tag-g','已签收':'tag-g','已取消':'tag-gr',
+        '正常行驶':'tag-g','服务区休息':'tag-b','即将到达':'tag-p','已到达':'tag-g',
+        '堵车':'tag-p','车辆故障':'tag-gr','交通事故':'tag-gr','其他':'tag-gr',
+      }[s] || 'tag-gr';
+    }
+
+    onMounted(()=> loadPage(firstId));
+
+    return {
+      ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
+      query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns,
+      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchVisible, dispatchRow, dispatchForm, activeFormFields, activeFormLineFields, formLineRows,
+      detailVisible, detailRow, detailRowFiltered, detailLineFields, detailLineRows, detailEnrouteRows,
+      batchVisible, batchTitle, batchForm, batchLines, batchSelected,
+      craftVisible, craftProcVisible, craftProcForm, craftTitle, craftKw, craftZoom, craftLocked, craftNodes, filteredCraftProcs, craftEdgeLines,
+      openCraftProc, onCraftProcOk,
+      designVisible, designTitle, designBasic, designAdvanced, designCanvas, designFormName, designFormTitle, designActive, designActiveField, designDragType, formPreviewVisible,
+      importVisible, exportVisible, printVisible,
+      pickerVisible, pickerTitle, pickerKw, pickerRows, pickerCurrent,
+      jobVisible, jobTitle, jobHead, jobProcs, jobProcIdx,
+      jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows,
+      dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,
+      visibleTypeFormFields, dictTypeOptions,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormOk, onDispatchOk, tagClass,
+      selectDictType, openDictTypeForm, onDictTypeFormOk, removeDictType,
+      openPicker, onPickerOk, onGenerateBatch, onBatchDeleteLines, onBatchOk,
+      onCraftDragStart, addCraftNode, onCraftDrop, onCraftOk, addDesignField, onDesignDrop, selectDesignField, moveDesignField, copyDesignField, removeDesignField, removeDesignChild, openFormPreview, onDesignCancel, onDesignOk, onDetailLineAction,
+    };
+  }
+}).use(ElementPlus, { locale: ElementPlusLocaleZhCn });
+if (typeof VxeUI !== 'undefined') app.use(VxeUI);
+if (typeof VXETable !== 'undefined') app.use(VXETable);
+app.mount('#app');
+</script>
+</body>
+</html>

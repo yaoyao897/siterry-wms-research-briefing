@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>思特瑞 WMS · APP Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+<style>
+[v-cloak]{display:none}
+:root{
+  --color-primary:#1A4099;--color-primary-hover:#2B56B0;
+  --navy:#1a3a5c;--navy-deep:#0d2137;
+  --color-text-main:#262626;--color-text-normal:#595959;--color-text-secondary:#8C8C8C;
+  --color-bg-page:#F0F2F5;--color-border:#E8E8E8;--color-success:#52C41A;--color-warning:#FA8C16;
+  --el-color-primary:#1A4099;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color:var(--color-text-normal);background:var(--color-bg-page)}
+#app{height:100vh}
+.app-shell{display:flex;height:100vh}
+.app-aside{width:240px;flex-shrink:0;height:100%;min-height:0;background:#fff;border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow:hidden}
+.app-aside__logo{padding:16px 20px;font-size:15px;font-weight:600;color:var(--color-text-main);border-bottom:1px solid var(--color-border);flex-shrink:0}
+.app-aside__scroll{flex:1;min-height:0;overflow:auto}
+.app-aside .el-menu{border-right:none;padding:8px 0}
+.app-aside .el-menu-item,.app-aside .el-sub-menu__title{height:40px;line-height:40px;margin:2px 8px;border-radius:8px}
+.app-aside .el-menu-item.is-active{color:var(--color-primary);background:#F0F4F8;font-weight:500}
+.app-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.app-header{height:52px;padding:0 20px;background:#fff;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.app-header__actions{display:flex;align-items:center;gap:10px}
+.mode-switch{display:inline-flex;border:1px solid var(--color-border);border-radius:4px;overflow:hidden}
+.mode-switch a{padding:6px 14px;font-size:13px;text-decoration:none;color:var(--color-text-normal);background:#fff}
+.mode-switch a:hover{color:var(--color-primary)}
+.mode-switch a.on{background:var(--color-primary);color:#fff}
+.app-body{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;background:#E8ECF0}
+.phone-frame{width:390px;height:780px;max-height:calc(100vh - 100px);background:#111;border-radius:28px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);flex-shrink:0}
+.phone-screen{width:100%;height:100%;background:#F5F6F8;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.phone-notch{height:28px;background:#F5F6F8;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.phone-notch span{width:90px;height:6px;background:#ddd;border-radius:3px}
+
+/* APP 页面通用 */
+.m-nav{height:44px;display:flex;align-items:center;padding:0 12px;background:#fff;border-bottom:1px solid #eee;flex-shrink:0;position:relative}
+.m-nav__back{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--color-text-main);padding:4px 8px 4px 0;line-height:1}
+.m-nav__title{position:absolute;left:50%;transform:translateX(-50%);font-size:16px;font-weight:600;color:var(--color-text-main);white-space:nowrap}
+.m-nav__right{margin-left:auto;font-size:14px;color:var(--color-primary);cursor:pointer;border:none;background:transparent}
+.m-scroll{flex:1;min-height:0;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
+.m-scroll::-webkit-scrollbar{width:0}
+.m-tabbar{height:56px;background:#fff;border-top:1px solid #eee;display:flex;flex-shrink:0}
+.m-tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#8C8C8C;cursor:pointer;border:none;background:transparent;gap:2px}
+.m-tabbar__item.on{color:var(--color-primary);font-weight:500}
+.m-tabbar__icon{font-size:18px;line-height:1}
+
+.m-search{margin-bottom:12px}
+.m-search input{width:100%;height:36px;border:1px solid #D9D9D9;border-radius:18px;padding:0 14px;font-size:13px;outline:none;background:#fff}
+.m-search input:focus{border-color:var(--color-primary)}
+.m-group{margin-bottom:16px}
+.m-group__title{font-size:13px;font-weight:600;color:var(--color-text-main);margin:0 0 8px 4px}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.m-mod{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;border:1px solid transparent;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.m-mod:active{background:#EEF2F8}
+.m-mod.stub{opacity:.55}
+.m-mod.ready{border-color:#C5D4EB}
+.m-mod__icon{font-size:22px;line-height:1.2;margin-bottom:6px}
+.m-mod__name{font-size:11px;color:var(--color-text-main);line-height:1.3}
+
+.doc-card{background:#fff;border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.doc-card__hd{height:44px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--navy),var(--navy-deep));color:#fff}
+.doc-card__no{font-size:15px;font-weight:600}
+.doc-card__bd{padding:12px}
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:13px}
+.doc-grid .full{grid-column:1/-1}
+.doc-label{color:#8C8C8C;font-size:12px;margin-right:4px}
+.doc-card__ft{padding:0 12px 12px;display:flex;justify-content:flex-end}
+.tag{display:inline-block;padding:0 8px;height:22px;line-height:20px;font-size:12px;border-radius:4px;border:1px solid transparent}
+.tag-b{color:#1A4099;background:#EEF2F8;border-color:#C5D4EB}
+.tag-o{color:#FA8C16;background:#FFF7E6;border-color:#FFD591}
+.tag-g{color:#52C41A;background:#F6FFED;border-color:#B7EB8F}
+.tag-gr{color:#8C8C8C;background:#FAFAFA;border-color:#D9D9D9}
+
+.line-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);position:relative;cursor:pointer}
+.line-card.done{opacity:.5;pointer-events:none}
+.line-card__status{position:absolute;top:12px;right:12px}
+.line-fields{font-size:13px;padding-right:64px}
+.line-fields div{margin-bottom:6px}
+.line-fields .k{color:#8C8C8C;font-size:12px;margin-right:4px}
+.line-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0;text-align:center}
+.line-stats .k{display:block;font-size:11px;color:#8C8C8C;margin-bottom:2px}
+.line-stats .v{font-size:15px;font-weight:600;color:var(--color-text-main)}
+.line-stats .v.zero{color:var(--color-success)}
+
+.info-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.info-card__left{flex:1;min-width:0;font-size:13px}
+.info-card__left div{margin-bottom:5px}
+.info-card__left .k{color:#8C8C8C;font-size:12px;margin-right:4px}
+.info-card__badge{flex-shrink:0;width:72px;align-self:center;padding:10px 6px;text-align:center;background:#EEF2F8;border:1px solid #C5D4EB;border-radius:8px;color:var(--color-primary)}
+.info-card__badge .k{display:block;font-size:11px;margin-bottom:4px}
+.info-card__badge .v{font-size:22px;font-weight:700;line-height:1}
+
+.sec{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sec__title{font-size:13px;font-weight:600;color:var(--color-text-main);margin:0 0 10px}
+.field{margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;color:#8C8C8C;margin-bottom:4px}
+.field label .req{color:#FF4D4F;margin-right:2px}
+.field input,.field select,.field textarea{width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px;font-size:14px;outline:none;background:#fff}
+.field textarea{height:64px;padding:8px 10px;resize:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--color-primary)}
+.field input[readonly]{background:#FAFAFA;color:#8C8C8C}
+
+.stat-bar{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;padding:0 2px;color:var(--color-text-main)}
+.scan-table{width:100%;border-collapse:collapse;font-size:12px}
+.scan-table th,.scan-table td{padding:8px 6px;border-bottom:1px solid #f0f0f0;text-align:left;white-space:nowrap}
+.scan-table th{color:#8C8C8C;font-weight:500;background:#FAFAFA}
+.scan-table tr{cursor:pointer}
+.scan-table tr:active td{background:#EEF2F8}
+.table-scroll{overflow-x:auto;margin:0 -4px}
+
+.process-tabs{display:flex;gap:8px;margin-bottom:4px}
+.process-tabs button{flex:1;height:36px;border:1px solid #D9D9D9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;color:var(--color-text-normal)}
+.process-tabs button.on{border-color:var(--color-primary);color:var(--color-primary);background:#EEF2F8;font-weight:500}
+
+.m-footer{padding:12px;background:#fff;border-top:1px solid #eee;flex-shrink:0}
+.btn-primary{width:100%;height:44px;border:none;border-radius:6px;background:var(--color-primary);color:#fff;font-size:16px;font-weight:500;cursor:pointer}
+.btn-primary:active{background:var(--color-primary-hover)}
+.btn-sm{height:32px;padding:0 16px;border:none;border-radius:4px;background:var(--color-primary);color:#fff;font-size:13px;cursor:pointer}
+
+.stub-page{padding:40px 24px;text-align:center;color:#8C8C8C}
+.stub-page h3{color:var(--color-text-main);margin:0 0 8px}
+.empty{padding:48px 16px;text-align:center;color:#BFBFBF;font-size:13px}
+.hint{font-size:12px;color:#8C8C8C;margin:0 0 8px 4px}
+
+.proc-block{margin-bottom:14px}
+.proc-block label{display:block;font-size:12px;color:#8C8C8C;margin-bottom:4px}
+.sub-card{border:1px solid #eee;border-radius:8px;padding:10px;margin-bottom:8px;background:#FAFAFA}
+.sub-card__hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600;font-size:13px;color:var(--color-text-main)}
+.upload-box{width:64px;height:64px;border:1px dashed #D9D9D9;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#BFBFBF;cursor:pointer;background:#fff}
+.proc-row{background:#fff;border:1px solid #F0F0F0;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer}
+.proc-row.done{opacity:.85}
+.proc-row.locked{opacity:.45;pointer-events:none}
+.proc-row__hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.proc-row__sum{font-size:12px;color:#8C8C8C;line-height:1.4}
+
+.sign-box{height:80px;border:1px dashed #D9D9D9;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#BFBFBF;background:#fff;cursor:pointer;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="app-shell">
+    <aside class="app-aside">
+      <div class="app-aside__logo">思特瑞 WMS · APP</div>
+      <div class="app-aside__scroll">
+        <el-menu :default-active="menuActive" :default-openeds="defaultOpeneds" @select="onMenuSelect">
+          <template v-for="m1 in menu" :key="m1.index">
+            <el-sub-menu v-if="m1.children" :index="m1.index">
+              <template #title>{{ m1.title }}</template>
+              <template v-for="m2 in m1.children" :key="m2.index">
+                <el-sub-menu v-if="m2.children" :index="m2.index">
+                  <template #title>{{ m2.title }}</template>
+                  <el-menu-item v-for="leaf in m2.children" :key="leaf.index" :index="leaf.index">{{ leaf.title }}</el-menu-item>
+                </el-sub-menu>
+                <el-menu-item v-else :index="m2.index">{{ m2.title }}</el-menu-item>
+              </template>
+            </el-sub-menu>
+          </template>
+        </el-menu>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-header">
+        <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
+        <div class="app-header__actions">
+          <div class="mode-switch">
+            <a href="./pc.html">PC</a>
+            <a href="./app.html" class="on">APP</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="app-body">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-notch"><span></span></div>
+
+            <!-- ===== 首页 ===== -->
+            <template v-if="view==='home'">
+              <div class="m-nav"><div class="m-nav__title">思特瑞 WMS</div></div>
+              <div class="m-scroll">
+                <div class="m-search"><input v-model="homeKw" placeholder="搜索模块名称…" /></div>
+                <div v-for="g in filteredHome" :key="g.group" class="m-group">
+                  <div class="m-group__title">{{ g.group }}</div>
+                  <div class="m-grid">
+                    <div
+                      v-for="it in g.items" :key="it.id"
+                      class="m-mod" :class="{ stub: it.stub, ready: it.ready }"
+                      @click="openModule(it)"
+                    >
+                      <div class="m-mod__icon">{{ it.icon }}</div>
+                      <div class="m-mod__name">{{ it.name }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-tabbar">
+                <button class="m-tabbar__item on"><span class="m-tabbar__icon">🏠</span>首页</button>
+                <button class="m-tabbar__item" @click="openStub('消息')"><span class="m-tabbar__icon">💬</span>消息</button>
+                <button class="m-tabbar__item" @click="openStub('我的')"><span class="m-tabbar__icon">👤</span>我的</button>
+              </div>
+            </template>
+
+            <!-- ===== 单据页 ===== -->
+            <template v-else-if="view==='docs'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">←</button>
+                <div class="m-nav__title">{{ flowTitle }}</div>
+                <button v-if="flowMeta.showDocAdd !== false && flowMode!=='waybill'" class="m-nav__right" @click="toast('新增单据（Demo）')">新增</button>
+              </div>
+              <div class="m-scroll">
+                <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
+                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张匹配{{ isLoadFlow ? '装卸单' : '单据' }}</p>
+                <div v-if="!filteredNotices.length" class="empty">{{ flowMeta.emptyDocs || '暂无待执行单据' }}</div>
+                <div v-for="n in filteredNotices" :key="n.id" class="doc-card">
+                  <div class="doc-card__hd">
+                    <span class="doc-card__no">{{ n.id }}</span>
+                    <span class="tag" :class="statusTag(n.status)">{{ n.status }}</span>
+                  </div>
+                  <div class="doc-card__bd">
+                    <div class="doc-grid" v-if="flowMode==='waybill'">
+                      <div class="full"><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
+                      <div><span class="doc-label">配送方式</span>{{ n.shipMode }}</div>
+                      <div><span class="doc-label">司机</span>{{ n.driver }} / {{ n.plate }}</div>
+                      <div class="full"><span class="doc-label">计划装车</span>{{ n.planLoad }}</div>
+                      <div class="full"><span class="doc-label">装卸货点</span>{{ n.route }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="isLoadFlow">
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">计划执行</span>{{ n.planDate }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
+                      <div class="full"><span class="doc-label">装卸区域</span>{{ n.loadArea || n.partner }}</div>
+                      <div class="full"><span class="doc-label">计划件数/数量</span>{{ n.planPcs }}件 / {{ n.planQty }} {{ n.planUnit || '' }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="flowMode==='stocktake'">
+                      <div><span class="doc-label">盘点类型</span>{{ n.refNo || n.docType }}</div>
+                      <div><span class="doc-label">盘点方式</span>{{ n.takeMode || '条码盘点' }}</div>
+                      <div class="full"><span class="doc-label">盘点仓库</span>{{ n.partner }}</div>
+                      <div class="full"><span class="doc-label">计划开始时间</span>{{ n.planStart || n.planDate }}</div>
+                      <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      <div><span class="doc-label">制单人</span>{{ n.creator || '—' }}</div>
+                      <div><span class="doc-label">制单时间</span>{{ n.createTime || '—' }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="flowMode==='pkg-doc'">
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">{{ flowMeta.partnerLabel || '产线名称' }}</span>{{ n.partner }}</div>
+                      <div><span class="doc-label">{{ flowMeta.refLabel || '车间名称' }}</span>{{ n.refNo }}</div>
+                      <div><span class="doc-label">工艺</span>{{ n.materialSummary }}</div>
+                      <div class="full"><span class="doc-label">计划件数</span>{{ n.planPcs }} 件</div>
+                    </div>
+                    <div class="doc-grid" v-else>
+                      <div><span class="doc-label">{{ flowMeta.partnerLabel || '往来单位' }}</span>{{ n.partner || n.supplier }}</div>
+                      <div><span class="doc-label">计划日期</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ n.refNo || n.poNo || '—' }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div class="full"><span class="doc-label">物料</span>{{ n.materialSummary }}</div>
+                      <div v-if="n.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ n.dispatchNo }}</div>
+                    </div>
+                  </div>
+                  <div class="line-stats" v-if="flowMode==='stocktake'" style="margin:0 12px 12px;border-top:1px solid #F0F0F0;padding-top:10px">
+                    <div><span class="k">应盘件数</span><span class="v">{{ n.planPcs ?? 0 }}</span></div>
+                    <div><span class="k">实盘件数</span><span class="v">{{ n.donePcs ?? 0 }}</span></div>
+                    <div><span class="k">待盘件数</span><span class="v" :class="{ zero: (n.pendingPcs||0)===0 }">{{ n.pendingPcs ?? 0 }}</span></div>
+                  </div>
+                  <div class="doc-card__ft" style="gap:8px">
+                    <button v-if="flowMode==='stocktake'" class="btn-sm" @click="openStockExec(n)">执行 ›</button>
+                    <button v-else class="btn-sm" @click="openDocAction(n)">执行</button>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- ===== 物料明细页 ===== -->
+            <template v-else-if="view==='materials'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">←</button>
+                <div class="m-nav__title">{{ flowTitle }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="m-group__title">基本信息</div>
+                <div class="doc-card" style="margin-bottom:16px">
+                  <div class="doc-card__hd">
+                    <span class="doc-card__no">{{ currentNotice.id }}</span>
+                    <span class="tag" :class="statusTag(currentNotice.status)">{{ currentNotice.status }}</span>
+                  </div>
+                  <div class="doc-card__bd">
+                    <div class="doc-grid" v-if="isLoadFlow">
+                      <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div><span class="doc-label">计划执行</span>{{ currentNotice.planDate }}</div>
+                      <div v-if="currentNotice.loadArea" class="full"><span class="doc-label">装卸区域</span>{{ currentNotice.loadArea }}</div>
+                      <div v-if="currentNotice.remark" class="full"><span class="doc-label">备注</span>{{ currentNotice.remark }}</div>
+                    </div>
+                    <div class="doc-grid" v-else>
+                      <div><span class="doc-label">{{ flowMeta.partnerLabel || '往来单位' }}</span>{{ currentNotice.partner || currentNotice.supplier }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
+                      <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div v-if="currentNotice.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ currentNotice.dispatchNo }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="m-group__title">物料明细（{{ (currentNotice.lines||[]).length }} 行）</div>
+                <div
+                  v-for="line in currentNotice.lines" :key="line.lineNo"
+                  class="line-card" :class="{ done: line.status==='已完成' || line.status==='已关闭' }"
+                  @click="openExec(line)"
+                >
+                  <span class="line-card__status tag" :class="statusTag(line.status)">{{ line.status }}</span>
+                  <div class="line-fields">
+                    <div><span class="k">物料编码：</span>{{ line.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ line.name }}</div>
+                    <div><span class="k">物料规格：</span>{{ line.spec }}</div>
+                    <div><span class="k">物料种类：</span>{{ line.kind }}</div>
+                    <div><span class="k">库存单位：</span>{{ line.unit }}</div>
+                    <div v-if="isLoadFlow"><span class="k">管理方式：</span>{{ line.manageMode || '—' }}</div>
+                    <div v-else><span class="k">批号：</span>{{ line.lot }}</div>
+                    <div><span class="k">备注：</span>{{ line.remark || '—' }}</div>
+                  </div>
+                  <div class="line-stats">
+                    <div><span class="k">计划件数</span><span class="v">{{ line.planPcs }}</span></div>
+                    <div><span class="k">计划数量</span><span class="v">{{ line.planQty }}</span></div>
+                    <div><span class="k">已完成</span><span class="v">{{ line.doneQty }}</span></div>
+                    <div><span class="k">未完成</span><span class="v" :class="{ zero: line.remainQty===0 }">{{ line.remainQty }}</span></div>
+                  </div>
+                </div>
+                <p v-if="allLinesDone" class="hint" style="text-align:center;margin-top:12px">{{ flowMeta.doneHint || '所有物料行已完成' }}</p>
+              </div>
+            </template>
+
+            <!-- ===== 执行页 · 流水码 ===== -->
+            <template v-else-if="view==='exec' && activeExecMode==='serial'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backFromExec">←</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="info-card" v-if="currentLine && currentLine.code">
+                  <div class="info-card__left">
+                    <div><span class="k">物料编码：</span>{{ currentLine.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ currentLine.name }}</div>
+                    <div><span class="k">物料规格：</span>{{ currentLine.spec }}</div>
+                    <div><span class="k">物料种类：</span>{{ currentLine.kind }}</div>
+                    <div><span class="k">库存单位：</span>{{ currentLine.unit }}</div>
+                    <div v-if="!isLineSidePick"><span class="k">批号：</span>{{ currentLine.lot }}</div>
+                    <div><span class="k">备注：</span>{{ currentLine.remark }}</div>
+                  </div>
+                  <div class="info-card__badge"><span class="k">未完成件数</span><span class="v">{{ currentLine.remainPcs }}</span></div>
+                </div>
+                <div class="sec" v-else-if="flowMode==='stocktake'">
+                  <div class="sec__title">基本信息</div>
+                  <div class="info-card" style="margin:0">
+                    <div class="info-card__left">
+                      <div><span class="k">盘点类型：</span>{{ currentNotice.refNo || currentNotice.docType }}</div>
+                      <div><span class="k">盘点仓库：</span>{{ currentNotice.partner }}</div>
+                      <div><span class="k">应盘件数：</span>{{ currentNotice.planPcs ?? 0 }}</div>
+                      <div><span class="k">实盘件数：</span>{{ currentNotice.donePcs ?? 0 }}</div>
+                      <div><span class="k">备注：</span>{{ currentNotice.remark || '—' }}</div>
+                    </div>
+                    <div class="info-card__badge"><span class="k">待盘件数</span><span class="v">{{ currentNotice.pendingPcs ?? 0 }}</span></div>
+                  </div>
+                </div>
+
+                <!-- 库存盘点 · 扫码 -->
+                <template v-if="flowMode==='stocktake'">
+                  <div class="sec">
+                    <div class="sec__title">添加条码</div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addStockScan" /></div>
+                    <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车" @keyup.enter="addStockScan" /></div>
+                  </div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="sec__title" style="padding:12px 16px 8px">条码信息</div>
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>状态</th><th>条码号</th><th>包材编号</th><th>物料名称</th><th>库位</th><th>应盘</th><th>实盘</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in stockRows" :key="i" :style="r.abnormal ? 'color:#FF4D4F' : ''">
+                            <td>{{ r.status }}</td><td>{{ r.barcode }}</td><td>{{ r.pkgNo }}</td><td>{{ r.name }}</td><td>{{ r.loc }}</td>
+                            <td>{{ r.planQty }}</td>
+                            <td><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" /></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                    <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                  </div>
+                </template>
+                <!-- 生产领料-流水码：按执行页 PRD（线边仓 + 库内包材） -->
+                <template v-else-if="isLineSidePick">
+                  <div class="sec">
+                    <div class="sec__title" style="display:flex;justify-content:space-between;align-items:center">
+                      <span>添加线边仓信息</span>
+                      <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openRecommend">查看推荐条码</button>
+                    </div>
+                    <div class="field">
+                      <label><span class="req">*</span>线边仓编码</label>
+                      <select v-model="form.lineSideWh">
+                        <option value="">请选择线边仓</option>
+                        <option v-for="w in lineSideWhOptions" :key="w" :value="w">{{ w }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">添加库内包材</div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addPickScan" /></div>
+                    <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认录入" @keyup.enter="addPickScan" /></div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>包材编号</th><th>数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th>外包材编号</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="i" :style="{ color: r.done ? '#52C41A' : '#262626' }" @click="openProcess(r)">
+                            <td style="color:#1A4099">{{ r.barcode }}</td>
+                            <td>{{ r.pkgNo }}</td><td>{{ r.qty }}</td><td>{{ r.fromLoc }}</td><td>{{ r.lot }}</td><td>{{ r.process }}</td><td>{{ r.outer }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 通用流水码执行 -->
+                <template v-else>
+                  <div class="sec">
+                    <div class="sec__title">{{ flowMeta.addLocTitle || '添加位置信息' }}</div>
+                    <div class="field"><label><span class="req">*</span>库位编号</label><input v-model="form.loc" placeholder="输入后回车确认" @keyup.enter="toast('库位已确认')" /></div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">{{ flowMeta.serialScanTitle || flowMeta.addMatTitle || '添加扫码' }}</div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码 / 手动输入，回车录入" @keyup.enter="addSerialScan" /></div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>库位</th><th>工序</th><th>外包材</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="i" @click="flowMeta.hasProcess && openProcess(r)">
+                            <td>{{ r.barcode }}</td><td>{{ r.qty }}</td><td>{{ r.lot }}</td><td>{{ r.loc }}</td><td>{{ r.process }}</td><td>{{ r.outer }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
+                <div class="sec" v-if="flowMeta.hasProcess && flowMode!=='stocktake'">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button :class="{ on: processTab==='包装检查' }" @click="goProcessBatch('包装检查')">包装检查</button>
+                    <button :class="{ on: processTab==='物料检查' }" @click="goProcessBatch('物料检查')">物料检查</button>
+                  </div>
+                </div>
+                <div class="sec" v-if="flowMode!=='stocktake'">
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+            </template>
+
+            <!-- 推荐条码弹窗 -->
+            <div v-if="recommendVisible" style="position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;border-radius:20px;overflow:hidden">
+              <div style="width:100%;max-height:70%;background:#fff;border-radius:16px 16px 0 0;display:flex;flex-direction:column">
+                <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center">
+                  <span>推荐条码</span>
+                  <button type="button" style="border:none;background:transparent;font-size:18px" @click="recommendVisible=false">×</button>
+                </div>
+                <div style="flex:1;overflow:auto;padding:12px">
+                  <div v-for="r in recommendBarcodes" :key="r.barcode" class="line-card" style="cursor:pointer" @click="useRecommend(r)">
+                    <div class="line-fields" style="padding-right:0">
+                      <div><span class="k">条码号：</span>{{ r.barcode }}</div>
+                      <div><span class="k">包材编号：</span>{{ r.pkgNo }}</div>
+                      <div><span class="k">库存位置：</span>{{ r.loc }}</div>
+                      <div><span class="k">批号：</span>{{ r.lot }}　<span class="k">数量：</span>{{ r.qty }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== 执行页 · 罐区 ===== -->
+            <template v-else-if="view==='exec' && activeExecMode==='tank'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backFromExec">←</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="info-card">
+                  <div class="info-card__left">
+                    <div><span class="k">物料编码：</span>{{ currentLine.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ currentLine.name }}</div>
+                    <div><span class="k">物料规格：</span>{{ currentLine.spec }}</div>
+                    <div><span class="k">物料种类：</span>{{ currentLine.kind }}</div>
+                    <div><span class="k">库存单位：</span>{{ currentLine.unit }}</div>
+                    <div><span class="k">批号：</span>{{ currentLine.lot }}</div>
+                    <div><span class="k">备注：</span>{{ currentLine.remark }}</div>
+                  </div>
+                  <div class="info-card__badge"><span class="k">未完成件数</span><span class="v">{{ currentLine.remainPcs }}</span></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">{{ flowMeta.addMatTitle || '添加厂外物料' }}</div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码 / 输入，回车确认" /></div>
+                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加原料信息</div>
+                  <div class="field"><label><span class="req">*</span>物料批号</label><input :value="currentLine.lot" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>生产日期</label><input v-model="form.prodDate" type="date" /></div>
+                  <div class="field"><label>有效期</label><input v-model="form.validDate" type="date" /></div>
+                  <div class="field"><label><span class="req">*</span>生产厂家</label><input v-model="form.maker" /></div>
+                  <div class="field"><label><span class="req">*</span>数量</label><input v-model.number="form.qty" type="number" min="0" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加库内储罐</div>
+                  <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="输入后回车 / 失焦校验" @keyup.enter="addTankRow" /></div>
+                  <div class="field">
+                    <label><span class="req">*</span>储罐编号</label>
+                    <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                  </div>
+                </div>
+                <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
+                <div class="sec" style="padding:0;overflow:hidden">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in tankRows" :key="i" @click="flowMeta.hasProcess && openProcess(r)">
+                          <td>{{ r.barcode }}</td><td>{{ r.tankNo }}</td><td>{{ r.loc }}</td><td>{{ r.beforeQty }}</td><td>{{ r.beforeLot }}</td><td>{{ r.afterQty }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec" v-if="flowMeta.hasProcess">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button :class="{ on: processTab==='包装检查' }" @click="goProcessBatch('包装检查')">包装检查</button>
+                    <button :class="{ on: processTab==='物料检查' }" @click="goProcessBatch('物料检查')">物料检查</button>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+            </template>
+
+            <!-- ===== 执行页 · 计数 / 装卸 ===== -->
+            <template v-else-if="view==='exec' && activeExecMode==='count'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backFromExec">←</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="info-card" v-if="currentLine && currentLine.code">
+                  <div class="info-card__left">
+                    <div><span class="k">物料编码：</span>{{ currentLine.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ currentLine.name }}</div>
+                    <div><span class="k">物料规格：</span>{{ currentLine.spec }}</div>
+                    <div><span class="k">物料种类：</span>{{ currentLine.kind }}</div>
+                    <div><span class="k">库存单位：</span>{{ currentLine.unit }}</div>
+                    <div v-if="isLoadFlow"><span class="k">通知单号：</span>{{ currentNotice.id }}</div>
+                    <div v-else><span class="k">批号：</span>{{ currentLine.lot }}</div>
+                    <div v-if="!isLoadFlow"><span class="k">备注：</span>{{ currentLine.remark }}</div>
+                  </div>
+                  <div class="info-card__badge"><span class="k">未完成数量</span><span class="v">{{ currentLine.remainQty }}</span></div>
+                </div>
+                <div class="sec" v-else-if="flowMode==='stocktake'">
+                  <div class="sec__title">基本信息</div>
+                  <div class="info-card" style="margin:0">
+                    <div class="info-card__left">
+                      <div><span class="k">盘点类型：</span>{{ currentNotice.refNo || currentNotice.docType }}</div>
+                      <div><span class="k">盘点仓库：</span>{{ currentNotice.partner }}</div>
+                      <div><span class="k">应盘件数：</span>{{ currentNotice.planPcs ?? 0 }}</div>
+                      <div><span class="k">实盘件数：</span>{{ currentNotice.donePcs ?? 0 }}</div>
+                      <div><span class="k">备注：</span>{{ currentNotice.remark || '—' }}</div>
+                    </div>
+                    <div class="info-card__badge"><span class="k">待盘件数</span><span class="v">{{ currentNotice.pendingPcs ?? 0 }}</span></div>
+                  </div>
+                </div>
+                <template v-if="isLoadFlow">
+                  <div class="sec">
+                    <div class="sec__title">装卸数量</div>
+                    <div class="field"><label><span class="req">*</span>本次数量</label>
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <input v-model.number="form.inQty" type="number" min="0" placeholder="输入本次装卸数量" style="flex:1" />
+                        <span style="color:#8C8C8C;font-size:13px">{{ currentLine.unit }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">工序执行区</div>
+                    <div
+                      v-for="(p, idx) in loadProcs" :key="p.name"
+                      class="proc-row"
+                      :class="{ done: p.status==='已完成', locked: idx>0 && loadProcs[idx-1].status!=='已完成' }"
+                      @click="openLoadProc(p, idx)"
+                    >
+                      <div class="proc-row__hd">
+                        <strong>{{ p.name }}</strong>
+                        <span class="tag" :class="statusTag(p.status==='已完成'?'已完成':'待执行')">{{ p.status }}</span>
+                      </div>
+                      <div class="proc-row__sum">{{ p.summary }}</div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="flowMode==='stocktake'">
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="sec__title" style="padding:12px 16px 8px">数量信息</div>
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>状态</th><th>仓库编码</th><th>物料名称</th><th>应盘数量</th><th>实盘数量</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in stockRows" :key="i" :style="r.abnormal ? 'color:#FF4D4F' : ''">
+                            <td>{{ r.status }}</td><td>{{ r.wh || r.loc }}</td><td>{{ r.name }}</td><td>{{ r.planQty }}</td>
+                            <td><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" /></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="sec">
+                    <div class="sec__title">{{ flowMeta.addLocTitle || '添加位置信息' }}</div>
+                    <div class="field"><label><span class="req">*</span>库位编号</label><input v-model="form.loc" placeholder="输入，回车确认" /></div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">{{ flowMeta.addMatTitle || '添加物料信息' }}</div>
+                    <div class="field"><label>批号</label><input v-model="form.lotIn" placeholder="输入，回车确认" /></div>
+                    <div class="field"><label><span class="req">*</span>{{ flowMeta.qtyLabel || '数量' }}</label><input v-model.number="form.inQty" type="number" min="0" placeholder="输入，回车确认" /></div>
+                  </div>
+                  <div class="sec" v-if="flowMeta.hasProcess">
+                    <div class="sec__title">工序（可批量执行）</div>
+                    <div class="process-tabs">
+                      <button :class="{ on: processTab==='包装检查' }" @click="goProcessBatch('包装检查')">包装检查</button>
+                      <button :class="{ on: processTab==='物料检查' }" @click="goProcessBatch('物料检查')">物料检查</button>
+                    </div>
+                  </div>
+                </template>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+            </template>
+
+            <!-- ===== 执行页 · 库内移库/转序 ===== -->
+            <template v-else-if="view==='exec' && activeExecMode==='inner'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">←</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field"><label>单据类型</label><input :value="currentNotice.docType" readonly /></div>
+                  <div class="field"><label>移出/转出仓库</label><input :value="currentNotice.fromWh || currentNotice.partner" readonly /></div>
+                  <div class="field"><label>移出/转出库位</label><input :value="currentNotice.fromLoc || '—'" readonly /></div>
+                  <div class="field"><label>移入/转入仓库</label><input :value="currentNotice.toWh || currentNotice.refNo" readonly /></div>
+                  <div class="field"><label>移入/转入库位</label><input :value="currentNotice.toLoc || '—'" readonly /></div>
+                  <div class="field"><label>备注</label><input :value="currentNotice.remark || '—'" readonly /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加物料</div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，回车确认" @keyup.enter="addInnerScan" /></div>
+                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="手动输入，回车确认" @keyup.enter="addInnerScan" /></div>
+                </div>
+                <div class="stat-bar"><span>扫码件数：{{ innerRows.length }}</span><span>扫码数量：{{ innerQtySum }}</span></div>
+                <div class="sec" style="padding:0;overflow:hidden">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>物料编码</th><th>数量</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in innerRows" :key="i">
+                          <td>{{ r.barcode }}</td><td>{{ r.pkgNo }}</td><td>{{ r.code }}</td><td>{{ r.qty }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+            </template>
+
+            <!-- ===== 工序页 ===== -->
+            <template v-else-if="view==='process'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view = (wayBackView==='waybill-pickup'||wayBackView==='waybill-sign'||wayBackView==='waybill-enroute') ? wayBackView : 'exec'">←</button>
+                <div class="m-nav__title">{{ processTab || '工序填报' }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="proc-block"><label>关联展示</label><input :value="processRef" readonly style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px;background:#FAFAFA;color:#8C8C8C" /></div>
+                <div class="proc-block"><label>单行文本</label><input v-model="procForm.text" placeholder="请输入" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" /></div>
+                <div class="proc-block"><label>数字输入</label><input v-model.number="procForm.num" type="number" placeholder="请输入数字" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" /></div>
+                <div class="sub-card">
+                  <div class="sub-card__hd"><span>子表表单名称</span><button class="btn-sm" style="height:28px;font-size:12px" @click="toast('已新增子表单卡片')">新增</button></div>
+                  <div class="proc-block"><label>日期选择</label><input v-model="procForm.date" type="date" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" /></div>
+                  <div class="proc-block"><label>下拉选择</label><select v-model="procForm.sel" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px"><option value="">请选择</option><option>合格</option><option>不合格</option></select></div>
+                  <div class="proc-block"><label>单/多选框</label>
+                    <label style="display:inline;margin-right:12px;color:#595959"><input type="radio" v-model="procForm.opt" value="1" /> 选项1</label>
+                    <label style="display:inline;margin-right:12px;color:#595959"><input type="radio" v-model="procForm.opt" value="2" /> 选项2</label>
+                  </div>
+                  <div class="proc-block"><label>签字</label><div class="sign-box" @click="toast('打开手写签字板')">点击签字区域</div></div>
+                </div>
+                <div class="sub-card">
+                  <div class="sub-card__hd"><span>子表表格名称</span><button class="btn-sm" style="height:28px;font-size:12px" @click="toast('已新增表格行')">新增</button></div>
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>日期选择</th><th>下拉选择</th><th>单/多选</th><th>签字</th></tr></thead>
+                      <tbody><tr><td>2025-08-05</td><td>合格</td><td>选项1</td><td>点击</td></tr></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="proc-block"><label>图片上传</label><div class="upload-box" @click="toast('拍照 / 相册')">＋</div></div>
+                <div class="proc-block"><label>附件上传</label><div class="upload-box" @click="toast('选择附件')">＋</div></div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitProcess">提交</button></div>
+            </template>
+
+            <!-- ===== 条码拆分（direct-exec） ===== -->
+            <template v-else-if="view==='exec' && flowMeta.execVariant==='pkg-split'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">← 返回</button>
+                <div class="m-nav__title">条码拆分</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">条码信息</div>
+                  <div class="field"><label><span class="req">*</span>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="loadSplitSrc" /></div>
+                  <div class="field"><label>库存状态</label><input :value="pkgSrc.status" readonly /></div>
+                  <div class="field"><label>物料信息</label><input :value="pkgSrc.material" readonly /></div>
+                  <div class="field"><label>包装规格</label><input :value="pkgSrc.spec" readonly /></div>
+                  <div class="field"><label>库存单位</label><input :value="pkgSrc.unit" readonly /></div>
+                  <div class="field"><label>剩余数量</label><input :value="pkgSrc.remain" readonly /></div>
+                  <div class="field"><label>物料批号</label><input :value="pkgSrc.lot" readonly /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">条码拆分</div>
+                  <div class="field"><label><span class="req">*</span>拆出条码个数</label><input v-model.number="form.splitCount" type="number" min="1" placeholder="正整数" /></div>
+                  <div class="field"><label>拆分条码标量</label><input v-model.number="form.splitScalar" type="number" min="0" step="any" placeholder="正数" /></div>
+                  <div class="stat-bar">
+                    <span>条码个数：{{ splitRows.length }}</span>
+                    <button type="button" class="btn-sm" @click="genSplitRows">生成条码</button>
+                  </div>
+                  <div class="sec" style="padding:0;overflow:hidden;margin:0">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>*条码号</th><th>*建档数量</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in splitRows" :key="i">
+                            <td>{{ r.barcode }} <button type="button" class="m-nav__right" style="position:static;transform:none;padding:0;height:auto;margin-left:4px" @click="refreshSplitCode(i)">↻</button></td>
+                            <td><input v-model.number="r.qty" type="number" min="0" step="any" style="width:72px;border:1px solid #D9D9D9;border-radius:4px;padding:2px 6px" /></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">条码拆分后信息</div>
+                  <div class="field"><label><span class="req">*</span>拆分后剩余数量</label><input :value="splitRemain" readonly /></div>
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
+                  <p class="hint">e.g:提交后剩余数量=0条码自动报废</p>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitPkgSplit">提交</button></div>
+            </template>
+
+            <!-- ===== 条码合并 ===== -->
+            <template v-else-if="view==='exec' && flowMeta.execVariant==='pkg-merge'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">← 返回</button>
+                <div class="m-nav__title">条码合并</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">条码信息</div>
+                  <div class="field"><label><span class="req">*</span>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="loadMergeMain" /></div>
+                  <div class="field"><label>库存状态</label><input :value="pkgSrc.status" readonly /></div>
+                  <div class="field"><label>物料信息</label><input :value="pkgSrc.material" readonly /></div>
+                  <div class="field"><label>包装规格</label><input :value="pkgSrc.spec" readonly /></div>
+                  <div class="field"><label>库存单位</label><input :value="pkgSrc.unit" readonly /></div>
+                  <div class="field"><label>剩余数量</label><input :value="pkgSrc.remain" readonly /></div>
+                  <div class="field"><label>物料批号</label><input :value="pkgSrc.lot" readonly /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">被合并条码</div>
+                  <div class="field"><label>条码号</label><input v-model="form.mergeBarcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addMergeRow" /></div>
+                  <div class="stat-bar"><span>条码个数：{{ mergeRows.length }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden;margin:0">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>*条码号</th><th>*剩余数量</th><th></th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in mergeRows" :key="i">
+                            <td>{{ r.barcode }}</td>
+                            <td>{{ r.remain }}</td>
+                            <td><button type="button" class="btn-sm" style="background:#FF4D4F" @click="removeMergeRow(i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">条码合并后信息</div>
+                  <div class="field"><label><span class="req">*</span>合并后剩余数量</label><input :value="mergeRemain" readonly /></div>
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
+                  <p class="hint">e.g:提交后被合并条码余量改为0并自动报废</p>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitPkgMerge">提交</button></div>
+            </template>
+
+            <!-- ===== 外包材拆组 ===== -->
+            <template v-else-if="view==='exec' && flowMeta.execVariant==='pkg-outer'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">← 返回</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="field" style="padding:12px 16px 0"><label>外包材拆组单号</label><input value="WZ202508060001" readonly /></div>
+                <div class="sec">
+                  <div class="sec__title">添加外包材信息</div>
+                  <div class="field"><label>条码号</label><input v-model="form.outerBarcode" placeholder="扫码/输入，扫码自动对焦，回车" /></div>
+                  <div class="field"><label>外包材编号</label><input v-model="form.outerNo" placeholder="扫码/输入，扫码自动对焦，回车" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加包材</div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addOuterScan" /></div>
+                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车" @keyup.enter="addOuterScan" /></div>
+                </div>
+                <div class="stat-bar"><span>扫码件数：{{ outerRows.length }}</span></div>
+                <div class="sec" style="padding:0;overflow:hidden">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>充装介质</th><th></th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in outerRows" :key="i">
+                          <td @click="toast('自查档案：'+r.barcode)">{{ r.barcode }}</td>
+                          <td>{{ r.pkgNo }}</td>
+                          <td>{{ r.medium }}</td>
+                          <td><button type="button" class="btn-sm" style="background:#FF4D4F" @click="removeOuterRow(i)">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitPkgOuter">提交</button></div>
+            </template>
+
+            <!-- ===== 报废/冻结/解冻执行 ===== -->
+            <template v-else-if="view==='exec' && flowMode==='pkg-doc'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">← 返回</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="info-card">
+                  <div class="info-card__left">
+                    <div class="sec__title" style="margin:0 0 8px;padding:0">基本信息</div>
+                    <div><span class="k">单据类型：</span>{{ currentNotice.docType || flowMeta.docTypeLabel }}</div>
+                    <div><span class="k">备注：</span>{{ currentNotice.remark || '—' }}</div>
+                  </div>
+                  <div class="info-card__badge"><span class="k">计划件数</span><span class="v">{{ currentNotice.planPcs || 10 }}</span></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加包材</div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addPkgDocScan" /></div>
+                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车" @keyup.enter="addPkgDocScan" /></div>
+                </div>
+                <div class="stat-bar"><span>扫码件数：{{ pkgRows.length }}</span></div>
+                <div class="sec" style="padding:0;overflow:hidden">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>批号</th><th>当前工序</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in pkgRows" :key="i" @click="openProcess(r)">
+                          <td style="color:#1A4099">{{ r.barcode }}</td>
+                          <td>{{ r.pkgNo }}</td>
+                          <td>{{ r.lot }}</td>
+                          <td>{{ r.process }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec" v-if="flowMeta.hasProcess">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button v-for="b in (currentNotice.processButtons || flowMeta.processButtons || [])" :key="b" :class="{ on: processTab===b }" @click="goPkgProcessBatch(b)">{{ b }}</button>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitPkgDoc">提交</button></div>
+            </template>
+
+            <!-- ===== 运单执行 ===== -->
+            <template v-else-if="view==='waybill-exec'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">← 返回</button>
+                <div class="m-nav__title">{{ currentNotice.id }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="doc-card" style="margin-bottom:12px">
+                  <div class="doc-card__bd">
+                    <div class="doc-grid">
+                      <div><span class="doc-label">状态</span><span class="tag" :class="statusTag(currentNotice.status)">{{ currentNotice.status }}</span></div>
+                      <div><span class="doc-label">配送方式</span>{{ currentNotice.shipMode }}</div>
+                      <div class="full"><span class="doc-label">司机</span>{{ currentNotice.driver }} / {{ currentNotice.plate }} / {{ currentNotice.phone }}</div>
+                      <div class="full"><span class="doc-label">排单时间</span>{{ currentNotice.scheduleAt }}</div>
+                      <div class="full"><span class="doc-label">计划装车</span>{{ currentNotice.planLoad }}</div>
+                      <div class="full"><span class="doc-label">关联派车单</span>{{ currentNotice.dispatchNo }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="m-group__title">装货点</div>
+                <div v-for="p in (currentNotice.loads||[])" :key="p.id" class="doc-card">
+                  <div class="doc-card__hd">
+                    <span class="doc-card__no">{{ p.id }}</span>
+                    <span class="tag" :class="statusTag(p.status==='已确认'?'已完成':'待执行')">{{ p.status }}</span>
+                  </div>
+                  <div class="doc-card__bd">
+                    <div class="doc-grid">
+                      <div class="full"><span class="doc-label">关联发货单</span>{{ p.shipNo }}</div>
+                      <div class="full"><span class="doc-label">发货单位</span>{{ p.unit }}</div>
+                      <div class="full"><span class="doc-label">装货地点</span>{{ p.place }}</div>
+                      <div class="full"><span class="doc-label">物料</span>{{ p.material }}</div>
+                      <div class="full"><span class="doc-label">总数量</span>{{ p.qty }}</div>
+                    </div>
+                  </div>
+                  <div class="doc-card__ft"><button class="btn-sm" @click="openPickup(p)">提货</button></div>
+                </div>
+                <div class="m-group__title">卸货点</div>
+                <div v-for="p in (currentNotice.unloads||[])" :key="p.id" class="doc-card">
+                  <div class="doc-card__hd" style="background:linear-gradient(90deg,#1a5c3a,#0d3721)">
+                    <span class="doc-card__no">{{ p.id }}</span>
+                    <span class="tag" :class="statusTag(p.status==='已确认'?'已完成':'待执行')">{{ p.status }}</span>
+                  </div>
+                  <div class="doc-card__bd">
+                    <div class="doc-grid">
+                      <div class="full"><span class="doc-label">关联收货单</span>{{ p.recvNo }}</div>
+                      <div class="full"><span class="doc-label">收货单位</span>{{ p.unit }}</div>
+                      <div class="full"><span class="doc-label">卸货地点</span>{{ p.place }}</div>
+                      <div class="full"><span class="doc-label">联系人</span>{{ p.contact }}</div>
+                      <div class="full"><span class="doc-label">物料</span>{{ p.material }}</div>
+                      <div class="full"><span class="doc-label">总数量</span>{{ p.qty }}</div>
+                    </div>
+                  </div>
+                  <div class="doc-card__ft"><button class="btn-sm" style="background:#389E0D" @click="openSign(p)">签收</button></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="openEnroute">更新在途信息</button></div>
+            </template>
+
+            <!-- ===== 提货确认 ===== -->
+            <template v-else-if="view==='waybill-pickup'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='waybill-exec'">← 返回</button>
+                <div class="m-nav__title">提货确认</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">装货点信息</div>
+                  <div class="field"><label>关联发货单</label><input :value="wayPoint.shipNo" readonly /></div>
+                  <div class="field"><label>发货单位</label><input :value="wayPoint.unit" readonly /></div>
+                  <div class="field"><label>装货地点</label><input :value="wayPoint.place" readonly /></div>
+                  <div class="field"><label>装货联系人</label><input :value="wayPoint.contact" readonly /></div>
+                </div>
+                <div class="m-group__title">物料明细</div>
+                <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
+                  <span v-if="line.confirmed" class="line-card__status tag tag-g">已确认 ✓</span>
+                  <div class="line-fields">
+                    <div><span class="k">物料信息：</span>{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
+                    <div><span class="k">计划数量：</span>{{ line.planQty }}　<span class="k">库存单位：</span>{{ line.unit }}</div>
+                    <div class="field" style="padding:8px 0 0"><label>实际数量</label><input v-model.number="line.actualQty" type="number" /></div>
+                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" placeholder="选填" /></div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
+                  </div>
+                  <div class="table-scroll" style="margin-top:8px">
+                    <table class="scan-table">
+                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
+                      <tbody>
+                        <tr v-for="p in (wayPoint.procs||[])" :key="p.name" @click="goWayProc(p)">
+                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">现场照片</div>
+                  <div style="display:flex;gap:8px">
+                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
+                    <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="confirmPickup">确认提货</button></div>
+            </template>
+
+            <!-- ===== 签收确认 ===== -->
+            <template v-else-if="view==='waybill-sign'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='waybill-exec'">← 返回</button>
+                <div class="m-nav__title">签收确认</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">卸货点信息</div>
+                  <div class="field"><label>关联发货单</label><input :value="wayPoint.recvNo || wayPoint.shipNo" readonly /></div>
+                  <div class="field"><label>收货单位</label><input :value="wayPoint.unit" readonly /></div>
+                  <div class="field"><label>卸货地点</label><input :value="wayPoint.place" readonly /></div>
+                  <div class="field"><label>卸货联系人</label><input :value="wayPoint.contact" readonly /></div>
+                </div>
+                <div class="m-group__title">物料明细核对</div>
+                <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
+                  <span v-if="line.confirmed" class="line-card__status tag tag-g">已确认 ✓</span>
+                  <div class="line-fields">
+                    <div><span class="k">物料信息：</span>{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
+                    <div><span class="k">提货数量：</span>{{ line.planQty }}　<span class="k">库存单位：</span>{{ line.unit }}</div>
+                    <div class="field" style="padding:8px 0 0"><label>实际签收</label><input v-model.number="line.actualQty" type="number" /></div>
+                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" placeholder="选填" /></div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">异常记录</div>
+                  <div class="field"><label>异常类型</label>
+                    <select v-model="signForm.exType"><option>无异常</option><option>破损</option><option>短少</option></select>
+                  </div>
+                  <div class="field"><label>异常描述</label><input v-model="signForm.exDesc" placeholder="选填" /></div>
+                  <div class="field"><label>处理方式</label>
+                    <select v-model="signForm.exHandle"><option>赔付</option><option>补发</option><option>退货</option></select>
+                  </div>
+                  <div class="field"><label>赔付金额</label><input v-model="signForm.exAmt" placeholder="元" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">签收信息</div>
+                  <div class="field"><label>签收人</label><input v-model="signForm.signer" placeholder="必填" /></div>
+                  <div class="field"><label>签收人电话</label><input v-model="signForm.phone" /></div>
+                  <div class="field"><label>签收时间</label><input v-model="signForm.time" /></div>
+                  <div class="field"><label>电子签名</label><div class="upload-box" style="height:64px" @click="toast('手写签名区')">手写区</div></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
+                  </div>
+                  <div class="table-scroll" style="margin-top:8px">
+                    <table class="scan-table">
+                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
+                      <tbody>
+                        <tr v-for="p in (wayPoint.procs||[])" :key="p.name" @click="goWayProc(p)">
+                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">现场照片</div>
+                  <div style="display:flex;gap:8px">
+                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
+                    <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="confirmSign">确认签收</button></div>
+            </template>
+
+            <!-- ===== 在途信息 ===== -->
+            <template v-else-if="view==='waybill-enroute'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='waybill-exec'">← 返回</button>
+                <div class="m-nav__title">在途信息</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">历史在途记录</div>
+                  <div class="doc-card" style="margin-bottom:8px" v-for="(h,i) in enrouteHistory" :key="i">
+                    <div class="doc-card__bd">
+                      <div>{{ h.time }}　{{ h.place }}</div>
+                      <div class="hint" style="margin:4px 0 0">状态：{{ h.status }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">当前在途信息</div>
+                  <div class="field"><label><span class="req">*</span>记录时间</label><input v-model="enrouteForm.time" /></div>
+                  <div class="field"><label><span class="req">*</span>当前位置</label><input v-model="enrouteForm.place" placeholder="自动定位 / 手动输入" /></div>
+                  <div class="field"><label><span class="req">*</span>行驶状态</label>
+                    <select v-model="enrouteForm.status"><option>正常行驶</option><option>服务区休息</option><option>即将到达</option><option>异常停留</option></select>
+                  </div>
+                  <div class="field"><label>当前位置经/纬度</label><input value="31.4823°N / 104.6836°E" readonly /></div>
+                  <div class="field"><label>预计到达时间</label><input v-model="enrouteForm.eta" /></div>
+                  <div class="field"><label>途经事件</label>
+                    <select v-model="enrouteForm.event"><option>无异常</option><option>交通事故</option><option>车辆故障</option><option>天气延误</option></select>
+                  </div>
+                  <div class="field"><label>备注</label><input v-model="enrouteForm.remark" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序（可批量执行）</div>
+                  <div class="process-tabs">
+                    <button v-for="p in enrouteProcs" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
+                  </div>
+                  <div class="table-scroll" style="margin-top:8px">
+                    <table class="scan-table">
+                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
+                      <tbody>
+                        <tr v-for="p in enrouteProcs" :key="p.name" @click="goWayProc(p)">
+                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">沿途照片</div>
+                  <div style="display:flex;gap:8px">
+                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
+                    <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitEnroute">提交在途信息</button></div>
+            </template>
+
+            <!-- ===== 包材建档 · 查询更新 ===== -->
+            <template v-else-if="view==='pkg-arch'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">← 返回</button>
+                <div class="m-nav__title">包材建档</div>
+                <button class="m-nav__right" @click="openPkgCreateForm">新增</button>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">档案信息搜索</div>
+                  <div class="field"><label>条码号</label><input v-model="pkgSearch.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="searchPkgArch" /></div>
+                  <div class="field"><label><span class="req">*</span>包材编号</label><input v-model="pkgSearch.pkgNo" placeholder="输入，回车" @keyup.enter="searchPkgArch" /></div>
+                </div>
+                <div class="sec" v-if="pkgDetail">
+                  <div class="sec__title">信息详情</div>
+                  <div class="field"><label>条码号</label><input :value="pkgDetail.barcode" readonly /></div>
+                  <div class="field"><label>包装规格</label>
+                    <select v-model="pkgDetail.packSpec" :disabled="!pkgEditable"><option>吨袋1T</option><option>25kg袋</option><option>200L标准桶</option><option>1000L吨袋</option></select>
+                  </div>
+                  <div class="field"><label>物料信息</label><input v-model="pkgDetail.material" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>物料批号</label><input v-model="pkgDetail.lot" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>库存单位</label><input :value="pkgDetail.unit" readonly /></div>
+                  <div class="field"><label>建档数量</label><input v-model="pkgDetail.archiveQty" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>当前数量</label><input v-model="pkgDetail.qty" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>生产厂家</label><input v-model="pkgDetail.maker" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>供应商信息</label><input v-model="pkgDetail.supplier" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>生产日期</label><input v-model="pkgDetail.prodDate" type="date" :readonly="!pkgEditable" /></div>
+                  <div class="field"><label>有效期</label>
+                    <div style="display:flex;gap:8px">
+                      <input v-model="pkgDetail.validPeriod" :readonly="!pkgEditable" style="flex:1" />
+                      <select v-model="pkgDetail.validUnit" :disabled="!pkgEditable" style="width:72px"><option>天</option><option>月</option><option>年</option></select>
+                    </div>
+                  </div>
+                  <div class="field"><label>失效日期</label><input :value="pkgDetail.expireDate" readonly /></div>
+                  <div class="field"><label>使用状态</label><input :value="pkgDetail.useStatus" readonly /></div>
+                  <div class="field"><label>库存状态</label><input :value="pkgDetail.stockStatus" readonly /></div>
+                  <div class="field"><label>存储位置</label><input :value="pkgDetail.loc" readonly /></div>
+                  <div class="field"><label>绑定状态</label><input :value="pkgDetail.bindStatus" readonly /></div>
+                  <div class="field"><label>当前绑定外包材</label><input :value="pkgDetail.bindOuter" readonly /></div>
+                  <div class="field"><label>备注</label><input v-model="pkgDetail.remark" :readonly="!pkgEditable" /></div>
+                </div>
+                <div class="empty" v-else style="padding:32px 16px">请输入包材编号检索档案</div>
+              </div>
+              <div class="m-footer" v-if="pkgDetail">
+                <button class="btn-primary" :disabled="!pkgEditable" @click="updatePkgArch">更新档案</button>
+              </div>
+            </template>
+
+            <!-- ===== 包材建档 · 新增表单 ===== -->
+            <template v-else-if="view==='pkg-create'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='pkg-arch'">← 返回</button>
+                <div class="m-nav__title">新增档案</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">条码与包装</div>
+                  <div class="field"><label><span class="req">*</span>条码号</label><input v-model="pkgForm.barcode" placeholder="自动生成/扫码/手动" /></div>
+                  <div class="field"><label>包装规格</label>
+                    <select v-model="pkgForm.packSpec"><option value="">请选择</option><option>吨袋1T</option><option>25kg袋</option><option>200L标准桶</option><option>1000L吨袋</option></select>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">物料及效期</div>
+                  <div class="field"><label>物料信息</label><input v-model="pkgForm.material" placeholder="弹窗选择条码管理物料" @click="toast('打开物料选择（Demo）')" /></div>
+                  <div class="field"><label>物料批号</label><input v-model="pkgForm.lot" /></div>
+                  <div class="field"><label>库存单位</label><input v-model="pkgForm.unit" readonly placeholder="选物料后带入" /></div>
+                  <div class="field"><label>建档数量</label><input v-model="pkgForm.archiveQty" type="number" min="0" /></div>
+                  <div class="field"><label>当前数量</label><input v-model="pkgForm.qty" type="number" min="0" /></div>
+                  <div class="field"><label>生产厂家</label><input v-model="pkgForm.maker" /></div>
+                  <div class="field"><label>供应商信息</label><input v-model="pkgForm.supplier" /></div>
+                  <div class="field"><label>生产日期</label><input v-model="pkgForm.prodDate" type="date" /></div>
+                  <div class="field"><label>有效期</label>
+                    <div style="display:flex;gap:8px">
+                      <input v-model="pkgForm.validPeriod" style="flex:1" />
+                      <select v-model="pkgForm.validUnit" style="width:72px"><option>天</option><option>月</option><option>年</option></select>
+                    </div>
+                  </div>
+                  <div class="field"><label>失效日期</label><input :value="pkgForm.expireDate || '自动计算'" readonly /></div>
+                  <div class="field"><label>备注</label><input v-model="pkgForm.remark" /></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:8px;padding:10px 12px">
+                <button class="btn-sm" style="flex:1;height:40px;background:#fff;color:#595959;border:1px solid #D9D9D9" @click="view='pkg-arch'">取消</button>
+                <button class="btn-primary" style="flex:1" @click="savePkgCreate">确认</button>
+              </div>
+            </template>
+
+            <!-- ===== 信息查询 ===== -->
+            <template v-else-if="view==='pkg-query'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">← 返回</button>
+                <div class="m-nav__title">信息查询</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">条码查询</div>
+                  <div class="field"><label><span class="req">*</span>条码号</label>
+                    <div style="display:flex;gap:8px">
+                      <input v-model="pkgSearch.barcode" placeholder="扫码/输入" style="flex:1" @keyup.enter="queryPkgInfo" />
+                      <button class="btn-sm" @click="queryPkgInfo">查询</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="sec" v-if="pkgDetail">
+                  <div class="sec__title">档案信息</div>
+                  <div class="field" v-for="pair in pkgQueryPairs" :key="pair[0]"><label>{{ pair[0] }}</label><input :value="pair[1]" readonly /></div>
+                </div>
+                <div class="empty" v-else style="padding:32px 16px">扫描或输入条码号查询流水码档案</div>
+              </div>
+            </template>
+
+            <!-- ===== 占位（非仓储） ===== -->
+            <template v-else-if="view==='stub'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">←</button>
+                <div class="m-nav__title">{{ stubTitle }}</div>
+              </div>
+              <div class="stub-page">
+                <h3>{{ stubTitle }}</h3>
+                <p>该模块尚未纳入本批 APP Demo。</p>
+                <p style="margin-top:24px"><button class="btn-sm" @click="goHome">返回首页</button></p>
+              </div>
+            </template>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/element-plus"></script>
+<script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
+<script src="./js/app-configs.js"></script>
+<script>
+const { createApp, ref, computed, reactive } = Vue;
+const CFG = window.APP_CFG;
+
+createApp({
+  setup() {
+    const menu = CFG.menu;
+    const defaultOpeneds = ['home', 'wh', 'wh-po', 'wh-prod', 'wh-os', 'pkg-mgmt', 'lg'];
+    const view = ref('home');
+    const flowId = ref('po-in-serial');
+    const menuActive = ref('app-home');
+    const homeKw = ref('');
+    const docKw = ref('');
+    const currentNotice = ref(CFG.notices[0]);
+    const currentLine = ref(CFG.notices[0].lines[0]);
+    const processTab = ref('包装检查');
+    const processRef = ref('');
+    const stubTitle = ref('');
+    const stockExecOverride = ref('');
+    const stockRows = ref([]);
+    const pkgSearch = reactive({ barcode: '', pkgNo: '' });
+    const pkgDetail = ref(null);
+    const pkgForm = reactive({
+      barcode: '', packSpec: '', material: '', lot: '', unit: '', archiveQty: '', qty: '',
+      maker: '', supplier: '', prodDate: '', validPeriod: '', validUnit: '天', expireDate: '', remark: '',
+    });
+    const operator = CFG.operator;
+    const tanks = CFG.tanks;
+    const scanRows = ref([...CFG.scanRowsSerial]);
+    const tankRows = ref([...CFG.tankRows]);
+    const innerRows = ref([...CFG.innerScanRows]);
+    const form = reactive({
+      loc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '丁A',
+      prodDate: '2025-08-01', validDate: '2026-08-01', maker: '天齐锂业股份有限公司', qty: 25,
+      lotIn: '', inQty: null, remark: '', lineSideWh: '',
+      splitCount: 5, splitScalar: 10, mergeBarcode: '', outerBarcode: '', outerNo: '',
+    });
+    const procForm = reactive({ text: '', num: null, date: '2025-08-05', sel: '', opt: '1' });
+    const recommendVisible = ref(false);
+    const lineSideWhOptions = CFG.lineSideWhOptions || [];
+    const recommendBarcodes = CFG.recommendBarcodes || [];
+    const pkgSrc = reactive({ status: '', material: '', spec: '', unit: '', remain: '', lot: '', loaded: false });
+    const splitRows = ref([]);
+    const mergeRows = ref([]);
+    const outerRows = ref([]);
+    const pkgRows = ref([]);
+    const wayPoint = ref({});
+    const wayBackView = ref('waybill-exec');
+    const signForm = reactive({ exType: '无异常', exDesc: '', exHandle: '赔付', exAmt: '', signer: '', phone: '', time: '2025-08-08 16:30' });
+    const enrouteForm = reactive({ time: '2025-08-07 15:00', place: '', status: '正常行驶', eta: '2025-08-07 16:00', event: '无异常', remark: '' });
+    const enrouteHistory = ref([
+      { time: '08-07 10:30', place: '成都绕城高速', status: '正常行驶' },
+      { time: '08-07 12:00', place: '成绵高速德阳段', status: '服务区休息' },
+      { time: '08-07 14:30', place: '绵阳高新区出口', status: '即将到达' },
+    ]);
+    const enrouteProcs = ref([
+      { name: '位置确认', status: '已完成', user: '张司', time: '10:30' },
+      { name: '状态确认', status: '已完成', user: '张司', time: '10:30' },
+      { name: '事件记录', status: '待执行', user: '—', time: '—' },
+    ]);
+
+    const flowMeta = computed(() => CFG.flowMeta[flowId.value] || {});
+    const flowTitle = computed(() => flowMeta.value.title || '');
+    const flowMode = computed(() => flowMeta.value.mode || 'serial');
+    const isLineSidePick = computed(() => flowMeta.value.execVariant === 'line-side-pick');
+    const isLoadFlow = computed(() => flowMeta.value.execVariant === 'load');
+    const loadProcs = computed(() => (currentLine.value && currentLine.value.procs) || []);
+    const activeExecMode = computed(() => {
+      if (flowMode.value === 'stocktake') return stockExecOverride.value || 'serial';
+      if (flowMode.value === 'inner') return 'inner';
+      return flowMode.value;
+    });
+    const pkgEditable = computed(() => pkgDetail.value && pkgDetail.value.useStatus === '在用' && pkgDetail.value.stockStatus === '厂外');
+    const pkgQueryPairs = computed(() => {
+      const d = pkgDetail.value;
+      if (!d) return [];
+      return [
+        ['条码号', d.barcode], ['包装规格', d.packSpec], ['物料信息', d.material], ['物料批号', d.lot],
+        ['库存单位', d.unit], ['当前数量', d.qty], ['生产厂家', d.maker], ['供应商信息', d.supplier],
+        ['生产日期', d.prodDate], ['有效期', `${d.validPeriod || '—'} ${d.validUnit || ''}`.trim()],
+        ['失效日期', d.expireDate], ['使用状态', d.useStatus], ['库存状态', d.stockStatus],
+        ['存储位置', d.loc], ['绑定状态', d.bindStatus], ['当前绑定外包材', d.bindOuter],
+        ['当前步骤', d.step], ['来源单号', d.sourceNo], ['备注', d.remark || '—'],
+      ];
+    });
+    const headerHint = computed(() => {
+      if (view.value === 'home') return 'APP 首页 · 仓储 / 包材 / 物流可点通';
+      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息' };
+      return `${flowTitle.value} · ${map[view.value] || view.value}`;
+    });
+
+    const filteredHome = computed(() => {
+      const kw = homeKw.value.trim();
+      if (!kw) return CFG.homeModules;
+      return CFG.homeModules.map(g => ({
+        ...g,
+        items: g.items.filter(it => it.name.includes(kw)),
+      })).filter(g => g.items.length);
+    });
+
+    const currentDocs = computed(() => {
+      const key = flowMeta.value.docsKey || 'default';
+      let list = (CFG.docsMap && CFG.docsMap[key]) || CFG.notices || [];
+      if (flowMode.value === 'inner') {
+        const want = flowMeta.value.innerType === 'xfer' ? '物料转序' : '货物移库';
+        list = list.filter(n => n.docType === want);
+      }
+      return list;
+    });
+
+    const filteredNotices = computed(() => {
+      const kw = docKw.value.trim();
+      const list = currentDocs.value;
+      if (!kw) return list;
+      return list.filter(n =>
+        [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.materialSummary, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode].join(' ').includes(kw)
+      );
+    });
+
+    const scanQtySum = computed(() => scanRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
+    const tankQtySum = computed(() => tankRows.value.reduce((s, r) => s + Number(r.afterQty || 0), 0));
+    const innerQtySum = computed(() => innerRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
+    const allLinesDone = computed(() => (currentNotice.value?.lines || []).every(l => l.status === '已完成' || l.status === '已关闭'));
+    const splitRemain = computed(() => {
+      const base = Number(pkgSrc.remain) || 0;
+      const used = splitRows.value.reduce((s, r) => s + Number(r.qty || 0), 0);
+      return base - used;
+    });
+    const mergeRemain = computed(() => {
+      const base = Number(pkgSrc.remain) || 0;
+      const add = mergeRows.value.reduce((s, r) => s + Number(r.remain || 0), 0);
+      return base + add;
+    });
+
+    function statusTag(s) {
+      return { '待执行': 'tag-b', '待完成': 'tag-b', '执行中': 'tag-o', '已完成': 'tag-g', '已关闭': 'tag-gr', '待发运': 'tag-b', '发运中': 'tag-o', '待确认': 'tag-b' }[s] || 'tag-gr';
+    }
+    function toast(msg) { ElementPlus.ElMessage.info(msg); }
+    function goHome() {
+      view.value = 'home';
+      menuActive.value = 'app-home';
+      stockExecOverride.value = '';
+    }
+    function openStub(title) {
+      stubTitle.value = title;
+      view.value = 'stub';
+    }
+    function openFlow(id) {
+      if (!CFG.flowMeta[id]) {
+        openStub(findMenuTitle(menu, id) || id);
+        return;
+      }
+      flowId.value = id;
+      menuActive.value = id;
+      docKw.value = '';
+      stockExecOverride.value = '';
+      const meta = CFG.flowMeta[id];
+      wayBackView.value = 'exec';
+      if (meta.mode === 'pkg-arch') {
+        pkgSearch.barcode = '';
+        pkgSearch.pkgNo = '';
+        pkgDetail.value = null;
+        view.value = 'pkg-arch';
+        return;
+      }
+      if (meta.mode === 'pkg-query') {
+        pkgSearch.barcode = '';
+        pkgSearch.pkgNo = '';
+        pkgDetail.value = null;
+        view.value = 'pkg-query';
+        return;
+      }
+      if (meta.mode === 'direct-exec') {
+        resetPkgDirect(meta.execVariant);
+        view.value = 'exec';
+        return;
+      }
+      view.value = 'docs';
+    }
+    function resetPkgDirect(variant) {
+      form.barcode = '';
+      form.pkgNo = '';
+      form.remark = '';
+      form.splitCount = 5;
+      form.splitScalar = 10;
+      form.mergeBarcode = '';
+      form.outerBarcode = '';
+      form.outerNo = '';
+      Object.assign(pkgSrc, { status: '', material: '', spec: '', unit: '', remain: '', lot: '', loaded: false });
+      splitRows.value = [];
+      mergeRows.value = [];
+      if (variant === 'pkg-outer') {
+        outerRows.value = JSON.parse(JSON.stringify(CFG.outerScanRows || []));
+      } else {
+        outerRows.value = [];
+      }
+    }
+    function openModule(it) {
+      if (it.ready && CFG.flowMeta[it.id]) { openFlow(it.id); return; }
+      menuActive.value = it.id;
+      openStub(it.name);
+    }
+    function onMenuSelect(index) {
+      menuActive.value = index;
+      if (index === 'app-home') { goHome(); return; }
+      if (CFG.flowMeta[index]) { openFlow(index); return; }
+      openStub(({ 'app-msg': '消息', 'app-mine': '我的' })[index] || findMenuTitle(menu, index) || index);
+    }
+    function findMenuTitle(nodes, index) {
+      for (const n of nodes) {
+        if (n.index === index) return n.title;
+        if (n.children) {
+          const t = findMenuTitle(n.children, index);
+          if (t) return t;
+        }
+      }
+      return '';
+    }
+    function openDocAction(n) {
+      currentNotice.value = n;
+      if (flowMode.value === 'inner') {
+        resetExecForm();
+        innerRows.value = [...CFG.innerScanRows];
+        currentLine.value = {};
+        view.value = 'exec';
+        return;
+      }
+      if (flowMode.value === 'pkg-doc') {
+        resetExecForm();
+        wayBackView.value = 'exec';
+        pkgRows.value = JSON.parse(JSON.stringify(CFG.pkgScanRows || []));
+        const btns = n.processButtons || flowMeta.value.processButtons || [];
+        processTab.value = btns[0] || '外观检查';
+        currentLine.value = {};
+        view.value = 'exec';
+        return;
+      }
+      if (flowMode.value === 'waybill') {
+        currentNotice.value = JSON.parse(JSON.stringify(n));
+        view.value = 'waybill-exec';
+        return;
+      }
+      view.value = 'materials';
+    }
+    function openStockExec(n, mode) {
+      currentNotice.value = n;
+      currentLine.value = {};
+      const takeMode = mode || (n.takeMode === '计数盘点' ? 'count' : 'serial');
+      stockExecOverride.value = takeMode;
+      resetExecForm();
+      if (takeMode === 'serial') {
+        stockRows.value = [
+          { status: '待盘', barcode: 'TM001', pkgNo: '/', name: '钢瓶', loc: 'A-01-03', planQty: 100, actualQty: 100, abnormal: false, isNew: false },
+          { status: '正常', barcode: 'TM002', pkgNo: 'GP001', name: '铝瓶', loc: 'A-02-01', planQty: 150, actualQty: 150, abnormal: false, isNew: false },
+          { status: '待盘', barcode: 'TM003', pkgNo: '/', name: '管件', loc: 'B-01-02', planQty: 200, actualQty: 200, abnormal: false, isNew: false },
+        ];
+      } else {
+        stockRows.value = [
+          { status: '正常', wh: 'CK-A', loc: 'A-01', name: '钢瓶', planQty: 500, actualQty: 500, abnormal: false },
+          { status: '待盘', wh: 'CK-A', loc: 'A-02', name: '铝瓶', planQty: 300, actualQty: 300, abnormal: false },
+          { status: '盘亏', wh: 'CK-B', loc: 'B-01', name: '管件', planQty: 200, actualQty: 180, abnormal: false },
+        ];
+      }
+      view.value = 'exec';
+    }
+    function addStockScan() {
+      const code = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!code && !pkg) return;
+      const hit = stockRows.value.find(r => r.barcode === code);
+      if (hit) {
+        hit.status = hit.actualQty === hit.planQty ? '正常' : (hit.actualQty > hit.planQty ? '盘盈' : '盘亏');
+        toast('已根据实盘数量自动更新盘点状态');
+      } else {
+        stockRows.value.push({
+          status: '盘盈', barcode: code || ('TMP' + Date.now()), pkgNo: pkg || '/', name: '新扫码物料',
+          loc: form.loc || '—', planQty: 0, actualQty: 1, abnormal: false, isNew: true,
+        });
+        toast('检测到新增条码，已自动插入盘点明细行，状态默认盘盈');
+      }
+      form.barcode = '';
+      form.pkgNo = '';
+      syncStockStats();
+    }
+    function onStockQtyChange(r) {
+      if (r.actualQty < 0) { r.actualQty = 0; ElementPlus.ElMessage.error('实盘数量不能小于0，请重新输入'); return; }
+      if (r.actualQty === r.planQty) r.status = '正常';
+      else if (r.actualQty > r.planQty) r.status = '盘盈';
+      else r.status = '盘亏';
+      syncStockStats();
+    }
+    function syncStockStats() {
+      const n = currentNotice.value;
+      if (!n) return;
+      const done = stockRows.value.filter(r => ['正常', '盘盈', '盘亏'].includes(r.status)).length;
+      const pending = stockRows.value.filter(r => r.status === '待盘').length;
+      n.donePcs = done;
+      n.pendingPcs = pending;
+      n.planPcs = stockRows.value.length;
+    }
+    function openPkgCreateForm() {
+      const d = new Date();
+      const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+      Object.assign(pkgForm, {
+        barcode: `TM${ymd}0001`, packSpec: '', material: '', lot: '', unit: 'KG', archiveQty: '', qty: '',
+        maker: '', supplier: '', prodDate: '', validPeriod: '', validUnit: '天', expireDate: '', remark: '',
+      });
+      view.value = 'pkg-create';
+    }
+    function searchPkgArch() {
+      if (!pkgSearch.pkgNo.trim()) {
+        ElementPlus.ElMessage.error('请输入必填的包材编号');
+        return;
+      }
+      const rows = CFG.serialArchRows || [];
+      const hit = rows.find(r =>
+        r.pkgNo === pkgSearch.pkgNo.trim() &&
+        (!pkgSearch.barcode.trim() || r.barcode === pkgSearch.barcode.trim())
+      );
+      if (!hit) {
+        pkgDetail.value = null;
+        toast('未查询到对应档案，请核对条码/包材编号');
+        return;
+      }
+      pkgDetail.value = { ...hit };
+      toast('已加载档案信息');
+    }
+    function updatePkgArch() {
+      if (!pkgEditable.value) {
+        ElementPlus.ElMessage.error('仅「在用 + 厂外」的流水码可更新');
+        return;
+      }
+      toast('档案信息更新成功');
+    }
+    function savePkgCreate() {
+      if (!pkgForm.barcode.trim()) {
+        ElementPlus.ElMessage.error('请填写或扫描条码号');
+        return;
+      }
+      toast('新增流水码成功');
+      pkgSearch.pkgNo = 'BK-NEW';
+      pkgSearch.barcode = pkgForm.barcode;
+      view.value = 'pkg-arch';
+    }
+    function queryPkgInfo() {
+      const code = pkgSearch.barcode.trim();
+      if (!code) {
+        ElementPlus.ElMessage.error('请输入条码号');
+        return;
+      }
+      const hit = (CFG.serialArchRows || []).find(r => r.barcode === code);
+      if (!hit) {
+        pkgDetail.value = null;
+        toast('未找到该条码信息');
+        return;
+      }
+      pkgDetail.value = { ...hit };
+    }
+    function openMaterials(n) { openDocAction(n); }
+    function resetExecForm() {
+      form.loc = '';
+      form.barcode = '';
+      form.pkgNo = '';
+      form.tankBarcode = '';
+      form.lotIn = currentLine.value?.lot || '';
+      form.inQty = null;
+      form.remark = '';
+      form.lineSideWh = '';
+      form.maker = currentNotice.value?.partner || currentNotice.value?.supplier || '';
+      processTab.value = '包装检查';
+    }
+    function openExec(line) {
+      if (line.status === '已完成' || line.status === '已关闭') return;
+      currentLine.value = line;
+      if (isLoadFlow.value && line.status === '待执行') line.status = '执行中';
+      resetExecForm();
+      if (flowMeta.value.execVariant === 'line-side-pick') {
+        scanRows.value = JSON.parse(JSON.stringify(CFG.scanRowsPick || []));
+      } else if (flowMode.value === 'serial') {
+        scanRows.value = [...CFG.scanRowsSerial];
+      }
+      if (flowMode.value === 'tank') tankRows.value = [...CFG.tankRows];
+      view.value = 'exec';
+    }
+    function backFromExec(opts) {
+      opts = opts || {};
+      if (isLineSidePick.value && !opts.skipSaveToast) toast('当前包材领出作业数据已自动保存');
+      if (isLoadFlow.value && !opts.skipSaveToast) toast('当前装卸作业数据已保存');
+      if (flowMode.value === 'stocktake' && !opts.skipSaveToast) toast('当前盘点数据已自动保存');
+      if (flowMode.value === 'inner' || flowMode.value === 'stocktake') view.value = 'docs';
+      else view.value = 'materials';
+    }
+    function addSerialScan() {
+      const code = form.barcode.trim();
+      if (!code) return;
+      scanRows.value.push({
+        barcode: code,
+        qty: 10,
+        lot: currentLine.value?.lot || form.lotIn || '—',
+        loc: form.loc || '—',
+        process: processTab.value === '包装检查' ? '包装' : '物料',
+        outer: '—',
+      });
+      form.barcode = '';
+      toast('已录入扫码明细');
+    }
+    function addPickScan() {
+      const code = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!code && !pkg) return;
+      if (code && scanRows.value.some(r => r.barcode === code)) {
+        ElementPlus.ElMessage.error('当前条码已在本单据录入，不可重复扫码');
+        return;
+      }
+      scanRows.value.push({
+        barcode: code || ('TMP' + Date.now()),
+        pkgNo: pkg || '—',
+        qty: 10,
+        fromLoc: 'A01-01',
+        lot: currentLine.value?.lot || '—',
+        process: '包装检查',
+        outer: '—',
+        done: false,
+      });
+      form.barcode = '';
+      form.pkgNo = '';
+      toast('当前包材领出作业数据已自动保存');
+    }
+    function openRecommend() { recommendVisible.value = true; }
+    function useRecommend(r) {
+      form.barcode = r.barcode;
+      form.pkgNo = r.pkgNo;
+      recommendVisible.value = false;
+      addPickScan();
+    }
+    function addTankRow() {
+      const code = form.tankBarcode.trim() || ('TK' + String(tankRows.value.length + 1).padStart(3, '0'));
+      tankRows.value.push({
+        barcode: code,
+        tankNo: form.tankNo,
+        loc: 'A01-01',
+        beforeQty: 10,
+        beforeLot: currentLine.value?.lot || '—',
+        afterQty: Number(form.qty) || 25,
+      });
+      form.tankBarcode = '';
+      toast('已添加储罐明细');
+    }
+    function addInnerScan() {
+      const code = form.barcode.trim() || form.pkgNo.trim();
+      if (!code) return;
+      innerRows.value.push({
+        barcode: form.barcode.trim() || ('SC' + String(100 + innerRows.value.length)),
+        pkgNo: form.pkgNo.trim() || '—',
+        code: 'RM-DEMO',
+        qty: 10,
+      });
+      form.barcode = '';
+      form.pkgNo = '';
+      toast('已添加移库/转序明细');
+    }
+    function openProcess(row) {
+      if (!flowMeta.value.hasProcess) return;
+      processRef.value = row.barcode || row.tankNo || currentLine.value?.code || '';
+      view.value = 'process';
+    }
+    function openLoadProc(p, idx) {
+      if (idx > 0) {
+        const prev = loadProcs.value[idx - 1];
+        if (prev && prev.status !== '已完成') {
+          toast('请先完成上一道工序');
+          return;
+        }
+      }
+      processTab.value = p.name;
+      wayBackView.value = 'exec';
+      view.value = 'process';
+    }
+    function goProcessBatch(name) {
+      if (!flowMeta.value.hasProcess) return;
+      const matched = scanRows.value.filter(r => (r.process || '').includes(name.replace('检查', '')) || r.process === name);
+      if (isLineSidePick.value && !scanRows.value.some(r => r.process === name && !r.done)) {
+        ElementPlus.ElMessage.error('部分条码不满足当前工序执行条件，请核对数据');
+        return;
+      }
+      processTab.value = name;
+      processRef.value = (currentNotice.value?.id || '') + ' · 批量';
+      if (isLineSidePick.value) {
+        scanRows.value.forEach(r => { if (r.process === name) r.done = true; });
+        toast('当前条码工序执行完成');
+      }
+      view.value = 'process';
+    }
+    function loadSplitSrc() {
+      const code = form.barcode.trim();
+      if (!code) return;
+      if (code === 'BAD') {
+        ElementPlus.ElMessageBox.alert('当前条码状态不可拆分，请检查条码', '扫码校验失败', { confirmButtonText: '确定' });
+        ElementPlus.ElMessage.error('该条码不可拆分，请核对状态及剩余数量');
+        return;
+      }
+      Object.assign(pkgSrc, {
+        status: '在用', material: 'A001 钢瓶 / φ219', spec: 'φ219', unit: 'Kg', remain: 100, lot: 'LOT20250801', loaded: true,
+      });
+      toast('条码信息加载完成');
+    }
+    function genSplitRows() {
+      const n = Number(form.splitCount);
+      if (!Number.isInteger(n) || n <= 0) {
+        ElementPlus.ElMessage.error('拆出条码个数必须为正整数');
+        return;
+      }
+      const doGen = () => {
+        const d = new Date();
+        const ymd = String(d.getFullYear()) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+        splitRows.value = Array.from({ length: n }, (_, i) => ({
+          barcode: 'TM' + ymd + String(i + 1).padStart(4, '0'),
+          qty: Number(form.splitScalar) || 0,
+        }));
+        toast(splitRows.value.length ? '拆分条码列表已生成' : '拆分条码列表已生成');
+      };
+      if (splitRows.value.length) {
+        ElementPlus.ElMessageBox.confirm('重新生成将覆盖现有拆分列表数据，是否继续？', '覆盖确认', {
+          confirmButtonText: '确认生成', cancelButtonText: '取消',
+        }).then(() => { doGen(); toast('已覆盖原有拆分数据'); }).catch(() => {});
+      } else doGen();
+    }
+    function refreshSplitCode(i) {
+      const d = new Date();
+      const ymd = String(d.getFullYear()) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+      splitRows.value[i].barcode = 'TM' + ymd + String(Math.floor(Math.random()*9000)+1000);
+      toast('已刷新条码号');
+    }
+    function submitPkgSplit() {
+      if (!pkgSrc.loaded) { ElementPlus.ElMessage.error('请先扫码加载条码信息'); return; }
+      if (!splitRows.value.length) { ElementPlus.ElMessage.error('请先生成拆分条码列表'); return; }
+      if (splitRows.value.some(r => !(Number(r.qty) > 0))) { ElementPlus.ElMessage.error('建档数量必须为正数'); return; }
+      if (splitRemain.value < 0) { ElementPlus.ElMessage.error('拆分后剩余数量不能小于0，请调整建档数量'); return; }
+      ElementPlus.ElMessageBox.confirm('确认提交本次条码拆分作业？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        ElementPlus.ElMessage.success('条码拆分提交完成，拆分单已生成');
+        if (splitRemain.value === 0) toast('原条码剩余数量为0，已自动报废');
+        goHome();
+      }).catch(() => {});
+    }
+    function loadMergeMain() {
+      const code = form.barcode.trim();
+      if (!code) return;
+      if (code === 'BAD') {
+        ElementPlus.ElMessageBox.alert('当前主条码状态不允许合并，请核对状态/余量', '扫码校验失败', { confirmButtonText: '确定' });
+        return;
+      }
+      Object.assign(pkgSrc, {
+        status: '在用', material: 'A001 钢瓶 / φ219', spec: 'φ219', unit: 'Kg', remain: 40, lot: 'LOT20250801', loaded: true,
+      });
+      toast('主条码信息加载完成');
+    }
+    function addMergeRow() {
+      const code = form.mergeBarcode.trim();
+      if (!code) return;
+      if (!pkgSrc.loaded) { ElementPlus.ElMessage.error('请先扫入主条码'); return; }
+      if (code === 'DIFF') {
+        ElementPlus.ElMessageBox.alert('该条码不符合合并条件（状态、数量或物料信息与主条码不符）', '条码校验失败', { confirmButtonText: '确定' });
+        ElementPlus.ElMessage.error('该条码物料/批号/库存状态与主条码不一致，无法合并');
+        return;
+      }
+      if (mergeRows.value.some(r => r.barcode === code)) { ElementPlus.ElMessage.error('该条码已在合并列表中'); return; }
+      mergeRows.value.push({ barcode: code, remain: 15 });
+      form.mergeBarcode = '';
+      toast('已添加至合并列表');
+    }
+    function removeMergeRow(i) {
+      ElementPlus.ElMessageBox.confirm('确认解绑并删除该条被合并条码数据？', '删除解绑确认', {
+        confirmButtonText: '确认删除', cancelButtonText: '取消',
+      }).then(() => {
+        mergeRows.value.splice(i, 1);
+        toast('已解绑并移除该条码');
+      }).catch(() => {});
+    }
+    function submitPkgMerge() {
+      if (!pkgSrc.loaded) { ElementPlus.ElMessage.error('请先扫码加载主条码信息'); return; }
+      if (!mergeRows.value.length) { ElementPlus.ElMessage.error('请至少添加一条被合并条码'); return; }
+      if (!(mergeRemain.value > 0)) { ElementPlus.ElMessage.error('合并后剩余数量必须大于0，请检查条码数据'); return; }
+      ElementPlus.ElMessageBox.confirm('确认提交本次条码合并作业？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        ElementPlus.ElMessage.success('条码合并提交完成，合并单已生成');
+        toast('所有被合并条码余量已置0并自动报废');
+        goHome();
+      }).catch(() => {});
+    }
+    function addOuterScan() {
+      const code = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!code && !pkg) return;
+      if (code === 'BOUND') {
+        ElementPlus.ElMessage.error('该包材已被其他外包材绑定，不可重复添加');
+        return;
+      }
+      outerRows.value.push({ barcode: code || ('TMP' + Date.now()), pkgNo: pkg || '—', medium: 'NO' });
+      form.barcode = '';
+      form.pkgNo = '';
+      toast('包材扫码添加成功，扫码件数已更新');
+    }
+    function removeOuterRow(i) {
+      ElementPlus.ElMessageBox.confirm('确认删除当前这条包材扫码明细？', '删除确认弹窗', {
+        confirmButtonText: '确认删除', cancelButtonText: '取消',
+      }).then(() => {
+        outerRows.value.splice(i, 1);
+        toast('已移除该条包材明细');
+      }).catch(() => {});
+    }
+    function submitPkgOuter() {
+      if (!form.outerBarcode.trim() && !form.outerNo.trim()) {
+        ElementPlus.ElMessage.error('请先完善外包材信息再提交');
+        return;
+      }
+      ElementPlus.ElMessageBox.confirm('确认提交本次外包材拆组执行数据？', '提交确认弹窗', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        ElementPlus.ElMessage.success('外包材拆组提交完成，包材绑定状态已更新');
+        toast('流水码外包材库存位置已完成变更');
+        goHome();
+      }).catch(() => {});
+    }
+    function addPkgDocScan() {
+      const code = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!code && !pkg) return;
+      pkgRows.value.push({
+        barcode: code || ('TMP' + Date.now()),
+        pkgNo: pkg || '001',
+        lot: '001',
+        process: '/',
+        done: false,
+      });
+      form.barcode = '';
+      form.pkgNo = '';
+      toast('包材扫码添加成功');
+    }
+    function goPkgProcessBatch(name) {
+      processTab.value = name;
+      processRef.value = (currentNotice.value?.id || '') + ' · 批量';
+      pkgRows.value.forEach(r => { if (r.process === '/' || !r.process) r.process = name; });
+      view.value = 'process';
+    }
+    function submitPkgDoc() {
+      ElementPlus.ElMessageBox.confirm('确认提交当前' + (flowMeta.value.docTypeLabel || '') + '执行数据？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        ElementPlus.ElMessage.success((flowMeta.value.docTypeLabel || '作业') + '提交完成');
+        view.value = 'docs';
+      }).catch(() => {});
+    }
+    function openPickup(p) {
+      wayPoint.value = p;
+      wayBackView.value = 'waybill-pickup';
+      processTab.value = (p.procs && p.procs[0] && p.procs[0].name) || '装货确认';
+      view.value = 'waybill-pickup';
+    }
+    function openSign(p) {
+      wayPoint.value = p;
+      wayBackView.value = 'waybill-sign';
+      signForm.signer = '';
+      processTab.value = (p.procs && p.procs[0] && p.procs[0].name) || '卸货确认';
+      view.value = 'waybill-sign';
+    }
+    function openEnroute() {
+      wayBackView.value = 'waybill-enroute';
+      enrouteForm.place = (currentNotice.value.enroute && currentNotice.value.enroute.location) || '';
+      enrouteForm.remark = (currentNotice.value.enroute && currentNotice.value.enroute.remark) || '';
+      processTab.value = '位置确认';
+      view.value = 'waybill-enroute';
+    }
+    function goWayProc(p) {
+      processTab.value = p.name;
+      processRef.value = p.name;
+      view.value = 'process';
+    }
+    function confirmPickup() {
+      ElementPlus.ElMessageBox.confirm('确认完成本次提货？', '提货确认', {
+        confirmButtonText: '确认提货', cancelButtonText: '返回编辑',
+      }).then(() => {
+        (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
+        wayPoint.value.status = '已确认';
+        ElementPlus.ElMessage.success('提货确认完成');
+        view.value = 'waybill-exec';
+      }).catch(() => {});
+    }
+    function confirmSign() {
+      if (!signForm.signer.trim()) { ElementPlus.ElMessage.error('请填写签收人'); return; }
+      ElementPlus.ElMessageBox.confirm('确认完成本次签收？', '签收确认', {
+        confirmButtonText: '确认签收', cancelButtonText: '返回编辑',
+      }).then(() => {
+        (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
+        wayPoint.value.status = '已确认';
+        ElementPlus.ElMessage.success('签收确认完成');
+        view.value = 'waybill-exec';
+      }).catch(() => {});
+    }
+    function submitEnroute() {
+      if (!enrouteForm.place.trim()) { ElementPlus.ElMessage.error('当前位置为必填'); return; }
+      ElementPlus.ElMessageBox.confirm('确认提交本次在途信息？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        enrouteHistory.value.unshift({
+          time: enrouteForm.time.slice(5),
+          place: enrouteForm.place,
+          status: enrouteForm.status,
+        });
+        ElementPlus.ElMessage.success('在途信息已更新');
+        view.value = 'waybill-exec';
+      }).catch(() => {});
+    }
+    function submitExec() {
+      const mode = activeExecMode.value;
+      if (flowMode.value === 'stocktake') {
+        ElementPlus.ElMessageBox.confirm('确认提交盘点结果？待盘条目将自动转为盘亏。', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(() => {
+          stockRows.value.forEach(r => { if (r.status === '待盘') r.status = '盘亏'; });
+          syncStockStats();
+          const hasEx = stockRows.value.some(r => r.status === '盘盈' || r.status === '盘亏');
+          currentNotice.value.status = '已完成';
+          toast(hasEx ? '所有待盘条目已转为盘亏，本次盘点结论标记为异常' : '本次盘点账实全部相符，盘点结论标记为正常');
+          ElementPlus.ElMessage.success('盘点执行提交完成，数据已同步更新');
+          view.value = 'docs';
+        }).catch(() => {});
+        return;
+      }
+      if (isLineSidePick.value) {
+        if (!form.lineSideWh) { ElementPlus.ElMessage.error('线边仓编码为必填，请选择目标线边仓'); return; }
+        if (scanRows.value.some(r => !r.done)) {
+          ElementPlus.ElMessage.error('仍存在未执行工序，请完成所有工序后再提交'); return;
+        }
+        ElementPlus.ElMessageBox.confirm('确认提交所有工序与包材领出数据，提交后单据将流转完成？', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(() => {
+          ElementPlus.ElMessage.success('包材领出工序执行提交成功，单据已流转完成');
+          backFromExec({ skipSaveToast: true });
+        }).catch(() => {});
+        return;
+      }
+      if (isLoadFlow.value) {
+        if (!(form.inQty > 0)) { ElementPlus.ElMessage.error('本次装卸数量必须大于 0'); return; }
+        if (form.inQty > Number(currentLine.value.remainQty || 0)) {
+          ElementPlus.ElMessage.error('本次数量不能超过未完成数量'); return;
+        }
+        if ((loadProcs.value || []).some(p => p.status !== '已完成')) {
+          ElementPlus.ElMessage.error('仍有工序未完成，请完成所有工序后再提交'); return;
+        }
+        ElementPlus.ElMessageBox.confirm('确认提交本次装卸执行？', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(() => {
+          const qty = Number(form.inQty);
+          currentLine.value.doneQty = Number(currentLine.value.doneQty || 0) + qty;
+          currentLine.value.remainQty = Math.max(0, Number(currentLine.value.remainQty || 0) - qty);
+          if (currentLine.value.remainQty === 0) currentLine.value.status = '已完成';
+          else currentLine.value.status = '执行中';
+          ElementPlus.ElMessage.success('装卸执行提交成功，流水状态已更新');
+          if (currentLine.value.remainQty === 0) toast('该物料已装卸完成');
+          backFromExec({ skipSaveToast: true });
+        }).catch(() => {});
+        return;
+      }
+      if (mode === 'serial' || mode === 'count') {
+        if (!form.loc) { ElementPlus.ElMessage.error('库位编号为必填，请完善表单'); return; }
+      }
+      if (mode === 'count' && !(form.inQty > 0)) {
+        ElementPlus.ElMessage.error((flowMeta.value.qtyLabel || '数量') + '必须填写正数'); return;
+      }
+      if (mode === 'tank' && !form.tankNo) {
+        ElementPlus.ElMessage.error('储罐编号为必填'); return;
+      }
+      ElementPlus.ElMessageBox.confirm('是否确认提交当前执行作业？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+      }).then(() => {
+        ElementPlus.ElMessage.success('提交成功');
+        backFromExec();
+      }).catch(() => {});
+    }
+    function submitProcess() {
+      ElementPlus.ElMessageBox.confirm('确认提交当前工序所有表单填报内容吗？', '提交确认', {
+        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
+      }).then(() => {
+        if (isLineSidePick.value) {
+          const ref = processRef.value;
+          scanRows.value.forEach(r => {
+            if (ref.includes('批量')) {
+              if (r.process === processTab.value) r.done = true;
+            } else if (r.barcode === ref || String(ref).includes(r.barcode)) {
+              r.done = true;
+            }
+          });
+        }
+        if (flowMode.value === 'pkg-doc') {
+          const ref = processRef.value;
+          pkgRows.value.forEach(r => {
+            if (String(ref).includes('批量') || r.barcode === ref) r.process = processTab.value;
+          });
+        }
+        if (wayBackView.value === 'waybill-pickup' || wayBackView.value === 'waybill-sign' || wayBackView.value === 'waybill-enroute') {
+          const list = wayBackView.value === 'waybill-enroute' ? enrouteProcs.value : (wayPoint.value.procs || []);
+          const hit = list.find(p => p.name === processTab.value);
+          if (hit) { hit.status = '已完成'; hit.user = operator; hit.time = '15:00'; }
+        }
+        if (isLoadFlow.value && currentLine.value && currentLine.value.procs) {
+          const hit = currentLine.value.procs.find(p => p.name === processTab.value);
+          if (hit) { hit.status = '已完成'; hit.summary = '✓ 已填写提交'; }
+          if (currentLine.value.status === '待执行') currentLine.value.status = '执行中';
+        }
+        ElementPlus.ElMessage.success(isLineSidePick.value ? '当前条码工序执行完成' : '工序表单提交成功');
+        if (wayBackView.value === 'waybill-pickup' || wayBackView.value === 'waybill-sign' || wayBackView.value === 'waybill-enroute') {
+          view.value = wayBackView.value;
+        } else {
+          view.value = 'exec';
+        }
+      }).catch(() => {});
+    }
+
+    return {
+      menu, defaultOpeneds, view, flowId, menuActive, homeKw, docKw,
+      currentNotice, currentLine, processTab, processRef, stubTitle,
+      stockRows, pkgSearch, pkgDetail, pkgForm, pkgEditable, pkgQueryPairs,
+      operator, tanks, scanRows, tankRows, innerRows, form, procForm,
+      recommendVisible, lineSideWhOptions, recommendBarcodes,
+      pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
+      signForm, enrouteForm, enrouteHistory, enrouteProcs,
+      flowMeta, flowTitle, flowMode, activeExecMode, isLineSidePick, isLoadFlow, loadProcs, headerHint, filteredHome, filteredNotices,
+      scanQtySum, tankQtySum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
+      statusTag, toast, goHome, openStub, openModule, onMenuSelect,
+      openMaterials, openDocAction, openStockExec, openExec, backFromExec,
+      addSerialScan, addPickScan, addTankRow, addInnerScan, openProcess, openLoadProc, goProcessBatch,
+      addStockScan, onStockQtyChange,
+      openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
+      openRecommend, useRecommend,
+      loadSplitSrc, genSplitRows, refreshSplitCode, submitPkgSplit,
+      loadMergeMain, addMergeRow, removeMergeRow, submitPkgMerge,
+      addOuterScan, removeOuterRow, submitPkgOuter,
+      addPkgDocScan, goPkgProcessBatch, submitPkgDoc,
+      openPickup, openSign, openEnroute, goWayProc, confirmPickup, confirmSign, submitEnroute,
+      submitExec, submitProcess,
+    };
+  },
+}).use(ElementPlus, { locale: ElementPlusLocaleZhCn }).mount('#app');
+</script>
+</body>
+</html>
