@@ -510,7 +510,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
         <el-tabs>
           <el-tab-pane :label="page.formLineTabLabel || '物料'">
             <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap" v-if="(page.formLineActions||[]).length">
-              <el-button v-for="a in page.formLineActions" :key="(a && a.name)||a" size="small" :type="String((a && a.name)||a).includes('删除')?'danger':'default'" @click="onFormLineAction((a && a.name)||a)">{{ (a && a.name)||a }}</el-button>
+              <el-button v-for="a in page.formLineActions" :key="(a && a.name)||a" size="small" :type="(a && a.type) || (String((a && a.name)||a).includes('删除')?'danger':(String((a && a.name)||a).includes('新增')?'primary':'default'))" @click="onFormLineAction((a && a.name)||a)">{{ (a && a.name)||a }}</el-button>
             </div>
             <el-table class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
               <el-table-column type="selection" width="48"></el-table-column>

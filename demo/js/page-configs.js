@@ -6736,6 +6736,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联采购订单",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -6747,7 +6755,9 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联采购订单"
+            "关联采购订单",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -6827,6 +6837,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -6879,6 +6899,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "新位置",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -6892,7 +6920,9 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "通知单号",
             "单据类型",
-            "新位置"
+            "新位置",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -7005,14 +7035,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -7194,11 +7224,6 @@ window.WMS_PAGE_CONFIGS = {
           "name": "新增",
           "type": "primary",
           "desc": "从采购订单物料中选择追加"
-        },
-        {
-          "name": "选择物料",
-          "type": "default",
-          "desc": "选择物料追加明细行"
         },
         {
           "name": "批量删除",
@@ -7485,13 +7510,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "出库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -7570,6 +7606,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -7623,6 +7669,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -7635,7 +7689,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -7733,14 +7789,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -8193,6 +8249,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -8204,7 +8268,9 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联委外加工单"
+            "关联委外加工单",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -8284,6 +8350,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -8336,6 +8412,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -8349,7 +8433,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -8452,9 +8538,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -8899,13 +8990,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "退料单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "退料单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -8984,6 +9086,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -9041,6 +9153,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9054,7 +9174,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -9157,14 +9279,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -9617,6 +9739,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9628,7 +9758,9 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联委外加工单"
+            "关联委外加工单",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -9708,6 +9840,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -9760,6 +9902,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9773,7 +9923,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -9876,9 +10028,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -10323,13 +10480,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "退货单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "退货单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -10408,6 +10576,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商名称",
               "title": "供应商名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -10465,6 +10643,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -10478,7 +10664,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -10581,14 +10769,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -10999,13 +11187,19 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "出库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -11074,6 +11268,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -11127,6 +11326,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -11139,7 +11342,8 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -11240,6 +11444,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -11615,13 +11824,19 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "入库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -11690,6 +11905,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -11743,6 +11963,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -11755,7 +11983,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "包装规格",
+            "关联物流订单"
           ],
           "toolbar": [
             {
@@ -11861,6 +12091,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -12211,13 +12451,19 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "入库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -12286,6 +12532,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -12339,6 +12590,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -12351,7 +12610,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "包装规格",
+            "关联物流订单"
           ],
           "toolbar": [
             {
@@ -12449,14 +12710,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -12879,6 +13140,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "客户名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -12890,7 +13159,9 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "客户名称",
             "单据类型",
-            "ERP单据号"
+            "ERP单据号",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -12970,6 +13241,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "客户名称",
               "title": "客户名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -13022,6 +13303,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "客户名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -13035,7 +13324,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -13138,9 +13429,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -13579,13 +13875,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "退料单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "退料单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -13664,6 +13971,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "客户名称",
               "title": "客户名称",
               "width": 160
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -13721,6 +14038,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "客户名称",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -13734,7 +14059,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -13837,14 +14164,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -14240,13 +14567,19 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "入库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -14325,6 +14658,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "客户名称",
               "title": "客户名称",
               "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -14382,6 +14720,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "客户名称",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -14395,7 +14741,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "包装规格",
+            "关联物流订单"
           ],
           "toolbar": [
             {
@@ -14498,14 +14846,14 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
             },
             {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "容积",
@@ -15155,6 +15503,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联物流订单",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -15165,7 +15517,8 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "ERP单据号",
-            "关联物流订单"
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -15237,6 +15590,11 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
               "field": "_actions",
               "title": "操作",
               "width": 140,
@@ -15271,13 +15629,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "出库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -15346,6 +15715,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -15398,6 +15777,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -15410,7 +15797,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -15501,6 +15890,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -15897,13 +16296,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "入库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -15972,6 +16382,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -16024,6 +16444,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -16036,7 +16464,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -16127,6 +16557,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -16527,13 +16967,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "入库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -16602,6 +17053,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -16654,6 +17115,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -16666,7 +17135,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -16757,6 +17228,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -17158,13 +17639,24 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "出库单号"
           ],
-          "queryMore": [],
+          "queryMore": [
+            "关联物流订单",
+            "包装规格"
+          ],
           "toolbar": [
             {
               "name": "导出",
@@ -17233,6 +17725,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -17285,6 +17787,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联物流订单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -17297,7 +17807,9 @@ window.WMS_PAGE_CONFIGS = {
             "检查结果",
             "档案类型",
             "新位置",
-            "单据类型"
+            "单据类型",
+            "关联物流订单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -17388,6 +17900,16 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联物流订单",
+              "title": "关联物流订单",
+              "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -17868,6 +18390,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "供应商/客户",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -17881,7 +18407,8 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "关联物流订单",
             "关联来源单据",
-            "供应商/客户"
+            "供应商/客户",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -17972,6 +18499,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "供应商/客户",
               "title": "供应商/客户",
               "width": 160
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -18410,6 +18942,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "移入仓库编码",
               "type": "select"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -18421,7 +18957,8 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "档案类型",
             "单据类型",
-            "移入仓库编码"
+            "移入仓库编码",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -18527,6 +19064,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -18903,6 +19445,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "新物料编码",
               "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -18914,7 +19460,8 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "档案类型",
             "单据类型",
-            "新物料编码"
+            "新物料编码",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -19055,6 +19602,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
             },
             {
               "field": "_actions",
@@ -19909,14 +20461,6 @@ window.WMS_PAGE_CONFIGS = {
               "type": "select"
             },
             {
-              "name": "充装介质",
-              "type": "select"
-            },
-            {
-              "name": "包材类型",
-              "type": "select"
-            },
-            {
               "name": "条码号",
               "type": "input"
             }
@@ -19931,8 +20475,6 @@ window.WMS_PAGE_CONFIGS = {
             "物料信息",
             "物料批号",
             "批号类型",
-            "充装介质",
-            "包材类型",
             "条码号"
           ],
           "toolbar": [
@@ -19970,16 +20512,6 @@ window.WMS_PAGE_CONFIGS = {
               "field": "包材编号",
               "title": "包材编号",
               "width": 120
-            },
-            {
-              "field": "充装介质",
-              "title": "充装介质",
-              "width": 100
-            },
-            {
-              "field": "包材类型",
-              "title": "包材类型",
-              "width": 100
             },
             {
               "field": "容积",
@@ -21931,70 +22463,175 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailFields": [
-        { "name": "状态" },
-        { "name": "运单号" },
-        { "name": "关联发货单" },
-        { "name": "关联派车申请单号" },
-        { "name": "发货单位（汇总）" },
-        { "name": "收货单位（汇总）" },
-        { "name": "装货地点（汇总）" },
-        { "name": "卸货地点（汇总）" },
-        { "name": "配送方式" },
-        { "name": "运费" },
-        { "name": "司机车牌号" },
-        { "name": "司机姓名" },
-        { "name": "司机电话" },
-        { "name": "要求送达时间" },
-        { "name": "排单时间" },
-        { "name": "计划装车时间" },
-        { "name": "实际发车时间" },
-        { "name": "实际到达时间" },
-        { "name": "创建人" },
-        { "name": "创建时间" },
-        { "name": "备注" }
+        {
+          "name": "状态"
+        },
+        {
+          "name": "运单号"
+        },
+        {
+          "name": "关联发货单"
+        },
+        {
+          "name": "关联派车申请单号"
+        },
+        {
+          "name": "发货单位（汇总）"
+        },
+        {
+          "name": "收货单位（汇总）"
+        },
+        {
+          "name": "装货地点（汇总）"
+        },
+        {
+          "name": "卸货地点（汇总）"
+        },
+        {
+          "name": "配送方式"
+        },
+        {
+          "name": "运费"
+        },
+        {
+          "name": "司机车牌号"
+        },
+        {
+          "name": "司机姓名"
+        },
+        {
+          "name": "司机电话"
+        },
+        {
+          "name": "要求送达时间"
+        },
+        {
+          "name": "排单时间"
+        },
+        {
+          "name": "计划装车时间"
+        },
+        {
+          "name": "实际发车时间"
+        },
+        {
+          "name": "实际到达时间"
+        },
+        {
+          "name": "创建人"
+        },
+        {
+          "name": "创建时间"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "hasEdit": true,
       "hasDetail": true,
       "formFlat": true,
       "stub": false,
       "formLineFields": [
-        { "name": "关联发货单号" },
-        { "name": "发货单位" },
-        { "name": "收货单位" },
-        { "name": "装货地点" },
-        { "name": "卸货地点" },
-        { "name": "卸货联系人" },
-        { "name": "卸货联系电话" },
-        { "name": "物料信息" },
-        { "name": "总数量" },
-        { "name": "单位" },
-        { "name": "备注" }
+        {
+          "name": "关联发货单号"
+        },
+        {
+          "name": "发货单位"
+        },
+        {
+          "name": "收货单位"
+        },
+        {
+          "name": "装货地点"
+        },
+        {
+          "name": "卸货地点"
+        },
+        {
+          "name": "卸货联系人"
+        },
+        {
+          "name": "卸货联系电话"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "总数量"
+        },
+        {
+          "name": "单位"
+        },
+        {
+          "name": "备注"
+        }
       ],
-      "formLineActions": ["选择发货单", "删除勾选"],
+      "formLineActions": [
+        "选择发货单",
+        "删除勾选"
+      ],
       "detailLineTitle": "装卸货点明细",
       "detailLineFields": [
-        { "name": "关联发货单号" },
-        { "name": "发货单位" },
-        { "name": "收货单位" },
-        { "name": "装货地点" },
-        { "name": "卸货地点" },
-        { "name": "卸货联系人" },
-        { "name": "卸货联系电话" },
-        { "name": "物料信息" },
-        { "name": "总数量" },
-        { "name": "单位" },
-        { "name": "备注" }
+        {
+          "name": "关联发货单号"
+        },
+        {
+          "name": "发货单位"
+        },
+        {
+          "name": "收货单位"
+        },
+        {
+          "name": "装货地点"
+        },
+        {
+          "name": "卸货地点"
+        },
+        {
+          "name": "卸货联系人"
+        },
+        {
+          "name": "卸货联系电话"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "总数量"
+        },
+        {
+          "name": "单位"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "detailEnrouteTitle": "在途信息（APP 上报）",
       "detailEnrouteFields": [
-        { "name": "记录时间" },
-        { "name": "当前位置" },
-        { "name": "行驶状态" },
-        { "name": "预计到达时间" },
-        { "name": "途经事件" },
-        { "name": "备注" },
-        { "name": "操作人" },
-        { "name": "照片" }
+        {
+          "name": "记录时间"
+        },
+        {
+          "name": "当前位置"
+        },
+        {
+          "name": "行驶状态"
+        },
+        {
+          "name": "预计到达时间"
+        },
+        {
+          "name": "途经事件"
+        },
+        {
+          "name": "备注"
+        },
+        {
+          "name": "操作人"
+        },
+        {
+          "name": "照片"
+        }
       ]
     },
     "lg-pickup": {
