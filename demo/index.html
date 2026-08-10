@@ -19,14 +19,23 @@ body {
     var(--bg);
   display: flex; align-items: center; justify-content: center; padding: 32px 16px;
 }
-.wrap { width: min(720px, 100%); }
-.back { font-size: 13px; margin-bottom: 16px; }
+.wrap { width: min(720px, 100%); position: relative; }
+.top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.back { font-size: 13px; }
 .back a { color: var(--accent); text-decoration: none; }
 .back a:hover { text-decoration: underline; }
+.demo-scope-tip {
+  max-width: 360px; font-size: 12px; line-height: 1.45; font-weight: 600;
+  color: #8B0000; text-align: right;
+}
 h1 { margin: 0 0 8px; font-size: 28px; }
 .sub { margin: 0 0 28px; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .top-row { flex-direction: column; }
+  .demo-scope-tip { text-align: left; max-width: none; }
+}
 .card {
   display: block; text-decoration: none; color: inherit;
   background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
@@ -47,7 +56,10 @@ h1 { margin: 0 0 8px; font-size: 28px; }
 </head>
 <body>
   <div class="wrap">
-    <div class="back"><a href="../">← 返回项目总览</a></div>
+    <div class="top-row">
+      <div class="back"><a href="../">← 返回项目总览</a></div>
+      <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
+    </div>
     <h1>原型方案</h1>
     <p class="sub">可交互 Demo（Mock 数据）。请选择 PC 端或 APP 端查看；页面内右上角也可互相切换。</p>
     <div class="grid">
