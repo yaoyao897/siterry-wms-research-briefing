@@ -31,6 +31,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .mode-switch a{padding:6px 14px;font-size:13px;text-decoration:none;color:var(--color-text-normal);background:#fff}
 .mode-switch a:hover{color:var(--color-primary)}
 .mode-switch a.on{background:var(--color-primary);color:#fff}
+.back-overview{
+  display:inline-flex;align-items:center;padding:6px 12px;font-size:13px;line-height:1.2;
+  border:1px solid var(--color-border);border-radius:4px;background:#fff;
+  color:var(--color-text-normal);text-decoration:none;white-space:nowrap;
+}
+.back-overview:hover{border-color:var(--color-primary);color:var(--color-primary)}
 .app-body{flex:1;min-height:0;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;background:#E8ECF0}
 .phone-frame{width:390px;height:780px;max-height:calc(100vh - 100px);background:#111;border-radius:28px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);flex-shrink:0}
 .phone-screen{width:100%;height:100%;background:#F5F6F8;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;position:relative}
@@ -169,6 +175,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
       <header class="app-header">
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
+          <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
             <a href="./app.html" class="on">APP</a>
