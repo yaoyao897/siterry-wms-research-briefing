@@ -123,26 +123,20 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .field input[readonly]{background:#FAFAFA;color:#8C8C8C}
 
 .stat-bar{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;padding:0 2px;color:var(--color-text-main)}
-.scan-table{width:100%;border-collapse:collapse;font-size:12px}
-.scan-table th,.scan-table td{padding:8px 6px;border-bottom:1px solid #f0f0f0;text-align:left;white-space:nowrap}
+.scan-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:12px}
+.scan-table th,.scan-table td{padding:8px 10px;border-bottom:1px solid #f0f0f0;text-align:left;white-space:nowrap;vertical-align:middle}
 .scan-table th{color:#8C8C8C;font-weight:500;background:#FAFAFA}
 .scan-table tr{cursor:default}
+.scan-table th.col-op,.scan-table td.col-op{position:sticky;right:0;background:#fff;box-shadow:-4px 0 8px rgba(0,0,0,.04);text-align:center;min-width:64px}
+.scan-table th.col-op{background:#FAFAFA;z-index:2}
+.scan-table td.col-op{z-index:1}
 .scan-link{color:#1A4099;cursor:pointer;text-decoration:none;font-weight:500}
 .scan-link:active{opacity:.7}
-.table-scroll{overflow-x:auto;margin:0 -4px}
-/* 扫码明细：左滑露出删除（防误触） */
-.scan-list{background:#fff}
-.scan-list__head{display:flex;gap:8px;padding:8px 12px;font-size:12px;color:#8C8C8C;background:#FAFAFA;border-bottom:1px solid #f0f0f0;white-space:nowrap;overflow-x:auto}
-.scan-list__head span{flex:0 0 auto;min-width:52px}
-.scan-list__head span.w-code{min-width:72px}
-.scan-swipe{overflow:hidden;border-bottom:1px solid #f0f0f0;touch-action:pan-y}
-.scan-swipe__track{display:flex;width:100%;will-change:transform;transition:transform .2s ease;cursor:grab}
-.scan-swipe__track:active{cursor:grabbing}
-.scan-swipe__main{flex:0 0 100%;width:100%;display:flex;gap:8px;align-items:center;padding:10px 12px;font-size:12px;background:#fff;box-sizing:border-box;white-space:nowrap;overflow-x:auto;min-height:44px}
-.scan-swipe__main > span{flex:0 0 auto;min-width:52px}
-.scan-swipe__main > span.w-code{min-width:72px}
-.scan-swipe__del{flex:0 0 72px;width:72px;border:none;background:#FF4D4F;color:#fff;font-size:14px;font-weight:500;cursor:pointer}
-.scan-swipe__hint{margin:6px 12px 10px;font-size:11px;color:#BFBFBF}
+.scan-op-del{border:none;background:transparent;color:#FF4D4F;font-size:12px;padding:4px 8px;cursor:pointer;border-radius:4px}
+.scan-op-del:active{background:#FFF1F0}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0;padding-bottom:2px}
+.table-scroll::-webkit-scrollbar{height:6px}
+.table-scroll::-webkit-scrollbar-thumb{background:#D9D9D9;border-radius:3px}
 
 .process-tabs{display:flex;gap:8px;margin-bottom:4px}
 .process-tabs button{flex:1;height:36px;border:1px solid #D9D9D9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;color:var(--color-text-normal)}
@@ -199,11 +193,11 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
       <header class="app-header">
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
-          <div class="demo-scope-tip">PC/APP 同源联动：提货·签收·在途·入库提交会写入 localStorage，另一端实时刷新（建议本地 http 打开双页）</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
+          <a class="back-overview" href="../../05-项目资料/项目产出资料/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html">PC</a>
-            <a href="./app.html" class="on">APP</a>
+            <a href="./思特瑞WMS_Demo.html">PC</a>
+            <a href="./思特瑞WMS_APP_Demo.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">联动·重置</button>
         </div>
@@ -409,32 +403,22 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="sec__title" style="padding:12px 16px 8px">条码信息</div>
-                    <div class="scan-list">
-                      <div class="scan-list__head">
-                        <span>状态</span><span class="w-code">条码号</span><span>包材编号</span><span>物料名称</span><span>库位</span><span>应盘</span><span>实盘</span>
-                      </div>
-                      <div
-                        class="scan-swipe"
-                        v-for="(r,i) in stockRows" :key="'stock-'+i"
-                        @pointerdown="onSwipeStart($event,'stock',i)"
-                        @pointermove="onSwipeMove($event)"
-                        @pointerup="onSwipeEnd($event)"
-                        @pointercancel="onSwipeEnd($event)"
-                      >
-                        <div class="scan-swipe__track" :style="swipeTrackStyle('stock', i)">
-                          <div class="scan-swipe__main" :style="r.abnormal ? 'color:#FF4D4F' : ''">
-                            <span>{{ r.status }}</span>
-                            <span class="w-code">{{ r.barcode }}</span>
-                            <span>{{ r.pkgNo }}</span>
-                            <span>{{ r.name }}</span>
-                            <span>{{ r.loc }}</span>
-                            <span>{{ r.planQty }}</span>
-                            <span><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" @pointerdown.stop /></span>
-                          </div>
-                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('stock', i)">删除</button>
-                        </div>
-                      </div>
-                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>状态</th><th>条码号</th><th>包材编号</th><th>物料名称</th><th>库位</th><th>应盘</th><th>实盘</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in stockRows" :key="'stock-'+i" :style="r.abnormal ? 'color:#FF4D4F' : ''">
+                            <td>{{ r.status }}</td>
+                            <td>{{ r.barcode }}</td>
+                            <td>{{ r.pkgNo }}</td>
+                            <td>{{ r.name }}</td>
+                            <td>{{ r.loc }}</td>
+                            <td>{{ r.planQty }}</td>
+                            <td><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" /></td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('stock', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                   <div class="sec">
@@ -464,32 +448,22 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
                   <div class="sec" style="padding:0;overflow:hidden">
-                    <div class="scan-list">
-                      <div class="scan-list__head">
-                        <span class="w-code">条码号</span><span>包材编号</span><span>数量</span><span>原位置</span><span>批号</span><span>当前工序</span><span>外包材编号</span>
-                      </div>
-                      <div
-                        class="scan-swipe"
-                        v-for="(r,i) in scanRows" :key="'pick-'+i"
-                        @pointerdown="onSwipeStart($event,'scan',i)"
-                        @pointermove="onSwipeMove($event)"
-                        @pointerup="onSwipeEnd($event)"
-                        @pointercancel="onSwipeEnd($event)"
-                      >
-                        <div class="scan-swipe__track" :style="swipeTrackStyle('scan', i)">
-                          <div class="scan-swipe__main" :style="{ color: r.done ? '#52C41A' : '#262626' }">
-                            <span class="w-code"><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></span>
-                            <span><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></span>
-                            <span>{{ r.qty }}</span>
-                            <span>{{ r.fromLoc }}</span>
-                            <span>{{ r.lot }}</span>
-                            <span>{{ r.process }}</span>
-                            <span>{{ r.outer }}</span>
-                          </div>
-                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('scan', i)">删除</button>
-                        </div>
-                      </div>
-                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>包材编号</th><th>数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th>外包材编号</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="'pick-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></td>
+                            <td>{{ r.qty }}</td>
+                            <td>{{ r.fromLoc }}</td>
+                            <td>{{ r.lot }}</td>
+                            <td>{{ r.process }}</td>
+                            <td>{{ r.outer }}</td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </template>
@@ -506,34 +480,24 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
                   <div class="sec" style="padding:0;overflow:hidden">
-                    <div class="scan-list">
-                      <div class="scan-list__head">
-                        <span class="w-code">条码号</span><span>数量</span><span>批号</span><span>库位</span><span>工序</span><span>外包材</span>
-                      </div>
-                      <div
-                        class="scan-swipe"
-                        v-for="(r,i) in scanRows" :key="'serial-'+i"
-                        @pointerdown="onSwipeStart($event,'scan',i)"
-                        @pointermove="onSwipeMove($event)"
-                        @pointerup="onSwipeEnd($event)"
-                        @pointercancel="onSwipeEnd($event)"
-                      >
-                        <div class="scan-swipe__track" :style="swipeTrackStyle('scan', i)">
-                          <div class="scan-swipe__main">
-                            <span class="w-code">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>库位</th><th>工序</th><th>外包材</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="'serial-'+i">
+                            <td>
                               <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else>{{ r.barcode }}</span>
-                            </span>
-                            <span>{{ r.qty }}</span>
-                            <span>{{ r.lot }}</span>
-                            <span>{{ r.loc }}</span>
-                            <span>{{ r.process }}</span>
-                            <span>{{ r.outer }}</span>
-                          </div>
-                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('scan', i)">删除</button>
-                        </div>
-                      </div>
-                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                            </td>
+                            <td>{{ r.qty }}</td>
+                            <td>{{ r.lot }}</td>
+                            <td>{{ r.loc }}</td>
+                            <td>{{ r.process }}</td>
+                            <td>{{ r.outer }}</td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </template>
@@ -615,37 +579,27 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="scan-list">
-                    <div class="scan-list__head">
-                      <span class="w-code">条码</span><span>储罐编号</span><span>库存位置</span><span>收料前量</span><span>收料前批号</span><span>收料后量</span>
-                    </div>
-                    <div
-                      class="scan-swipe"
-                      v-for="(r,i) in tankRows" :key="'tank-'+i"
-                      @pointerdown="onSwipeStart($event,'tank',i)"
-                      @pointermove="onSwipeMove($event)"
-                      @pointerup="onSwipeEnd($event)"
-                      @pointercancel="onSwipeEnd($event)"
-                    >
-                      <div class="scan-swipe__track" :style="swipeTrackStyle('tank', i)">
-                        <div class="scan-swipe__main">
-                          <span class="w-code">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th><th class="col-op">操作</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in tankRows" :key="'tank-'+i">
+                          <td>
                             <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                             <span v-else>{{ r.barcode }}</span>
-                          </span>
-                          <span>
+                          </td>
+                          <td>
                             <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a>
                             <span v-else>{{ r.tankNo }}</span>
-                          </span>
-                          <span>{{ r.loc }}</span>
-                          <span>{{ r.beforeQty }}</span>
-                          <span>{{ r.beforeLot }}</span>
-                          <span>{{ r.afterQty }}</span>
-                        </div>
-                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('tank', i)">删除</button>
-                      </div>
-                    </div>
-                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                          </td>
+                          <td>{{ r.loc }}</td>
+                          <td>{{ r.beforeQty }}</td>
+                          <td>{{ r.beforeLot }}</td>
+                          <td>{{ r.afterQty }}</td>
+                          <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <div class="sec" v-if="flowMeta.hasProcess">
@@ -787,29 +741,19 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ innerRows.length }}</span><span>扫码数量：{{ innerQtySum }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="scan-list">
-                    <div class="scan-list__head">
-                      <span class="w-code">条码号</span><span>包材编号</span><span>物料编码</span><span>数量</span>
-                    </div>
-                    <div
-                      class="scan-swipe"
-                      v-for="(r,i) in innerRows" :key="'inner-'+i"
-                      @pointerdown="onSwipeStart($event,'inner',i)"
-                      @pointermove="onSwipeMove($event)"
-                      @pointerup="onSwipeEnd($event)"
-                      @pointercancel="onSwipeEnd($event)"
-                    >
-                      <div class="scan-swipe__track" :style="swipeTrackStyle('inner', i)">
-                        <div class="scan-swipe__main">
-                          <span class="w-code">{{ r.barcode }}</span>
-                          <span>{{ r.pkgNo }}</span>
-                          <span>{{ r.code }}</span>
-                          <span>{{ r.qty }}</span>
-                        </div>
-                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('inner', i)">删除</button>
-                      </div>
-                    </div>
-                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>物料编码</th><th>数量</th><th class="col-op">操作</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in innerRows" :key="'inner-'+i">
+                          <td>{{ r.barcode }}</td>
+                          <td>{{ r.pkgNo }}</td>
+                          <td>{{ r.code }}</td>
+                          <td>{{ r.qty }}</td>
+                          <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('inner', i)">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <div class="sec">
@@ -1014,29 +958,19 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ pkgRows.length }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="scan-list">
-                    <div class="scan-list__head">
-                      <span class="w-code">条码号</span><span>包材编号</span><span>批号</span><span>当前工序</span>
-                    </div>
-                    <div
-                      class="scan-swipe"
-                      v-for="(r,i) in pkgRows" :key="'pkg-'+i"
-                      @pointerdown="onSwipeStart($event,'pkg',i)"
-                      @pointermove="onSwipeMove($event)"
-                      @pointerup="onSwipeEnd($event)"
-                      @pointercancel="onSwipeEnd($event)"
-                    >
-                      <div class="scan-swipe__track" :style="swipeTrackStyle('pkg', i)">
-                        <div class="scan-swipe__main">
-                          <span class="w-code"><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></span>
-                          <span><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></span>
-                          <span>{{ r.lot }}</span>
-                          <span>{{ r.process }}</span>
-                        </div>
-                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('pkg', i)">删除</button>
-                      </div>
-                    </div>
-                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>批号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in pkgRows" :key="'pkg-'+i">
+                          <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                          <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></td>
+                          <td>{{ r.lot }}</td>
+                          <td>{{ r.process }}</td>
+                          <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('pkg', i)">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
                 <div class="sec" v-if="flowMeta.hasProcess">
@@ -2359,68 +2293,8 @@ createApp({
     }
     function openProcess(row) {
       if (!flowMeta.value.hasProcess) return;
-      closeSwipe();
       processRef.value = row.barcode || row.pkgNo || row.tankNo || currentLine.value?.code || '';
       view.value = 'process';
-    }
-    const SWIPE_DEL_W = 72;
-    const swipeOpen = ref('');
-    const swipeDrag = ref({ key: '', dx: 0, active: false });
-    let swipeState = null;
-    function swipeKey(kind, i) { return kind + '-' + i; }
-    function closeSwipe() {
-      swipeOpen.value = '';
-      swipeDrag.value = { key: '', dx: 0, active: false };
-      swipeState = null;
-    }
-    function swipeTrackStyle(kind, i) {
-      const key = swipeKey(kind, i);
-      if (swipeDrag.value.active && swipeDrag.value.key === key) {
-        return { transform: 'translateX(' + swipeDrag.value.dx + 'px)', transition: 'none' };
-      }
-      if (swipeOpen.value === key) return { transform: 'translateX(-' + SWIPE_DEL_W + 'px)' };
-      return { transform: 'translateX(0)' };
-    }
-    function onSwipeStart(e, kind, i) {
-      if (e.target && e.target.closest && e.target.closest('a,button,input,select,textarea,.scan-link')) return;
-      const key = swipeKey(kind, i);
-      const origin = swipeOpen.value === key ? -SWIPE_DEL_W : 0;
-      swipeState = {
-        key: key,
-        startX: e.clientX,
-        startY: e.clientY,
-        origin: origin,
-        dx: origin,
-        locked: null,
-      };
-      swipeDrag.value = { key: key, dx: origin, active: true };
-      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-    }
-    function onSwipeMove(e) {
-      if (!swipeState) return;
-      const rawDx = e.clientX - swipeState.startX;
-      const rawDy = e.clientY - swipeState.startY;
-      if (swipeState.locked == null && (Math.abs(rawDx) > 8 || Math.abs(rawDy) > 8)) {
-        swipeState.locked = Math.abs(rawDx) > Math.abs(rawDy) ? 'x' : 'y';
-        if (swipeState.locked === 'y') {
-          swipeDrag.value = { key: '', dx: 0, active: false };
-          swipeState = null;
-          return;
-        }
-      }
-      if (swipeState.locked !== 'x') return;
-      let dx = swipeState.origin + rawDx;
-      dx = Math.min(0, Math.max(-SWIPE_DEL_W, dx));
-      swipeState.dx = dx;
-      swipeDrag.value = { key: swipeState.key, dx: dx, active: true };
-    }
-    function onSwipeEnd() {
-      if (!swipeState) return;
-      if (swipeState.locked === 'x') {
-        swipeOpen.value = swipeState.dx < -SWIPE_DEL_W / 2 ? swipeState.key : '';
-      }
-      swipeDrag.value = { key: '', dx: 0, active: false };
-      swipeState = null;
     }
     function removeScanRow(kind, index) {
       ElementPlus.ElMessageBox.confirm('确认删除当前扫码明细？删除后将解绑档案并清除本单对应流水。', '删除确认', {
@@ -2429,9 +2303,8 @@ createApp({
         const map = { scan: scanRows, tank: tankRows, inner: innerRows, pkg: pkgRows, stock: stockRows };
         const list = map[kind];
         if (list && list.value) list.value.splice(index, 1);
-        closeSwipe();
         ElementPlus.ElMessage.success('明细数据删除完成');
-      }).catch(() => { closeSwipe(); });
+      }).catch(() => {});
     }
     function openLoadProc(p, idx) {
       if (idx > 0) {
@@ -2892,7 +2765,6 @@ createApp({
       statusTag, toast, goHome, openStub, openModule, onMenuSelect,
       openMaterials, openDocAction, openStockExec, openExec, backFromExec,
       addSerialScan, addPickScan, addTankRow, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch,
-      onSwipeStart, onSwipeMove, onSwipeEnd, swipeTrackStyle,
       addStockScan, onStockQtyChange,
       openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,
