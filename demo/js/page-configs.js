@@ -435,6 +435,17 @@ window.WMS_PAGE_CONFIGS = {
       ]
     },
     {
+      "title": "质量管理",
+      "index": "g-质量管理",
+      "children": [
+        {
+          "title": "检验数据台账",
+          "index": "qc-ledger",
+          "pageId": "qc-ledger"
+        }
+      ]
+    },
+    {
       "title": "条码管理",
       "index": "g-条码管理",
       "children": [
@@ -3507,8 +3518,14 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "formLineActions": [
-        "添加物料",
-        "删除勾选"
+        {
+          "name": "新增",
+          "type": "primary"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger"
+        }
       ],
       "detailLineFields": [
         {
@@ -3542,7 +3559,8 @@ window.WMS_PAGE_CONFIGS = {
           "name": "备注"
         }
       ],
-      "detailLineTitle": "采购明细"
+      "detailLineTitle": "采购明细",
+      "formLineTabLabel": "物料"
     },
     "so": {
       "id": "so",
@@ -3869,8 +3887,14 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "formLineActions": [
-        "添加物料",
-        "删除勾选"
+        {
+          "name": "新增",
+          "type": "primary"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger"
+        }
       ],
       "detailLineFields": [
         {
@@ -3910,7 +3934,8 @@ window.WMS_PAGE_CONFIGS = {
           "name": "备注"
         }
       ],
-      "detailLineTitle": "销售明细"
+      "detailLineTitle": "销售明细",
+      "formLineTabLabel": "物料"
     },
     "serial-arch": {
       "id": "serial-arch",
@@ -21757,39 +21782,99 @@ window.WMS_PAGE_CONFIGS = {
           ]
         }
       ],
-      "formFields": [
+      "formFields": [],
+      "formDialogWidth": "920px",
+      "formSections": [
         {
-          "name": "派车申请单号",
-          "type": "readonly",
-          "required": false,
-          "ctrl": "只读文本"
+          "title": "基本信息",
+          "fields": [
+            { "name": "派车申请单号", "type": "readonly", "required": true, "ctrl": "系统自动生成" },
+            { "name": "申请部门", "type": "input", "required": true, "ctrl": "手动输入 / 自动带入当前部门" },
+            { "name": "申请人", "type": "readonly", "required": true, "ctrl": "自动带入当前用户" },
+            { "name": "申请日期", "type": "readonly", "required": true, "ctrl": "自动带入当前日期" }
+          ]
         },
         {
-          "name": "申请部门",
-          "type": "readonly",
-          "required": false,
-          "ctrl": "文本输入 / 自动带入"
+          "title": "用车信息",
+          "fields": [
+            { "name": "用车类型", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["发货提货", "设备发运", "厂内园区倒短", "运输", "物资转运", "其他"] },
+            { "name": "车型要求", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["厢式货车", "平板车", "高栏车", "槽罐车", "其他"] },
+            { "name": "要求送达时间", "type": "datetime", "required": false, "ctrl": "日期时间选择器" },
+            { "name": "是否带托盘", "type": "select", "required": false, "ctrl": "单选（是/否），默认否", "options": ["是", "否"] },
+            { "name": "特殊要求", "type": "textarea", "required": false, "ctrl": "多行文本" }
+          ]
         },
         {
-          "name": "申请人",
-          "type": "readonly",
-          "required": false,
-          "ctrl": "只读文本"
+          "title": "收发信息",
+          "fields": [
+            { "name": "发货单位", "type": "picker", "required": true, "ctrl": "弹窗选择（供应商/客户）或手动输入" },
+            { "name": "收货单位", "type": "picker", "required": true, "ctrl": "弹窗选择（供应商/客户）或手动输入" },
+            { "name": "装货地点", "type": "input", "required": true, "ctrl": "手动输入" },
+            { "name": "装货联系人", "type": "input", "required": false, "ctrl": "手动输入" },
+            { "name": "装货联系电话", "type": "input", "required": false, "ctrl": "手动输入" },
+            { "name": "卸货地点", "type": "input", "required": true, "ctrl": "手动输入" },
+            { "name": "卸货联系人", "type": "input", "required": false, "ctrl": "手动输入" },
+            { "name": "卸货联系电话", "type": "input", "required": false, "ctrl": "手动输入" }
+          ]
         },
         {
-          "name": "申请日期",
-          "type": "readonly",
-          "required": false,
-          "ctrl": "只读文本"
+          "title": "备注",
+          "fields": [
+            { "name": "备注", "type": "textarea", "required": false, "ctrl": "多行文本" }
+          ]
         }
       ],
-      "detailFields": [],
+      "detailFields": [
+        { "name": "派车申请单号" },
+        { "name": "单据状态" },
+        { "name": "审核状态" },
+        { "name": "申请部门" },
+        { "name": "申请人" },
+        { "name": "申请日期" },
+        { "name": "用车类型" },
+        { "name": "车型要求" },
+        { "name": "要求送达时间" },
+        { "name": "是否带托盘" },
+        { "name": "特殊要求" },
+        { "name": "发货单位" },
+        { "name": "收货单位" },
+        { "name": "装货地点" },
+        { "name": "装货联系人" },
+        { "name": "装货联系电话" },
+        { "name": "卸货地点" },
+        { "name": "卸货联系人" },
+        { "name": "卸货联系电话" },
+        { "name": "备注" }
+      ],
+      "detailLineTitle": "物料明细",
+      "detailLineFields": [
+        { "name": "物料信息" },
+        { "name": "数量" },
+        { "name": "单位" },
+        { "name": "体积(长×宽×高)" },
+        { "name": "备注" }
+      ],
       "hasEdit": true,
       "hasDetail": true,
-      "formFlat": true,
+      "formFlat": false,
       "stub": false,
-      "formLineFields": [],
-      "formLineActions": []
+      "formLineFields": [
+        { "name": "物料信息", "type": "picker", "required": true, "ctrl": "选单弹窗" },
+        { "name": "数量", "type": "input", "required": true, "ctrl": "数字输入" },
+        { "name": "单位", "type": "readonly", "required": true, "ctrl": "选择物料后自动带入" },
+        { "name": "体积(长×宽×高)", "type": "input", "required": false, "ctrl": "文本输入" },
+        { "name": "备注", "type": "input", "required": false, "ctrl": "文本输入" }
+      ],
+      "formLineActions": [
+        { "name": "新增", "type": "primary" },
+        { "name": "批量删除", "type": "danger" }
+      ],
+      "formLineTabLabel": "物料",
+      "formLineTip": "在物料 Tab 中维护派车货物明细；选择物料后自动带入单位；至少保留一行",
+      "formFooterActions": [
+        { "name": "取消", "type": "default" },
+        { "name": "确认", "type": "primary" }
+      ]
     },
     "lg-order": {
       "id": "lg-order",
@@ -21957,23 +22042,489 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "物流订单号",
           "type": "readonly",
-          "required": false,
-          "ctrl": "只读文本"
+          "required": true,
+          "ctrl": "系统自动生成"
         },
         {
           "name": "关联派车申请单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（单选）"
+          "ctrl": "弹窗选择（选填）"
+        },
+        {
+          "name": "发货单位",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "收货单位",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "装货地点",
+          "type": "input",
+          "required": true,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "装货联系人",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "装货联系电话",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "卸货地点",
+          "type": "input",
+          "required": true,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "卸货联系人",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "卸货联系电话",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "车型要求",
+          "type": "select",
+          "required": false,
+          "ctrl": "下拉选择",
+          "lockWhenLinked": true,
+          "options": [
+            "厢式货车",
+            "平板车",
+            "罐车",
+            "危险品车"
+          ]
+        },
+        {
+          "name": "要求送达时间",
+          "type": "date",
+          "required": false,
+          "ctrl": "日期时间选择器（含时分）",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "特殊要求",
+          "type": "textarea",
+          "required": false,
+          "ctrl": "多行文本",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "承运公司",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择"
+        },
+        {
+          "name": "提货车辆",
+          "type": "input",
+          "required": true,
+          "ctrl": "手动输入"
+        },
+        {
+          "name": "司机",
+          "type": "input",
+          "required": true,
+          "ctrl": "手动输入"
+        },
+        {
+          "name": "司机联系电话",
+          "type": "input",
+          "required": true,
+          "ctrl": "手动输入"
+        },
+        {
+          "name": "核定载重量",
+          "type": "number-unit",
+          "required": false,
+          "ctrl": "数字",
+          "defaultUnit": "T",
+          "options": [
+            "T"
+          ]
+        },
+        {
+          "name": "车辆资质证件",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入 / 上传附件"
+        },
+        {
+          "name": "实发总重量",
+          "type": "number-unit",
+          "required": false,
+          "ctrl": "数字",
+          "defaultUnit": "T",
+          "options": [
+            "T"
+          ]
+        },
+        {
+          "name": "实发总件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "正整数"
+        },
+        {
+          "name": "预计发车时间",
+          "type": "date",
+          "required": false,
+          "ctrl": "日期时间选择器（含时分）"
+        },
+        {
+          "name": "预计到达时间",
+          "type": "date",
+          "required": false,
+          "ctrl": "日期时间选择器（含时分）"
+        },
+        {
+          "name": "运输备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入"
+        },
+        {
+          "name": "备注",
+          "type": "textarea",
+          "required": false,
+          "ctrl": "多行文本"
         }
       ],
-      "detailFields": [],
+      "detailFields": [
+        {
+          "name": "物流订单号"
+        },
+        {
+          "name": "状态"
+        },
+        {
+          "name": "关联派车申请单号"
+        },
+        {
+          "name": "发货单位"
+        },
+        {
+          "name": "收货单位"
+        },
+        {
+          "name": "承运公司"
+        },
+        {
+          "name": "车牌号"
+        },
+        {
+          "name": "司机"
+        },
+        {
+          "name": "实发重量(T)"
+        },
+        {
+          "name": "要求送达时间"
+        },
+        {
+          "name": "创建时间"
+        }
+      ],
       "hasEdit": true,
       "hasDetail": true,
-      "formFlat": true,
+      "formFlat": false,
       "stub": false,
-      "formLineFields": [],
-      "formLineActions": []
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择 / 关联只读"
+        },
+        {
+          "name": "数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "数字输入"
+        },
+        {
+          "name": "单位",
+          "type": "input",
+          "required": false,
+          "ctrl": "关联只读 / 不关联可填",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "体积(长×宽×高)",
+          "type": "input",
+          "required": false,
+          "ctrl": "关联只读 / 不关联可填",
+          "lockWhenLinked": true
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "文本输入"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger"
+        }
+      ],
+      "formSectionTitle": "关联信息",
+      "formSections": [
+        {
+          "title": "关联信息",
+          "fields": [
+            {
+              "name": "物流订单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "关联派车申请单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "弹窗选择（选填）"
+            },
+            {
+              "name": "发货单位",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "收货单位",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "装货地点",
+              "type": "input",
+              "required": true,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "装货联系人",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "装货联系电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "卸货地点",
+              "type": "input",
+              "required": true,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "卸货联系人",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "卸货联系电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "车型要求",
+              "type": "select",
+              "required": false,
+              "ctrl": "下拉选择",
+              "lockWhenLinked": true,
+              "options": [
+                "厢式货车",
+                "平板车",
+                "罐车",
+                "危险品车"
+              ]
+            },
+            {
+              "name": "要求送达时间",
+              "type": "date",
+              "required": false,
+              "ctrl": "日期时间选择器（含时分）",
+              "lockWhenLinked": true
+            },
+            {
+              "name": "特殊要求",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "多行文本",
+              "lockWhenLinked": true
+            }
+          ]
+        },
+        {
+          "title": "车辆与司机",
+          "fields": [
+            {
+              "name": "承运公司",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择"
+            },
+            {
+              "name": "提货车辆",
+              "type": "input",
+              "required": true,
+              "ctrl": "手动输入"
+            },
+            {
+              "name": "司机",
+              "type": "input",
+              "required": true,
+              "ctrl": "手动输入"
+            },
+            {
+              "name": "司机联系电话",
+              "type": "input",
+              "required": true,
+              "ctrl": "手动输入"
+            },
+            {
+              "name": "核定载重量",
+              "type": "number-unit",
+              "required": false,
+              "ctrl": "数字",
+              "defaultUnit": "T",
+              "options": [
+                "T"
+              ]
+            },
+            {
+              "name": "车辆资质证件",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入 / 上传附件"
+            }
+          ]
+        },
+        {
+          "title": "运输信息",
+          "fields": [
+            {
+              "name": "实发总重量",
+              "type": "number-unit",
+              "required": false,
+              "ctrl": "数字",
+              "defaultUnit": "T",
+              "options": [
+                "T"
+              ]
+            },
+            {
+              "name": "实发总件数",
+              "type": "input",
+              "required": false,
+              "ctrl": "正整数"
+            },
+            {
+              "name": "预计发车时间",
+              "type": "date",
+              "required": false,
+              "ctrl": "日期时间选择器（含时分）"
+            },
+            {
+              "name": "预计到达时间",
+              "type": "date",
+              "required": false,
+              "ctrl": "日期时间选择器（含时分）"
+            },
+            {
+              "name": "运输备注",
+              "type": "input",
+              "required": false,
+              "ctrl": "手动输入"
+            }
+          ]
+        },
+        {
+          "title": "备注",
+          "fields": [
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "多行文本"
+            }
+          ]
+        }
+      ],
+      "formLineTabLabel": "物料",
+      "formLineTip": "选择派车单后自动带入明细（物料/单位/体积只读）；未选择时可新增并弹窗选择物料",
+      "formFooterActions": [
+        {
+          "name": "取消",
+          "type": "default"
+        },
+        {
+          "name": "确认",
+          "type": "primary"
+        }
+      ],
+      "detailLineFields": [
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "数量"
+        },
+        {
+          "name": "单位"
+        },
+        {
+          "name": "体积(长×宽×高)"
+        },
+        {
+          "name": "备注"
+        }
+      ]
     },
     "lg-ship": {
       "id": "lg-ship",
@@ -22199,10 +22750,66 @@ window.WMS_PAGE_CONFIGS = {
       "detailFields": [],
       "hasEdit": true,
       "hasDetail": true,
-      "formFlat": true,
+      "formFlat": false,
       "stub": false,
-      "formLineFields": [],
-      "formLineActions": []
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择 / 关联只读"
+        },
+        {
+          "name": "数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "数字输入"
+        },
+        {
+          "name": "单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入不可编辑"
+        },
+        {
+          "name": "完成状态",
+          "type": "select",
+          "required": false,
+          "ctrl": "下拉选择",
+          "options": [
+            "未完成",
+            "已完成"
+          ]
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "文本输入"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger"
+        }
+      ],
+      "formLineTabLabel": "物料",
+      "formLineTip": "关联出库单可带入明细，也可手动新增；物料信息/数量/完成状态/备注可维护",
+      "formFooterActions": [
+        {
+          "name": "取消",
+          "type": "default"
+        },
+        {
+          "name": "确认",
+          "type": "primary"
+        }
+      ]
     },
     "lg-waybill": {
       "id": "lg-waybill",
@@ -22375,56 +22982,81 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "运单号",
           "type": "readonly",
-          "required": false,
-          "ctrl": "只读文本"
+          "required": true,
+          "ctrl": "系统自动生成"
         },
         {
           "name": "关联发货单",
           "type": "picker",
-          "required": false,
+          "required": true,
           "ctrl": "弹窗多选"
         },
         {
           "name": "关联派车申请单号",
           "type": "readonly",
           "required": false,
-          "ctrl": "只读文本"
+          "ctrl": "自动带入"
         },
         {
           "name": "配送方式",
           "type": "select",
           "required": true,
-          "ctrl": "下拉选择"
+          "ctrl": "下拉选择（字典表）",
+          "options": [
+            "公路运输",
+            "铁路运输",
+            "海运",
+            "空运",
+            "快递"
+          ]
+        },
+        {
+          "name": "运费",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入"
+        },
+        {
+          "name": "要求送达时间",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入（取最早）"
+        },
+        {
+          "name": "计划装车时间",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入（取最早）"
         },
         {
           "name": "司机车牌号",
           "type": "input",
           "required": false,
-          "ctrl": "手动输入"
+          "ctrl": "自动带入 / 手动录入"
         },
         {
           "name": "司机姓名",
           "type": "input",
           "required": false,
-          "ctrl": "手动输入"
+          "ctrl": "自动带入 / 手动录入"
         },
         {
           "name": "司机电话",
           "type": "input",
           "required": false,
-          "ctrl": "手动输入"
+          "ctrl": "自动带入 / 手动录入"
         },
         {
           "name": "排单时间",
-          "type": "datetime",
+          "type": "date",
           "required": false,
-          "ctrl": "日期时间"
+          "ctrl": "日期时间选择器（含时分）"
         },
         {
           "name": "备注",
-          "type": "input",
+          "type": "textarea",
           "required": false,
-          "ctrl": "手动输入"
+          "ctrl": "多行文本"
         }
       ],
       "detailFields": [
@@ -22494,47 +23126,55 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "hasEdit": true,
       "hasDetail": true,
-      "formFlat": true,
+      "formFlat": false,
       "stub": false,
       "formLineFields": [
         {
-          "name": "关联发货单号"
+          "name": "关联发货单号",
+          "type": "readonly"
         },
         {
-          "name": "发货单位"
+          "name": "发货单位",
+          "type": "readonly"
         },
         {
-          "name": "收货单位"
+          "name": "收货单位",
+          "type": "readonly"
         },
         {
-          "name": "装货地点"
+          "name": "装货地点",
+          "type": "readonly"
         },
         {
-          "name": "卸货地点"
+          "name": "卸货地点",
+          "type": "readonly"
         },
         {
-          "name": "卸货联系人"
+          "name": "联系人",
+          "type": "readonly"
         },
         {
-          "name": "卸货联系电话"
+          "name": "联系电话",
+          "type": "readonly"
         },
         {
-          "name": "物料信息"
+          "name": "物料信息",
+          "type": "readonly"
         },
         {
-          "name": "总数量"
+          "name": "总数量",
+          "type": "readonly"
         },
         {
-          "name": "单位"
+          "name": "单位",
+          "type": "readonly"
         },
         {
-          "name": "备注"
+          "name": "备注",
+          "type": "input"
         }
       ],
-      "formLineActions": [
-        "选择发货单",
-        "删除勾选"
-      ],
+      "formLineActions": [],
       "detailLineTitle": "装卸货点明细",
       "detailLineFields": [
         {
@@ -22596,6 +23236,119 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "照片"
+        }
+      ],
+      "formSections": [
+        {
+          "title": "关联发货单",
+          "fields": [
+            {
+              "name": "运单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗多选"
+            },
+            {
+              "name": "关联派车申请单号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "自动带入"
+            }
+          ]
+        },
+        {
+          "title": "运单信息",
+          "fields": [
+            {
+              "name": "配送方式",
+              "type": "select",
+              "required": true,
+              "ctrl": "下拉选择（字典表）",
+              "options": [
+                "公路运输",
+                "铁路运输",
+                "海运",
+                "空运",
+                "快递"
+              ]
+            },
+            {
+              "name": "运费",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "自动带入"
+            },
+            {
+              "name": "要求送达时间",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "自动带入（取最早）"
+            },
+            {
+              "name": "计划装车时间",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "自动带入（取最早）"
+            }
+          ]
+        },
+        {
+          "title": "司机与配送",
+          "fields": [
+            {
+              "name": "司机车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "自动带入 / 手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "自动带入 / 手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "自动带入 / 手动录入"
+            },
+            {
+              "name": "排单时间",
+              "type": "date",
+              "required": false,
+              "ctrl": "日期时间选择器（含时分）"
+            }
+          ]
+        },
+        {
+          "title": "备注",
+          "fields": [
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "多行文本"
+            }
+          ]
+        }
+      ],
+      "formLineTabLabel": "装卸货点明细",
+      "formLineTip": "装卸货点明细来源发货单，只读；请先选择关联发货单",
+      "formFooterActions": [
+        {
+          "name": "取消",
+          "type": "default"
+        },
+        {
+          "name": "确认",
+          "type": "primary"
         }
       ]
     },
@@ -26007,6 +26760,270 @@ window.WMS_PAGE_CONFIGS = {
           }
         ]
       }
+    },
+    "qc-ledger": {
+      "id": "qc-ledger",
+      "title": "检验数据台账",
+      "groups": [
+        "质量管理"
+      ],
+      "breadcrumb": [
+        "质量管理",
+        "检验数据台账"
+      ],
+      "formFlat": true,
+      "formSectionTitle": "基本信息",
+      "tabs": [],
+      "tabViews": [
+        {
+          "name": "main",
+          "label": "",
+          "queryFields": [
+            {
+              "name": "检验单号",
+              "type": "input"
+            },
+            {
+              "name": "关联单号",
+              "type": "input"
+            },
+            {
+              "name": "检验类型",
+              "type": "select",
+              "options": [
+                "来料检验",
+                "过程检验",
+                "成品检验",
+                "委外检验",
+                "留样复测"
+              ]
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "批次号",
+              "type": "input"
+            },
+            {
+              "name": "检验判定",
+              "type": "select",
+              "options": [
+                "全部",
+                "合格",
+                "不合格",
+                "待判定"
+              ]
+            },
+            {
+              "name": "质检员",
+              "type": "input"
+            },
+            {
+              "name": "检验日期",
+              "type": "daterange"
+            }
+          ],
+          "queryDefault": [
+            "检验单号",
+            "物料信息",
+            "检验判定"
+          ],
+          "queryMore": [
+            "关联单号",
+            "检验类型",
+            "批次号",
+            "质检员",
+            "检验日期"
+          ],
+          "toolbar": [
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增检验数据弹窗"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出检验记录数据"
+            }
+          ],
+          "columns": [
+            {
+              "field": "检验单号",
+              "title": "检验单号",
+              "width": 140
+            },
+            {
+              "field": "关联单号",
+              "title": "关联单号",
+              "width": 130
+            },
+            {
+              "field": "检验类型",
+              "title": "检验类型",
+              "width": 100
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "批次号",
+              "title": "批次号",
+              "width": 120
+            },
+            {
+              "field": "检验日期",
+              "title": "检验日期",
+              "width": 140
+            },
+            {
+              "field": "质检员",
+              "title": "质检员",
+              "width": 90
+            },
+            {
+              "field": "检验判定",
+              "title": "检验判定",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "编辑",
+              "desc": "编辑检验数据记录"
+            },
+            {
+              "name": "检验",
+              "desc": "打开检验执行弹窗，录入检验结果与报告"
+            }
+          ]
+        }
+      ],
+      "formFields": [
+        {
+          "name": "检验单号",
+          "type": "readonly",
+          "required": true,
+          "ctrl": "系统自动生成"
+        },
+        {
+          "name": "检验类型",
+          "type": "select",
+          "required": true,
+          "ctrl": "下拉选择",
+          "options": [
+            "来料检验",
+            "过程检验",
+            "成品检验",
+            "委外检验"
+          ]
+        },
+        {
+          "name": "关联单号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "弹窗选择"
+        },
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择物料"
+        },
+        {
+          "name": "物料批次号",
+          "type": "input",
+          "required": true,
+          "ctrl": "文本输入"
+        },
+        {
+          "name": "抽样数量",
+          "type": "input",
+          "required": false,
+          "ctrl": "数值输入"
+        },
+        {
+          "name": "检验日期",
+          "type": "date",
+          "required": true,
+          "ctrl": "日期选择"
+        },
+        {
+          "name": "质检员",
+          "type": "input",
+          "required": true,
+          "ctrl": "文本/选择"
+        },
+        {
+          "name": "检验判定",
+          "type": "select",
+          "required": true,
+          "ctrl": "下拉选择",
+          "options": [
+            "合格",
+            "不合格",
+            "待判定"
+          ]
+        }
+      ],
+      "formFooterActions": [
+        {
+          "name": "取消",
+          "type": "default"
+        },
+        {
+          "name": "确认",
+          "type": "primary"
+        }
+      ],
+      "detailFields": [
+        {
+          "name": "检验单号"
+        },
+        {
+          "name": "关联单号"
+        },
+        {
+          "name": "检验类型"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "批次号"
+        },
+        {
+          "name": "抽样数量"
+        },
+        {
+          "name": "检验日期"
+        },
+        {
+          "name": "质检员"
+        },
+        {
+          "name": "检验判定"
+        },
+        {
+          "name": "备注"
+        }
+      ],
+      "formLineFields": [],
+      "formLineActions": [],
+      "detailLineFields": [],
+      "detailLineActions": []
     }
   },
   "pageList": [
@@ -26467,6 +27484,13 @@ window.WMS_PAGE_CONFIGS = {
       "groups": [
         "物流管理",
         "承运商管理"
+      ]
+    },
+    {
+      "id": "qc-ledger",
+      "title": "检验数据台账",
+      "groups": [
+        "质量管理"
       ]
     },
     {

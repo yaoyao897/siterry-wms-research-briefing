@@ -259,7 +259,7 @@ window.APP_CFG = (function () {
       hasProcess: opts.hasProcess !== undefined ? opts.hasProcess : mode !== 'count',
       hasMaterials: opts.hasMaterials !== false,
       docKind: opts.docKind || 'supplier',
-      partnerLabel: opts.partnerLabel || '供应商',
+      partnerLabel: opts.partnerLabel || '供应商名称',
       refLabel: opts.refLabel || '关联单据',
       searchHint: opts.searchHint || '模糊搜索单号/往来单位/物料…',
       emptyDocs: opts.emptyDocs || '暂无待执行单据',
@@ -299,30 +299,30 @@ window.APP_CFG = (function () {
     'prod-in-count': flow('生产入库-计数', 'count', { hasProcess: false, docKind: 'dept', partnerLabel: '生产部门', refLabel: '关联生产订单', qtyLabel: '入库数量' }),
 
     // 委外
-    'os-issue-serial': flow('委外发料-流水码', 'serial', { isOut: true, partnerLabel: '委外供应商', refLabel: '关联委外订单', serialScanTitle: '添加发料扫码' }),
-    'os-issue-count': flow('委外发料-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '委外供应商', refLabel: '关联委外订单', qtyLabel: '发料数量' }),
-    'os-ret-serial': flow('委外退料-流水码', 'serial', { partnerLabel: '委外供应商', refLabel: '关联委外订单', serialScanTitle: '添加退料扫码' }),
-    'os-ret-count': flow('委外退料-计数', 'count', { hasProcess: false, partnerLabel: '委外供应商', refLabel: '关联委外订单', qtyLabel: '退料数量' }),
-    'os-recv-serial': flow('委外收货-流水码', 'serial', { partnerLabel: '委外供应商', refLabel: '关联委外订单' }),
-    'os-recv-count': flow('委外收货-计数', 'count', { hasProcess: false, partnerLabel: '委外供应商', refLabel: '关联委外订单', qtyLabel: '收货数量' }),
-    'os-recv-tank': flow('委外收货-罐区', 'tank', { partnerLabel: '委外供应商', refLabel: '关联委外订单' }),
-    'os-rma-serial': flow('委外退货-流水码', 'serial', { isOut: true, partnerLabel: '委外供应商', refLabel: '关联委外订单', serialScanTitle: '添加退货扫码' }),
-    'os-rma-count': flow('委外退货-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '委外供应商', refLabel: '关联委外订单', qtyLabel: '退货数量' }),
+    'os-issue-serial': flow('委外发料-流水码', 'serial', { isOut: true, partnerLabel: '供应商名称', refLabel: '关联委外加工单', serialScanTitle: '添加发料扫码' }),
+    'os-issue-count': flow('委外发料-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '供应商名称', refLabel: '关联委外加工单', qtyLabel: '发料数量' }),
+    'os-ret-serial': flow('委外退料-流水码', 'serial', { partnerLabel: '供应商名称', refLabel: '关联委外加工单', serialScanTitle: '添加退料扫码' }),
+    'os-ret-count': flow('委外退料-计数', 'count', { hasProcess: false, partnerLabel: '供应商名称', refLabel: '关联委外加工单', qtyLabel: '退料数量' }),
+    'os-recv-serial': flow('委外收货-流水码', 'serial', { partnerLabel: '供应商名称', refLabel: '关联委外加工单' }),
+    'os-recv-count': flow('委外收货-计数', 'count', { hasProcess: false, partnerLabel: '供应商名称', refLabel: '关联委外加工单', qtyLabel: '收货数量' }),
+    'os-recv-tank': flow('委外收货-罐区', 'tank', { partnerLabel: '供应商名称', refLabel: '关联委外加工单' }),
+    'os-rma-serial': flow('委外退货-流水码', 'serial', { isOut: true, partnerLabel: '供应商名称', refLabel: '关联委外加工单', serialScanTitle: '添加退货扫码' }),
+    'os-rma-count': flow('委外退货-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '供应商名称', refLabel: '关联委外加工单', qtyLabel: '退货数量' }),
 
     // 受托
-    'trust-recv-serial': flow('受托收料-流水码', 'serial', { partnerLabel: '委托方', refLabel: '关联受托订单' }),
-    'trust-recv-count': flow('受托收料-计数', 'count', { hasProcess: false, partnerLabel: '委托方', refLabel: '关联受托订单', qtyLabel: '收料数量' }),
-    'trust-recv-tank': flow('受托收料-罐区', 'tank', { partnerLabel: '委托方', refLabel: '关联受托订单' }),
-    'trust-ret-serial': flow('受托退料-流水码', 'serial', { isOut: true, partnerLabel: '委托方', refLabel: '关联受托订单', serialScanTitle: '添加退料扫码' }),
-    'trust-ret-count': flow('受托退料-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '委托方', refLabel: '关联受托订单', qtyLabel: '退料数量' }),
-    'trust-in-serial': flow('受托入库-流水码', 'serial', { partnerLabel: '委托方', refLabel: '关联受托订单' }),
-    'trust-in-count': flow('受托入库-计数', 'count', { hasProcess: false, partnerLabel: '委托方', refLabel: '关联受托订单', qtyLabel: '入库数量' }),
+    'trust-recv-serial': flow('受托收料-流水码', 'serial', { partnerLabel: '委托方名称', refLabel: '关联受托订单' }),
+    'trust-recv-count': flow('受托收料-计数', 'count', { hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '收料数量' }),
+    'trust-recv-tank': flow('受托收料-罐区', 'tank', { partnerLabel: '委托方名称', refLabel: '关联受托订单' }),
+    'trust-ret-serial': flow('受托退料-流水码', 'serial', { isOut: true, partnerLabel: '委托方名称', refLabel: '关联受托订单', serialScanTitle: '添加退料扫码' }),
+    'trust-ret-count': flow('受托退料-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '退料数量' }),
+    'trust-in-serial': flow('受托入库-流水码', 'serial', { partnerLabel: '委托方名称', refLabel: '关联受托订单' }),
+    'trust-in-count': flow('受托入库-计数', 'count', { hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '入库数量' }),
 
     // 销售（计数也有工序）
-    'so-ship-serial': flow('销售发货-流水码', 'serial', { isOut: true, docKind: 'customer', partnerLabel: '客户', refLabel: '关联销售订单', serialScanTitle: '添加发货扫码' }),
-    'so-ship-count': flow('销售发货-计数', 'count', { isOut: true, hasProcess: true, docKind: 'customer', partnerLabel: '客户', refLabel: '关联销售订单', qtyLabel: '发货数量' }),
-    'so-rma-serial': flow('销售退货-流水码', 'serial', { docKind: 'customer', partnerLabel: '客户', refLabel: '关联销售订单', serialScanTitle: '添加退货扫码' }),
-    'so-rma-count': flow('销售退货-计数', 'count', { hasProcess: true, docKind: 'customer', partnerLabel: '客户', refLabel: '关联销售订单', qtyLabel: '退货数量' }),
+    'so-ship-serial': flow('销售发货-流水码', 'serial', { isOut: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', serialScanTitle: '添加发货扫码' }),
+    'so-ship-count': flow('销售发货-计数', 'count', { isOut: true, hasProcess: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', qtyLabel: '发货数量' }),
+    'so-rma-serial': flow('销售退货-流水码', 'serial', { docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', serialScanTitle: '添加退货扫码' }),
+    'so-rma-count': flow('销售退货-计数', 'count', { hasProcess: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', qtyLabel: '退货数量' }),
 
     // 其他
     'oth-in-serial': flow('其他入库-流水码', 'serial', { partnerLabel: '往来单位', refLabel: '关联单据' }),
@@ -460,7 +460,7 @@ window.APP_CFG = (function () {
       addLocTitle: '装卸数量',
       addMatTitle: '装卸数量',
       doneHint: '所有物料已装卸完成',
-      showDocAdd: false,
+      showDocAdd: true,
     },
     'lg-waybill': {
       title: '运单',
@@ -533,7 +533,8 @@ window.APP_CFG = (function () {
 
   const noticesDefault = [
     {
-      id: 'CG202508010001',
+      // 与 PC wh-po-in「单号」PO-I0001 同源联动
+      id: 'PO-I0001',
       status: '待执行',
       partner: '天齐锂业股份有限公司',
       supplier: '天齐锂业股份有限公司',
@@ -541,12 +542,13 @@ window.APP_CFG = (function () {
       poNo: 'PO20250801001',
       planDate: '2025-08-05',
       docType: '标准业务',
-      dispatchNo: 'PA20250801002',
+      logisticsNo: 'WL202608100001',
       materialSummary: 'RM-LI2CO3 电池级碳酸锂 / Li2CO3≥99.5% / 原料',
       lines: cloneLines(),
     },
     {
-      id: 'CG202508010002',
+      // 与 PC wh-po-in「单号」PO-I0002 同源联动
+      id: 'PO-I0002',
       status: '执行中',
       partner: '赣锋锂业集团股份有限公司',
       supplier: '赣锋锂业集团股份有限公司',
@@ -554,7 +556,7 @@ window.APP_CFG = (function () {
       poNo: 'PO20250801012',
       planDate: '2025-08-06',
       docType: '紧急业务',
-      dispatchNo: '',
+      logisticsNo: 'WL202608100002',
       materialSummary: 'RM-LI2CO3 电池级碳酸锂 / 原料',
       lines: [
         {
@@ -585,7 +587,7 @@ window.APP_CFG = (function () {
       refNo: '成品仓 B02',
       planDate: '2025-08-05',
       docType: '货物移库',
-      dispatchNo: '',
+      logisticsNo: '',
       materialSummary: '库内移库 · 原料→成品',
       fromWh: 'CK001',
       fromLoc: 'KW001',
@@ -601,7 +603,7 @@ window.APP_CFG = (function () {
       refNo: '线边仓 X01',
       planDate: '2025-08-06',
       docType: '物料转序',
-      dispatchNo: '',
+      logisticsNo: '',
       materialSummary: '库内转序 · 清洗→包装',
       fromWh: 'CK001',
       fromLoc: 'KW002',
@@ -622,7 +624,7 @@ window.APP_CFG = (function () {
       planDate: '2025-08-05 09:10',
       planStart: '2025-08-05 09:10',
       docType: '库存全盘',
-      dispatchNo: '',
+      logisticsNo: '',
       materialSummary: '原料仓全盘',
       remark: '月度盘点',
       creator: '张三',
@@ -641,7 +643,7 @@ window.APP_CFG = (function () {
       planDate: '2025-08-06 08:00',
       planStart: '2025-08-06 08:00',
       docType: '库存抽盘',
-      dispatchNo: '',
+      logisticsNo: '',
       materialSummary: '成品仓抽盘',
       remark: '抽盘作业',
       creator: '李四',
@@ -787,9 +789,10 @@ window.APP_CFG = (function () {
 
   const waybills = [
     {
-      id: 'YD202508060001',
+      // 与 PC lg-waybill「运单号」YD2026080101 同源联动
+      id: 'YD2026080101',
       status: '待发运',
-      dispatchNo: 'PC20250801001',
+      dispatchNo: 'PC001',
       shipMode: '陆运',
       driver: '张司',
       plate: '川A12345',
@@ -860,9 +863,10 @@ window.APP_CFG = (function () {
       enroute: { location: '成渝高速 K128', remark: '正常行驶', updatedAt: '2025-08-07 12:00' },
     },
     {
-      id: 'YD202508060002',
+      // 与 PC lg-waybill「运单号」YD2026080201 同源联动
+      id: 'YD2026080201',
       status: '发运中',
-      dispatchNo: 'PC20250801005',
+      dispatchNo: 'PC002',
       shipMode: '陆运',
       driver: '王司',
       plate: '川B67890',

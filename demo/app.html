@@ -31,6 +31,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .mode-switch a{padding:6px 14px;font-size:13px;text-decoration:none;color:var(--color-text-normal);background:#fff}
 .mode-switch a:hover{color:var(--color-primary)}
 .mode-switch a.on{background:var(--color-primary);color:#fff}
+.sync-chip{margin-left:8px;height:30px;padding:0 10px;border:1px solid #C5D4EB;border-radius:4px;background:#EEF2F8;color:#1A4099;font-size:12px;cursor:pointer}
+.sync-chip:hover{background:#DCE6F5}
 .back-overview{
   display:inline-flex;align-items:center;padding:6px 12px;font-size:13px;line-height:1.2;
   border:1px solid var(--color-border);border-radius:4px;background:#fff;
@@ -59,6 +61,9 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .m-tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#8C8C8C;cursor:pointer;border:none;background:transparent;gap:2px}
 .m-tabbar__item.on{color:var(--color-primary);font-weight:500}
 .m-tabbar__icon{font-size:18px;line-height:1}
+.msg-sub-tab{flex:1;text-align:center;font-size:13px;font-weight:600;color:#8C8C8C;cursor:pointer}
+.msg-sub-tab.on{color:var(--color-primary)}
+.msg-unread-dot{color:#FA8C16;font-weight:800;margin-left:6px;font-size:12px}
 
 .m-search{margin-bottom:12px}
 .m-search input{width:100%;height:36px;border:1px solid #D9D9D9;border-radius:18px;padding:0 14px;font-size:13px;outline:none;background:#fff}
@@ -121,9 +126,23 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .scan-table{width:100%;border-collapse:collapse;font-size:12px}
 .scan-table th,.scan-table td{padding:8px 6px;border-bottom:1px solid #f0f0f0;text-align:left;white-space:nowrap}
 .scan-table th{color:#8C8C8C;font-weight:500;background:#FAFAFA}
-.scan-table tr{cursor:pointer}
-.scan-table tr:active td{background:#EEF2F8}
+.scan-table tr{cursor:default}
+.scan-link{color:#1A4099;cursor:pointer;text-decoration:none;font-weight:500}
+.scan-link:active{opacity:.7}
 .table-scroll{overflow-x:auto;margin:0 -4px}
+/* 扫码明细：左滑露出删除（防误触） */
+.scan-list{background:#fff}
+.scan-list__head{display:flex;gap:8px;padding:8px 12px;font-size:12px;color:#8C8C8C;background:#FAFAFA;border-bottom:1px solid #f0f0f0;white-space:nowrap;overflow-x:auto}
+.scan-list__head span{flex:0 0 auto;min-width:52px}
+.scan-list__head span.w-code{min-width:72px}
+.scan-swipe{overflow:hidden;border-bottom:1px solid #f0f0f0;touch-action:pan-y}
+.scan-swipe__track{display:flex;width:100%;will-change:transform;transition:transform .2s ease;cursor:grab}
+.scan-swipe__track:active{cursor:grabbing}
+.scan-swipe__main{flex:0 0 100%;width:100%;display:flex;gap:8px;align-items:center;padding:10px 12px;font-size:12px;background:#fff;box-sizing:border-box;white-space:nowrap;overflow-x:auto;min-height:44px}
+.scan-swipe__main > span{flex:0 0 auto;min-width:52px}
+.scan-swipe__main > span.w-code{min-width:72px}
+.scan-swipe__del{flex:0 0 72px;width:72px;border:none;background:#FF4D4F;color:#fff;font-size:14px;font-weight:500;cursor:pointer}
+.scan-swipe__hint{margin:6px 12px 10px;font-size:11px;color:#BFBFBF}
 
 .process-tabs{display:flex;gap:8px;margin-bottom:4px}
 .process-tabs button{flex:1;height:36px;border:1px solid #D9D9D9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;color:var(--color-text-normal)}
@@ -180,12 +199,13 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
       <header class="app-header">
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
-          <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
+          <div class="demo-scope-tip">PC/APP 同源联动：提货·签收·在途·入库提交会写入 localStorage，另一端实时刷新（建议本地 http 打开双页）</div>
           <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
             <a href="./app.html" class="on">APP</a>
           </div>
+          <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">联动·重置</button>
         </div>
       </header>
 
@@ -246,7 +266,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                     </div>
                     <div class="doc-grid" v-else-if="isLoadFlow">
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
-                      <div><span class="doc-label">计划执行</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <div class="full"><span class="doc-label">装卸区域</span>{{ n.loadArea || n.partner }}</div>
                       <div class="full"><span class="doc-label">计划件数/数量</span>{{ n.planPcs }}件 / {{ n.planQty }} {{ n.planUnit || '' }}</div>
@@ -269,11 +289,11 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                     </div>
                     <div class="doc-grid" v-else>
                       <div><span class="doc-label">{{ flowMeta.partnerLabel || '往来单位' }}</span>{{ n.partner || n.supplier }}</div>
-                      <div><span class="doc-label">计划日期</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ n.refNo || n.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
-                      <div class="full"><span class="doc-label">物料</span>{{ n.materialSummary }}</div>
-                      <div v-if="n.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ n.dispatchNo }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
+                      <div v-if="n.logisticsNo || n.dispatchNo" class="full"><span class="doc-label">关联物流订单</span>{{ n.logisticsNo || n.dispatchNo }}</div>
                     </div>
                   </div>
                   <div class="line-stats" v-if="flowMode==='stocktake'" style="margin:0 12px 12px;border-top:1px solid #F0F0F0;padding-top:10px">
@@ -305,7 +325,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   <div class="doc-card__bd">
                     <div class="doc-grid" v-if="isLoadFlow">
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
-                      <div><span class="doc-label">计划执行</span>{{ currentNotice.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div v-if="currentNotice.loadArea" class="full"><span class="doc-label">装卸区域</span>{{ currentNotice.loadArea }}</div>
                       <div v-if="currentNotice.remark" class="full"><span class="doc-label">备注</span>{{ currentNotice.remark }}</div>
                     </div>
@@ -314,7 +334,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                       <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
-                      <div v-if="currentNotice.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ currentNotice.dispatchNo }}</div>
+                      <div v-if="currentNotice.materialSummary" class="full"><span class="doc-label">物料信息</span>{{ currentNotice.materialSummary }}</div>
+                      <div v-if="currentNotice.logisticsNo || currentNotice.dispatchNo" class="full"><span class="doc-label">关联物流订单</span>{{ currentNotice.logisticsNo || currentNotice.dispatchNo }}</div>
                     </div>
                   </div>
                 </div>
@@ -388,17 +409,32 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="sec__title" style="padding:12px 16px 8px">条码信息</div>
-                    <div class="table-scroll">
-                      <table class="scan-table">
-                        <thead><tr><th>状态</th><th>条码号</th><th>包材编号</th><th>物料名称</th><th>库位</th><th>应盘</th><th>实盘</th></tr></thead>
-                        <tbody>
-                          <tr v-for="(r,i) in stockRows" :key="i" :style="r.abnormal ? 'color:#FF4D4F' : ''">
-                            <td>{{ r.status }}</td><td>{{ r.barcode }}</td><td>{{ r.pkgNo }}</td><td>{{ r.name }}</td><td>{{ r.loc }}</td>
-                            <td>{{ r.planQty }}</td>
-                            <td><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" /></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div class="scan-list">
+                      <div class="scan-list__head">
+                        <span>状态</span><span class="w-code">条码号</span><span>包材编号</span><span>物料名称</span><span>库位</span><span>应盘</span><span>实盘</span>
+                      </div>
+                      <div
+                        class="scan-swipe"
+                        v-for="(r,i) in stockRows" :key="'stock-'+i"
+                        @pointerdown="onSwipeStart($event,'stock',i)"
+                        @pointermove="onSwipeMove($event)"
+                        @pointerup="onSwipeEnd($event)"
+                        @pointercancel="onSwipeEnd($event)"
+                      >
+                        <div class="scan-swipe__track" :style="swipeTrackStyle('stock', i)">
+                          <div class="scan-swipe__main" :style="r.abnormal ? 'color:#FF4D4F' : ''">
+                            <span>{{ r.status }}</span>
+                            <span class="w-code">{{ r.barcode }}</span>
+                            <span>{{ r.pkgNo }}</span>
+                            <span>{{ r.name }}</span>
+                            <span>{{ r.loc }}</span>
+                            <span>{{ r.planQty }}</span>
+                            <span><input v-model.number="r.actualQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onStockQtyChange(r)" @pointerdown.stop /></span>
+                          </div>
+                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('stock', i)">删除</button>
+                        </div>
+                      </div>
+                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                     </div>
                   </div>
                   <div class="sec">
@@ -428,16 +464,32 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
                   <div class="sec" style="padding:0;overflow:hidden">
-                    <div class="table-scroll">
-                      <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>包材编号</th><th>数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th>外包材编号</th></tr></thead>
-                        <tbody>
-                          <tr v-for="(r,i) in scanRows" :key="i" :style="{ color: r.done ? '#52C41A' : '#262626' }" @click="openProcess(r)">
-                            <td style="color:#1A4099">{{ r.barcode }}</td>
-                            <td>{{ r.pkgNo }}</td><td>{{ r.qty }}</td><td>{{ r.fromLoc }}</td><td>{{ r.lot }}</td><td>{{ r.process }}</td><td>{{ r.outer }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div class="scan-list">
+                      <div class="scan-list__head">
+                        <span class="w-code">条码号</span><span>包材编号</span><span>数量</span><span>原位置</span><span>批号</span><span>当前工序</span><span>外包材编号</span>
+                      </div>
+                      <div
+                        class="scan-swipe"
+                        v-for="(r,i) in scanRows" :key="'pick-'+i"
+                        @pointerdown="onSwipeStart($event,'scan',i)"
+                        @pointermove="onSwipeMove($event)"
+                        @pointerup="onSwipeEnd($event)"
+                        @pointercancel="onSwipeEnd($event)"
+                      >
+                        <div class="scan-swipe__track" :style="swipeTrackStyle('scan', i)">
+                          <div class="scan-swipe__main" :style="{ color: r.done ? '#52C41A' : '#262626' }">
+                            <span class="w-code"><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></span>
+                            <span><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></span>
+                            <span>{{ r.qty }}</span>
+                            <span>{{ r.fromLoc }}</span>
+                            <span>{{ r.lot }}</span>
+                            <span>{{ r.process }}</span>
+                            <span>{{ r.outer }}</span>
+                          </div>
+                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('scan', i)">删除</button>
+                        </div>
+                      </div>
+                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                     </div>
                   </div>
                 </template>
@@ -454,15 +506,34 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                   <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
                   <div class="sec" style="padding:0;overflow:hidden">
-                    <div class="table-scroll">
-                      <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>库位</th><th>工序</th><th>外包材</th></tr></thead>
-                        <tbody>
-                          <tr v-for="(r,i) in scanRows" :key="i" @click="flowMeta.hasProcess && openProcess(r)">
-                            <td>{{ r.barcode }}</td><td>{{ r.qty }}</td><td>{{ r.lot }}</td><td>{{ r.loc }}</td><td>{{ r.process }}</td><td>{{ r.outer }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div class="scan-list">
+                      <div class="scan-list__head">
+                        <span class="w-code">条码号</span><span>数量</span><span>批号</span><span>库位</span><span>工序</span><span>外包材</span>
+                      </div>
+                      <div
+                        class="scan-swipe"
+                        v-for="(r,i) in scanRows" :key="'serial-'+i"
+                        @pointerdown="onSwipeStart($event,'scan',i)"
+                        @pointermove="onSwipeMove($event)"
+                        @pointerup="onSwipeEnd($event)"
+                        @pointercancel="onSwipeEnd($event)"
+                      >
+                        <div class="scan-swipe__track" :style="swipeTrackStyle('scan', i)">
+                          <div class="scan-swipe__main">
+                            <span class="w-code">
+                              <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
+                              <span v-else>{{ r.barcode }}</span>
+                            </span>
+                            <span>{{ r.qty }}</span>
+                            <span>{{ r.lot }}</span>
+                            <span>{{ r.loc }}</span>
+                            <span>{{ r.process }}</span>
+                            <span>{{ r.outer }}</span>
+                          </div>
+                          <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('scan', i)">删除</button>
+                        </div>
+                      </div>
+                      <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                     </div>
                   </div>
                 </template>
@@ -544,15 +615,37 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="table-scroll">
-                    <table class="scan-table">
-                      <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th></tr></thead>
-                      <tbody>
-                        <tr v-for="(r,i) in tankRows" :key="i" @click="flowMeta.hasProcess && openProcess(r)">
-                          <td>{{ r.barcode }}</td><td>{{ r.tankNo }}</td><td>{{ r.loc }}</td><td>{{ r.beforeQty }}</td><td>{{ r.beforeLot }}</td><td>{{ r.afterQty }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="scan-list">
+                    <div class="scan-list__head">
+                      <span class="w-code">条码</span><span>储罐编号</span><span>库存位置</span><span>收料前量</span><span>收料前批号</span><span>收料后量</span>
+                    </div>
+                    <div
+                      class="scan-swipe"
+                      v-for="(r,i) in tankRows" :key="'tank-'+i"
+                      @pointerdown="onSwipeStart($event,'tank',i)"
+                      @pointermove="onSwipeMove($event)"
+                      @pointerup="onSwipeEnd($event)"
+                      @pointercancel="onSwipeEnd($event)"
+                    >
+                      <div class="scan-swipe__track" :style="swipeTrackStyle('tank', i)">
+                        <div class="scan-swipe__main">
+                          <span class="w-code">
+                            <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
+                            <span v-else>{{ r.barcode }}</span>
+                          </span>
+                          <span>
+                            <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a>
+                            <span v-else>{{ r.tankNo }}</span>
+                          </span>
+                          <span>{{ r.loc }}</span>
+                          <span>{{ r.beforeQty }}</span>
+                          <span>{{ r.beforeLot }}</span>
+                          <span>{{ r.afterQty }}</span>
+                        </div>
+                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('tank', i)">删除</button>
+                      </div>
+                    </div>
+                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                   </div>
                 </div>
                 <div class="sec" v-if="flowMeta.hasProcess">
@@ -694,15 +787,29 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ innerRows.length }}</span><span>扫码数量：{{ innerQtySum }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="table-scroll">
-                    <table class="scan-table">
-                      <thead><tr><th>条码号</th><th>包材编号</th><th>物料编码</th><th>数量</th></tr></thead>
-                      <tbody>
-                        <tr v-for="(r,i) in innerRows" :key="i">
-                          <td>{{ r.barcode }}</td><td>{{ r.pkgNo }}</td><td>{{ r.code }}</td><td>{{ r.qty }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="scan-list">
+                    <div class="scan-list__head">
+                      <span class="w-code">条码号</span><span>包材编号</span><span>物料编码</span><span>数量</span>
+                    </div>
+                    <div
+                      class="scan-swipe"
+                      v-for="(r,i) in innerRows" :key="'inner-'+i"
+                      @pointerdown="onSwipeStart($event,'inner',i)"
+                      @pointermove="onSwipeMove($event)"
+                      @pointerup="onSwipeEnd($event)"
+                      @pointercancel="onSwipeEnd($event)"
+                    >
+                      <div class="scan-swipe__track" :style="swipeTrackStyle('inner', i)">
+                        <div class="scan-swipe__main">
+                          <span class="w-code">{{ r.barcode }}</span>
+                          <span>{{ r.pkgNo }}</span>
+                          <span>{{ r.code }}</span>
+                          <span>{{ r.qty }}</span>
+                        </div>
+                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('inner', i)">删除</button>
+                      </div>
+                    </div>
+                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                   </div>
                 </div>
                 <div class="sec">
@@ -907,18 +1014,29 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ pkgRows.length }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="table-scroll">
-                    <table class="scan-table">
-                      <thead><tr><th>条码号</th><th>包材编号</th><th>批号</th><th>当前工序</th></tr></thead>
-                      <tbody>
-                        <tr v-for="(r,i) in pkgRows" :key="i" @click="openProcess(r)">
-                          <td style="color:#1A4099">{{ r.barcode }}</td>
-                          <td>{{ r.pkgNo }}</td>
-                          <td>{{ r.lot }}</td>
-                          <td>{{ r.process }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="scan-list">
+                    <div class="scan-list__head">
+                      <span class="w-code">条码号</span><span>包材编号</span><span>批号</span><span>当前工序</span>
+                    </div>
+                    <div
+                      class="scan-swipe"
+                      v-for="(r,i) in pkgRows" :key="'pkg-'+i"
+                      @pointerdown="onSwipeStart($event,'pkg',i)"
+                      @pointermove="onSwipeMove($event)"
+                      @pointerup="onSwipeEnd($event)"
+                      @pointercancel="onSwipeEnd($event)"
+                    >
+                      <div class="scan-swipe__track" :style="swipeTrackStyle('pkg', i)">
+                        <div class="scan-swipe__main">
+                          <span class="w-code"><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></span>
+                          <span><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></span>
+                          <span>{{ r.lot }}</span>
+                          <span>{{ r.process }}</span>
+                        </div>
+                        <button type="button" class="scan-swipe__del" @click.stop="removeScanRow('pkg', i)">删除</button>
+                      </div>
+                    </div>
+                    <div class="scan-swipe__hint">← 左滑行可删除（防误触）</div>
                   </div>
                 </div>
                 <div class="sec" v-if="flowMeta.hasProcess">
@@ -1018,26 +1136,16 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                 </div>
                 <div class="sec">
-                  <div class="sec__title">工序（可批量执行）</div>
-                  <div class="process-tabs">
-                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
-                  </div>
-                  <div class="table-scroll" style="margin-top:8px">
-                    <table class="scan-table">
-                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
-                      <tbody>
-                        <tr v-for="p in (wayPoint.procs||[])" :key="p.name" @click="goWayProc(p)">
-                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="sec">
                   <div class="sec__title">现场照片</div>
                   <div style="display:flex;gap:8px">
                     <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
                     <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序</div>
+                  <div class="process-tabs">
+                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
                   </div>
                 </div>
               </div>
@@ -1087,26 +1195,16 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   <div class="field"><label>电子签名</label><div class="upload-box" style="height:64px" @click="toast('手写签名区')">手写区</div></div>
                 </div>
                 <div class="sec">
-                  <div class="sec__title">工序（可批量执行）</div>
-                  <div class="process-tabs">
-                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
-                  </div>
-                  <div class="table-scroll" style="margin-top:8px">
-                    <table class="scan-table">
-                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
-                      <tbody>
-                        <tr v-for="p in (wayPoint.procs||[])" :key="p.name" @click="goWayProc(p)">
-                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="sec">
                   <div class="sec__title">现场照片</div>
                   <div style="display:flex;gap:8px">
                     <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
                     <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序</div>
+                  <div class="process-tabs">
+                    <button v-for="p in (wayPoint.procs||[])" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
                   </div>
                 </div>
               </div>
@@ -1144,26 +1242,16 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   <div class="field"><label>备注</label><input v-model="enrouteForm.remark" /></div>
                 </div>
                 <div class="sec">
-                  <div class="sec__title">工序（可批量执行）</div>
-                  <div class="process-tabs">
-                    <button v-for="p in enrouteProcs" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
-                  </div>
-                  <div class="table-scroll" style="margin-top:8px">
-                    <table class="scan-table">
-                      <thead><tr><th>工序名称</th><th>工序状态</th><th>操作人</th><th>操作时间</th></tr></thead>
-                      <tbody>
-                        <tr v-for="p in enrouteProcs" :key="p.name" @click="goWayProc(p)">
-                          <td>{{ p.name }}</td><td>{{ p.status }}</td><td>{{ p.user }}</td><td>{{ p.time }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="sec">
                   <div class="sec__title">沿途照片</div>
                   <div style="display:flex;gap:8px">
                     <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
                     <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">工序</div>
+                  <div class="process-tabs">
+                    <button v-for="p in enrouteProcs" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
                   </div>
                 </div>
               </div>
@@ -1282,6 +1370,264 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               </div>
             </template>
 
+            <!-- ===== 消息中心 ===== -->
+            <template v-else-if="view==='msg'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">←</button>
+                <div class="m-nav__title">消息</div>
+              </div>
+              <div class="m-scroll">
+                <div style="display:flex;gap:12px;margin-bottom:12px">
+                  <div class="msg-sub-tab" :class="{ on: msgSubTab==='myMsg' }" @click="msgSubTab='myMsg'">
+                    我的消息
+                    <span v-if="msgUnreadCount>0" class="msg-unread-dot">🔴{{ msgUnreadCount }}</span>
+                  </div>
+                  <div class="msg-sub-tab" :class="{ on: msgSubTab==='myAudit' }" @click="msgSubTab='myAudit'">
+                    我的审核
+                    <span v-if="auditPendingCount>0" class="msg-unread-dot">🔴{{ auditPendingCount }}</span>
+                  </div>
+                  <div class="msg-sub-tab" :class="{ on: msgSubTab==='myInitiate' }" @click="msgSubTab='myInitiate'">
+                    我的发起
+                    <span v-if="initiatePendingCount>0" class="msg-unread-dot">🔴{{ initiatePendingCount }}</span>
+                  </div>
+                </div>
+
+                <!-- 我的消息 -->
+                <div v-if="msgSubTab==='myMsg'">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 12px">
+                    <div class="mode-switch" style="min-width:240px">
+                      <a href="#" @click.prevent="msgReadSeg='unread'" :class="{ on: msgReadSeg==='unread' }">未读</a>
+                      <a href="#" @click.prevent="msgReadSeg='read'" :class="{ on: msgReadSeg==='read' }">已读</a>
+                    </div>
+                    <button
+                      class="btn-sm"
+                      style="height:32px;background:#fff;color:#1A4099;border:1px solid #C5D4EB;flex:0 0 auto"
+                      v-if="msgReadSeg==='unread' && msgUnreadCount>0"
+                      @click="markAllMessagesRead"
+                    >
+                      全部已读
+                    </button>
+                  </div>
+
+                  <div v-if="msgList.length">
+                    <div v-for="m in msgList" :key="m.id" class="doc-card" style="margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+                      <div style="padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                        <div style="font-size:15px;font-weight:700;color:var(--color-text-main);line-height:1.3">
+                          {{ m.name }}
+                        </div>
+                        <div>
+                          <span class="tag" :class="m.status==='未读' ? 'tag-b' : 'tag-gr'">{{ m.status }}</span>
+                        </div>
+                      </div>
+                      <div class="doc-card__bd" style="padding:0 12px 12px">
+                        <div class="doc-grid" style="grid-template-columns:1fr 1fr">
+                          <div><span class="doc-label">消息类型</span>{{ m.type }}</div>
+                          <div><span class="doc-label">来源单号</span>{{ m.sourceNo }}</div>
+                          <div class="full" style="grid-column:1/-1">
+                            <span class="doc-label">消息内容</span>
+                            <div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
+                              {{ m.content }}
+                            </div>
+                          </div>
+                          <div><span class="doc-label">通知方式</span>{{ m.channel }}</div>
+                          <div><span class="doc-label">发起人</span>{{ m.sender }}</div>
+                          <div class="full" style="grid-column:1/-1">
+                            <span class="doc-label">发起时间</span>{{ m.created_time }}
+                          </div>
+                        </div>
+                        <div class="m-footer" style="padding-top:12px" v-if="m.status==='未读'">
+                          <button class="btn-primary" style="height:44px" @click="markMessageRead(m)">已读</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="empty" style="padding:32px 16px;text-align:center">
+                    {{ msgReadSeg==='unread' ? '暂无未读消息' : '暂无已读消息' }}
+                  </div>
+                </div>
+
+                <!-- 我的审核 -->
+                <div v-else-if="msgSubTab==='myAudit'">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 12px">
+                    <div class="mode-switch" style="min-width:240px">
+                      <a href="#" @click.prevent="auditSeg='pending'" :class="{ on: auditSeg==='pending' }">待审核</a>
+                      <a href="#" @click.prevent="auditSeg='record'" :class="{ on: auditSeg==='record' }">审核记录</a>
+                    </div>
+                  </div>
+
+                  <div v-if="auditList.length">
+                    <div
+                      v-for="a in auditList"
+                      :key="a.id"
+                      class="doc-card"
+                      style="margin-bottom:12px;cursor:pointer"
+                      @click="toast('进入审核详情（Demo）')"
+                    >
+                      <div style="padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                        <div style="font-size:15px;font-weight:700;color:var(--color-text-main);line-height:1.3">
+                          {{ a.name }}
+                        </div>
+                        <div>
+                          <span class="tag" :class="a.tag==='正常' ? 'tag-gr' : (a.tag==='超时未审' ? 'tag-o' : 'tag-b')">{{ a.tag }}</span>
+                        </div>
+                      </div>
+                      <div class="doc-card__bd" style="padding:0 12px 12px">
+                        <div class="doc-grid" style="grid-template-columns:1fr 1fr">
+                          <div><span class="doc-label">审核类型</span>{{ a.auditType }}</div>
+                          <div><span class="doc-label">来源单号</span>{{ a.sourceNo }}</div>
+                          <div><span class="doc-label">审核单号</span>{{ a.auditNo }}</div>
+                          <div><span class="doc-label">发起人</span>{{ a.sender }}</div>
+                          <div class="full" style="grid-column:1/-1">
+                            <span class="doc-label">发起时间</span>{{ a.created_time }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="empty" style="padding:32px 16px;text-align:center">
+                    {{ auditSeg==='pending' ? '暂无待审核任务' : '暂无审核记录' }}
+                  </div>
+                </div>
+
+                <!-- 我的发起 -->
+                <div v-else-if="msgSubTab==='myInitiate'">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 12px">
+                    <div class="mode-switch" style="min-width:240px">
+                      <a href="#" @click.prevent="initiateSeg='processing'" :class="{ on: initiateSeg==='processing' }">处理中</a>
+                      <a href="#" @click.prevent="initiateSeg='done'" :class="{ on: initiateSeg==='done' }">已处理</a>
+                    </div>
+                  </div>
+
+                  <div v-if="initiateList.length">
+                    <div
+                      v-for="i in initiateList"
+                      :key="i.id"
+                      class="doc-card"
+                      style="margin-bottom:12px;cursor:pointer"
+                      @click="toast('进入申请详情（Demo）')"
+                    >
+                      <div style="padding:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                        <div style="font-size:15px;font-weight:700;color:var(--color-text-main);line-height:1.3">
+                          {{ i.name }}
+                        </div>
+                        <div>
+                          <span class="tag" :class="i.tag==='正常' ? 'tag-gr' : (i.tag==='流程中断' ? 'tag-o' : 'tag-b')">{{ i.tag }}</span>
+                        </div>
+                      </div>
+                      <div class="doc-card__bd" style="padding:0 12px 12px">
+                        <div class="doc-grid" style="grid-template-columns:1fr 1fr">
+                          <div><span class="doc-label">审核类型</span>{{ i.auditType }}</div>
+                          <div><span class="doc-label">来源单号</span>{{ i.sourceNo }}</div>
+                          <div><span class="doc-label">审核单号</span>{{ i.auditNo }}</div>
+                          <div><span class="doc-label">发起人</span>{{ i.sender }}</div>
+                          <div class="full" style="grid-column:1/-1">
+                            <span class="doc-label">发起时间</span>{{ i.created_time }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="empty" style="padding:32px 16px;text-align:center">
+                    {{ initiateSeg==='processing' ? '暂无处理中发起' : '暂无已处理记录' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="m-tabbar">
+                <button class="m-tabbar__item" @click="goHome"><span class="m-tabbar__icon">🏠</span>首页</button>
+                <button class="m-tabbar__item on"><span class="m-tabbar__icon">💬</span>消息</button>
+                <button class="m-tabbar__item" @click="openStub('我的')"><span class="m-tabbar__icon">👤</span>我的</button>
+              </div>
+            </template>
+
+            <!-- ===== 个人中心与设置 ===== -->
+            <template v-else-if="view==='mine'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="goHome">←</button>
+                <div class="m-nav__title">我的</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title" style="margin-bottom:8px">用户</div>
+                  <div style="display:flex;gap:12px;align-items:center">
+                    <div style="width:46px;height:46px;border-radius:50%;background:#EEF2F8;display:flex;align-items:center;justify-content:center;font-size:18px">👤</div>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:16px;font-weight:700;color:var(--color-text-main);line-height:1.3">{{ mineUser.name }}</div>
+                      <div style="margin-top:6px;font-size:13px;color:var(--color-text-normal)">账号：{{ mineUser.username }}</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px">
+                    <div class="field" style="margin-bottom:10px">
+                      <label>组织</label>
+                      <div style="display:flex;gap:10px;align-items:center">
+                        <div style="flex:1;font-size:14px;line-height:1.2;padding:10px 0;color:var(--color-text-normal)">{{ mineUser.org }}</div>
+                        <button class="btn-sm" style="height:32px;width:92px;background:#fff;color:#1A4099;border:1px solid #C5D4EB" @click="toast('组织切换（Demo）')">切换 &gt;</button>
+                      </div>
+                    </div>
+                    <div class="field" style="margin-bottom:0">
+                      <label>修改密码</label>
+                      <button class="btn-sm" style="height:36px;width:100%;background:#fff;color:#1A4099;border:1px solid #C5D4EB" @click="toast('进入修改密码（Demo）')">修改密码 &gt;</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sec">
+                  <div class="sec__title" style="margin-bottom:8px">系统信息</div>
+
+                  <div class="field" style="margin-bottom:10px">
+                    <label>横幅提示</label>
+                    <select v-model="minePrefs.bannerTip" style="height:36px">
+                      <option :value="true">开启（默认）</option>
+                      <option :value="false">关闭</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin-bottom:10px">
+                    <label>消息提示音</label>
+                    <select v-model="minePrefs.messageSound" style="height:36px">
+                      <option :value="true">开启</option>
+                      <option :value="false">关闭</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin-bottom:10px">
+                    <label>扫码提示音</label>
+                    <select v-model="minePrefs.scanSound" style="height:36px">
+                      <option :value="true">语音提醒</option>
+                      <option :value="false">关闭</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin-bottom:10px">
+                    <label>切换语言</label>
+                    <select v-model="minePrefs.language" style="height:36px">
+                      <option value="中文">中文</option>
+                      <option value="English">English</option>
+                    </select>
+                  </div>
+
+                  <div class="field" style="margin-bottom:10px">
+                    <label>版本号</label>
+                    <button class="btn-sm" style="height:36px;width:100%;background:#fff;color:#1A4099;border:1px solid #C5D4EB" @click="checkUpdate">
+                      {{ minePrefs.version }} （点击可在线升级） &gt;
+                    </button>
+                  </div>
+
+                  <div class="field" style="margin-bottom:0">
+                    <label>PC地址</label>
+                    <input v-model="minePrefs.pcAddress" readonly />
+                  </div>
+                </div>
+
+                <div style="margin-top:16px">
+                  <button class="btn-primary" @click="logoutConfirm">退出登录</button>
+                </div>
+              </div>
+
+              <div class="m-tabbar">
+                <button class="m-tabbar__item" @click="goHome"><span class="m-tabbar__icon">🏠</span>首页</button>
+                <button class="m-tabbar__item" @click="openStub('消息')"><span class="m-tabbar__icon">💬</span>消息</button>
+                <button class="m-tabbar__item on"><span class="m-tabbar__icon">👤</span>我的</button>
+              </div>
+            </template>
+
             <!-- ===== 占位（非仓储） ===== -->
             <template v-else-if="view==='stub'">
               <div class="m-nav">
@@ -1305,10 +1651,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
+<script src="./js/demo-store.js"></script>
 <script src="./js/app-configs.js"></script>
 <script>
-const { createApp, ref, computed, reactive } = Vue;
+const { createApp, ref, computed, reactive, onMounted, onBeforeUnmount } = Vue;
 const CFG = window.APP_CFG;
+const STORE = window.WMS_DEMO_STORE;
 
 createApp({
   setup() {
@@ -1321,9 +1669,180 @@ createApp({
     const docKw = ref('');
     const currentNotice = ref(CFG.notices[0]);
     const currentLine = ref(CFG.notices[0].lines[0]);
+    const storeTick = ref(0);
+    function bumpStore() { storeTick.value += 1; }
+    function hydrateAllDocs() {
+      if (!STORE || !CFG.docsMap) return;
+      Object.keys(CFG.docsMap).forEach((k) => STORE.hydrateAppDocs(CFG.docsMap[k] || []));
+      if (currentNotice.value && currentNotice.value.id) {
+        STORE.overlayAppDoc(currentNotice.value);
+      }
+      bumpStore();
+    }
+    function syncDocToStore(docId, status, extra) {
+      if (!STORE || !docId) return;
+      STORE.setDocStatus(docId, status, Object.assign({ source: 'APP' }, extra || {}));
+      STORE.appendFlow({
+        docId: docId,
+        type: (extra && extra.action) || '单据更新',
+        source: 'APP',
+        summary: `${docId} → ${status}`,
+      });
+      bumpStore();
+    }
+    function resetDemoStore() {
+      if (!STORE) return;
+      ElementPlus.ElMessageBox.confirm('确认清空 PC/APP 联动缓存？两侧状态将恢复为初始 Mock。', '重置联动数据', {
+        confirmButtonText: '确认重置', cancelButtonText: '取消', type: 'warning',
+      }).then(() => {
+        STORE.reset();
+        location.reload();
+      }).catch(() => {});
+    }
     const processTab = ref('包装检查');
     const processRef = ref('');
     const stubTitle = ref('');
+    // ===== 消息中心：3 个 Tab =====
+    const msgSubTab = ref('myMsg'); // myMsg | myAudit | myInitiate
+    const msgReadSeg = ref('unread'); // unread | read
+    const auditSeg = ref('pending'); // pending | record
+    const initiateSeg = ref('processing'); // processing | done
+
+    // Demo mock data（PRD 字段对齐：sys_message / sys_workflow_task / sys_workflow_instance）
+    const myMessages = ref([
+      {
+        id: 'MSG-10001',
+        name: '系统公告：APP Demo 更新',
+        type: '系统公告',
+        content: '本批次 APP Demo 增加“消息中心/个人中心”页面，已读记录将归档保留近 3 个月。',
+        sourceNo: 'WMS-APP-UPDATE',
+        channel: 'APP 站内信',
+        sender: '管理员',
+        created_time: '2026-08-11 09:30',
+        status: '未读',
+      },
+      {
+        id: 'MSG-10002',
+        name: '审批提醒：派车申请待处理',
+        type: '审批通知',
+        content: '你有 1 条派车申请正在等待审批，请尽快处理以避免超时。',
+        sourceNo: 'PAICHE-20260811',
+        channel: '极光推送',
+        sender: '流程引擎',
+        created_time: '2026-08-11 10:02',
+        status: '已读',
+      },
+      {
+        id: 'MSG-10003',
+        name: '业务提醒：发货单已完成',
+        type: '业务提醒',
+        content: '发货单已完成并同步至下游环节。',
+        sourceNo: 'FAHUODAN-20260801',
+        channel: '邮件',
+        sender: '物流系统',
+        created_time: '2026-07-25 14:40',
+        status: '已读',
+      },
+    ]);
+
+    const myAuditTasks = ref([
+      {
+        id: 'TASK-20001',
+        name: '派车审批',
+        auditType: '派车审批',
+        sourceNo: 'PAICHE-20260811',
+        auditNo: 'WF-CH1-8881',
+        sender: '张三',
+        created_time: '2026-08-11 10:20',
+        tab: 'pending',
+        slaExpired: false,
+      },
+      {
+        id: 'TASK-20002',
+        name: '领料审批',
+        auditType: '领料审批',
+        sourceNo: 'LINGLIAO-20260810',
+        auditNo: 'WF-CH1-8890',
+        sender: '李四',
+        created_time: '2026-08-11 08:12',
+        tab: 'record',
+        resultTag: '已拒绝',
+      },
+      {
+        id: 'TASK-20003',
+        name: '采购审批',
+        auditType: '采购审批',
+        sourceNo: 'PO-20260725',
+        auditNo: 'WF-CH1-8801',
+        sender: '王五',
+        created_time: '2026-07-20 11:02',
+        tab: 'record',
+        resultTag: '已同意',
+      },
+      {
+        id: 'TASK-20004',
+        name: '装卸审批',
+        auditType: '装卸审批',
+        sourceNo: 'LOAD-20260722',
+        auditNo: 'WF-CH2-7711',
+        sender: '赵六',
+        created_time: '2026-07-02 16:30',
+        tab: 'record',
+        resultTag: '已拒绝',
+      },
+    ]);
+
+    const myInitiated = ref([
+      {
+        id: 'INST-30001',
+        name: '派车申请单',
+        auditType: '派车申请',
+        sourceNo: 'PAICHE-20260811',
+        auditNo: 'WF-I-90001',
+        sender: '张三',
+        created_time: '2026-08-11 09:15',
+        tab: 'processing',
+        broken: false,
+      },
+      {
+        id: 'INST-30002',
+        name: '领料申请单',
+        auditType: '领料申请',
+        sourceNo: 'LINGLIAO-20260810',
+        auditNo: 'WF-I-90002',
+        sender: '李四',
+        created_time: '2026-08-10 17:42',
+        tab: 'done',
+        tag: '已拒绝',
+      },
+      {
+        id: 'INST-30003',
+        name: '销售发货申请单',
+        auditType: '销售发货',
+        sourceNo: 'SHIP-20260730',
+        auditNo: 'WF-I-89999',
+        sender: '王五',
+        created_time: '2026-07-30 10:05',
+        tab: 'done',
+        tag: '已同意',
+      },
+    ]);
+
+    // ===== 个人中心 =====
+    const mineUser = reactive({
+      name: '张三',
+      username: 'ZJ12345',
+      org: '思特瑞集团',
+    });
+    const minePrefs = reactive({
+      bannerTip: true,
+      messageSound: true,
+      scanSound: true,
+      language: '中文',
+      version: '1.0.10',
+      pcAddress: '192.168.xx.xx',
+    });
+
     const stockExecOverride = ref('');
     const stockRows = ref([]);
     const pkgSearch = reactive({ barcode: '', pkgNo: '' });
@@ -1393,8 +1912,39 @@ createApp({
     });
     const headerHint = computed(() => {
       if (view.value === 'home') return 'APP 首页 · 仓储 / 包材 / 物流可点通';
-      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息' };
+      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', msg: '消息中心', mine: '个人中心', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息' };
       return `${flowTitle.value} · ${map[view.value] || view.value}`;
+    });
+
+    // ===== 消息中心计算属性 =====
+    const msgUnreadCount = computed(() => myMessages.value.filter(m => m.status === '未读').length);
+    const msgList = computed(() => {
+      if (msgReadSeg.value === 'unread') return myMessages.value.filter(m => m.status === '未读');
+      return myMessages.value.filter(m => m.status === '已读');
+    });
+
+    const auditPendingCount = computed(() => myAuditTasks.value.filter(t => t.tab === 'pending').length);
+    const auditList = computed(() => {
+      if (auditSeg.value === 'pending') {
+        return myAuditTasks.value
+          .filter(t => t.tab === 'pending')
+          .map(t => ({ ...t, tag: t.slaExpired ? '超时未审' : '正常' }));
+      }
+      return myAuditTasks.value
+        .filter(t => t.tab === 'record')
+        .map(t => ({ ...t, tag: t.resultTag || '已同意' }));
+    });
+
+    const initiatePendingCount = computed(() => myInitiated.value.filter(i => i.tab === 'processing').length);
+    const initiateList = computed(() => {
+      if (initiateSeg.value === 'processing') {
+        return myInitiated.value
+          .filter(i => i.tab === 'processing')
+          .map(i => ({ ...i, tag: i.broken ? '流程中断' : '正常' }));
+      }
+      return myInitiated.value
+        .filter(i => i.tab === 'done')
+        .map(i => ({ ...i, tag: i.tag || '已同意' }));
     });
 
     const filteredHome = computed(() => {
@@ -1407,12 +1957,14 @@ createApp({
     });
 
     const currentDocs = computed(() => {
+      storeTick.value;
       const key = flowMeta.value.docsKey || 'default';
       let list = (CFG.docsMap && CFG.docsMap[key]) || CFG.notices || [];
       if (flowMode.value === 'inner') {
         const want = flowMeta.value.innerType === 'xfer' ? '物料转序' : '货物移库';
         list = list.filter(n => n.docType === want);
       }
+      if (STORE) STORE.hydrateAppDocs(list);
       return list;
     });
 
@@ -1421,7 +1973,7 @@ createApp({
       const list = currentDocs.value;
       if (!kw) return list;
       return list.filter(n =>
-        [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.materialSummary, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode].join(' ').includes(kw)
+        [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode].join(' ').includes(kw)
       );
     });
 
@@ -1450,8 +2002,46 @@ createApp({
       stockExecOverride.value = '';
     }
     function openStub(title) {
+      // APP 底部 Tab：消息/我的
+      if (title === '消息') {
+        msgSubTab.value = 'myMsg';
+        msgReadSeg.value = 'unread';
+        view.value = 'msg';
+        return;
+      }
+      if (title === '我的') {
+        view.value = 'mine';
+        return;
+      }
       stubTitle.value = title;
       view.value = 'stub';
+    }
+
+    // ===== 消息中心交互 =====
+    function markMessageRead(m) {
+      m.status = '已读';
+      toast('已标记为已读');
+    }
+    function markAllMessagesRead() {
+      myMessages.value.forEach(m => {
+        if (m.status === '未读') m.status = '已读';
+      });
+      toast('已全部标记为已读');
+    }
+
+    // ===== 个人中心交互 =====
+    function checkUpdate() {
+      toast(`当前已是最新版本 (${minePrefs.version})`);
+    }
+    function logoutConfirm() {
+      ElementPlus.ElMessageBox.confirm('确定要退出当前账号登录吗？', '退出登录', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        toast('已退出登录（Demo）');
+        goHome();
+      }).catch(() => {});
     }
     function openFlow(id) {
       if (!CFG.flowMeta[id]) {
@@ -1769,8 +2359,79 @@ createApp({
     }
     function openProcess(row) {
       if (!flowMeta.value.hasProcess) return;
-      processRef.value = row.barcode || row.tankNo || currentLine.value?.code || '';
+      closeSwipe();
+      processRef.value = row.barcode || row.pkgNo || row.tankNo || currentLine.value?.code || '';
       view.value = 'process';
+    }
+    const SWIPE_DEL_W = 72;
+    const swipeOpen = ref('');
+    const swipeDrag = ref({ key: '', dx: 0, active: false });
+    let swipeState = null;
+    function swipeKey(kind, i) { return kind + '-' + i; }
+    function closeSwipe() {
+      swipeOpen.value = '';
+      swipeDrag.value = { key: '', dx: 0, active: false };
+      swipeState = null;
+    }
+    function swipeTrackStyle(kind, i) {
+      const key = swipeKey(kind, i);
+      if (swipeDrag.value.active && swipeDrag.value.key === key) {
+        return { transform: 'translateX(' + swipeDrag.value.dx + 'px)', transition: 'none' };
+      }
+      if (swipeOpen.value === key) return { transform: 'translateX(-' + SWIPE_DEL_W + 'px)' };
+      return { transform: 'translateX(0)' };
+    }
+    function onSwipeStart(e, kind, i) {
+      if (e.target && e.target.closest && e.target.closest('a,button,input,select,textarea,.scan-link')) return;
+      const key = swipeKey(kind, i);
+      const origin = swipeOpen.value === key ? -SWIPE_DEL_W : 0;
+      swipeState = {
+        key: key,
+        startX: e.clientX,
+        startY: e.clientY,
+        origin: origin,
+        dx: origin,
+        locked: null,
+      };
+      swipeDrag.value = { key: key, dx: origin, active: true };
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    }
+    function onSwipeMove(e) {
+      if (!swipeState) return;
+      const rawDx = e.clientX - swipeState.startX;
+      const rawDy = e.clientY - swipeState.startY;
+      if (swipeState.locked == null && (Math.abs(rawDx) > 8 || Math.abs(rawDy) > 8)) {
+        swipeState.locked = Math.abs(rawDx) > Math.abs(rawDy) ? 'x' : 'y';
+        if (swipeState.locked === 'y') {
+          swipeDrag.value = { key: '', dx: 0, active: false };
+          swipeState = null;
+          return;
+        }
+      }
+      if (swipeState.locked !== 'x') return;
+      let dx = swipeState.origin + rawDx;
+      dx = Math.min(0, Math.max(-SWIPE_DEL_W, dx));
+      swipeState.dx = dx;
+      swipeDrag.value = { key: swipeState.key, dx: dx, active: true };
+    }
+    function onSwipeEnd() {
+      if (!swipeState) return;
+      if (swipeState.locked === 'x') {
+        swipeOpen.value = swipeState.dx < -SWIPE_DEL_W / 2 ? swipeState.key : '';
+      }
+      swipeDrag.value = { key: '', dx: 0, active: false };
+      swipeState = null;
+    }
+    function removeScanRow(kind, index) {
+      ElementPlus.ElMessageBox.confirm('确认删除当前扫码明细？删除后将解绑档案并清除本单对应流水。', '删除确认', {
+        confirmButtonText: '确认删除', cancelButtonText: '取消', type: 'warning',
+      }).then(() => {
+        const map = { scan: scanRows, tank: tankRows, inner: innerRows, pkg: pkgRows, stock: stockRows };
+        const list = map[kind];
+        if (list && list.value) list.value.splice(index, 1);
+        closeSwipe();
+        ElementPlus.ElMessage.success('明细数据删除完成');
+      }).catch(() => { closeSwipe(); });
     }
     function openLoadProc(p, idx) {
       if (idx > 0) {
@@ -1979,6 +2640,16 @@ createApp({
       enrouteForm.place = (currentNotice.value.enroute && currentNotice.value.enroute.location) || '';
       enrouteForm.remark = (currentNotice.value.enroute && currentNotice.value.enroute.remark) || '';
       processTab.value = '位置确认';
+      if (STORE && currentNotice.value && currentNotice.value.id) {
+        const rows = STORE.getEnroute(currentNotice.value.id);
+        if (rows.length) {
+          enrouteHistory.value = rows.map((r) => ({
+            time: String(r['记录时间'] || '').slice(5, 16) || String(r['记录时间'] || ''),
+            place: r['当前位置'] || '',
+            status: r['行驶状态'] || '',
+          }));
+        }
+      }
       view.value = 'waybill-enroute';
     }
     function goWayProc(p) {
@@ -1992,7 +2663,21 @@ createApp({
       }).then(() => {
         (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
         wayPoint.value.status = '已确认';
-        ElementPlus.ElMessage.success('提货确认完成');
+        const wbId = currentNotice.value && currentNotice.value.id;
+        if (STORE && wbId) {
+          STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'pickup' });
+          const loads = currentNotice.value.loads || [];
+          const allLoaded = loads.every(p => p.status === '已确认');
+          if (allLoaded || currentNotice.value.status === '待发运') {
+            currentNotice.value.status = '发运中';
+            STORE.setDocStatus(wbId, '发运中', { source: 'APP', action: 'pickup' });
+          }
+          STORE.appendFlow({
+            docId: wbId, type: '提货确认', source: 'APP',
+            summary: `装货点 ${wayPoint.value.id || ''} 已确认提货`,
+          });
+        }
+        ElementPlus.ElMessage.success('提货确认完成（已同步 PC）');
         view.value = 'waybill-exec';
       }).catch(() => {});
     }
@@ -2003,7 +2688,23 @@ createApp({
       }).then(() => {
         (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
         wayPoint.value.status = '已确认';
-        ElementPlus.ElMessage.success('签收确认完成');
+        const wbId = currentNotice.value && currentNotice.value.id;
+        if (STORE && wbId) {
+          STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'sign', signer: signForm.signer });
+          const unloads = currentNotice.value.unloads || [];
+          const allSigned = unloads.every(p => p.status === '已确认');
+          if (allSigned) {
+            currentNotice.value.status = '已到达';
+            STORE.setDocStatus(wbId, '已到达', { source: 'APP', action: 'sign' });
+          } else {
+            STORE.setDocStatus(wbId, currentNotice.value.status || '发运中', { source: 'APP', action: 'sign' });
+          }
+          STORE.appendFlow({
+            docId: wbId, type: '签收确认', source: 'APP',
+            summary: `卸货点 ${wayPoint.value.id || ''} 签收人 ${signForm.signer}`,
+          });
+        }
+        ElementPlus.ElMessage.success('签收确认完成（已同步 PC）');
         view.value = 'waybill-exec';
       }).catch(() => {});
     }
@@ -2017,7 +2718,35 @@ createApp({
           place: enrouteForm.place,
           status: enrouteForm.status,
         });
-        ElementPlus.ElMessage.success('在途信息已更新');
+        const wbId = currentNotice.value && currentNotice.value.id;
+        if (STORE && wbId) {
+          if (currentNotice.value.status === '待发运') currentNotice.value.status = '发运中';
+          STORE.appendEnroute(wbId, {
+            记录时间: enrouteForm.time,
+            当前位置: enrouteForm.place,
+            行驶状态: enrouteForm.status,
+            预计到达时间: enrouteForm.eta || '—',
+            途经事件: enrouteForm.event || '无异常',
+            备注: enrouteForm.remark || '—',
+            操作人: operator,
+            照片: '1',
+            经纬度: '31.4823°N / 104.6836°E',
+            工序摘要: (enrouteProcs.value || []).map(p => `${p.name}(${p.status})`).join(' / '),
+          });
+          STORE.setDocStatus(wbId, currentNotice.value.status || '发运中', {
+            source: 'APP', action: 'enroute', lastEnroute: enrouteForm.place,
+          });
+          STORE.appendFlow({
+            docId: wbId, type: '在途更新', source: 'APP',
+            summary: `${enrouteForm.place} · ${enrouteForm.status}`,
+          });
+          if (currentNotice.value.enroute) {
+            currentNotice.value.enroute.location = enrouteForm.place;
+            currentNotice.value.enroute.remark = enrouteForm.remark || enrouteForm.status;
+            currentNotice.value.enroute.updatedAt = enrouteForm.time;
+          }
+        }
+        ElementPlus.ElMessage.success('在途信息已更新（已同步 PC）');
         view.value = 'waybill-exec';
       }).catch(() => {});
     }
@@ -2031,6 +2760,7 @@ createApp({
           syncStockStats();
           const hasEx = stockRows.value.some(r => r.status === '盘盈' || r.status === '盘亏');
           currentNotice.value.status = '已完成';
+          syncDocToStore(currentNotice.value.id, '已完成', { action: 'stocktake' });
           toast(hasEx ? '所有待盘条目已转为盘亏，本次盘点结论标记为异常' : '本次盘点账实全部相符，盘点结论标记为正常');
           ElementPlus.ElMessage.success('盘点执行提交完成，数据已同步更新');
           view.value = 'docs';
@@ -2045,7 +2775,9 @@ createApp({
         ElementPlus.ElMessageBox.confirm('确认提交所有工序与包材领出数据，提交后单据将流转完成？', '提交确认', {
           confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
         }).then(() => {
-          ElementPlus.ElMessage.success('包材领出工序执行提交成功，单据已流转完成');
+          currentNotice.value.status = '已完成';
+          syncDocToStore(currentNotice.value.id, '已完成', { action: 'pick-submit' });
+          ElementPlus.ElMessage.success('包材领出工序执行提交成功，单据已流转完成（已同步 PC）');
           backFromExec({ skipSaveToast: true });
         }).catch(() => {});
         return;
@@ -2084,7 +2816,18 @@ createApp({
       ElementPlus.ElMessageBox.confirm('是否确认提交当前执行作业？', '提交确认', {
         confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
       }).then(() => {
-        ElementPlus.ElMessage.success('提交成功');
+        const n = currentNotice.value;
+        if (n) {
+          n.status = '已完成';
+          syncDocToStore(n.id, '已完成', { action: 'exec-submit', flowId: flowId.value });
+          if (STORE && n.lines && n.lines[0]) {
+            STORE.bumpInventory(n.lines[0].code || n.id, Number(form.inQty || scanQtySum.value || 10), {
+              name: n.lines[0].name || n.materialSummary || '',
+              source: 'APP',
+            });
+          }
+        }
+        ElementPlus.ElMessage.success('提交成功（已同步 PC）');
         backFromExec();
       }).catch(() => {});
     }
@@ -2127,6 +2870,15 @@ createApp({
       }).catch(() => {});
     }
 
+    let unsubStore = null;
+    onMounted(() => {
+      hydrateAllDocs();
+      if (STORE) unsubStore = STORE.subscribe(() => hydrateAllDocs());
+    });
+    onBeforeUnmount(() => {
+      if (typeof unsubStore === 'function') unsubStore();
+    });
+
     return {
       menu, defaultOpeneds, view, flowId, menuActive, homeKw, docKw,
       currentNotice, currentLine, processTab, processRef, stubTitle,
@@ -2139,7 +2891,8 @@ createApp({
       scanQtySum, tankQtySum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
       statusTag, toast, goHome, openStub, openModule, onMenuSelect,
       openMaterials, openDocAction, openStockExec, openExec, backFromExec,
-      addSerialScan, addPickScan, addTankRow, addInnerScan, openProcess, openLoadProc, goProcessBatch,
+      addSerialScan, addPickScan, addTankRow, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch,
+      onSwipeStart, onSwipeMove, onSwipeEnd, swipeTrackStyle,
       addStockScan, onStockQtyChange,
       openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,
@@ -2149,6 +2902,15 @@ createApp({
       addPkgDocScan, goPkgProcessBatch, submitPkgDoc,
       openPickup, openSign, openEnroute, goWayProc, confirmPickup, confirmSign, submitEnroute,
       submitExec, submitProcess,
+      // 消息中心/个人中心
+      msgSubTab, msgReadSeg, auditSeg, initiateSeg,
+      mineUser, minePrefs,
+      msgUnreadCount, msgList,
+      auditPendingCount, auditList,
+      initiatePendingCount, initiateList,
+      markMessageRead, markAllMessagesRead,
+      checkUpdate, logoutConfirm,
+      resetDemoStore, storeTick,
     };
   },
 }).use(ElementPlus, { locale: ElementPlusLocaleZhCn }).mount('#app');
