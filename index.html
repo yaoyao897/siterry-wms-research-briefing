@@ -888,90 +888,45 @@ function renderOverview() {
 
 // 蓝图确认计划与甘特图渲染
 function renderBlueprintPlan() {
-  pageTitle.textContent = '三、蓝图确认计划与甘特图';
+  pageTitle.textContent = '三、蓝图确认计划';
   
   const planTasks = [
-    { id: 0, topic: 'TMS 物流模块核对（提前启动）', module: 'PC/APP 物流管理（派车申请/发货单拆分/运单合并/提货/在途打卡/签收/承运商考核）', roles: '物流部负责人、承运商代表、项目经理', location: '线上会议', start: '2026-08-14 (周五 13:30)', end: '2026-08-14', status: '🟢 进行中', dStart: 0, dEnd: 0, cls: 'doing' },
-    { id: 1, topic: '采购与销售业务流程核对', module: 'PC/APP 采购入库/退料、销售备货/发货/退货、委外收发退、受托加工收发', roles: '采购部、销售部、委外业务员、受托业务员、仓储部负责人', location: '成都思特瑞总部', start: '2026-08-17 (周一)', end: '2026-08-17', status: '🟡 待核对', dStart: 1, dEnd: 1, cls: 'todo' },
-    { id: 2, topic: '生产业务与库内管理核对', module: 'PC/APP 生产领料/退料/入库、罐区投料、库内转移/转序、厂内与跨厂区调拨', roles: '生产车间主管、仓储部库管/装卸工、品管部质检员', location: '思特瑞绵竹工厂', start: '2026-08-18 (周二)', end: '2026-08-18', status: '🟡 待核对', dStart: 2, dEnd: 2, cls: 'todo' },
-    { id: 3, topic: '系统基础数据与系统管理核对', module: 'PC/APP 物料/客供/仓库/包材档案、标签设计器、表单设计器、条码拆组/冻结/报废、权限与审批流', roles: '项目经理负责人、IT 负责人、关键用户', location: '思特瑞绵竹工厂', start: '2026-08-19 (周三)', end: '2026-08-19', status: '🟡 待核对', dStart: 3, dEnd: 3, cls: 'todo' },
-    { id: 4, topic: '跨系统集成接口详细核对', module: '28 个系统集成接口（ERP 15个 + OA 5个 + LIMS 3个 + MES 1个 + 硬件/其他 4个）', roles: 'IT 负责人、系统集成工程师、项目经理', location: '思特瑞绵竹工厂', start: '2026-08-20 (周四)', end: '2026-08-20', status: '🟡 待核对', dStart: 4, dEnd: 4, cls: 'todo' },
-    { id: 5, topic: '原型确认汇报及蓝图签署会议', module: '全业务场景端到端实操推演与验收确认，定稿签署《蓝图与验收标准确认书》', roles: '所有岗位负责人及公司领导、项目总监、项目经理', location: '思特瑞绵竹工厂', start: '2026-08-21 (周五)', end: '2026-08-21', status: '🚩 里程碑', dStart: 5, dEnd: 5, cls: 'milestone' }
+    { id: 0, topic: 'TMS 物流管理（提前启动）', scene: '跨厂区/我方配送物流闭环（场景一/二/七/八/九调拨派车）', roles: '物流部负责人、承运商代表、项目经理', location: '线上会议', time: '8/14 周五 13:30', status: '🟢 进行中', cls: 'doing' },
+    { id: 1, topic: '采购与销售业务流程核对', scene: '场景一（来料入库）、场景二（采购退料）、场景七（销售出库）、场景八（销售退货）', roles: '采购部、销售部、委外业务员、受托业务员、仓储部负责人', location: '成都思特瑞总部', time: '8/17 周一', status: '🟡 待核对', cls: 'todo' },
+    { id: 2, topic: '生产业务与库内管理核对', scene: '场景三（领料）、场景四（罐区投料）、场景五（生产入库）、场景六（生产退料）、场景九（调拨）、场景十（转序）', roles: '生产车间主管、仓储部库管/装卸工、品管部质检员', location: '思特瑞绵竹工厂', time: '8/18 周二', status: '🟡 待核对', cls: 'todo' },
+    { id: 3, topic: '系统基础数据与系统管理核对', scene: '场景十二（条码生命周期与包材档案管理、系统基础配置）', roles: '项目经理负责人、IT 负责人、关键用户代表', location: '思特瑞绵竹工厂', time: '8/19 周三', status: '🟡 待核对', cls: 'todo' },
+    { id: 4, topic: '跨系统接口详细核对', scene: '28 个系统集成接口（ERP 15个 + OA 5个 + LIMS 3个 + MES 1个 + 硬件/其他 4个）', roles: 'IT 负责人、系统集成工程师、项目经理', location: '思特瑞绵竹工厂', time: '8/20 周四', status: '🟡 待核对', cls: 'todo' },
+    { id: 5, topic: '原型确认汇报及蓝图签署会议', scene: '全业务场景汇总（场景一至十二全局闭环确认与验收签字）', roles: '所有岗位负责人及公司领导、项目总监、项目经理', location: '思特瑞绵竹工厂', time: '8/21 周五', status: '🚩 里程碑', cls: 'milestone' }
   ];
-
-  const totalDays = 5;
-  const dayPct = (d) => (d / totalDays) * 100;
-  
-  const ticksHtml = [
-    { d: 0, l: '8/17 周一' },
-    { d: 1, l: '8/18 周二' },
-    { d: 2, l: '8/19 周三' },
-    { d: 3, l: '8/20 周四' },
-    { d: 4, l: '8/21 周五' }
-  ].map(t => `<span class="gantt-tick" style="left:${(t.d + 0.5) * 20}%">${t.l}</span>`).join('');
-
-  const ganttRows = planTasks.map(t => {
-    const left = t.dStart * 20;
-    const width = (t.dEnd - t.dStart + 1) * 20;
-    return `
-    <div class="gantt-row">
-      <div class="gantt-label">${t.topic}</div>
-      <div class="gantt-track" style="background: repeating-linear-gradient(90deg, transparent, transparent calc(20% - 1px), #e8edf3 calc(20% - 1px), #e8edf3 20%);">
-        <div class="gantt-bar ${t.cls}" style="left:${left}%;width:${width}%;margin-left:2px;margin-right:2px;" title="${t.topic} (${t.start})">${t.topic} (${t.start === t.end ? t.start.slice(5) : t.start.slice(5)+'~'+t.end.slice(5)})</div>
-      </div>
-    </div>`;
-  }).join('');
 
   const tableRows = planTasks.map(t => `
     <tr>
-      <td>${t.id}</td>
-      <td><strong>${t.topic}</strong></td>
-      <td>${t.module}</td>
-      <td><span class="badge" style="background:#f1f5f9;color:#0f172a;font-weight:600">${t.location || "-"}</span></td>
-      <td>${t.roles}</td>
-      <td>${t.start}</td>
-      <td>${t.end}</td>
-      <td><span class="status-pill ${t.cls === 'milestone' ? 'done' : 'todo'}">${t.status}</span></td>
+      <td><strong>${t.time}</strong></td>
+      <td><span class="status-pill ${t.location === '线上会议' ? 'doing' : 'todo'}">${t.location}</span></td>
+      <td><strong style="color:var(--text)">${t.topic}</strong></td>
+      <td style="color:#475569;font-size:13px">${t.scene}</td>
+      <td style="color:#334155">${t.roles}</td>
     </tr>
   `).join('');
 
   content.innerHTML = `
   <div class="card">
-    <h3>蓝图核对周计划安排（2026.08.17 ～ 2026.08.21）</h3>
-    <p class="muted" style="margin-bottom:14px">下下周项目组将正式启动【系统原型与蓝图核对】工作，计划于周五完成《蓝图与验收标准确认书》的签署。</p>
+    <h3>原型核对与蓝图确认日程安排（2026.08.14 ～ 2026.08.21）</h3>
+    <p class="muted" style="margin-bottom:16px">结合 12 大核心业务场景与责任岗位，按时间与地点分步开展系统原型功能推演与跨系统接口确认，计划于 8/21（周五）在绵竹工厂正式签署《蓝图与验收标准确认书》。</p>
     <table>
       <thead>
         <tr>
-          <th>序号</th>
-          <th>主题</th>
-          <th>模块</th>
-          <th>地点</th>
-          <th>相关岗位</th>
-          <th>计划开始</th>
-          <th>计划结束</th>
-          <th>状态</th>
+          <th style="width:130px">时间</th>
+          <th style="width:140px">地点</th>
+          <th style="width:200px">核对主题</th>
+          <th>涉及业务场景</th>
+          <th style="width:220px">参会岗位</th>
         </tr>
       </thead>
       <tbody>
         ${tableRows}
       </tbody>
     </table>
-    
-    <div class="gantt-wrap">
-      <h4>蓝图核对周任务甘特图</h4>
-      <div class="gantt">
-        <div class="gantt-head">
-          <div class="gantt-label">核对主题</div>
-          <div class="gantt-axis"><div class="gantt-axis-inner">${ticksHtml}</div></div>
-        </div>
-        ${ganttRows}
-      </div>
-      <div class="gantt-legend">
-        <span><i style="background:#2563eb"></i>单模块核对</span>
-        <span><i style="background:#f59e0b"></i>多模块串联/走查</span>
-        <span><i style="background:#ea580c"></i>蓝图终审签署（里程碑）</span>
-      </div>
-    </div>
   </div>`;
 }
 
