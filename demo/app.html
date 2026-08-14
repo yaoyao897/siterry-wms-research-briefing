@@ -145,7 +145,16 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .m-footer{padding:12px;background:#fff;border-top:1px solid #eee;flex-shrink:0}
 .btn-primary{width:100%;height:44px;border:none;border-radius:6px;background:var(--color-primary);color:#fff;font-size:16px;font-weight:500;cursor:pointer}
 .btn-primary:active{background:var(--color-primary-hover)}
-.btn-sm{height:32px;padding:0 16px;border:none;border-radius:4px;background:var(--color-primary);color:#fff;font-size:13px;cursor:pointer}
+.btn-sm{height:32px;padding:0 16px;border:none;border-radius:4px;background:var(--color-primary);color:#fff;font-size:13px;cursor:pointer;min-width:72px}
+.btn-sm.is-off{opacity:.45;pointer-events:none;background:#BFBFBF}
+.btn-sm.is-dim{opacity:.45}
+.btn-sm.btn-sign{background:#389E0D}
+.photo-row{display:flex;gap:8px;flex-wrap:wrap}
+.photo-thumb{width:64px;height:64px;border:1px dashed #D9D9D9;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8C8C8C;text-align:center;padding:4px;background:#FAFAFA}
+.qty-diff{color:#FF4D4F;font-size:12px;margin-top:4px}
+.sign-pad{height:72px;border:1px dashed #D9D9D9;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8C8C8C;background:#FAFAFA;cursor:pointer;font-style:italic}
+.sign-pad.on{border-color:#52C41A;color:#389E0D;background:#F6FFED;font-style:normal;font-weight:600}
+.enroute-mini{background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 
 .stub-page{padding:40px 24px;text-align:center;color:#8C8C8C}
 .stub-page h3{color:var(--color-text-main);margin:0 0 8px}
@@ -194,9 +203,9 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../../05-项目资料/项目产出资料/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./思特瑞WMS_Demo.html">PC</a>
+            <a href="./pc.html">PC</a>
             <a href="./思特瑞WMS_APP_Demo.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">联动·重置</button>
@@ -239,24 +248,32 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               <div class="m-nav">
                 <button class="m-nav__back" @click="goHome">←</button>
                 <div class="m-nav__title">{{ flowTitle }}</div>
-                <button v-if="flowMeta.showDocAdd !== false && flowMode!=='waybill'" class="m-nav__right" @click="toast('新增单据（Demo）')">新增</button>
+                <button v-if="flowMeta.showDocAdd !== false" class="m-nav__right" @click="flowMode==='waybill' ? openWaybillAdd() : toast('新增单据（Demo）')">新增</button>
               </div>
               <div class="m-scroll">
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
-                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张匹配{{ isLoadFlow ? '装卸单' : '单据' }}</p>
+                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张匹配{{ flowMode==='waybill' ? '运单' : (isLoadFlow ? '装卸单' : '单据') }}</p>
                 <div v-if="!filteredNotices.length" class="empty">{{ flowMeta.emptyDocs || '暂无待执行单据' }}</div>
                 <div v-for="n in filteredNotices" :key="n.id" class="doc-card">
                   <div class="doc-card__hd">
                     <span class="doc-card__no">{{ n.id }}</span>
                     <span class="tag" :class="statusTag(n.status)">{{ n.status }}</span>
                   </div>
-                  <div class="doc-card__bd">
+                  <div class="doc-card__bd" @click="flowMode==='waybill' && toggleExpand('doc', n.id)">
                     <div class="doc-grid" v-if="flowMode==='waybill'">
-                      <div class="full"><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
-                      <div><span class="doc-label">配送方式</span>{{ n.shipMode }}</div>
+                      <div><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
+                      <div><span class="doc-label">用车类型</span>{{ n.shipMode }}</div>
                       <div><span class="doc-label">司机</span>{{ n.driver }} / {{ n.plate }}</div>
-                      <div class="full"><span class="doc-label">计划装车</span>{{ n.planLoad }}</div>
+                      <div><span class="doc-label">计划发货</span>{{ n.planLoad }}</div>
                       <div class="full"><span class="doc-label">装卸货点</span>{{ n.route }}</div>
+                      <div v-if="n.scheduleAt"><span class="doc-label">排单时间</span>{{ n.scheduleAt }}</div>
+                      <template v-if="isExpanded('doc', n.id)">
+                        <div class="full"><span class="doc-label">关联发货单</span>{{ n.shipNos || '—' }}</div>
+                        <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                        <div><span class="doc-label">实际发车</span>{{ n.actualDepart || '—' }}</div>
+                        <div class="full"><span class="doc-label">实际到达</span>{{ n.actualArrive || '—' }}</div>
+                        <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      </template>
                     </div>
                     <div class="doc-grid" v-else-if="isLoadFlow">
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
@@ -771,6 +788,24 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <div class="m-nav__title">{{ processTab || '工序填报' }}</div>
               </div>
               <div class="m-scroll">
+                <div class="sec" v-if="wayBackView==='waybill-pickup' || wayBackView==='waybill-sign' || wayBackView==='waybill-enroute'" style="margin-bottom:12px">
+                  <div class="sec__title">关联信息</div>
+                  <div class="field"><label>运单号</label><input :value="currentNotice.id" readonly /></div>
+                  <div class="field"><label>关联发货单</label><input :value="wayPoint.shipNo || '—'" readonly /></div>
+                  <div class="field"><label>发货单位 → 收货单位</label><input :value="(wayPoint.unit||'') + ' → ' + ((currentNotice.unloads&&currentNotice.unloads[0]&&currentNotice.unloads[0].unit)||'—')" readonly /></div>
+                </div>
+                <template v-if="wayProcFields.length">
+                  <div class="proc-block" v-for="f in wayProcFields" :key="f.name">
+                    <label>{{ f.name }}</label>
+                    <select v-if="f.type==='select'" v-model="procForm[f.key]" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px">
+                      <option v-for="o in f.options" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                    <div v-else-if="f.type==='photo'" class="upload-box" @click="toast('拍照 / 相册')">＋</div>
+                    <div v-else-if="f.type==='sign'" class="sign-pad" :class="{ on: procForm[f.key] }" @click="procForm[f.key]=!procForm[f.key]">{{ procForm[f.key] ? '已签名 ✓' : '点击签字区域' }}</div>
+                    <input v-else v-model="procForm[f.key]" :type="f.type==='num'?'number':(f.type==='date'?'datetime-local':'text')" :placeholder="f.placeholder||'请输入'" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" />
+                  </div>
+                </template>
+                <template v-else>
                 <div class="proc-block"><label>关联展示</label><input :value="processRef" readonly style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px;background:#FAFAFA;color:#8C8C8C" /></div>
                 <div class="proc-block"><label>单行文本</label><input v-model="procForm.text" placeholder="请输入" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" /></div>
                 <div class="proc-block"><label>数字输入</label><input v-model.number="procForm.num" type="number" placeholder="请输入数字" style="width:100%;height:36px;border:1px solid #D9D9D9;border-radius:4px;padding:0 10px" /></div>
@@ -795,6 +830,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </div>
                 <div class="proc-block"><label>图片上传</label><div class="upload-box" @click="toast('拍照 / 相册')">＋</div></div>
                 <div class="proc-block"><label>附件上传</label><div class="upload-box" @click="toast('选择附件')">＋</div></div>
+                </template>
               </div>
               <div class="m-footer"><button class="btn-primary" @click="submitProcess">提交</button></div>
             </template>
@@ -998,51 +1034,72 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   <div class="doc-card__bd">
                     <div class="doc-grid">
                       <div><span class="doc-label">状态</span><span class="tag" :class="statusTag(currentNotice.status)">{{ currentNotice.status }}</span></div>
-                      <div><span class="doc-label">配送方式</span>{{ currentNotice.shipMode }}</div>
+                      <div><span class="doc-label">用车类型</span>{{ currentNotice.shipMode }}</div>
                       <div class="full"><span class="doc-label">司机</span>{{ currentNotice.driver }} / {{ currentNotice.plate }} / {{ currentNotice.phone }}</div>
                       <div class="full"><span class="doc-label">排单时间</span>{{ currentNotice.scheduleAt }}</div>
-                      <div class="full"><span class="doc-label">计划装车</span>{{ currentNotice.planLoad }}</div>
+                      <div class="full"><span class="doc-label">计划发货</span>{{ currentNotice.planLoad }}</div>
                       <div class="full"><span class="doc-label">关联派车单</span>{{ currentNotice.dispatchNo }}</div>
                     </div>
                   </div>
                 </div>
-                <div class="m-group__title">装货点</div>
+                <div class="m-group__title" v-if="(currentNotice.loads||[]).length">装货点</div>
                 <div v-for="p in (currentNotice.loads||[])" :key="p.id" class="doc-card">
                   <div class="doc-card__hd">
                     <span class="doc-card__no">{{ p.id }}</span>
-                    <span class="tag" :class="statusTag(p.status==='已确认'?'已完成':'待执行')">{{ p.status }}</span>
+                    <span class="tag" :class="statusTag(p.status)">{{ p.status }}</span>
                   </div>
-                  <div class="doc-card__bd">
+                  <div class="doc-card__bd" @click="toggleExpand('pt', p.id)">
                     <div class="doc-grid">
                       <div class="full"><span class="doc-label">关联发货单</span>{{ p.shipNo }}</div>
                       <div class="full"><span class="doc-label">发货单位</span>{{ p.unit }}</div>
                       <div class="full"><span class="doc-label">装货地点</span>{{ p.place }}</div>
-                      <div class="full"><span class="doc-label">物料</span>{{ p.material }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ p.material }}</div>
                       <div class="full"><span class="doc-label">总数量</span>{{ p.qty }}</div>
+                      <template v-if="isExpanded('pt', p.id)">
+                        <div class="full"><span class="doc-label">装货联系人</span>{{ p.contact }}</div>
+                        <div class="full"><span class="doc-label">备注</span>{{ p.remark || '—' }}</div>
+                      </template>
                     </div>
                   </div>
-                  <div class="doc-card__ft"><button class="btn-sm" @click="openPickup(p)">提货</button></div>
+                  <div class="doc-card__ft">
+                    <button class="btn-sm" :class="{ 'is-off': p.status==='已确认' }" @click="openPickup(p)">{{ p.status==='已确认' ? '已提货' : '提货' }}</button>
+                  </div>
                 </div>
-                <div class="m-group__title">卸货点</div>
+                <div class="m-group__title" v-if="(currentNotice.unloads||[]).length">卸货点</div>
                 <div v-for="p in (currentNotice.unloads||[])" :key="p.id" class="doc-card">
                   <div class="doc-card__hd" style="background:linear-gradient(90deg,#1a5c3a,#0d3721)">
                     <span class="doc-card__no">{{ p.id }}</span>
-                    <span class="tag" :class="statusTag(p.status==='已确认'?'已完成':'待执行')">{{ p.status }}</span>
+                    <span class="tag" :class="statusTag(p.status)">{{ p.status }}</span>
                   </div>
-                  <div class="doc-card__bd">
+                  <div class="doc-card__bd" @click="toggleExpand('pt', p.id)">
                     <div class="doc-grid">
-                      <div class="full"><span class="doc-label">关联收货单</span>{{ p.recvNo }}</div>
+                      <div class="full"><span class="doc-label">关联发货单</span>{{ p.shipNo }}</div>
                       <div class="full"><span class="doc-label">收货单位</span>{{ p.unit }}</div>
                       <div class="full"><span class="doc-label">卸货地点</span>{{ p.place }}</div>
                       <div class="full"><span class="doc-label">联系人</span>{{ p.contact }}</div>
-                      <div class="full"><span class="doc-label">物料</span>{{ p.material }}</div>
-                      <div class="full"><span class="doc-label">总数量</span>{{ p.qty }}</div>
+                      <div class="full"><span class="doc-label">要求送达</span>{{ p.due || '—' }}</div>
+                      <template v-if="isExpanded('pt', p.id)">
+                        <div class="full"><span class="doc-label">物料信息</span>{{ p.material }}</div>
+                        <div class="full"><span class="doc-label">总数量</span>{{ p.qty }}</div>
+                        <div class="full"><span class="doc-label">备注</span>{{ p.remark || '—' }}</div>
+                      </template>
                     </div>
                   </div>
-                  <div class="doc-card__ft"><button class="btn-sm" style="background:#389E0D" @click="openSign(p)">签收</button></div>
+                  <div class="doc-card__ft">
+                    <button class="btn-sm btn-sign" :class="{ 'is-off': p.status==='已确认', 'is-dim': p.status!=='已确认' && !canSignPoint(p) }" @click="openSign(p)">{{ p.status==='已确认' ? '已签收' : '签收' }}</button>
+                  </div>
+                </div>
+                <div v-if="currentNotice.status==='运输中' && recentEnroute.length" style="margin-top:8px">
+                  <div class="m-group__title">最近打卡</div>
+                  <div class="enroute-mini" v-for="(h,i) in recentEnroute" :key="'er'+i" @click="openEnroute">
+                    <div>{{ h.time }}　{{ h.place }}</div>
+                    <div class="hint" style="margin:4px 0 0">{{ h.remark || '—' }}</div>
+                  </div>
                 </div>
               </div>
-              <div class="m-footer"><button class="btn-primary" @click="openEnroute">更新在途信息</button></div>
+              <div class="m-footer" v-if="currentNotice.status==='运输中'">
+                <button class="btn-primary" @click="openEnroute">更新在途信息</button>
+              </div>
             </template>
 
             <!-- ===== 提货确认 ===== -->
@@ -1063,17 +1120,21 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
                   <span v-if="line.confirmed" class="line-card__status tag tag-g">已确认 ✓</span>
                   <div class="line-fields">
-                    <div><span class="k">物料信息：</span>{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
-                    <div><span class="k">计划数量：</span>{{ line.planQty }}　<span class="k">库存单位：</span>{{ line.unit }}</div>
-                    <div class="field" style="padding:8px 0 0"><label>实际数量</label><input v-model.number="line.actualQty" type="number" /></div>
-                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" placeholder="选填" /></div>
+                    <div><span class="k">物料信息</span></div>
+                    <div style="margin-bottom:8px">{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
+                    <div class="doc-grid">
+                      <div><span class="k">计划数量：</span>{{ line.planQty }}</div>
+                      <div><span class="k">库存单位：</span>{{ line.unit }}</div>
+                    </div>
+                    <div class="field" style="padding:8px 0 0"><label>实际数量</label><input v-model.number="line.actualQty" type="number" @input="markWayLine(line)" /></div>
+                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" placeholder="选填，如破损、更换" /></div>
                   </div>
                 </div>
                 <div class="sec">
                   <div class="sec__title">现场照片</div>
-                  <div style="display:flex;gap:8px">
-                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
-                    <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  <div class="photo-row">
+                    <div class="upload-box" @click="addWayPhoto">＋拍照</div>
+                    <div class="photo-thumb" v-for="(ph,i) in wayPhotos" :key="'ph'+i" @click="wayPhotos.splice(i,1)">{{ ph }}</div>
                   </div>
                 </div>
                 <div class="sec">
@@ -1095,44 +1156,41 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               <div class="m-scroll">
                 <div class="sec">
                   <div class="sec__title">卸货点信息</div>
-                  <div class="field"><label>关联发货单</label><input :value="wayPoint.recvNo || wayPoint.shipNo" readonly /></div>
+                  <div class="field"><label>关联发货单</label><input :value="wayPoint.shipNo" readonly /></div>
                   <div class="field"><label>收货单位</label><input :value="wayPoint.unit" readonly /></div>
                   <div class="field"><label>卸货地点</label><input :value="wayPoint.place" readonly /></div>
                   <div class="field"><label>卸货联系人</label><input :value="wayPoint.contact" readonly /></div>
+                  <div class="field"><label>要求送达</label><input :value="wayPoint.due || '—'" readonly /></div>
                 </div>
                 <div class="m-group__title">物料明细核对</div>
                 <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
                   <span v-if="line.confirmed" class="line-card__status tag tag-g">已确认 ✓</span>
                   <div class="line-fields">
-                    <div><span class="k">物料信息：</span>{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
-                    <div><span class="k">提货数量：</span>{{ line.planQty }}　<span class="k">库存单位：</span>{{ line.unit }}</div>
-                    <div class="field" style="padding:8px 0 0"><label>实际签收</label><input v-model.number="line.actualQty" type="number" /></div>
-                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" placeholder="选填" /></div>
+                    <div><span class="k">物料信息</span></div>
+                    <div style="margin-bottom:8px">{{ line.code }} {{ line.name }} / {{ line.spec }} / {{ line.kind }}</div>
+                    <div class="doc-grid">
+                      <div><span class="k">提货数量：</span>{{ line.planQty }}</div>
+                      <div><span class="k">库存单位：</span>{{ line.unit }}</div>
+                    </div>
+                    <div class="field" style="padding:8px 0 0"><label>实际签收</label><input v-model.number="line.actualQty" type="number" @input="markWayLine(line)" /></div>
+                    <div class="qty-diff" v-if="wayLineDiff(line)!==0">数量差异 {{ wayLineDiff(line) }}（提货 − 实收）</div>
+                    <div class="field" style="padding:0"><label>备注</label><input v-model="line.remark" :placeholder="wayLineDiff(line)!==0 ? '请填写数量差异原因' : '选填'" /></div>
                   </div>
-                </div>
-                <div class="sec">
-                  <div class="sec__title">异常记录</div>
-                  <div class="field"><label>异常类型</label>
-                    <select v-model="signForm.exType"><option>无异常</option><option>破损</option><option>短少</option></select>
-                  </div>
-                  <div class="field"><label>异常描述</label><input v-model="signForm.exDesc" placeholder="选填" /></div>
-                  <div class="field"><label>处理方式</label>
-                    <select v-model="signForm.exHandle"><option>赔付</option><option>补发</option><option>退货</option></select>
-                  </div>
-                  <div class="field"><label>赔付金额</label><input v-model="signForm.exAmt" placeholder="元" /></div>
                 </div>
                 <div class="sec">
                   <div class="sec__title">签收信息</div>
-                  <div class="field"><label>签收人</label><input v-model="signForm.signer" placeholder="必填" /></div>
-                  <div class="field"><label>签收人电话</label><input v-model="signForm.phone" /></div>
-                  <div class="field"><label>签收时间</label><input v-model="signForm.time" /></div>
-                  <div class="field"><label>电子签名</label><div class="upload-box" style="height:64px" @click="toast('手写签名区')">手写区</div></div>
+                  <div class="field"><label><span class="req">*</span>签收人</label><input v-model="signForm.signer" placeholder="收货方签收人姓名" /></div>
+                  <div class="field"><label><span class="req">*</span>签收人电话</label><input v-model="signForm.phone" placeholder="11 位手机号" /></div>
+                  <div class="field"><label><span class="req">*</span>签收时间</label><input v-model="signForm.time" /></div>
+                  <div class="field"><label><span class="req">*</span>电子签名</label>
+                    <div class="sign-pad" :class="{ on: signForm.signed }" @click="signForm.signed=!signForm.signed">{{ signForm.signed ? '已签名 ✓' : '点击打开手写区' }}</div>
+                  </div>
                 </div>
                 <div class="sec">
                   <div class="sec__title">现场照片</div>
-                  <div style="display:flex;gap:8px">
-                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
-                    <div class="upload-box" @click="toast('查看照片')">📷</div>
+                  <div class="photo-row">
+                    <div class="upload-box" @click="addWayPhoto">＋拍照</div>
+                    <div class="photo-thumb" v-for="(ph,i) in wayPhotos" :key="'sph'+i" @click="wayPhotos.splice(i,1)">{{ ph }}</div>
                   </div>
                 </div>
                 <div class="sec">
@@ -1145,51 +1203,42 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               <div class="m-footer"><button class="btn-primary" @click="confirmSign">确认签收</button></div>
             </template>
 
-            <!-- ===== 在途信息 ===== -->
+            <!-- ===== 在途打卡 ===== -->
             <template v-else-if="view==='waybill-enroute'">
               <div class="m-nav">
                 <button class="m-nav__back" @click="view='waybill-exec'">← 返回</button>
-                <div class="m-nav__title">在途信息</div>
+                <div class="m-nav__title">在途打卡</div>
               </div>
               <div class="m-scroll">
                 <div class="sec">
-                  <div class="sec__title">历史在途记录</div>
-                  <div class="doc-card" style="margin-bottom:8px" v-for="(h,i) in enrouteHistory" :key="i">
+                  <div class="sec__title">历史打卡记录</div>
+                  <div v-if="!enrouteHistory.length" class="hint" style="padding:8px 0">暂无打卡记录</div>
+                  <div class="doc-card" style="margin-bottom:8px" v-for="(h,i) in enrouteHistory.slice(0,3)" :key="i">
                     <div class="doc-card__bd">
                       <div>{{ h.time }}　{{ h.place }}</div>
-                      <div class="hint" style="margin:4px 0 0">状态：{{ h.status }}</div>
+                      <div class="hint" style="margin:4px 0 0">备注：{{ h.remark || '—' }}</div>
                     </div>
                   </div>
                 </div>
                 <div class="sec">
-                  <div class="sec__title">当前在途信息</div>
-                  <div class="field"><label><span class="req">*</span>记录时间</label><input v-model="enrouteForm.time" /></div>
-                  <div class="field"><label><span class="req">*</span>当前位置</label><input v-model="enrouteForm.place" placeholder="自动定位 / 手动输入" /></div>
-                  <div class="field"><label><span class="req">*</span>行驶状态</label>
-                    <select v-model="enrouteForm.status"><option>正常行驶</option><option>服务区休息</option><option>即将到达</option><option>异常停留</option></select>
+                  <div class="sec__title">当前在途打卡</div>
+                  <div class="field"><label><span class="req">*</span>打卡时间</label><input v-model="enrouteForm.time" /></div>
+                  <div class="field"><label><span class="req">*</span>打卡位置</label>
+                    <div style="display:flex;gap:8px">
+                      <input v-model="enrouteForm.place" placeholder="自动定位 / 手动调整" style="flex:1" />
+                      <button class="btn-sm" style="flex-shrink:0" @click="enrouteForm.place='四川省成都市高新区xx路'">定位</button>
+                    </div>
                   </div>
-                  <div class="field"><label>当前位置经/纬度</label><input value="31.4823°N / 104.6836°E" readonly /></div>
-                  <div class="field"><label>预计到达时间</label><input v-model="enrouteForm.eta" /></div>
-                  <div class="field"><label>途经事件</label>
-                    <select v-model="enrouteForm.event"><option>无异常</option><option>交通事故</option><option>车辆故障</option><option>天气延误</option></select>
+                  <div class="field"><label>现场照片</label>
+                    <div class="photo-row">
+                      <div class="upload-box" @click="addWayPhoto">＋拍照</div>
+                      <div class="photo-thumb" v-for="(ph,i) in wayPhotos" :key="'eph'+i" @click="wayPhotos.splice(i,1)">{{ ph }}</div>
+                    </div>
                   </div>
-                  <div class="field"><label>备注</label><input v-model="enrouteForm.remark" /></div>
-                </div>
-                <div class="sec">
-                  <div class="sec__title">沿途照片</div>
-                  <div style="display:flex;gap:8px">
-                    <div class="upload-box" @click="toast('拍照上传')">＋拍照</div>
-                    <div class="upload-box" @click="toast('查看照片')">📷</div>
-                  </div>
-                </div>
-                <div class="sec">
-                  <div class="sec__title">工序</div>
-                  <div class="process-tabs">
-                    <button v-for="p in enrouteProcs" :key="p.name" :class="{ on: processTab===p.name }" @click="goWayProc(p)">{{ p.name }}</button>
-                  </div>
+                  <div class="field"><label>打卡备注</label><input v-model="enrouteForm.remark" placeholder="输入现场补充说明或异常备注" /></div>
                 </div>
               </div>
-              <div class="m-footer"><button class="btn-primary" @click="submitEnroute">提交在途信息</button></div>
+              <div class="m-footer"><button class="btn-primary" @click="submitEnroute">提交在途打卡</button></div>
             </template>
 
             <!-- ===== 包材建档 · 查询更新 ===== -->
@@ -1807,13 +1856,11 @@ createApp({
     const pkgRows = ref([]);
     const wayPoint = ref({});
     const wayBackView = ref('waybill-exec');
-    const signForm = reactive({ exType: '无异常', exDesc: '', exHandle: '赔付', exAmt: '', signer: '', phone: '', time: '2025-08-08 16:30' });
-    const enrouteForm = reactive({ time: '2025-08-07 15:00', place: '', status: '正常行驶', eta: '2025-08-07 16:00', event: '无异常', remark: '' });
-    const enrouteHistory = ref([
-      { time: '08-07 10:30', place: '成都绕城高速', status: '正常行驶' },
-      { time: '08-07 12:00', place: '成绵高速德阳段', status: '服务区休息' },
-      { time: '08-07 14:30', place: '绵阳高新区出口', status: '即将到达' },
-    ]);
+    const signForm = reactive({ signer: '', phone: '', time: '', signed: false });
+    const enrouteForm = reactive({ time: '', place: '', remark: '' });
+    const enrouteHistory = ref([]);
+    const wayPhotos = ref([]);
+    const expandedIds = ref([]);
     const enrouteProcs = ref([
       { name: '位置确认', status: '已完成', user: '张司', time: '10:30' },
       { name: '状态确认', status: '已完成', user: '张司', time: '10:30' },
@@ -1904,11 +1951,54 @@ createApp({
 
     const filteredNotices = computed(() => {
       const kw = docKw.value.trim();
-      const list = currentDocs.value;
+      let list = currentDocs.value || [];
+      if (flowMode.value === 'waybill') {
+        list = list.filter(n => ['待运输', '运输中', '待发运', '发运中'].includes(n.status));
+        list = list.slice().sort((a, b) => String(a.planLoad || '').localeCompare(String(b.planLoad || '')) || String(a.id || '').localeCompare(String(b.id || '')));
+      }
       if (!kw) return list;
-      return list.filter(n =>
-        [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode].join(' ').includes(kw)
-      );
+      const blob = (n) => {
+        const pts = [...(n.loads || []), ...(n.unloads || [])].map(p => [p.unit, p.place, p.shipNo, p.contact].join(' ')).join(' ');
+        return [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode, n.shipNos, n.phone, pts].join(' ');
+      };
+      return list.filter(n => blob(n).includes(kw));
+    });
+    const recentEnroute = computed(() => (enrouteHistory.value || []).slice(0, 3));
+    const wayProcFields = computed(() => {
+      const name = processTab.value || '';
+      const map = {
+        '装货确认': [
+          { name: '装货时间', key: 'loadAt', type: 'date' },
+          { name: '封签号', key: 'sealNo', type: 'text', placeholder: '请输入封签号' },
+          { name: '铅封照片', key: 'sealPhoto', type: 'photo' },
+          { name: '备注', key: 'text', type: 'text' },
+        ],
+        '包装检查': [
+          { name: '包装完好性', key: 'sel', type: 'select', options: ['完好', '破损'] },
+          { name: '破损描述', key: 'text', type: 'text' },
+          { name: '破损照片', key: 'photo', type: 'photo' },
+        ],
+        '数量核对': [
+          { name: '抽查件数', key: 'num', type: 'num' },
+          { name: '抽查结果', key: 'sel', type: 'select', options: ['一致', '不一致'] },
+          { name: '差异件数', key: 'diff', type: 'num' },
+          { name: '差异原因', key: 'text', type: 'text' },
+        ],
+        '卸货确认': [
+          { name: '卸货时间', key: 'unloadAt', type: 'date' },
+          { name: '封签完好', key: 'sel', type: 'select', options: ['完好', '破损'] },
+          { name: '卸货方式', key: 'mode', type: 'select', options: ['人工', '叉车'] },
+          { name: '备注', key: 'text', type: 'text' },
+        ],
+        '异常记录': [
+          { name: '异常类型', key: 'sel', type: 'select', options: ['破损', '短少', '错发'] },
+          { name: '异常描述', key: 'text', type: 'text' },
+          { name: '处理方式', key: 'mode', type: 'select', options: ['赔付', '补发', '退货'] },
+          { name: '异常照片', key: 'photo', type: 'photo' },
+          { name: '签字', key: 'signed', type: 'sign' },
+        ],
+      };
+      return map[name] || [];
     });
 
     const scanQtySum = computed(() => scanRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
@@ -1927,7 +2017,7 @@ createApp({
     });
 
     function statusTag(s) {
-      return { '待执行': 'tag-b', '待完成': 'tag-b', '执行中': 'tag-o', '已完成': 'tag-g', '已关闭': 'tag-gr', '待发运': 'tag-b', '发运中': 'tag-o', '待确认': 'tag-b' }[s] || 'tag-gr';
+      return { '待执行': 'tag-b', '待完成': 'tag-b', '执行中': 'tag-o', '已完成': 'tag-g', '已关闭': 'tag-gr', '待发运': 'tag-b', '发运中': 'tag-o', '待确认': 'tag-b', '已确认': 'tag-g', '待运输': 'tag-b', '运输中': 'tag-o', '已签收': 'tag-g', '待派车': 'tag-p' }[s] || 'tag-gr';
     }
     function toast(msg) { ElementPlus.ElMessage.info(msg); }
     function goHome() {
@@ -2069,6 +2159,8 @@ createApp({
       }
       if (flowMode.value === 'waybill') {
         currentNotice.value = JSON.parse(JSON.stringify(n));
+        if (STORE) STORE.overlayAppDoc(currentNotice.value);
+        syncEnrouteHistory(currentNotice.value.id);
         view.value = 'waybill-exec';
         return;
       }
@@ -2495,133 +2587,233 @@ createApp({
         view.value = 'docs';
       }).catch(() => {});
     }
+    function nowStamp() {
+      const d = new Date();
+      const p = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    }
+    function isExpanded(kind, id) {
+      return expandedIds.value.includes(kind + ':' + id);
+    }
+    function toggleExpand(kind, id) {
+      const k = kind + ':' + id;
+      const i = expandedIds.value.indexOf(k);
+      if (i >= 0) expandedIds.value.splice(i, 1);
+      else expandedIds.value.push(k);
+    }
+    function canSignPoint(p) {
+      const loads = (currentNotice.value && currentNotice.value.loads) || [];
+      const hit = loads.find(l => l.shipNo === p.shipNo) || loads[0];
+      return !hit || hit.status === '已确认';
+    }
+    function markWayLine(line) {
+      if (line && line.actualQty !== '' && line.actualQty !== null && line.actualQty !== undefined) line.confirmed = true;
+    }
+    function wayLineDiff(line) {
+      return Number(line.planQty || 0) - Number(line.actualQty || 0);
+    }
+    function addWayPhoto() {
+      if (wayPhotos.value.length >= 9) { toast('最多上传 9 张'); return; }
+      wayPhotos.value.push('照片' + (wayPhotos.value.length + 1));
+    }
+    function syncEnrouteHistory(wbId) {
+      let rows = [];
+      if (STORE && wbId) rows = STORE.getEnroute(wbId) || [];
+      if (rows.length) {
+        enrouteHistory.value = rows.map((r) => ({
+          time: String(r['打卡时间'] || r['记录时间'] || '').slice(5, 16) || String(r['打卡时间'] || r['记录时间'] || ''),
+          place: r['打卡位置'] || r['当前位置'] || '',
+          remark: r['打卡备注'] || r['备注'] || '',
+        }));
+        return;
+      }
+      const e = currentNotice.value && currentNotice.value.enroute;
+      enrouteHistory.value = (e && e.location) ? [{ time: String(e.updatedAt || '').slice(5, 16) || String(e.updatedAt || ''), place: e.location, remark: e.remark || '—' }] : [];
+    }
+    function openWaybillAdd() {
+      ElementPlus.ElMessageBox.confirm('将选择待调度发货单并自动带入派车、司机车辆与装卸货点后生成运单（Demo 轻量化）。', '新增运单', {
+        confirmButtonText: '确认生成', cancelButtonText: '取消',
+      }).then(() => {
+        const list = (CFG.docsMap && CFG.docsMap.waybill) || [];
+        const id = 'WY' + nowStamp().replace(/[-: ]/g, '').slice(0, 12);
+        const card = {
+          id, status: '待运输', dispatchNo: 'PC2026081203', shipMode: '发货',
+          driver: '赵六', plate: '川A12345', phone: '13900000001',
+          planLoad: nowStamp(), scheduleAt: nowStamp(),
+          route: '思特瑞原料仓 → 无锡客户B卸货区', shipNos: 'DN2026081201',
+          remark: 'Demo 新增', actualDepart: '—', actualArrive: '—',
+          loads: JSON.parse(JSON.stringify((list[0] && list[0].loads) || [])),
+          unloads: JSON.parse(JSON.stringify((list[0] && list[0].unloads) || [])),
+          enroute: { location: '', remark: '', updatedAt: '' },
+        };
+        list.unshift(card);
+        if (STORE) STORE.setDocStatus(id, '待运输', { source: 'APP', action: 'create' });
+        bumpStore();
+        ElementPlus.ElMessage.success('运单创建成功');
+      }).catch(() => {});
+    }
     function openPickup(p) {
+      if (p.status === '已确认') { toast('该装货点已提货'); return; }
       wayPoint.value = p;
       wayBackView.value = 'waybill-pickup';
+      wayPhotos.value = [];
       processTab.value = (p.procs && p.procs[0] && p.procs[0].name) || '装货确认';
       view.value = 'waybill-pickup';
     }
     function openSign(p) {
+      if (p.status === '已确认') { toast('该卸货点已签收'); return; }
+      if (!canSignPoint(p)) { ElementPlus.ElMessage.warning('请先完成提货确认'); return; }
       wayPoint.value = p;
       wayBackView.value = 'waybill-sign';
-      signForm.signer = '';
+      wayPhotos.value = [];
+      Object.assign(signForm, { signer: '', phone: '', time: nowStamp(), signed: false });
       processTab.value = (p.procs && p.procs[0] && p.procs[0].name) || '卸货确认';
       view.value = 'waybill-sign';
     }
     function openEnroute() {
+      if (currentNotice.value.status !== '运输中') { ElementPlus.ElMessage.warning('仅运输中的运单可更新在途信息'); return; }
       wayBackView.value = 'waybill-enroute';
-      enrouteForm.place = (currentNotice.value.enroute && currentNotice.value.enroute.location) || '';
-      enrouteForm.remark = (currentNotice.value.enroute && currentNotice.value.enroute.remark) || '';
-      processTab.value = '位置确认';
-      if (STORE && currentNotice.value && currentNotice.value.id) {
-        const rows = STORE.getEnroute(currentNotice.value.id);
-        if (rows.length) {
-          enrouteHistory.value = rows.map((r) => ({
-            time: String(r['记录时间'] || '').slice(5, 16) || String(r['记录时间'] || ''),
-            place: r['当前位置'] || '',
-            status: r['行驶状态'] || '',
-          }));
-        }
-      }
+      wayPhotos.value = [];
+      Object.assign(enrouteForm, { time: nowStamp(), place: (currentNotice.value.enroute && currentNotice.value.enroute.location) || '', remark: '' });
+      syncEnrouteHistory(currentNotice.value && currentNotice.value.id);
       view.value = 'waybill-enroute';
     }
     function goWayProc(p) {
       processTab.value = p.name;
       processRef.value = p.name;
+      Object.keys(procForm).forEach((k) => { procForm[k] = ''; });
       view.value = 'process';
     }
     function confirmPickup() {
-      ElementPlus.ElMessageBox.confirm('确认完成本次提货？', '提货确认', {
-        confirmButtonText: '确认提货', cancelButtonText: '返回编辑',
-      }).then(() => {
-        (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
-        wayPoint.value.status = '已确认';
-        const wbId = currentNotice.value && currentNotice.value.id;
-        if (STORE && wbId) {
-          STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'pickup' });
-          const loads = currentNotice.value.loads || [];
-          const allLoaded = loads.every(p => p.status === '已确认');
-          if (allLoaded || currentNotice.value.status === '待发运') {
-            currentNotice.value.status = '发运中';
-            STORE.setDocStatus(wbId, '发运中', { source: 'APP', action: 'pickup' });
-          }
-          STORE.appendFlow({
-            docId: wbId, type: '提货确认', source: 'APP',
-            summary: `装货点 ${wayPoint.value.id || ''} 已确认提货`,
-          });
+      const lines = wayPoint.value.lines || [];
+      const emptyLines = lines.filter(l => l.actualQty === '' || l.actualQty === null || l.actualQty === undefined);
+      for (const l of lines) {
+        if (l.actualQty === '' || l.actualQty === null || l.actualQty === undefined) continue;
+        if (Number(l.actualQty) < 0) { ElementPlus.ElMessage.warning((l.name || '物料') + ' 实际装货数量不能为负数'); return; }
+        if (Number(l.actualQty) > Number(l.planQty)) {
+          ElementPlus.ElMessage.warning((l.name || '物料') + ' 实际数量不可超过计划数量 ' + l.planQty);
+          return;
         }
-        ElementPlus.ElMessage.success('提货确认完成（已同步 PC）');
-        view.value = 'waybill-exec';
-      }).catch(() => {});
+      }
+      if (!wayPhotos.value.length) { ElementPlus.ElMessage.warning('请至少上传 1 张装货现场照片'); return; }
+      const pending = (wayPoint.value.procs || []).filter(p => p.status !== '已完成');
+      const run = () => {
+        emptyLines.forEach(l => { l.actualQty = l.planQty; });
+        const zero = lines.some(l => Number(l.actualQty) === 0);
+        const afterZero = () => {
+          lines.forEach(l => { l.confirmed = true; });
+          wayPoint.value.status = '已确认';
+          const wbId = currentNotice.value && currentNotice.value.id;
+          if (currentNotice.value.status === '待运输' || currentNotice.value.status === '待发运') {
+            currentNotice.value.status = '运输中';
+          }
+          if (STORE && wbId) {
+            STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'pickup' });
+            STORE.setDocStatus(wbId, currentNotice.value.status, { source: 'APP', action: 'pickup' });
+            STORE.appendFlow({ docId: wbId, type: '提货确认', source: 'APP', summary: `装货点 ${wayPoint.value.id || ''} 已确认提货` });
+          }
+          ElementPlus.ElMessage.success('提货确认已提交');
+          view.value = 'waybill-exec';
+        };
+        if (zero) {
+          ElementPlus.ElMessageBox.confirm('确认该物料实际装货数量为 0？', '提示', {
+            confirmButtonText: '确认', cancelButtonText: '取消', type: 'warning',
+          }).then(afterZero).catch(() => {});
+        } else afterZero();
+      };
+      const askPending = () => {
+        if (pending.length) {
+          ElementPlus.ElMessageBox.confirm('存在未完成的工序，确认提货？', '提示', {
+            confirmButtonText: '确认提货', cancelButtonText: '返回编辑', type: 'warning',
+          }).then(run).catch(() => {});
+        } else {
+          ElementPlus.ElMessageBox.confirm('确认完成本次提货？', '提货确认', {
+            confirmButtonText: '确认提货', cancelButtonText: '返回编辑',
+          }).then(run).catch(() => {});
+        }
+      };
+      if (emptyLines.length) {
+        ElementPlus.ElMessageBox.confirm('未填写将按计划数量确认', '提示', {
+          confirmButtonText: '按计划确认', cancelButtonText: '返回填写',
+        }).then(askPending).catch(() => {});
+      } else askPending();
     }
     function confirmSign() {
-      if (!signForm.signer.trim()) { ElementPlus.ElMessage.error('请填写签收人'); return; }
-      ElementPlus.ElMessageBox.confirm('确认完成本次签收？', '签收确认', {
-        confirmButtonText: '确认签收', cancelButtonText: '返回编辑',
-      }).then(() => {
-        (wayPoint.value.lines || []).forEach(l => { l.confirmed = true; });
+      const lines = wayPoint.value.lines || [];
+      if (lines.some(l => !l.confirmed && (l.actualQty === '' || l.actualQty === null || l.actualQty === undefined))) {
+        ElementPlus.ElMessage.warning('请确认所有物料行的签收数量'); return;
+      }
+      for (const l of lines) {
+        if (wayLineDiff(l) !== 0 && !String(l.remark || '').trim()) {
+          ElementPlus.ElMessage.warning('请填写 ' + (l.name || '物料') + ' 的数量差异原因'); return;
+        }
+      }
+      if (!signForm.signer.trim()) { ElementPlus.ElMessage.warning('请填写签收人姓名'); return; }
+      if (!/^1\d{10}$/.test(String(signForm.phone || '').trim())) { ElementPlus.ElMessage.warning('请填写正确的签收人手机号'); return; }
+      if (!signForm.signed) { ElementPlus.ElMessage.warning('请完成电子签名'); return; }
+      if (!wayPhotos.value.length) { ElementPlus.ElMessage.warning('请至少上传 1 张卸货现场照片'); return; }
+      const pending = (wayPoint.value.procs || []).filter(p => p.status !== '已完成');
+      const run = () => {
+        lines.forEach(l => { l.confirmed = true; });
         wayPoint.value.status = '已确认';
         const wbId = currentNotice.value && currentNotice.value.id;
+        const unloads = currentNotice.value.unloads || [];
+        const loads = currentNotice.value.loads || [];
+        const allDone = unloads.every(p => p.status === '已确认') && loads.every(p => p.status === '已确认');
+        if (allDone) currentNotice.value.status = '已签收';
         if (STORE && wbId) {
           STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'sign', signer: signForm.signer });
-          const unloads = currentNotice.value.unloads || [];
-          const allSigned = unloads.every(p => p.status === '已确认');
-          if (allSigned) {
-            currentNotice.value.status = '已到达';
-            STORE.setDocStatus(wbId, '已到达', { source: 'APP', action: 'sign' });
-          } else {
-            STORE.setDocStatus(wbId, currentNotice.value.status || '发运中', { source: 'APP', action: 'sign' });
-          }
-          STORE.appendFlow({
-            docId: wbId, type: '签收确认', source: 'APP',
-            summary: `卸货点 ${wayPoint.value.id || ''} 签收人 ${signForm.signer}`,
-          });
+          STORE.setDocStatus(wbId, currentNotice.value.status, { source: 'APP', action: 'sign' });
+          STORE.appendFlow({ docId: wbId, type: '签收确认', source: 'APP', summary: `卸货点 ${wayPoint.value.id || ''} 签收人 ${signForm.signer}` });
         }
-        ElementPlus.ElMessage.success('签收确认完成（已同步 PC）');
+        ElementPlus.ElMessage.success('签收确认已提交');
         view.value = 'waybill-exec';
-      }).catch(() => {});
+      };
+      if (pending.length) {
+        ElementPlus.ElMessageBox.confirm('存在未完成的工序，确认签收？', '提示', {
+          confirmButtonText: '确认签收', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(run).catch(() => {});
+      } else {
+        ElementPlus.ElMessageBox.confirm('确认完成本次签收？', '签收确认', {
+          confirmButtonText: '确认签收', cancelButtonText: '返回编辑',
+        }).then(run).catch(() => {});
+      }
     }
     function submitEnroute() {
-      if (!enrouteForm.place.trim()) { ElementPlus.ElMessage.error('当前位置为必填'); return; }
-      ElementPlus.ElMessageBox.confirm('确认提交本次在途信息？', '提交确认', {
-        confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
-      }).then(() => {
-        enrouteHistory.value.unshift({
-          time: enrouteForm.time.slice(5),
-          place: enrouteForm.place,
-          status: enrouteForm.status,
+      if (!enrouteForm.time) { ElementPlus.ElMessage.warning('请填写打卡时间'); return; }
+      if (!enrouteForm.place.trim()) { ElementPlus.ElMessage.warning('请完成打卡位置定位'); return; }
+      const wbId = currentNotice.value && currentNotice.value.id;
+      const rec = {
+        time: String(enrouteForm.time).slice(5),
+        place: enrouteForm.place,
+        remark: enrouteForm.remark || '—',
+      };
+      enrouteHistory.value.unshift(rec);
+      if (STORE && wbId) {
+        STORE.appendEnroute(wbId, {
+          打卡时间: enrouteForm.time,
+          打卡位置: enrouteForm.place,
+          现场照片: wayPhotos.value.length ? (wayPhotos.value.length + ' 张') : '—',
+          打卡备注: enrouteForm.remark || '—',
+          记录时间: enrouteForm.time,
+          当前位置: enrouteForm.place,
+          备注: enrouteForm.remark || '—',
+          操作人: operator,
+          照片: String(wayPhotos.value.length),
+          经纬度: '31.4823°N / 104.6836°E',
         });
-        const wbId = currentNotice.value && currentNotice.value.id;
-        if (STORE && wbId) {
-          if (currentNotice.value.status === '待发运') currentNotice.value.status = '发运中';
-          STORE.appendEnroute(wbId, {
-            记录时间: enrouteForm.time,
-            当前位置: enrouteForm.place,
-            行驶状态: enrouteForm.status,
-            预计到达时间: enrouteForm.eta || '—',
-            途经事件: enrouteForm.event || '无异常',
-            备注: enrouteForm.remark || '—',
-            操作人: operator,
-            照片: '1',
-            经纬度: '31.4823°N / 104.6836°E',
-            工序摘要: (enrouteProcs.value || []).map(p => `${p.name}(${p.status})`).join(' / '),
-          });
-          STORE.setDocStatus(wbId, currentNotice.value.status || '发运中', {
-            source: 'APP', action: 'enroute', lastEnroute: enrouteForm.place,
-          });
-          STORE.appendFlow({
-            docId: wbId, type: '在途更新', source: 'APP',
-            summary: `${enrouteForm.place} · ${enrouteForm.status}`,
-          });
-          if (currentNotice.value.enroute) {
-            currentNotice.value.enroute.location = enrouteForm.place;
-            currentNotice.value.enroute.remark = enrouteForm.remark || enrouteForm.status;
-            currentNotice.value.enroute.updatedAt = enrouteForm.time;
-          }
+        STORE.setDocStatus(wbId, currentNotice.value.status || '运输中', {
+          source: 'APP', action: 'enroute', lastEnroute: enrouteForm.place,
+        });
+        STORE.appendFlow({ docId: wbId, type: '在途打卡', source: 'APP', summary: `${enrouteForm.place} · ${enrouteForm.remark || '—'}` });
+        if (currentNotice.value.enroute) {
+          currentNotice.value.enroute.location = enrouteForm.place;
+          currentNotice.value.enroute.remark = enrouteForm.remark || '—';
+          currentNotice.value.enroute.updatedAt = enrouteForm.time;
         }
-        ElementPlus.ElMessage.success('在途信息已更新（已同步 PC）');
-        view.value = 'waybill-exec';
-      }).catch(() => {});
+      }
+      ElementPlus.ElMessage.success('在途打卡信息提交成功');
+      view.value = 'waybill-exec';
     }
     function submitExec() {
       const mode = activeExecMode.value;
@@ -2759,7 +2951,7 @@ createApp({
       operator, tanks, scanRows, tankRows, innerRows, form, procForm,
       recommendVisible, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
-      signForm, enrouteForm, enrouteHistory, enrouteProcs,
+      signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute,
       flowMeta, flowTitle, flowMode, activeExecMode, isLineSidePick, isLoadFlow, loadProcs, headerHint, filteredHome, filteredNotices,
       scanQtySum, tankQtySum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
       statusTag, toast, goHome, openStub, openModule, onMenuSelect,
@@ -2773,6 +2965,7 @@ createApp({
       addOuterScan, removeOuterRow, submitPkgOuter,
       addPkgDocScan, goPkgProcessBatch, submitPkgDoc,
       openPickup, openSign, openEnroute, goWayProc, confirmPickup, confirmSign, submitEnroute,
+      openWaybillAdd, toggleExpand, isExpanded, canSignPoint, addWayPhoto, markWayLine, wayLineDiff,
       submitExec, submitProcess,
       // 消息中心/个人中心
       msgSubTab, msgReadSeg, auditSeg, initiateSeg,

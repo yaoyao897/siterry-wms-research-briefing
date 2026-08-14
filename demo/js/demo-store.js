@@ -14,22 +14,26 @@ window.WMS_DEMO_STORE = (function () {
     执行中: '执行中',
     已完成: '已完成',
     已关闭: '已关闭',
-    待发运: '待发运',
+    待发运: '待运输',
+    待派车: '待派车',
+    待运输: '待运输',
     发运中: '运输中',
     运输中: '运输中',
     已签收: '已签收',
-    已到达: '已到达',
+    已到达: '已签收',
   };
   const STATUS_TO_APP = {
     待执行: '待执行',
     执行中: '执行中',
     已完成: '已完成',
     已关闭: '已关闭',
-    待发运: '待发运',
-    运输中: '发运中',
-    发运中: '发运中',
+    待发运: '待运输',
+    待派车: '待派车',
+    待运输: '待运输',
+    运输中: '运输中',
+    发运中: '运输中',
     已签收: '已签收',
-    已到达: '已到达',
+    已到达: '已签收',
   };
 
   function emptyState() {
@@ -124,8 +128,13 @@ window.WMS_DEMO_STORE = (function () {
     if (!waybillId || !record) return load();
     return mutate((s) => {
       const list = s.enroute[waybillId] ? s.enroute[waybillId].slice() : [];
+      const stamp = nowStr();
       const row = Object.assign({
-        记录时间: nowStr(),
+        打卡时间: stamp.slice(0, 16),
+        打卡位置: '',
+        现场照片: '—',
+        打卡备注: '—',
+        记录时间: stamp,
         当前位置: '',
         行驶状态: '正常行驶',
         预计到达时间: '—',
@@ -136,13 +145,17 @@ window.WMS_DEMO_STORE = (function () {
         经纬度: '—',
         工序摘要: '—',
       }, record);
+      if (!row['打卡位置'] && row['当前位置']) row['打卡位置'] = row['当前位置'];
+      if (!row['当前位置'] && row['打卡位置']) row['当前位置'] = row['打卡位置'];
+      if (!row['打卡备注'] && row['备注']) row['打卡备注'] = row['备注'];
+      if (!row['备注'] && row['打卡备注']) row['备注'] = row['打卡备注'];
       list.unshift(row);
       s.enroute[waybillId] = list.slice(0, 50);
       const prev = s.docs[waybillId] || { id: waybillId };
       s.docs[waybillId] = Object.assign({}, prev, {
         id: waybillId,
-        status: prev.status || '发运中',
-        lastEnroute: row.当前位置,
+        status: prev.status || '运输中',
+        lastEnroute: row['打卡位置'] || row['当前位置'],
         updatedAt: nowStr(),
         source: 'APP',
       });
@@ -213,12 +226,16 @@ window.WMS_DEMO_STORE = (function () {
   /** PC 列表行叠加共享状态 */
   function overlayPcRow(pageId, row) {
     if (!row) return row;
+    if (pageId === 'lg-ship' || pageId === 'lg-pickup' || pageId === 'lg-sign') return row;
     const id =
       row['运单号'] ||
+      row['提货单号'] ||
+      row['签收单号'] ||
       row['单号'] ||
       row['物流订单号'] ||
       row['发货单号'] ||
       row['派车申请单号'] ||
+      row['编号'] ||
       row.id;
     const doc = getDoc(id);
     if (!doc || !doc.status) return row;
