@@ -1341,6 +1341,93 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
   </el-dialog>
 
   
+  
+  <!-- 运单结算弹窗 -->
+  <el-dialog v-model="settleVisible" class="demo-dialog--biz" :title="'运单结算 · 生成 ERP 采购订单 (已选 ' + settleRows.length + ' 笔待结算运单)'" width="1020px" top="6vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="120px" :model="settleForm">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>1. ERP 采购订单表头信息</span></h4>
+        <div class="demo-form-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <el-form-item label="供应商/承运商" required>
+            <el-select v-model="settleForm.供应商" placeholder="请选择承运商/供应商" style="width:100%">
+              <el-option label="顺丰速运有限公司 (S.001267)" value="顺丰速运有限公司 (S.001267)"></el-option>
+              <el-option label="盛杰物流有限公司 (S.001288)" value="盛杰物流有限公司 (S.001288)"></el-option>
+              <el-option label="喜百年供应链有限公司 (S.001305)" value="喜百年供应链有限公司 (S.001305)"></el-option>
+              <el-option label="安吉达物流有限公司 (S.001322)" value="安吉达物流有限公司 (S.001322)"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="采购合同号" required>
+            <el-input v-model="settleForm.采购合同号" placeholder="例: LY-FW-F-2025120183"></el-input>
+          </el-form-item>
+          <el-form-item label="结算日期" required>
+            <el-date-picker v-model="settleForm.结算日期" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="结算部门"><span class="demo-readonly">物流管理室</span></el-form-item>
+          <el-form-item label="币种"><span class="demo-readonly">人民币元</span></el-form-item>
+          <el-form-item label="增值税率"><span class="demo-readonly">9% 税率</span></el-form-item>
+        </div>
+      </section>
+
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>2. 待结算运单明细列表</span></h4>
+        <el-table :data="settleRows" border size="small" style="width: 100%; max-height: 280px; overflow-y: auto;">
+          <el-table-column type="index" label="序号" width="50" align="center"></el-table-column>
+          <el-table-column prop="运单号" label="运单号" width="130"></el-table-column>
+          <el-table-column prop="关联发货单" label="关联发货单" width="130" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="物料信息" label="物料信息" width="150" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="总数量" label="总数量" width="80" align="right">
+            <template #default="{row}">{{ Number(row['总数量']||0).toFixed(2) }}</template>
+          </el-table-column>
+          <el-table-column prop="用车类型" label="用车类型" width="80" align="center"></el-table-column>
+          <el-table-column prop="运输类型" label="运输类型" width="80" align="center"></el-table-column>
+          <el-table-column prop="运费单价（元）" label="单价(元)" width="90" align="right">
+            <template #default="{row}">¥{{ (row['运费单价（元）']||400).toFixed(2) }}</template>
+          </el-table-column>
+          <el-table-column label="应付运费(元)" width="105" align="right">
+            <template #default="{row}">¥{{ ((Number(row['总数量']||1) * Number(row['运费单价（元）']||400))).toFixed(2) }}</template>
+          </el-table-column>
+          <el-table-column label="额外附加费(元)" width="120">
+            <template #default="{row}">
+              <el-input-number v-model="row._extraFee" :min="0" :step="50" size="small" style="width:100%" placeholder="0.00" controls-position="right"></el-input-number>
+            </template>
+          </el-table-column>
+          <el-table-column label="结算总金额(元)" width="115" align="right">
+            <template #default="{row}">
+              <strong style="color:var(--el-color-primary)">¥{{ ((Number(row['总数量']||1) * Number(row['运费单价（元）']||400)) + Number(row._extraFee||0)).toFixed(2) }}</strong>
+            </template>
+          </el-table-column>
+          <el-table-column label="结算备注" min-width="120">
+            <template #default="{row}">
+              <el-input v-model="row._memo" size="small" placeholder="压车/异常说明"></el-input>
+            </template>
+          </el-table-column>
+        </el-table>
+      </section>
+
+      <section class="demo-form-section" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:12px 16px; margin-top:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span>已选运单: <strong>{{ settleRows.length }}</strong> 笔</span>
+            <span style="margin-left:20px;">总发货量: <strong>{{ totalSettleQty }}</strong> 吨</span>
+            <span style="margin-left:20px;">基础运费: <strong>¥{{ totalBaseFee.toFixed(2) }}</strong></span>
+            <span style="margin-left:20px;">附加费合计: <strong>¥{{ totalExtraFee.toFixed(2) }}</strong></span>
+          </div>
+          <div>
+            <span style="font-size:14px; color:#64748b;">本次结算合计金额: </span>
+            <span style="font-size:20px; font-weight:bold; color:#0f766e;">¥{{ grandTotalSettleAmount.toFixed(2) }}</span>
+          </div>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
+          💡 提示：点击【确认结算】后将自动调用 U9 ERP 接口生成标准采购订单（运输服务），运单状态更新为【已完成】。
+        </div>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="settleVisible=false">取消</el-button>
+      <el-button type="primary" @click="onSettleOk">确认结算 (推ERP采购订单)</el-button>
+    </template>
+  </el-dialog>
+
   <!-- 二次派车（专线）弹窗 -->
   <el-dialog v-model="secondaryAssignVisible" class="demo-dialog--biz" :title="'二次派车 · 专线送货分配 (运单号: ' + (secondaryAssignRow['运单号']||'') + ')'" width="680px" top="8vh" align-center destroy-on-close append-to-body>
     <el-form label-width="140px">
@@ -1785,9 +1872,13 @@ const app = createApp({
       }
       if(pageId.value==='lg-waybill'){
         const st = row?.['状态'] || '';
+        const trans = row?.['运输类型'] || '';
         return ops.filter(op=>{
           if(op.name==='派车') return st==='待派车' || st==='待运输';
           if(op.name==='取消派车') return st==='待运输';
+          if(op.name==='二次派车（专线）' || op.name==='二次派车' || op.name==='专线派车'){
+            return trans==='专线' && ['待运输','运输中','已签收','已完成'].includes(st);
+          }
           return true;
         });
       }
@@ -4448,7 +4539,7 @@ const app = createApp({
     return {
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseWaybill, canDeleteKpiPlan,
-      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, splitVisible, splitRow, splitForm, splitLines, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, activeFormFields, activeFormLineFields, formLineRows,
+      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, splitVisible, splitRow, splitForm, splitLines, settleVisible, settleRows, settleForm, totalSettleQty, totalBaseFee, totalExtraFee, grandTotalSettleAmount, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, activeFormFields, activeFormLineFields, formLineRows,
       kpiCfgVisible, kpiGrades, kpiGradeSel, kpiProjects, kpiProjSel, kpiScoreVisible, kpiScoreReadonly, kpiScoreVendor, kpiScoreProjects, kpiScoreExplain, kpiScoreRemark, kpiScoreTotal, kpiScoreGrade, kpiVendorRows, kpiVendorCols, kpiVendorSel,
       kpiFlowVisible, kpiFlowRow, kpiFlowNodes, kpiFlowStamp, kpiFlowStampClass,
       qcInspectVisible, qcInspectRow, qcInspectForm,
