@@ -566,7 +566,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
             </div>
             <el-table class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
               <el-table-column type="selection" width="48"></el-table-column>
-              <el-table-column type="index" :label="['lg-order','lg-dispatch','lg-ship','lg-waybill'].includes(pageId)?'行号':'序号'" width="56"></el-table-column>
+              <el-table-column type="index" :label="['lg-dispatch','lg-ship','lg-waybill'].includes(pageId)?'行号':'序号'" width="56"></el-table-column>
               <el-table-column v-for="f in activeFormLineFields" :key="f.name" :label="f.name" :min-width="f.name.includes('物料')||f.name.includes('地点')?160:(f.name.includes('体积')?140:100)" show-overflow-tooltip>
                 <template #default="{ row }">
                   <el-input v-if="isFormLineFieldLocked(f, row) || (f.name==='物料信息' && row[f.name]) || f.type==='readonly'" :model-value="row[f.name]||'—'" disabled size="small"></el-input>
@@ -735,7 +735,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
           <el-button v-for="a in page.detailLineActions" :key="a" size="small" :type="a.includes('解绑')||a.includes('删除')?'danger':'primary'" @click="onDetailLineAction(a)">{{ a }}</el-button>
         </div>
         <el-table class="demo-data-table demo-data-table--striped" :data="detailLineRows" border stripe style="width:100%" max-height="320">
-          <el-table-column type="index" :label="['lg-order','lg-dispatch','lg-ship','lg-pickup','lg-sign'].includes(pageId)?'行号':'序号'" width="56"></el-table-column>
+          <el-table-column type="index" :label="['lg-dispatch','lg-ship','lg-pickup','lg-sign'].includes(pageId)?'行号':'序号'" width="56"></el-table-column>
           <el-table-column v-for="f in detailLineFields" :key="f.name" :prop="f.name" :label="f.name" :min-width="f.name.includes('物料')?160:100" show-overflow-tooltip></el-table-column>
           <el-table-column v-if="pageId==='po' || pageId==='so'" label="操作" width="80" fixed="right">
             <template #default>
@@ -1635,7 +1635,7 @@ const app = createApp({
     const formLineRows = ref([{ _i:1 }, { _i:2 }]);
     const formDialogTitle = computed(()=>{
       if(pageId.value==='dict') return (formMode.value==='add'?'新增':(formMode.value==='copy'?'复制':'编辑')) + '字典项';
-      if(pageId.value==='lg-order') return (formMode.value==='add'?'新增':'编辑') + '物流订单';
+      if(false /*lg-order removed*/) return (formMode.value==='add'?'新增':'编辑') + '物流单据';
       if(pageId.value==='lg-waybill') return (formMode.value==='add'?'新增':'编辑') + '运单';
       if(pageId.value==='lg-dispatch'){
         if(formMode.value==='add') return '新增派车申请单';
@@ -2009,11 +2009,11 @@ const app = createApp({
     function isFormFieldLocked(f){
       if(pageId.value==='lg-kpi-scheme' && f && f.name==='方案编码' && formMode.value!=='add') return true;
       if(!f || !f.lockWhenLinked) return false;
-      if(pageId.value==='lg-order') return !!(formModel['关联派车申请单']);
+      if(false /*lg-order removed*/) return !!(formModel['关联派车申请单']);
       return false;
     }
     function isFormLineFieldLocked(f, row){
-      if(pageId.value==='lg-order' && formModel['关联派车申请单']){
+      if(false /*lg-order removed*/ && formModel['关联派车申请单']){
         if(f.name==='物料信息' && row && row[f.name]) return true;
         if(f.lockWhenLinked || f.name==='单位' || f.name==='体积(长×宽×高)') return true;
       }
@@ -2081,11 +2081,6 @@ const app = createApp({
         all = [
           {编码:'S001',名称:'苏州气体供应商',规格:'—'},
           {编码:'S002',名称:'上海包材供应商',规格:'—'},
-        ];
-      } else if(t.includes('物流订单')){
-        all = [
-          {编码:'LO001',名称:'物流订单-沪苏线',规格:'承运商A'},
-          {编码:'LO002',名称:'物流订单-苏锡线',规格:'承运商B'},
         ];
       } else if(t.includes('派车申请单')){
         all = [
@@ -2318,7 +2313,7 @@ const app = createApp({
       if(pageId.value==='tank-arch') formLineRows.value = [];
       else if(pageId.value==='wh-po-in' || osPo) formLineRows.value = [];
       else if(pageId.value==='wh-prod-issue') formLineRows.value = [];
-      else if(pageId.value==='lg-order') formLineRows.value = [];
+      else if(false /*lg-order removed*/) formLineRows.value = [];
       else if(pageId.value==='lg-waybill') formLineRows.value = [];
       else if(pageId.value==='lg-ship') formLineRows.value = [emptyShipLine(1)];
       else if(pageId.value==='lg-dispatch'){
@@ -2674,9 +2669,9 @@ const app = createApp({
             检验判定: row['检验判定']||'待判定'
           });
         }
-        if(pageId.value==='lg-order'){
+        if(false /*lg-order removed*/){
           Object.assign(formModel, {
-            物流订单号: row['物流订单号']||'',
+            派车申请单号: row['派车申请单号']||'',
             关联派车申请单: row['关联派车申请单号']||row['关联派车申请单']||'',
             发货单位: row['发货单位']||'',
             收货单位: row['收货单位']||'',
@@ -2705,7 +2700,7 @@ const app = createApp({
             运输备注: row['运输备注']||'',
             备注: row['备注']||''
           });
-          const lines = (MOCK['lg-order']||{}).detailLines || [];
+          const lines = ((MOCK['lg-dispatch']||{})||{}).detailLines || [];
           formLineRows.value = lines.map((r,i)=>({_i:i+1, ...r}));
         }
         if(pageId.value==='lg-waybill'){
@@ -3038,7 +3033,7 @@ const app = createApp({
     }
     function onFormLineAction(name){
       if(name==='新增' || name==='新增行' || name==='选择物料'){
-        if(pageId.value==='lg-order'){
+        if(false /*lg-order removed*/){
           formLineRows.value = formLineRows.value.concat([{
             _i: formLineRows.value.length+1,
             物料信息: '',
@@ -3123,14 +3118,121 @@ const app = createApp({
       ];
     }
     function defaultKpiProjects(){
-      return [{
-        考评项目:'运输时效与服务', 评价部门:'物流部', 负责人:'张三',
-        _indicators:[
-          { 代号:'IND01', 考评内容:'准时送达率', 配分:'40.00', 评分标准:'100%按时得40分，每迟到1%扣2分', 备注:'无' },
-          { 代号:'IND02', 考评内容:'货损率', 配分:'30.00', 评分标准:'零货损得30分，每增加0.1%扣5分', 备注:'无' },
-          { 代号:'IND03', 考评内容:'服务响应', 配分:'30.00', 评分标准:'及时响应得30分，超时扣分', 备注:'无' }
-        ]
-      }];
+      // 默认对齐客户《物流供应商季度评价表》STR-RD-JY-019
+      return [
+        {
+          "考评项目": "价格竞争力",
+          "评价部门": "物流部",
+          "负责人": "张三",
+          "_indicators": [
+            {
+              "代号": "Q-P01",
+              "考评内容": "中标率（整车）",
+              "配分": "10.00",
+              "评分标准": "≧目标20%，每低于1%扣2分；中标率=季度中标线路数/投标线路总数×100%",
+              "备注": "权重10%"
+            },
+            {
+              "代号": "Q-P02",
+              "考评内容": "临时报价采纳率",
+              "配分": "5.00",
+              "评分标准": "≧目标20%，每低于1%扣1分；采纳率=季度临时报价采纳数/临时报价总数×100%",
+              "备注": "权重5%"
+            },
+            {
+              "代号": "Q-P03",
+              "考评内容": "临时报价响应率",
+              "配分": "5.00",
+              "评分标准": "紧急≤2小时、一般≤4小时；每延迟1次紧急扣1分/一般扣0.5分",
+              "备注": "权重5%"
+            }
+          ]
+        },
+        {
+          "考评项目": "运作质量",
+          "评价部门": "物流部",
+          "负责人": "张三",
+          "_indicators": [
+            {
+              "代号": "Q-O01",
+              "考评内容": "承运商责任货损率",
+              "配分": "15.00",
+              "评分标准": "≦0.5%，每高于0.1%扣3分，且全额赔偿",
+              "备注": "权重15%"
+            },
+            {
+              "代号": "Q-O02",
+              "考评内容": "承运商责任货差率",
+              "配分": "15.00",
+              "评分标准": "≦0.2%，每高于0.1%扣3分，且全额赔偿",
+              "备注": "权重15%"
+            },
+            {
+              "代号": "Q-O03",
+              "考评内容": "提货及时率",
+              "配分": "10.00",
+              "评分标准": "≧98%，每低于1%扣1分；按时派车提货票数/总派车票数",
+              "备注": "权重10%"
+            },
+            {
+              "代号": "Q-O04",
+              "考评内容": "到货准时率",
+              "配分": "10.00",
+              "评分标准": "≧98%，每低于1%扣1分；按承诺时效送达票数/总订单票数",
+              "备注": "权重10%"
+            },
+            {
+              "代号": "Q-O05",
+              "考评内容": "单据准确完整率",
+              "配分": "10.00",
+              "评分标准": "≧99%，每低于1%扣1分；签收单/对账单按时准确完整返回比例",
+              "备注": "权重10%"
+            }
+          ]
+        },
+        {
+          "考评项目": "服务响应",
+          "评价部门": "物流部",
+          "负责人": "李四",
+          "_indicators": [
+            {
+              "代号": "Q-S01",
+              "考评内容": "异常反馈及时性",
+              "配分": "5.00",
+              "评分标准": "=100%，每低于1%扣1分；异常2小时内首次响应、24小时内出具处理方案",
+              "备注": "权重5%"
+            },
+            {
+              "代号": "Q-S02",
+              "考评内容": "信息反馈及时性",
+              "配分": "5.00",
+              "评分标准": "≧98%，每低于1%扣1分；轨迹节点按时更新率",
+              "备注": "权重5%"
+            }
+          ]
+        },
+        {
+          "考评项目": "协同",
+          "评价部门": "经营中心",
+          "负责人": "王五",
+          "_indicators": [
+            {
+              "代号": "Q-C01",
+              "考评内容": "紧急订单配合度",
+              "配分": "5.00",
+              "评分标准": "≧90%，每低于1%扣1分；要求时间内成功履行的紧急/加急订单比例",
+              "备注": "权重5%"
+            },
+            {
+              "代号": "Q-C02",
+              "考评内容": "可持续发展",
+              "配分": "5.00",
+              "评分标准": "国六及新能源车使用比例≧80%，每低于1%扣1分",
+              "备注": "权重5%"
+            }
+          ]
+        }
+      ];
     }
     function kpiSchemeInUse(name){
       if(!name) return false;
@@ -3492,7 +3594,7 @@ const app = createApp({
         ElMessage.success(formMode.value==='add' ? '承运商已新增' : '承运商已保存');
         return;
       }
-      if(pageId.value==='lg-order'){
+      if(false /*lg-order removed*/){
         if(!formModel['发货单位']){ ElMessage.warning('请选择发货单位'); return; }
         if(!formModel['收货单位']){ ElMessage.warning('请选择收货单位'); return; }
         if(!formModel['装货地点']){ ElMessage.warning('请填写或选择装货地点'); return; }
@@ -3507,7 +3609,7 @@ const app = createApp({
         const badQty = formLineRows.value.some(r=> !(Number(r['数量'])>0));
         if(badQty){ ElMessage.warning('物料数量必须大于 0'); return; }
         formVisible.value=false;
-        ElMessage.success(formMode.value==='add'?'物流订单已创建':'物流订单已更新');
+        ElMessage.success(formMode.value==='add'?'单据已创建':'单据已更新');
         return;
       }
       if(pageId.value==='lg-waybill'){
@@ -3733,7 +3835,7 @@ const app = createApp({
             车型要求:'平板车', 要求送达时间:'2026-08-11 16:00', 特殊要求:'—'
           });
         }
-        const lines = (MOCK['lg-order']||{}).formLinesFromDispatch || (MOCK['lg-order']||{}).detailLines || [];
+        const lines = ((MOCK['lg-dispatch']||{})||{}).formLinesFromDispatch || ((MOCK['lg-dispatch']||{})||{}).detailLines || [];
         formLineRows.value = lines.map((r,i)=>({_i:i+1, ...r}));
         ElMessage.success('已带入派车申请单关联信息及物料明细');
       } else if(t.includes('承运公司') || t.includes('承运商')){
@@ -3765,14 +3867,11 @@ const app = createApp({
           formModel['司机电话'] = withDriver['司机电话']||'';
         }
         ElMessage.success('已选择发货单并生成装卸货点明细：'+formModel['关联发货单']);
-      } else if(t.includes('物流订单')){
-        formModel['关联物流订单'] = label;
-        ElMessage.success('已选择物流订单：'+label);
       } else if(t.includes('物料')){
         if(pageId.value==='qc-ledger'){
           formModel['物料信息'] = `${row.编码} / ${row.名称} / ${row.规格||'—'} / —`;
           ElMessage.success('已选择物料：'+formModel['物料信息']);
-        } else if(pageId.value==='lg-order' || pageId.value==='lg-dispatch' || pageId.value==='lg-ship'){
+        } else if(false /*lg-order removed*/ || pageId.value==='lg-dispatch' || pageId.value==='lg-ship'){
           const info = `${row.编码} / ${row.名称} / ${row.规格||'—'} / —`;
           const unitMap = { M001:'个', M002:'个', M003:'个', MAT001:'吨' };
           const unit = unitMap[row.编码] || 'kg';
@@ -3780,7 +3879,7 @@ const app = createApp({
           if(empty){
             empty['物料信息'] = info;
             empty['单位'] = unit;
-            if(pageId.value==='lg-order') empty['体积(长×宽×高)'] = empty['体积(长×宽×高)'] || '';
+            if(false /*lg-order removed*/) empty['体积(长×宽×高)'] = empty['体积(长×宽×高)'] || '';
             if(pageId.value==='lg-dispatch' || pageId.value==='lg-ship') empty['体积(长*宽*高)'] = empty['体积(长*宽*高)'] || '';
           } else {
             const line = {
@@ -3790,7 +3889,7 @@ const app = createApp({
               单位: unit,
               备注: ''
             };
-            if(pageId.value==='lg-order') line['体积(长×宽×高)'] = '';
+            if(false /*lg-order removed*/) line['体积(长×宽×高)'] = '';
             if(pageId.value==='lg-dispatch'){
               line['需求数量'] = '';
               line['体积(长*宽*高)'] = '';
@@ -4056,8 +4155,8 @@ const app = createApp({
           });
           bumpStore();
           if(detailVisible.value && detailRow.value){
-            const id = detailRow.value['运单号'] || detailRow.value['物流订单号'] || detailRow.value['单号'] || detailRow.value.id;
-            const refreshed = tableData.value.find(r => (r['运单号']||r['物流订单号']||r['单号']||r.id) === id);
+            const id = detailRow.value['运单号'] || detailRow.value['单号'] || detailRow.value.id;
+            const refreshed = tableData.value.find(r => (r['运单号']||r['单号']||r.id) === id);
             if(refreshed) openDetail(refreshed);
             else if((page.value?.detailEnrouteFields||[]).length){
               const fromStore = STORE.getEnrouteForPc(pageId.value, detailRow.value);

@@ -304,7 +304,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                       <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ n.refNo || n.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
-                      <div v-if="n.logisticsNo || n.dispatchNo" class="full"><span class="doc-label">关联物流订单</span>{{ n.logisticsNo || n.dispatchNo }}</div>
+                      <div v-if="n.logisticsNo || n.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ n.logisticsNo || n.dispatchNo }}</div>
                     </div>
                   </div>
                   <div class="line-stats" v-if="flowMode==='stocktake'" style="margin:0 12px 12px;border-top:1px solid #F0F0F0;padding-top:10px">
@@ -346,7 +346,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                       <div><span class="doc-label">{{ flowMeta.refLabel || '关联单据' }}</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
                       <div v-if="currentNotice.materialSummary" class="full"><span class="doc-label">物料信息</span>{{ currentNotice.materialSummary }}</div>
-                      <div v-if="currentNotice.logisticsNo || currentNotice.dispatchNo" class="full"><span class="doc-label">关联物流订单</span>{{ currentNotice.logisticsNo || currentNotice.dispatchNo }}</div>
+                      <div v-if="currentNotice.logisticsNo || currentNotice.dispatchNo" class="full"><span class="doc-label">关联派车申请单</span>{{ currentNotice.logisticsNo || currentNotice.dispatchNo }}</div>
                     </div>
                   </div>
                 </div>

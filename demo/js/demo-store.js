@@ -232,7 +232,7 @@ window.WMS_DEMO_STORE = (function () {
       row['提货单号'] ||
       row['签收单号'] ||
       row['单号'] ||
-      row['物流订单号'] ||
+      row['派车申请单号'] ||
       row['发货单号'] ||
       row['派车申请单号'] ||
       row['编号'] ||
@@ -241,14 +241,14 @@ window.WMS_DEMO_STORE = (function () {
     if (!doc || !doc.status) return row;
     const next = Object.assign({}, row);
     const pcStatus = STATUS_TO_PC[doc.status] || doc.status;
-    if (pageId === 'lg-waybill' || pageId === 'lg-order') {
+    if (pageId === 'lg-waybill') {
       if (next['状态'] !== undefined) next['状态'] = pcStatus;
     } else if (next['单据状态'] !== undefined) {
       next['单据状态'] = pcStatus;
     } else if (next['状态'] !== undefined) {
       next['状态'] = pcStatus;
     }
-    if (doc.lastEnroute && next['备注'] !== undefined && (pageId === 'lg-waybill' || pageId === 'lg-order')) {
+    if (doc.lastEnroute && next['备注'] !== undefined && (pageId === 'lg-waybill')) {
       next['备注'] = 'APP在途：' + doc.lastEnroute;
     }
     return next;
@@ -290,7 +290,7 @@ window.WMS_DEMO_STORE = (function () {
   }
 
   function getEnrouteForPc(pageId, row) {
-    const id = (row && (row['运单号'] || row['物流订单号'] || row.id)) || '';
+    const id = (row && (row['运单号'] || row['派车申请单号'] || row.id)) || '';
     const list = getEnroute(id);
     if (list.length) return list;
     return null;
