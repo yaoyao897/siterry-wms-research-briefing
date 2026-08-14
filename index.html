@@ -891,12 +891,12 @@ function renderBlueprintPlan() {
   pageTitle.textContent = '三、蓝图确认计划与甘特图';
   
   const planTasks = [
-    { id: 1, topic: '基础资料模块核对', module: 'PC/APP 基础数据（物料、客户、供应商、仓库、包材档案、标签配置等）', roles: '仓库管理员、系统管理员、质检员', start: '2026-08-17', end: '2026-08-17', status: '🟡 待核对', dStart: 0, dEnd: 0, cls: 'todo' },
-    { id: 2, topic: '仓储核心出入库核对', module: 'PC/APP 仓储管理（采购入库/退料、销售发货/退货、委外收发退）', roles: '仓库主管、仓库操作员、采购员、销售员', start: '2026-08-18', end: '2026-08-18', status: '🟡 待核对', dStart: 1, dEnd: 1, cls: 'todo' },
-    { id: 3, topic: '仓储库内及物流模块核对', module: 'PC/APP 库内转移/转序/盘点、受托加工、物流管理（派车/运单/门卫）', roles: '仓库操作员、质检员、物流管理员、门卫', start: '2026-08-19', end: '2026-08-19', status: '🟡 待核对', dStart: 2, dEnd: 2, cls: 'todo' },
-    { id: 4, topic: '移动端(APP/PDA)全流程走查', module: 'APP端包材建档、仓储扫码作业、PDA现场操作及特殊场景', roles: '仓库一线操作员、装卸工、现场物流员', start: '2026-08-20', end: '2026-08-20', status: '🟡 待核对', dStart: 3, dEnd: 3, cls: 'doing' },
-    { id: 5, topic: '全流程跨模块串联走查', module: '跨系统（ERP-WMS-LIMS）与全业务主线串联，问题集中收集与调整', roles: '项目组、各业务部门关键用户', start: '2026-08-20', end: '2026-08-21', status: '🟡 待核对', dStart: 3, dEnd: 4, cls: 'doing' },
-    { id: 6, topic: '蓝图终审与确认签署', module: '召开蓝图与原型最终确认汇报会，定稿签署《蓝图与验收标准确认书》', roles: '项目领导、部门主管、关键用户', start: '2026-08-21', end: '2026-08-21', status: '🚩 里程碑', dStart: 4, dEnd: 4, cls: 'milestone' }
+    { id: 0, topic: 'TMS 物流模块核对（提前启动）', module: 'PC/APP 物流管理（派车申请/发货单拆分/运单合并/提货/在途打卡/签收/承运商考核）', roles: '物流部负责人、承运商代表、项目经理', location: '线上会议', start: '2026-08-14 (周五 13:30)', end: '2026-08-14', status: '🟢 进行中', dStart: 0, dEnd: 0, cls: 'doing' },
+    { id: 1, topic: '采购与销售业务流程核对', module: 'PC/APP 采购入库/退料、销售备货/发货/退货、委外收发退、受托加工收发', roles: '采购部、销售部、委外业务员、受托业务员、仓储部负责人', location: '成都思特瑞总部', start: '2026-08-17 (周一)', end: '2026-08-17', status: '🟡 待核对', dStart: 1, dEnd: 1, cls: 'todo' },
+    { id: 2, topic: '生产业务与库内管理核对', module: 'PC/APP 生产领料/退料/入库、罐区投料、库内转移/转序、厂内与跨厂区调拨', roles: '生产车间主管、仓储部库管/装卸工、品管部质检员', location: '思特瑞绵竹工厂', start: '2026-08-18 (周二)', end: '2026-08-18', status: '🟡 待核对', dStart: 2, dEnd: 2, cls: 'todo' },
+    { id: 3, topic: '系统基础数据与系统管理核对', module: 'PC/APP 物料/客供/仓库/包材档案、标签设计器、表单设计器、条码拆组/冻结/报废、权限与审批流', roles: '项目经理负责人、IT 负责人、关键用户', location: '思特瑞绵竹工厂', start: '2026-08-19 (周三)', end: '2026-08-19', status: '🟡 待核对', dStart: 3, dEnd: 3, cls: 'todo' },
+    { id: 4, topic: '跨系统集成接口详细核对', module: '28 个系统集成接口（ERP 15个 + OA 5个 + LIMS 3个 + MES 1个 + 硬件/其他 4个）', roles: 'IT 负责人、系统集成工程师、项目经理', location: '思特瑞绵竹工厂', start: '2026-08-20 (周四)', end: '2026-08-20', status: '🟡 待核对', dStart: 4, dEnd: 4, cls: 'todo' },
+    { id: 5, topic: '原型确认汇报及蓝图签署会议', module: '全业务场景端到端实操推演与验收确认，定稿签署《蓝图与验收标准确认书》', roles: '所有岗位负责人及公司领导、项目总监、项目经理', location: '思特瑞绵竹工厂', start: '2026-08-21 (周五)', end: '2026-08-21', status: '🚩 里程碑', dStart: 5, dEnd: 5, cls: 'milestone' }
   ];
 
   const totalDays = 5;
@@ -927,6 +927,7 @@ function renderBlueprintPlan() {
       <td>${t.id}</td>
       <td><strong>${t.topic}</strong></td>
       <td>${t.module}</td>
+      <td><span class="badge" style="background:#f1f5f9;color:#0f172a;font-weight:600">${t.location || "-"}</span></td>
       <td>${t.roles}</td>
       <td>${t.start}</td>
       <td>${t.end}</td>
@@ -944,6 +945,7 @@ function renderBlueprintPlan() {
           <th>序号</th>
           <th>主题</th>
           <th>模块</th>
+          <th>地点</th>
           <th>相关岗位</th>
           <th>计划开始</th>
           <th>计划结束</th>
@@ -1176,6 +1178,7 @@ function renderProtoProgress() {
           <th>描述</th>
           <th>设计状态</th>
           <th>确认状态</th>
+          <th>地点</th>
           <th>相关岗位</th>
           <th>计划完成</th>
         </tr>
