@@ -378,10 +378,10 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
         </el-breadcrumb>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html" class="on">PC</a>
-            <a href="./app.html">APP</a>
+            <a href="./思特瑞WMS_Demo.html" class="on">PC</a>
+            <a href="./思特瑞WMS_APP_Demo.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore">联动·重置</button>
         </div>
@@ -467,6 +467,18 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <template #tag="{ row, column }">
                   <span class="tag" :class="tagClass(row[column.field])">{{ row[column.field] }}</span>
                 </template>
+                <template #addr_info="{ row }">
+                  <el-popover v-if="(row._addrs||[]).length" placement="top" :width="320" :trigger="['hover','click']">
+                    <el-table :data="row._addrs" size="small" border>
+                      <el-table-column prop="客户地址编码" label="地址编码" width="100"></el-table-column>
+                      <el-table-column prop="客户地址描述" label="地址描述" min-width="160" show-overflow-tooltip></el-table-column>
+                    </el-table>
+                    <template #reference>
+                      <el-button link type="primary">地址信息</el-button>
+                    </template>
+                  </el-popover>
+                  <span v-else class="demo-readonly">—</span>
+                </template>
                 <template #link="{ row, column }">
                   <el-button v-if="row[column.field] && row[column.field]!=='—'" link type="primary" @click="onBizLink(column.field, row[column.field])">{{ row[column.field] }}</el-button>
                   <span v-else class="demo-readonly">—</span>
@@ -506,7 +518,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
           <div class="demo-form-grid" v-if="(sec.fields||[]).length">
             <el-form-item v-for="f in sec.fields" :key="sec.title+'-'+f.name" :label="f.name" :required="f.required" :style="f.type==='textarea' ? 'grid-column:1/-1' : undefined">
               <el-input v-if="f.type==='readonly' || isFormFieldLocked(f)" :model-value="formModel[f.name] || ((f.ctrl||'').includes('系统')?'系统自动生成':'自动带入')" disabled></el-input>
-              <el-select v-else-if="f.type==='select'" v-model="formModel[f.name]" placeholder="请选择" style="width:100%">
+              <el-select v-else-if="f.type==='select'" v-model="formModel[f.name]" placeholder="请选择" style="width:100%" @change="onFormSelectChange(f)">
                 <el-option v-for="opt in ((f.options&&f.options.length)?f.options:['示例选项'])" :key="opt" :label="opt" :value="opt"></el-option>
               </el-select>
               <div v-else-if="f.type==='number-unit'" style="display:flex;gap:8px;width:100%">
@@ -516,9 +528,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 </el-select>
               </div>
               <el-date-picker v-else-if="f.type==='date' || f.type==='datetime'" v-model="formModel[f.name]" :type="isDateTimeField(f)?'datetime':'date'" :value-format="isDateTimeField(f)?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="isDateTimeField(f)?'选择日期时间':'选择日期'" style="width:100%"></el-date-picker>
-              <el-radio-group v-else-if="f.type==='radio'" v-model="formModel[f.name]">
-                <el-radio v-for="opt in (f.options||['是','否'])" :key="opt" :value="opt">{{ opt }}</el-radio>
-              </el-radio-group>
+              <div v-else-if="f.type==='radio'">
+                <el-radio-group v-model="formModel[f.name]">
+                  <el-radio v-for="opt in (f.options||['是','否'])" :key="opt" :value="opt">{{ opt }}</el-radio>
+                </el-radio-group>
+                <el-input v-if="f.name==='用车类型' && formModel['用车类型']==='其他'" v-model="formModel['用车类型其他']" placeholder="请填写其他用车类型" style="margin-top:8px"></el-input>
+              </div>
               <el-input v-else-if="f.type==='picker'" :model-value="formModel[f.name]||''" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
               <el-input v-else-if="f.type==='textarea'" v-model="formModel[f.name]" type="textarea" :rows="3" placeholder="请输入"></el-input>
               <el-switch v-else-if="f.type==='switch'" v-model="formSwitch[f.name]" active-text="启用" inactive-text="禁用"></el-switch>
@@ -543,9 +558,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               </el-select>
             </div>
               <el-date-picker v-else-if="f.type==='date' || f.type==='datetime'" v-model="formModel[f.name]" :type="isDateTimeField(f)?'datetime':'date'" :value-format="isDateTimeField(f)?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="isDateTimeField(f)?'选择日期时间':'选择日期'" style="width:100%"></el-date-picker>
-              <el-radio-group v-else-if="f.type==='radio'" v-model="formModel[f.name]">
-                <el-radio v-for="opt in (f.options||['是','否'])" :key="opt" :value="opt">{{ opt }}</el-radio>
-              </el-radio-group>
+              <div v-else-if="f.type==='radio'">
+                <el-radio-group v-model="formModel[f.name]">
+                  <el-radio v-for="opt in (f.options||['是','否'])" :key="opt" :value="opt">{{ opt }}</el-radio>
+                </el-radio-group>
+                <el-input v-if="f.name==='用车类型' && formModel['用车类型']==='其他'" v-model="formModel['用车类型其他']" placeholder="请填写其他用车类型" style="margin-top:8px"></el-input>
+              </div>
               <el-input v-else-if="f.type==='picker'" :model-value="formModel[f.name]||''" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
             <el-input v-else-if="f.type==='textarea'" v-model="formModel[f.name]" type="textarea" :rows="3" placeholder="请输入"></el-input>
             <el-switch v-else-if="f.type==='switch'" v-model="formSwitch[f.name]" active-text="启用" inactive-text="禁用"></el-switch>
@@ -558,13 +576,14 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
         <el-alert v-if="page.formLineTip" type="info" :closable="false" style="margin-bottom:10px" :title="page.formLineTip"></el-alert>
         <el-tabs>
           <el-tab-pane :label="page.formLineTabLabel || '物料'">
-            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap" v-if="(page.formLineActions||[]).length">
+            <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;justify-content:flex-end" v-if="(page.formLineActions||[]).length">
               <el-button v-for="a in page.formLineActions" :key="(a && a.name)||a" size="small"
-                :type="(a && a.type) || (String((a && a.name)||a).includes('删除')?'danger':(String((a && a.name)||a).includes('新增')?'primary':'default'))"
+                :type="(a && a.type) || (String((a && a.name)||a).includes('删除')?'danger':(String((a && a.name)||a).includes('新增')||String((a && a.name)||a).includes('添加')?'primary':'default'))"
                 :disabled="String((a && a.name)||a).includes('删除') && !(formLineSelected&&formLineSelected.length)"
                 @click="onFormLineAction((a && a.name)||a)">{{ (a && a.name)||a }}</el-button>
             </div>
-            <el-table class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
+            <el-empty v-if="pageId==='customer' && !formLineRows.length" description="暂无数据" :image-size="80"></el-empty>
+            <el-table v-else class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
               <el-table-column type="selection" width="48"></el-table-column>
               <el-table-column type="index" :label="['lg-dispatch','lg-ship','lg-waybill'].includes(pageId)?'行号':'序号'" width="56"></el-table-column>
               <el-table-column v-for="f in activeFormLineFields" :key="f.name" :label="f.name" :min-width="f.name.includes('物料')||f.name.includes('地点')?160:(f.name.includes('体积')?140:100)" show-overflow-tooltip>
@@ -1321,18 +1340,92 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
     </template>
   </el-dialog>
 
+  
+  <!-- 二次派车（专线）弹窗 -->
+  <el-dialog v-model="secondaryAssignVisible" class="demo-dialog--biz" :title="'二次派车 · 专线送货分配 (运单号: ' + (secondaryAssignRow['运单号']||'') + ')'" width="680px" top="8vh" align-center destroy-on-close append-to-body>
+    <el-form label-width="140px">
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>运单首程信息 (只读)</span></h4>
+        <div class="demo-form-grid">
+          <el-form-item label="关联发货单"><span class="demo-readonly">{{ secondaryAssignRow['关联发货单'] || '—' }}</span></el-form-item>
+          <el-form-item label="物料信息"><span class="demo-readonly">{{ secondaryAssignRow['物料信息'] || '—' }}</span></el-form-item>
+          <el-form-item label="承运商名称"><span class="demo-readonly">{{ secondaryAssignRow['承运商名称'] || '—' }}</span></el-form-item>
+          <el-form-item label="首程车牌/司机"><span class="demo-readonly">{{ (secondaryAssignRow['车牌号']||'—') + (secondaryAssignRow['司机姓名'] ? ' ('+secondaryAssignRow['司机姓名']+' / '+(secondaryAssignRow['司机电话']||'')+')' : '') }}</span></el-form-item>
+        </div>
+      </section>
+      <section class="demo-form-section">
+        <h4 class="demo-form-section__title"><span>专线二次送货车辆与司机信息</span></h4>
+        <div class="demo-form-grid">
+          <el-form-item label="送货车牌号（专线）" required>
+            <el-input v-model="secondaryAssignForm.送货车牌号" placeholder="例: 川A66666"></el-input>
+          </el-form-item>
+          <el-form-item label="送货车挂号（专线）">
+            <el-input v-model="secondaryAssignForm.送货车挂号" placeholder="例: 川A666挂"></el-input>
+          </el-form-item>
+          <el-form-item label="送货司机（专线）" required>
+            <el-input v-model="secondaryAssignForm.送货司机" placeholder="输入末端送货司机姓名"></el-input>
+          </el-form-item>
+          <el-form-item label="送货司机电话（专线）" required>
+            <el-input v-model="secondaryAssignForm.送货司机电话" placeholder="11 位有效手机号码"></el-input>
+          </el-form-item>
+          <el-form-item label="中转送货备注" style="grid-column:1/-1">
+            <el-input v-model="secondaryAssignForm.送货备注" type="textarea" :rows="2" placeholder="专线中转网点、联系人或送货交接注意事项"></el-input>
+          </el-form-item>
+        </div>
+      </section>
+    </el-form>
+    <template #footer>
+      <el-button @click="secondaryAssignVisible=false">取消</el-button>
+      <el-button type="primary" @click="onSecondaryAssignOk">确认保存</el-button>
+    </template>
+  </el-dialog>
+
   <!-- 选单弹窗 -->
   <el-dialog v-model="pickerVisible" class="demo-dialog--biz" :title="'选择 · '+pickerTitle" width="720px" align-center destroy-on-close append-to-body>
     <el-input v-model="pickerKw" clearable placeholder="关键词搜索" style="margin-bottom:12px;max-width:280px"></el-input>
     <el-table class="demo-data-table demo-data-table--striped" :data="pickerRows" border stripe highlight-current-row @current-change="r=>pickerCurrent=r" max-height="320" style="width:100%">
       <el-table-column type="index" width="56" label="序号"></el-table-column>
-      <el-table-column prop="编码" label="编码" width="120" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="名称" label="名称" min-width="160" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="规格" label="规格" width="120" show-overflow-tooltip></el-table-column>
+      <template v-if="pickerMode==='addr'">
+        <el-table-column prop="地址编码" label="地址编码" width="120" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="地址描述" label="地址描述" min-width="200" show-overflow-tooltip></el-table-column>
+      </template>
+      <template v-else>
+        <el-table-column prop="编码" label="编码" width="120" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="名称" label="名称" min-width="160" show-overflow-tooltip></el-table-column>
+        <el-table-column v-if="pickerMode!=='order'" prop="规格" label="规格" width="120" show-overflow-tooltip></el-table-column>
+        <el-table-column v-if="pickerTitle==='产品名称'" prop="种类" label="种类" width="120" show-overflow-tooltip></el-table-column>
+      </template>
     </el-table>
     <template #footer>
       <el-button @click="pickerVisible=false">取消</el-button>
       <el-button type="primary" @click="onPickerOk">确定</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 发货单合并下发 -->
+  <el-dialog v-model="mergeVisible" class="demo-dialog--biz" title="下发" width="520px" align-center destroy-on-close append-to-body>
+    <el-form label-width="128px">
+      <el-form-item label="选择承运商" required>
+        <el-select v-model="mergeForm.承运商名称" placeholder="请选择承运商" style="width:100%">
+          <el-option v-for="c in assignCarriers" :key="c" :label="c" :value="c"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="计划发货日期" required>
+        <el-date-picker v-model="mergeForm.计划发货日期" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width:100%"></el-date-picker>
+      </el-form-item>
+      <el-form-item label="运输类型" required>
+        <el-select v-model="mergeForm.运输类型" placeholder="请选择运输类型" style="width:100%">
+          <el-option label="专线" value="专线"></el-option>
+          <el-option label="专车" value="专车"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="运费单价（元）">
+        <el-input v-model="mergeForm.运费单价" placeholder="按运费参照带出，可改"></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="mergeVisible=false">取消</el-button>
+      <el-button type="primary" @click="onMergeShipOk">确认</el-button>
     </template>
   </el-dialog>
 
@@ -1590,6 +1683,10 @@ const app = createApp({
     const pickerTitle = ref('');
     const pickerKw = ref('');
     const pickerCurrent = ref(null);
+    const mergeVisible = ref(false);
+    const mergeForm = reactive({ 承运商名称: '', 计划发货日期: '', 运输类型: '', 运费单价: '' });
+    const mergeShipRows = ref([]);
+    const VEHICLE_OPTS = ['发货','提货','设备发运','厂内/园区倒短运输','物资转运','其他'];
     const jobVisible = ref(false);
     const jobTitle = ref('作业详情');
     const jobHead = ref({});
@@ -1685,9 +1782,6 @@ const app = createApp({
           if(op.name==='编辑') return audit==='待审核' && st==='待执行';
           return true;
         });
-      }
-      if(pageId.value==='lg-ship'){
-        return ops.filter(op=> op.name!=='编辑' || row?.['状态']==='待调度');
       }
       if(pageId.value==='lg-waybill'){
         const st = row?.['状态'] || '';
@@ -2025,7 +2119,7 @@ const app = createApp({
     const detailLineFields = computed(()=> page.value?.detailLineFields || []);
     const detailRowFiltered = computed(()=>{
       const row = detailRow.value || {};
-      const skip = new Set(['id','_actions','typeId']);
+      const skip = new Set(['id','_actions','typeId','_addrs','_addrSeq','_lines','_photos','_signature','_vendors','_grades','_projects','_flow','_scores']);
       const out = {};
       Object.keys(row).forEach(k=>{ if(!skip.has(k)) out[k]=row[k]; });
       return out;
@@ -2069,10 +2163,48 @@ const app = createApp({
         {编码:'M004',名称:'软管',规格:'1.5m',供应商:'上海包材供应商'},
       ],
     };
+    const pickerMode = computed(()=>{
+      const t = pickerTitle.value || '';
+      if(t==='发货地' || t==='收货地') return 'addr';
+      if(t==='订单号') return 'order';
+      return 'default';
+    });
     const pickerRows = computed(()=>{
       const t = pickerTitle.value || '';
       let all = [];
-      if(t.includes('采购订单') || t.includes('委外加工单')){
+      if(t==='订单号'){
+        const typ = formModel['订单类型'] || '';
+        if(typ==='采购订单'){
+          all = ((MOCK.po||{}).main||[]).map(r=>({编码:r['采购订单号'],名称:r['供应商名称']||r['采购类型']||''}));
+        } else if(typ==='销售订单'){
+          all = ((MOCK.so||{}).main||[]).map(r=>({编码:r['销售订单号'],名称:r['客户名称']||r['销售类型']||''}));
+        } else if(typ==='委外加工单'){
+          all = [
+            {编码:'WWDD2026080001',名称:'委外加工-铝瓶'},
+            {编码:'WWDD2026080002',名称:'委外加工-钢瓶'}
+          ];
+        }
+      } else if(t==='发货地' || t==='收货地'){
+        const addrs = [];
+        ((MOCK.customer||{}).main||[]).forEach(c=>{
+          (c._addrs||[]).forEach(a=>{
+            addrs.push({地址编码:a['客户地址编码'],地址描述:a['客户地址描述']||'',编码:a['客户地址编码'],名称:a['客户地址描述']||''});
+          });
+        });
+        ((MOCK.supplier||{}).main||[]).forEach((s,i)=>{
+          const code = String(i+1).padStart(3,'0');
+          const desc = s['供应商地址'] || s['供应商名称'] || '';
+          addrs.push({地址编码:code,地址描述:desc,编码:code,名称:desc});
+        });
+        all = addrs;
+      } else if(t==='产品名称' || (t.includes('物料') && pageId.value==='freight')){
+        all = ((MOCK['mat-list']||{}).main||[]).map(m=>({
+          编码: m['物料编码'],
+          名称: m['物料名称'],
+          规格: m['物料规格']||'—',
+          种类: m['物料种类']||'—'
+        }));
+      } else if(t.includes('采购订单') || t.includes('委外加工单')){
         all = [
           {编码:'PO001',名称:'采购订单-钢瓶铝瓶',规格:'供应商：苏州气体供应商'},
           {编码:'PO002',名称:'采购订单-软管钢瓶',规格:'供应商：上海包材供应商'},
@@ -2088,11 +2220,17 @@ const app = createApp({
           {编码:'PC2026081002',名称:'已批准-成品仓发无锡',规格:'发货：思特瑞成品仓 → 无锡客户B'},
         ];
       } else if(t.includes('发货单') || t==='关联发货单'){
-        all = [
-          {编码:'FH001',名称:'发货单-XX化工→YY材料',规格:'待发货 / PC001'},
-          {编码:'FH002',名称:'发货单-AA工厂→BB公司',规格:'待发货 / PC001'},
-          {编码:'FH003',名称:'发货单-XX化工→德阳客户',规格:'运输中 / PC002'},
-        ];
+        all = ((MOCK['lg-ship']||{}).main||[]).map(r=>({
+          编码: r['发货单号'],
+          名称: (r['装货点']||'') + ' → ' + (r['卸货点']||''),
+          规格: (r['状态']||'') + ' / ' + (r['物料信息']||'')
+        }));
+        if(!all.length){
+          all = [
+            {编码:'DN2026081201',名称:'思特瑞原料仓 → 无锡客户B卸货区',规格:'已调度 / 钢瓶'},
+            {编码:'DN2026081202',名称:'常州成品仓 → 苏州园区',规格:'待调度 / 氢氧化锂'}
+          ];
+        }
       } else if(t==='发货单位' || t==='收货单位'){
         all = [
           {编码:'U001',名称:'思特瑞原料仓',规格:'发货单位'},
@@ -2126,7 +2264,7 @@ const app = createApp({
         ];
       }
       const kw = pickerKw.value.trim();
-      return kw ? all.filter(r=> (r.编码+r.名称+(r.规格||'')).includes(kw)) : all;
+      return kw ? all.filter(r=> (r.编码+r.名称+(r.规格||'')+(r.地址编码||'')+(r.地址描述||'')).includes(kw)) : all;
     });
 
     const visibleTypeFormFields = computed(()=> (page.value?.typeFormFields||[]).filter(f=> !(f.editOnly && dictTypeFormMode.value==='add')));
@@ -2260,6 +2398,8 @@ const app = createApp({
           cols.push({ field:c.field, title:c.title, width:c.width||120, minWidth:c.width||100, fixed:c.fixed||null, slots:{ default:'tag' } });
         } else if(c.slot==='link'){
           cols.push({ field:c.field, title:c.title, width:c.width||160, minWidth:c.width||120, slots:{ default:'link' } });
+        } else if(c.slot==='addr_info'){
+          cols.push({ field:c.field, title:c.title, width:c.width||120, minWidth:c.width||120, slots:{ default:'addr_info' } });
         } else {
           const col = { field:c.field, title:c.title, width:c.width||120, minWidth:c.width||100 };
           if(c.fixed==='left' || c.fixed==='right') col.fixed = c.fixed;
@@ -2318,6 +2458,10 @@ const app = createApp({
       else if(pageId.value==='lg-ship') formLineRows.value = [emptyShipLine(1)];
       else if(pageId.value==='lg-dispatch'){
         formLineRows.value = [emptyDispatchLine(1)];
+      }
+      else if(pageId.value==='customer'){
+        formLineRows.value = [];
+        formModel._addrSeq = 0;
       }
       else if(pageId.value==='wh-stocktake'){
         const inv = (MOCK['wh-stocktake']||{}).stockInvLines || [];
@@ -2432,67 +2576,13 @@ const app = createApp({
       if(btn.name==='合并下发运单'){
         if(!canMergeShip.value){ ElMessage.warning('请勾选待调度状态的发货单后再合并下发'); return; }
         const rows = tableData.value.filter(r=> selectedIds.value.includes(r.id));
-        ElementPlus.ElMessageBox.confirm(`确认将选中的 ${rows.length} 张【待调度】发货单合并下发为新运单吗？`, '下发确认', {
-          confirmButtonText:'确认', cancelButtonText:'取消', type:'warning'
-        }).then(()=>{
-          const d = new Date();
-          const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-          const pad = n => String(n).padStart(2,'0');
-          const wb = (MOCK['lg-waybill'] = MOCK['lg-waybill'] || { main: [] });
-          wb.main = wb.main || [];
-          const wayNo = 'WY' + ymd + String(wb.main.length + 1).padStart(2,'0');
-          const dns = rows.map(r=> r['发货单号']).filter(Boolean);
-          const first = rows[0] || {};
-          const qtySum = rows.reduce((s,r)=> s + (Number(String(r['发货数量']||'').replace(/[^\d.]/g,''))||0), 0);
-          wb.main.unshift({
-            id: String(wb.main.length+1),
-            运单号: wayNo,
-            状态: '待派车',
-            关联发货单: dns.join('、'),
-            物料信息: [...new Set(rows.map(r=> r['物料信息']).filter(Boolean))].join('；'),
-            总数量: String(qtySum),
-            申请部门: first['申请部门']||'',
-            申请人: first['申请人']||'',
-            用车类型: first['用车类型']||'',
-            车型要求: first['车型要求']||'',
-            是否带托盘: first['是否带托盘']||'',
-            特殊要求: first['特殊要求']||'—',
-            计划发货时间: rows.map(r=> r['计划发货时间']).filter(Boolean).sort()[0] || '—',
-            要求送达时间: rows.map(r=> r['要求送达时间']).filter(Boolean).sort()[0] || '—',
-            承运商名称: '—',
-            车牌号: '—',
-            车挂号: '—',
-            司机姓名: '—',
-            司机电话: '—',
-            驾驶证号: '—',
-            从业资格证号: '—',
-            押运员姓名: '—',
-            押运员资格证号: '—',
-            创建时间: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
-            _lines: rows.map(r=>{
-              const thNo = buildPickupFromShip(r, wayNo, {
-                创建时间: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-              });
-              return {
-                关联发货单号: r['发货单号']||'',
-                关联仓储通知单: r['关联仓储通知单']||'—',
-                装货点: r['装货点']||'',
-                卸货点: r['卸货点']||'',
-                物料信息: r['物料信息']||'',
-                发货数量: r['发货数量']||'',
-                关联提货单: thNo,
-                关联签收单: '—'
-              };
-            })
-          });
-          rows.forEach(r=>{
-            r['状态'] = '已调度';
-            r['关联运单'] = wayNo;
-          });
-          selectedIds.value = [];
-          bumpStore();
-          ElMessage.success(`发货单合并下发成功，已生成运单 (${wayNo}) 及对应提货单，状态更新为已调度`);
-        }).catch(()=>{});
+        mergeShipRows.value = rows;
+        const first = rows[0] || {};
+        mergeForm.承运商名称 = '';
+        mergeForm.计划发货日期 = '';
+        mergeForm.运输类型 = '';
+        mergeForm.运费单价 = lookupFreightPrice(first['装货点'], first['卸货点'], first['用车类型']);
+        mergeVisible.value = true;
         return;
       }
       if(btn.name==='关闭' && pageId.value==='lg-waybill'){
@@ -2656,6 +2746,10 @@ const app = createApp({
           }
         });
         formModel._editId = row.id;
+        if(pageId.value==='customer'){
+          formLineRows.value = (row._addrs||[]).map((a,i)=>({_i:i+1, 客户地址编码:a['客户地址编码'], 客户地址描述:a['客户地址描述']||''}));
+          formModel._addrSeq = row._addrSeq || formLineRows.value.length;
+        }
         if(pageId.value==='qc-ledger'){
           Object.assign(formModel, {
             检验单号: row['检验单号']||'',
@@ -2722,12 +2816,17 @@ const app = createApp({
           formLineRows.value = lines.map((r,i)=>({_i:i+1, ...r}));
         }
         if(pageId.value==='lg-dispatch'){
+          const vt = row['用车类型']||'';
+          const isOther = vt && !VEHICLE_OPTS.includes(vt);
           Object.assign(formModel, {
             编号: row['编号']||'',
             日期: row['日期']||'',
             申请部门: row['申请部门']||'',
             申请人: row['申请人']||'',
-            用车类型: row['用车类型']||'',
+            用车类型: isOther ? '其他' : vt,
+            用车类型其他: isOther ? vt : '',
+            订单类型: row['订单类型']||'',
+            订单号: row['订单号']||'',
             车型要求: row['车型要求']||'',
             是否带托盘: row['是否带托盘']||'否',
             特殊要求: row['特殊要求'] && row['特殊要求']!=='—' ? row['特殊要求'] : '',
@@ -2876,6 +2975,16 @@ const app = createApp({
           return { ...r, 未拆数量: String(remain), 本次发货数量: remain>0 ? String(remain) : '' };
         });
         splitVisible.value = true; return;
+      }
+            if(op.name==='二次派车（专线）' || op.name==='二次派车' || op.name==='专线派车'){
+        if(row['状态']==='待派车'){
+          ElMessage.warning('请先完成首程派车后再进行专线二次派车');
+          return;
+        }
+        secondaryAssignRow.value = row;
+        resetSecondaryAssignForm(row);
+        secondaryAssignVisible.value = true;
+        return;
       }
       if(op.name==='派车'){
         if(!(row['状态']==='待派车' || row['状态']==='待运输')){ ElMessage.warning('当前运单状态不可派车'); return; }
@@ -3032,6 +3141,17 @@ const app = createApp({
       return ['wh-os-issue','wh-os-recv','wh-os-ret-mat','wh-os-ret-goods'].includes(pageId.value);
     }
     function onFormLineAction(name){
+      if(name==='添加一项' && pageId.value==='customer'){
+        const nums = formLineRows.value.map(r=> parseInt(r['客户地址编码'],10)||0);
+        const next = Math.max(0, ...(nums.length?nums:[0]), formModel._addrSeq||0) + 1;
+        formModel._addrSeq = next;
+        formLineRows.value = formLineRows.value.concat([{
+          _i: formLineRows.value.length+1,
+          客户地址编码: String(next).padStart(3,'0'),
+          客户地址描述: ''
+        }]);
+        return;
+      }
       if(name==='新增' || name==='新增行' || name==='选择物料'){
         if(false /*lg-order removed*/){
           formLineRows.value = formLineRows.value.concat([{
@@ -3073,7 +3193,7 @@ const app = createApp({
           if(!selected.length){ ElMessage.warning('请先勾选要删除的明细行'); return; }
           const set = new Set(selected);
           const next = formLineRows.value.filter(r=> !set.has(r));
-          if(!next.length){ ElMessage.warning('至少保留 1 行明细'); return; }
+          if(!next.length && pageId.value!=='customer'){ ElMessage.warning('至少保留 1 行明细'); return; }
           formLineRows.value = next;
           formLineSelected.value = [];
           ElMessage.success('已删除勾选明细行');
@@ -3399,6 +3519,91 @@ const app = createApp({
       kpiFlowNodes.value = cloneKpi(row._flow || []);
       kpiFlowVisible.value = true;
     }
+    function addrNorm(s){
+      const t = String(s||'').trim();
+      const desc = t.includes(' / ') ? t.split(' / ').slice(1).join(' / ') : t;
+      return desc.replace(/\s+/g,'').toLowerCase();
+    }
+    function addrMatch(a, b){
+      const x = addrNorm(a), y = addrNorm(b);
+      if(!x || !y) return false;
+      return x===y || x.includes(y) || y.includes(x);
+    }
+    function lookupFreightPrice(from, to, vehicleType){
+      const vt = String(vehicleType||'').trim();
+      const rows = ((MOCK.freight||{}).main||[]).filter(r => r['启用状态']!=='禁用');
+      const hit = rows.find(r => addrMatch(r['发货地'], from) && addrMatch(r['收货地'], to) && String(r['用车类型']||'').trim()===vt);
+      return hit ? String(hit['运费单价']||'') : '';
+    }
+    function onMergeShipOk(){
+      if(!mergeForm.承运商名称){ ElMessage.warning('请选择承运商'); return; }
+      if(!mergeForm.计划发货日期){ ElMessage.warning('请选择计划发货日期'); return; }
+      if(!mergeForm.运输类型){ ElMessage.warning('请选择运输类型'); return; }
+      const rows = mergeShipRows.value || [];
+      if(!rows.length){ ElMessage.warning('请勾选待调度发货单'); return; }
+      const d = new Date();
+      const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      const pad = n => String(n).padStart(2,'0');
+      const wb = (MOCK['lg-waybill'] = MOCK['lg-waybill'] || { main: [] });
+      wb.main = wb.main || [];
+      const wayNo = 'WY' + ymd + String(wb.main.length + 1).padStart(2,'0');
+      const dns = rows.map(r=> r['发货单号']).filter(Boolean);
+      const first = rows[0] || {};
+      const qtySum = rows.reduce((s,r)=> s + (Number(String(r['发货数量']||'').replace(/[^\d.]/g,''))||0), 0);
+      const planTime = mergeForm.计划发货日期 + ' 08:00';
+      wb.main.unshift({
+        id: String(wb.main.length+1),
+        运单号: wayNo,
+        状态: '待派车',
+        关联发货单: dns.join('、'),
+        物料信息: [...new Set(rows.map(r=> r['物料信息']).filter(Boolean))].join('；'),
+        总数量: String(qtySum),
+        申请部门: first['申请部门']||'',
+        申请人: first['申请人']||'',
+        用车类型: first['用车类型']||'',
+        运输类型: mergeForm.运输类型,
+        '运费单价（元）': mergeForm.运费单价===undefined || mergeForm.运费单价===null ? '' : String(mergeForm.运费单价).trim(),
+        车型要求: first['车型要求']||'',
+        是否带托盘: first['是否带托盘']||'',
+        特殊要求: first['特殊要求']||'—',
+        计划发货时间: planTime,
+        要求送达时间: rows.map(r=> r['要求送达时间']).filter(Boolean).sort()[0] || '—',
+        预计到货时间: '—',
+        承运商名称: mergeForm.承运商名称,
+        车牌号: '—',
+        车挂号: '—',
+        司机姓名: '—',
+        司机电话: '—',
+        驾驶证号: '—',
+        从业资格证号: '—',
+        押运员姓名: '—',
+        押运员资格证号: '—',
+        创建时间: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,
+        _lines: rows.map(r=>{
+          const thNo = buildPickupFromShip(r, wayNo, {
+            创建时间: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+          });
+          return {
+            关联发货单号: r['发货单号']||'',
+            关联仓储通知单: r['关联仓储通知单']||'—',
+            装货点: r['装货点']||'',
+            卸货点: r['卸货点']||'',
+            物料信息: r['物料信息']||'',
+            发货数量: r['发货数量']||'',
+            关联提货单: thNo,
+            关联签收单: '—'
+          };
+        })
+      });
+      rows.forEach(r=>{
+        r['状态'] = '已调度';
+        r['关联运单'] = wayNo;
+      });
+      selectedIds.value = [];
+      mergeVisible.value = false;
+      bumpStore();
+      ElMessage.success(`发货单合并下发成功，已生成运单 (${wayNo}) 及对应提货单，状态更新为已调度`);
+    }
     function onFormOk(){
       if(pageId.value==='lg-kpi-scheme'){
         const code = String(formModel['方案编码']||'').trim();
@@ -3455,6 +3660,47 @@ const app = createApp({
         }
         return;
       }
+      if(pageId.value==='customer'){
+        const code = String(formModel['客户编码']||'').trim();
+        const name = String(formModel['客户名称']||'').trim();
+        if(!code){ ElMessage.warning('请填写客户编码'); return; }
+        if(!name){ ElMessage.warning('请填写客户名称'); return; }
+        const list = ((MOCK.customer = MOCK.customer || {}).main = (MOCK.customer.main || []));
+        if(list.some(r=> r['客户编码']===code && r.id!==formModel._editId)){ ElMessage.warning('客户编码已存在，请重新输入'); return; }
+        const addrs = formLineRows.value.map(r=>({
+          客户地址编码: r['客户地址编码']||'',
+          客户地址描述: r['客户地址描述']||''
+        }));
+        const payload = {
+          客户编码: code,
+          客户名称: name,
+          客户简称: formModel['客户简称']||'',
+          客户类型: formModel['客户类型']||'',
+          客户邮箱: formModel['客户邮箱']||'',
+          客户联系人: formModel['客户联系人']||'',
+          客户电话: formModel['客户电话']||'',
+          所属业务员: formModel['所属业务员']||'',
+          备注: formModel['备注']||'—',
+          启用状态: formSwitch['启用状态']===false ? '禁用' : '启用',
+          _addrs: addrs,
+          _addrSeq: formModel._addrSeq || addrs.length
+        };
+        if(formMode.value==='add' || formMode.value==='copy'){
+          payload.id = 'c-' + Date.now();
+          payload.创建人 = '张三';
+          const d = new Date();
+          const pad = n => String(n).padStart(2,'0');
+          payload.创建时间 = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+          list.unshift(payload);
+        } else {
+          const cur = list.find(r=> r.id===formModel._editId);
+          if(cur) Object.assign(cur, payload, { id: cur.id, 创建人: cur['创建人'], 创建时间: cur['创建时间'] });
+        }
+        formVisible.value=false;
+        bumpStore();
+        ElMessage.success(formMode.value==='add'||formMode.value==='copy' ? '客户已新增' : '客户已保存');
+        return;
+      }
       if(pageId.value==='freight'){
         const from = String(formModel['发货地']||'').trim();
         const to = String(formModel['收货地']||'').trim();
@@ -3463,6 +3709,7 @@ const app = createApp({
         if(!from){ ElMessage.warning('请填写发货地'); return; }
         if(!to){ ElMessage.warning('请填写收货地'); return; }
         if(from===to){ ElMessage.warning('发货地与收货地不能相同'); return; }
+        if(!String(formModel['用车类型']||'').trim()){ ElMessage.warning('请选择用车类型'); return; }
         if(!unit){ ElMessage.warning('请选择计费单位'); return; }
         if(formModel['运费单价']===undefined || formModel['运费单价']==='' || formModel['运费单价']===null){
           ElMessage.warning('请填写运费单价'); return;
@@ -3472,6 +3719,7 @@ const app = createApp({
         const payload = {
           发货地: from,
           收货地: to,
+          用车类型: formModel['用车类型']||'',
           产品名称: formModel['产品名称']||'',
           计费单位: unit,
           运费单价: price.toFixed(2),
@@ -3623,6 +3871,8 @@ const app = createApp({
         if(!formModel['申请部门']){ ElMessage.warning('请选择申请部门'); return; }
         if(!formModel['申请人']){ ElMessage.warning('请填写申请人'); return; }
         if(!formModel['用车类型']){ ElMessage.warning('请选择用车类型'); return; }
+        if(formModel['用车类型']==='其他' && !String(formModel['用车类型其他']||'').trim()){ ElMessage.warning('请填写其他用车类型说明'); return; }
+        const vehicleType = formModel['用车类型']==='其他' ? String(formModel['用车类型其他']).trim() : formModel['用车类型'];
         if(!formModel['车型要求']){ ElMessage.warning('请选择车型要求'); return; }
         if(!formModel['是否带托盘']){ ElMessage.warning('请选择是否带托盘'); return; }
         if(!formModel['装货地点']){ ElMessage.warning('请填写装货地点'); return; }
@@ -3641,7 +3891,9 @@ const app = createApp({
           日期: formModel['日期']||'',
           申请部门: formModel['申请部门']||'',
           申请人: formModel['申请人']||'',
-          用车类型: formModel['用车类型']||'',
+          用车类型: vehicleType,
+          订单类型: formModel['订单类型']||'',
+          订单号: formModel['订单号']||'',
           车型要求: formModel['车型要求']||'',
           是否带托盘: formModel['是否带托盘']||'否',
           特殊要求: formModel['特殊要求']||'—',
@@ -3783,7 +4035,13 @@ const app = createApp({
       qcInspectVisible.value=false;
       ElMessage.success('检验结果已确认');
     }
+    function onFormSelectChange(f){
+      if(f && f.name==='订单类型'){
+        formModel['订单号'] = '';
+      }
+    }
     function openPicker(title){
+      if(title==='订单号' && !formModel['订单类型']){ ElMessage.warning('请先选择订单类型'); return; }
       pickerTitle.value = title || '选单';
       pickerKw.value=''; pickerCurrent.value=null;
       pickerVisible.value=true;
@@ -3793,7 +4051,17 @@ const app = createApp({
       const row = pickerCurrent.value;
       const t = pickerTitle.value || '';
       const label = row.编码+' / '+row.名称;
-      if(t.includes('采购订单') || t.includes('委外加工单')){
+      if(t==='订单号'){
+        formModel['订单号'] = (row.编码||'') + ' / ' + (row.名称||'');
+        ElMessage.success('已选择订单号：'+formModel['订单号']);
+      } else if(t==='发货地' || t==='收货地'){
+        formModel[t] = (row.地址编码||row.编码||'') + ' / ' + (row.地址描述||row.名称||'');
+        ElMessage.success('已选择'+t+'：'+formModel[t]);
+      } else if(t==='产品名称' || (t.includes('物料') && pageId.value==='freight')){
+        const kind = row.种类 || row.物料种类 || '—';
+        formModel['产品名称'] = `${row.编码} / ${row.名称} / ${row.规格||'—'} / ${kind}`;
+        ElMessage.success('已选择产品：'+formModel['产品名称']);
+      } else if(t.includes('采购订单') || t.includes('委外加工单')){
         if(t.includes('委外加工单') || isOsPoPage()){
           formModel['关联委外加工单'] = label;
         } else {
@@ -3846,27 +4114,32 @@ const app = createApp({
         ElMessage.success('已选择'+t+'：'+row.名称);
       } else if(t.includes('发货单') || t==='关联发货单'){
         const code = row.编码;
-        const cur = (formModel['关联发货单']||'').split('、').map(s=>s.trim()).filter(Boolean);
-        if(!cur.includes(code)) cur.push(code);
-        formModel['关联发货单'] = cur.join('、');
-        const map = (MOCK['lg-waybill']||{}).formShipMap || {};
-        const lines = cur.map(c => map[c]).filter(Boolean).map((r,i)=>({_i:i+1, ...r}));
-        formLineRows.value = lines;
-        const pcs = [...new Set(lines.map(r=>r['派车申请单号']).filter(Boolean))];
-        formModel['关联派车申请单号'] = pcs.join('、') || '—';
-        const times = lines.map(r=>r['要求送达时间']).filter(Boolean).sort();
-        const loadTimes = lines.map(r=>r['计划装车时间']).filter(Boolean).sort();
-        formModel['要求送达时间'] = times[0] || '—';
-        formModel['计划装车时间'] = loadTimes[0] || '—';
-        const fee = lines.reduce((s,r)=> s + (Number(r['运费'])||0), 0);
-        formModel['运费'] = fee ? ('¥' + fee.toLocaleString()) : '—';
-        const withDriver = lines.find(r=> r['司机车牌号']);
-        if(withDriver){
-          formModel['司机车牌号'] = withDriver['司机车牌号']||'';
-          formModel['司机姓名'] = withDriver['司机姓名']||'';
-          formModel['司机电话'] = withDriver['司机电话']||'';
+        if(String(pageId.value||'').startsWith('wh-')){
+          formModel['关联发货单'] = code;
+          ElMessage.success('已选择发货单：'+code);
+        } else {
+          const cur = (formModel['关联发货单']||'').split('、').map(s=>s.trim()).filter(Boolean);
+          if(!cur.includes(code)) cur.push(code);
+          formModel['关联发货单'] = cur.join('、');
+          const map = (MOCK['lg-waybill']||{}).formShipMap || {};
+          const lines = cur.map(c => map[c]).filter(Boolean).map((r,i)=>({_i:i+1, ...r}));
+          formLineRows.value = lines;
+          const pcs = [...new Set(lines.map(r=>r['派车申请单号']).filter(Boolean))];
+          formModel['关联派车申请单号'] = pcs.join('、') || '—';
+          const times = lines.map(r=>r['要求送达时间']).filter(Boolean).sort();
+          const loadTimes = lines.map(r=>r['计划装车时间']).filter(Boolean).sort();
+          formModel['要求送达时间'] = times[0] || '—';
+          formModel['计划装车时间'] = loadTimes[0] || '—';
+          const fee = lines.reduce((s,r)=> s + (Number(r['运费'])||0), 0);
+          formModel['运费'] = fee ? ('¥' + fee.toLocaleString()) : '—';
+          const withDriver = lines.find(r=> r['司机车牌号']);
+          if(withDriver){
+            formModel['司机车牌号'] = withDriver['司机车牌号']||'';
+            formModel['司机姓名'] = withDriver['司机姓名']||'';
+            formModel['司机电话'] = withDriver['司机电话']||'';
+          }
+          ElMessage.success('已选择发货单并生成装卸货点明细：'+formModel['关联发货单']);
         }
-        ElMessage.success('已选择发货单并生成装卸货点明细：'+formModel['关联发货单']);
       } else if(t.includes('物料')){
         if(pageId.value==='qc-ledger'){
           formModel['物料信息'] = `${row.编码} / ${row.名称} / ${row.规格||'—'} / —`;
@@ -4175,7 +4448,7 @@ const app = createApp({
     return {
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseWaybill, canDeleteKpiPlan,
-      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, splitVisible, splitRow, splitForm, splitLines, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, activeFormFields, activeFormLineFields, formLineRows,
+      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, splitVisible, splitRow, splitForm, splitLines, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, activeFormFields, activeFormLineFields, formLineRows,
       kpiCfgVisible, kpiGrades, kpiGradeSel, kpiProjects, kpiProjSel, kpiScoreVisible, kpiScoreReadonly, kpiScoreVendor, kpiScoreProjects, kpiScoreExplain, kpiScoreRemark, kpiScoreTotal, kpiScoreGrade, kpiVendorRows, kpiVendorCols, kpiVendorSel,
       kpiFlowVisible, kpiFlowRow, kpiFlowNodes, kpiFlowStamp, kpiFlowStampClass,
       qcInspectVisible, qcInspectRow, qcInspectForm,
@@ -4185,7 +4458,8 @@ const app = createApp({
       openCraftProc, onCraftProcOk,
       designVisible, designTitle, designBasic, designAdvanced, designCanvas, designFormName, designFormTitle, designActive, designActiveField, designDragType, formPreviewVisible,
       importVisible, exportVisible, printVisible,
-      pickerVisible, pickerTitle, pickerKw, pickerRows, pickerCurrent,
+      pickerVisible, pickerTitle, pickerKw, pickerRows, pickerCurrent, pickerMode,
+      mergeVisible, mergeForm, onMergeShipOk, onFormSelectChange,
       jobVisible, jobTitle, jobHead, jobProcs, jobProcIdx,
       jobLogiMode, jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,

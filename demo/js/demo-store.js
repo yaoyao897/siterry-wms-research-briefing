@@ -156,6 +156,7 @@ window.WMS_DEMO_STORE = (function () {
         id: waybillId,
         status: prev.status || '运输中',
         lastEnroute: row['打卡位置'] || row['当前位置'],
+        预计到货时间: record.预计送达时间 || prev.预计到货时间 || '',
         updatedAt: nowStr(),
         source: 'APP',
       });
@@ -234,22 +235,26 @@ window.WMS_DEMO_STORE = (function () {
       row['单号'] ||
       row['派车申请单号'] ||
       row['发货单号'] ||
-      row['派车申请单号'] ||
       row['编号'] ||
       row.id;
     const doc = getDoc(id);
-    if (!doc || !doc.status) return row;
+    if (!doc) return row;
     const next = Object.assign({}, row);
-    const pcStatus = STATUS_TO_PC[doc.status] || doc.status;
-    if (pageId === 'lg-waybill') {
-      if (next['状态'] !== undefined) next['状态'] = pcStatus;
-    } else if (next['单据状态'] !== undefined) {
-      next['单据状态'] = pcStatus;
-    } else if (next['状态'] !== undefined) {
-      next['状态'] = pcStatus;
+    if (doc.status) {
+      const pcStatus = STATUS_TO_PC[doc.status] || doc.status;
+      if (pageId === 'lg-waybill') {
+        if (next['状态'] !== undefined) next['状态'] = pcStatus;
+      } else if (next['单据状态'] !== undefined) {
+        next['单据状态'] = pcStatus;
+      } else if (next['状态'] !== undefined) {
+        next['状态'] = pcStatus;
+      }
     }
     if (doc.lastEnroute && next['备注'] !== undefined && (pageId === 'lg-waybill')) {
       next['备注'] = 'APP在途：' + doc.lastEnroute;
+    }
+    if (pageId === 'lg-waybill' && doc.预计到货时间) {
+      next['预计到货时间'] = doc.预计到货时间;
     }
     return next;
   }
@@ -261,6 +266,7 @@ window.WMS_DEMO_STORE = (function () {
     if (!hit) return doc;
     const next = doc;
     if (hit.status) next.status = STATUS_TO_APP[hit.status] || hit.status;
+    if (hit.预计到货时间) next.eta = hit.预计到货时间;
     if (hit.lastEnroute) {
       next.enroute = Object.assign({}, next.enroute || {}, {
         location: hit.lastEnroute,

@@ -1089,9 +1089,10 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "客户地址",
-              "title": "客户地址",
-              "width": 200
+              "field": "客户地址信息",
+              "title": "客户地址信息",
+              "width": 120,
+              "slot": "addr_info"
             },
             {
               "field": "客户邮箱",
@@ -1180,12 +1181,6 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "下拉选择（字典表，单选）"
         },
         {
-          "name": "客户地址",
-          "type": "input",
-          "required": false,
-          "ctrl": "手动输入（文本）"
-        },
-        {
           "name": "客户邮箱",
           "type": "input",
           "required": false,
@@ -1226,9 +1221,16 @@ window.WMS_PAGE_CONFIGS = {
       "hasEdit": true,
       "hasDetail": true,
       "stub": false,
-      "formFlat": true,
-      "formLineFields": [],
-      "formLineActions": []
+      "formFlat": false,
+      "formLineTabLabel": "数据列表",
+      "formLineFields": [
+        { "name": "客户地址编码", "type": "readonly", "required": false, "ctrl": "系统自动生成" },
+        { "name": "客户地址描述", "type": "input", "required": false, "ctrl": "可编辑文本" }
+      ],
+      "formLineActions": [
+        { "name": "添加一项", "type": "primary" },
+        { "name": "批量删除", "type": "danger" }
+      ]
     },
     "supplier": {
       "id": "supplier",
@@ -6622,7 +6624,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -6635,7 +6637,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -6707,8 +6709,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -6769,7 +6771,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -6787,7 +6789,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "ERP单据号",
             "关联采购订单",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -6870,8 +6872,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -6932,7 +6934,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -6952,7 +6954,7 @@ window.WMS_PAGE_CONFIGS = {
             "通知单号",
             "单据类型",
             "新位置",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -7066,8 +7068,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -7123,10 +7125,10 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（派车申请单，单选）"
+          "ctrl": "弹窗选择（发货单，单选）"
         },
         {
           "name": "关联采购订单",
@@ -7175,7 +7177,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -7412,7 +7414,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -7425,7 +7427,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -7497,8 +7499,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -7538,7 +7540,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -7551,7 +7553,7 @@ window.WMS_PAGE_CONFIGS = {
             "出库单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -7634,8 +7636,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -7697,7 +7699,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -7716,7 +7718,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -7815,8 +7817,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -7884,7 +7886,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入，不可修改"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -7924,7 +7926,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -8125,7 +8127,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -8138,7 +8140,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -8210,8 +8212,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -8272,7 +8274,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -8290,7 +8292,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -8373,8 +8375,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -8435,7 +8437,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -8455,7 +8457,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -8559,8 +8561,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -8604,10 +8606,10 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（派车申请单，单选）"
+          "ctrl": "弹窗选择（发货单，单选）"
         },
         {
           "name": "关联委外加工单",
@@ -8650,7 +8652,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -8887,7 +8889,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -8900,7 +8902,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -8972,8 +8974,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -9013,7 +9015,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -9026,7 +9028,7 @@ window.WMS_PAGE_CONFIGS = {
             "退料单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -9109,8 +9111,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -9176,7 +9178,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -9196,7 +9198,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -9300,8 +9302,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -9369,10 +9371,10 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入，不可修改"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（派车申请单，单选）"
+          "ctrl": "弹窗选择（发货单，单选）"
         }
       ],
       "detailFields": [
@@ -9409,7 +9411,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -9610,7 +9612,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -9623,7 +9625,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -9695,8 +9697,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -9757,7 +9759,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -9775,7 +9777,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -9858,8 +9860,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -9920,7 +9922,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -9940,7 +9942,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -10044,8 +10046,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -10089,10 +10091,10 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（派车申请单，单选）"
+          "ctrl": "弹窗选择（发货单，单选）"
         },
         {
           "name": "关联委外加工单",
@@ -10135,7 +10137,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -10372,7 +10374,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -10385,7 +10387,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "ERP单据号",
             "关联委外加工单",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -10457,8 +10459,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -10498,7 +10500,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -10511,7 +10513,7 @@ window.WMS_PAGE_CONFIGS = {
             "退货单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -10594,8 +10596,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -10661,7 +10663,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -10681,7 +10683,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -10785,8 +10787,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -10854,10 +10856,10 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入，不可修改"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择（派车申请单，单选）"
+          "ctrl": "弹窗选择（发货单，单选）"
         }
       ],
       "detailFields": [
@@ -10894,7 +10896,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -11980,7 +11982,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -11996,7 +11998,7 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "包装规格",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -12104,8 +12106,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -12607,7 +12609,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -12623,7 +12625,7 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "包装规格",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -12721,8 +12723,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -13001,7 +13003,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -13014,7 +13016,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -13086,8 +13088,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -13148,7 +13150,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -13166,7 +13168,7 @@ window.WMS_PAGE_CONFIGS = {
             "客户名称",
             "单据类型",
             "ERP单据号",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -13249,8 +13251,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -13311,7 +13313,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -13331,7 +13333,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -13435,8 +13437,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -13480,7 +13482,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -13520,7 +13522,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -13757,7 +13759,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -13770,7 +13772,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -13842,8 +13844,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -13883,7 +13885,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -13896,7 +13898,7 @@ window.WMS_PAGE_CONFIGS = {
             "退料单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -13979,8 +13981,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -14046,7 +14048,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -14066,7 +14068,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -14170,8 +14172,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -14239,7 +14241,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入，不可修改"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -14279,7 +14281,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -14727,7 +14729,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -14744,7 +14746,7 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "包装规格",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -14847,8 +14849,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -15497,7 +15499,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -15513,7 +15515,7 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "ERP单据号",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -15581,8 +15583,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -15627,7 +15629,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -15640,7 +15642,7 @@ window.WMS_PAGE_CONFIGS = {
             "出库单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -15713,8 +15715,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 100
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -15775,7 +15777,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -15794,7 +15796,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -15888,8 +15890,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -15951,7 +15953,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -15987,7 +15989,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本，超长省略 + tooltip"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -16180,7 +16182,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -16191,7 +16193,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型"
           ],
           "queryMore": [
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -16253,8 +16255,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -16294,7 +16296,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -16307,7 +16309,7 @@ window.WMS_PAGE_CONFIGS = {
             "入库单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -16380,8 +16382,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 100
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -16442,7 +16444,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -16461,7 +16463,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -16555,8 +16557,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -16612,7 +16614,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -16644,7 +16646,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本，超长省略 + tooltip"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -16846,7 +16848,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -16857,7 +16859,7 @@ window.WMS_PAGE_CONFIGS = {
             "入库方向"
           ],
           "queryMore": [
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -16924,8 +16926,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -16965,7 +16967,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -16978,7 +16980,7 @@ window.WMS_PAGE_CONFIGS = {
             "入库单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -17051,8 +17053,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 100
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -17113,7 +17115,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -17132,7 +17134,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -17226,8 +17228,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -17289,7 +17291,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -17325,7 +17327,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本，超长省略 + tooltip"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -17518,7 +17520,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -17529,7 +17531,7 @@ window.WMS_PAGE_CONFIGS = {
             "出库方向"
           ],
           "queryMore": [
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -17596,8 +17598,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -17637,7 +17639,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -17650,7 +17652,7 @@ window.WMS_PAGE_CONFIGS = {
             "出库单号"
           ],
           "queryMore": [
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -17723,8 +17725,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 100
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -17785,7 +17787,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -17804,7 +17806,7 @@ window.WMS_PAGE_CONFIGS = {
             "档案类型",
             "新位置",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "包装规格"
           ],
           "toolbar": [
@@ -17898,8 +17900,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -17961,7 +17963,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -17997,7 +17999,7 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本，超长省略 + tooltip"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "spec": "文本"
         }
       ],
@@ -18198,7 +18200,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -18223,7 +18225,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "单据类型",
             "ERP单据号",
-            "关联派车申请单",
+            "关联发货单",
             "关联来源单据",
             "来源单据类型",
             "供应商/客户"
@@ -18299,8 +18301,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -18376,7 +18378,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "select"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             },
             {
@@ -18401,7 +18403,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "物流厂区",
             "单据类型",
-            "关联派车申请单",
+            "关联发货单",
             "关联来源单据",
             "供应商/客户",
             "包装规格"
@@ -18482,8 +18484,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 100
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -18561,7 +18563,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -18596,7 +18598,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "备注"
         },
         {
-          "name": "关联派车申请单"
+          "name": "关联发货单"
         },
         {
           "name": "关联来源单据"
@@ -18791,7 +18793,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "select"
             },
             {
-              "name": "关联派车申请单",
+              "name": "关联发货单",
               "type": "input"
             }
           ],
@@ -18803,7 +18805,7 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "移入库位编码",
-            "关联派车申请单"
+            "关联发货单"
           ],
           "toolbar": [
             {
@@ -18875,8 +18877,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联派车申请单",
-              "title": "关联派车申请单",
+              "field": "关联发货单",
+              "title": "关联发货单",
               "width": 160
             },
             {
@@ -19114,7 +19116,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（文本）"
         },
         {
-          "name": "关联派车申请单",
+          "name": "关联发货单",
           "type": "picker",
           "required": false,
           "ctrl": "弹窗选择（单选）"
@@ -19137,7 +19139,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "备注"
         },
         {
-          "name": "关联派车申请单"
+          "name": "关联发货单"
         }
       ],
       "hasEdit": true,
@@ -21156,11 +21158,12 @@ window.WMS_PAGE_CONFIGS = {
           "queryFields": [
             { "name": "发货地", "type": "input" },
             { "name": "收货地", "type": "input" },
+            { "name": "用车类型", "type": "select", "options": ["发货", "提货", "设备发运", "厂内/园区倒短运输", "物资转运", "其他"] },
             { "name": "产品名称", "type": "input" },
             { "name": "车型", "type": "select", "options": ["9.6米高栏", "13米半挂", "槽罐车", "厢式货车"] },
             { "name": "启用状态", "type": "select", "options": ["启用", "禁用"] }
           ],
-          "queryDefault": ["发货地", "收货地", "产品名称", "车型", "启用状态"],
+          "queryDefault": ["发货地", "收货地", "用车类型", "产品名称", "车型", "启用状态"],
           "queryMore": [],
           "toolbar": [
             { "name": "新增", "type": "primary", "desc": "弹窗新增运费参照" },
@@ -21171,6 +21174,7 @@ window.WMS_PAGE_CONFIGS = {
           "columns": [
             { "field": "发货地", "title": "发货地", "width": 150 },
             { "field": "收货地", "title": "收货地", "width": 150 },
+            { "field": "用车类型", "title": "用车类型", "width": 160 },
             { "field": "产品名称", "title": "产品名称", "width": 160 },
             { "field": "计费单位", "title": "计费单位", "width": 100 },
             { "field": "运费单价", "title": "运费单价(元)", "width": 120 },
@@ -21191,9 +21195,10 @@ window.WMS_PAGE_CONFIGS = {
         { "name": "确认", "type": "primary" }
       ],
       "formFields": [
-        { "name": "发货地", "type": "input", "required": true, "ctrl": "始发城市或工厂仓库" },
-        { "name": "收货地", "type": "input", "required": true, "ctrl": "目的城市或客户送货地" },
-        { "name": "产品名称", "type": "input", "required": false, "ctrl": "物料产品分类或品名" },
+        { "name": "发货地", "type": "picker", "required": true, "ctrl": "弹窗单选客供地址，仅地址编码/地址描述" },
+        { "name": "收货地", "type": "picker", "required": true, "ctrl": "弹窗单选客供地址，仅地址编码/地址描述" },
+        { "name": "用车类型", "type": "select", "required": true, "ctrl": "下拉，与派车申请单一致", "options": ["发货", "提货", "设备发运", "厂内/园区倒短运输", "物资转运", "其他"] },
+        { "name": "产品名称", "type": "picker", "required": false, "ctrl": "弹窗选物料，回写编码/名称/规格/种类" },
         { "name": "计费单位", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["吨", "公斤", "车", "箱", "立方米"] },
         { "name": "运费单价", "type": "input", "required": true, "ctrl": "数字，单位元，保留两位小数" },
         { "name": "车型", "type": "select", "required": false, "ctrl": "下拉选择（字典）", "options": ["9.6米高栏", "13米半挂", "槽罐车", "厢式货车"] },
@@ -21227,7 +21232,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryFields": [
             { "name": "申请单号", "type": "input" },
             { "name": "申请部门", "type": "select", "options": ["仓储部", "销售部", "采购部"] },
-            { "name": "用车类型", "type": "select", "options": ["发货", "提货"] },
+            { "name": "用车类型", "type": "select", "options": ["发货", "提货", "设备发运", "厂内/园区倒短运输", "物资转运", "其他"] },
             { "name": "审核状态", "type": "select", "options": ["待审核", "审核中", "已通过", "已驳回"] },
             { "name": "状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
             { "name": "关联发货单号", "type": "input" },
@@ -21262,7 +21267,9 @@ window.WMS_PAGE_CONFIGS = {
             { "field": "日期", "title": "日期", "width": 110 },
             { "field": "申请部门", "title": "申请部门", "width": 100 },
             { "field": "申请人", "title": "申请人", "width": 90 },
-            { "field": "用车类型", "title": "用车类型", "width": 90 },
+            { "field": "用车类型", "title": "用车类型", "width": 160 },
+            { "field": "订单类型", "title": "订单类型", "width": 120 },
+            { "field": "订单号", "title": "订单号", "width": 180 },
             { "field": "车型要求", "title": "车型要求", "width": 110 },
             { "field": "是否带托盘", "title": "是否带托盘", "width": 90 },
             { "field": "特殊要求", "title": "特殊要求", "width": 130 },
@@ -21299,10 +21306,12 @@ window.WMS_PAGE_CONFIGS = {
             { "name": "日期", "type": "date", "required": true, "ctrl": "日期选择器，默认当天" },
             { "name": "申请部门", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["仓储部", "销售部", "采购部"] },
             { "name": "申请人", "type": "input", "required": true, "ctrl": "默认登录用户" },
-            { "name": "用车类型", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["发货", "提货"] },
+            { "name": "用车类型", "type": "radio", "required": true, "ctrl": "单选", "options": ["发货", "提货", "设备发运", "厂内/园区倒短运输", "物资转运", "其他"] },
             { "name": "车型要求", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["高栏", "平板", "厢式", "冷藏", "罐车"] },
             { "name": "是否带托盘", "type": "radio", "required": true, "ctrl": "单选", "options": ["是", "否"] },
             { "name": "特殊要求", "type": "input", "required": false, "ctrl": "运输与防护注意事项" },
+            { "name": "订单类型", "type": "select", "required": false, "ctrl": "下拉选择", "options": ["采购订单", "销售订单", "委外加工单"] },
+            { "name": "订单号", "type": "picker", "required": false, "ctrl": "弹窗单选，随订单类型过滤，展示编码+名称" },
             { "name": "装货地点", "type": "input", "required": true, "ctrl": "装货工厂或仓库地址" },
             { "name": "装货联系人", "type": "input", "required": false, "ctrl": "装货现场联系人姓名" },
             { "name": "装货联系电话", "type": "input", "required": false, "ctrl": "装货现场联系电话" },
@@ -21325,6 +21334,8 @@ window.WMS_PAGE_CONFIGS = {
         { "name": "申请部门" },
         { "name": "申请人" },
         { "name": "用车类型" },
+        { "name": "订单类型" },
+        { "name": "订单号" },
         { "name": "车型要求" },
         { "name": "是否带托盘" },
         { "name": "特殊要求" },
@@ -21422,7 +21433,7 @@ window.WMS_PAGE_CONFIGS = {
             { "field": "来源派车单号", "title": "来源派车单号", "width": 140, "slot": "link" },
             { "field": "申请部门", "title": "申请部门", "width": 100 },
             { "field": "申请人", "title": "申请人", "width": 90 },
-            { "field": "用车类型", "title": "用车类型", "width": 90 },
+            { "field": "用车类型", "title": "用车类型", "width": 160 },
             { "field": "车型要求", "title": "车型要求", "width": 110 },
             { "field": "是否带托盘", "title": "是否带托盘", "width": 90 },
             { "field": "特殊要求", "title": "特殊要求", "width": 130 },
@@ -21440,43 +21451,16 @@ window.WMS_PAGE_CONFIGS = {
             { "field": "关联运单", "title": "关联运单", "width": 160, "slot": "link" },
             { "field": "关联仓储通知单", "title": "关联仓储通知单", "width": 180, "slot": "link" },
             { "field": "签收状态", "title": "签收状态", "width": 100, "slot": "tag" },
-            { "field": "_actions", "title": "行操作", "width": 140, "fixed": "right", "slot": "row_actions" }
+            { "field": "_actions", "title": "行操作", "width": 80, "fixed": "right", "slot": "row_actions" }
           ],
           "rowOps": [
-            { "name": "编辑", "desc": "仅待调度时可编辑装卸点、时间与物料" },
             { "name": "详情", "desc": "只读查看发货单" }
           ]
         }
       ],
       "formFields": [],
       "formDialogWidth": "1100px",
-      "formSections": [
-        {
-          "title": "基本信息",
-          "fields": [
-            { "name": "发货单号", "type": "readonly", "required": true, "ctrl": "系统自动生成" },
-            { "name": "来源派车单号", "type": "readonly", "required": true, "ctrl": "继承派车申请单编号" },
-            { "name": "状态", "type": "readonly", "required": true, "ctrl": "待调度/已调度/已关闭" },
-            { "name": "关联运单", "type": "readonly", "required": false, "ctrl": "下发后反写 WAY" },
-            { "name": "申请部门", "type": "readonly", "required": true, "ctrl": "继承派车单" },
-            { "name": "申请人", "type": "readonly", "required": true, "ctrl": "继承派车单" },
-            { "name": "用车类型", "type": "readonly", "required": true, "ctrl": "继承派车单" },
-            { "name": "车型要求", "type": "readonly", "required": true, "ctrl": "继承派车单" },
-            { "name": "是否带托盘", "type": "readonly", "required": true, "ctrl": "继承派车单" },
-            { "name": "特殊要求", "type": "readonly", "required": false, "ctrl": "继承派车单" },
-            { "name": "业务类型", "type": "select", "required": true, "ctrl": "下拉选择", "options": ["销售发货", "采购送货", "调拨发货", "委外发货"] },
-            { "name": "装货点", "type": "input", "required": true, "ctrl": "装货工厂或仓库地址" },
-            { "name": "装货联系人", "type": "input", "required": false, "ctrl": "装货现场联系人姓名" },
-            { "name": "装货联系电话", "type": "input", "required": false, "ctrl": "装货现场联系电话" },
-            { "name": "卸货点", "type": "input", "required": true, "ctrl": "目的地或卸货仓库地址" },
-            { "name": "卸货联系人", "type": "input", "required": false, "ctrl": "卸货现场收货联系人姓名" },
-            { "name": "卸货联系电话", "type": "input", "required": false, "ctrl": "卸货现场收货联系电话" },
-            { "name": "计划发货时间", "type": "datetime", "required": true, "ctrl": "日期时间选择器" },
-            { "name": "要求送达时间", "type": "datetime", "required": false, "ctrl": "日期时间选择器" },
-            { "name": "备注", "type": "textarea", "required": false, "ctrl": "多行文本" }
-          ]
-        }
-      ],
+      "formSections": [],
       "detailFields": [
         { "name": "状态" },
         { "name": "签收状态" },
@@ -21511,27 +21495,15 @@ window.WMS_PAGE_CONFIGS = {
         { "name": "单位" },
         { "name": "行备注" }
       ],
-      "hasEdit": true,
+      "hasEdit": false,
       "hasDetail": true,
       "formFlat": false,
       "stub": false,
-      "formLineFields": [
-        { "name": "物料信息", "type": "picker", "required": true, "ctrl": "选单弹窗，拼接物料编码/名称/规格/种类" },
-        { "name": "发货数量", "type": "input", "required": true, "ctrl": "数字输入" },
-        { "name": "体积(长*宽*高)", "type": "input", "required": true, "ctrl": "文本输入，如 1.1*1.1*1.4" },
-        { "name": "单位", "type": "readonly", "required": false, "ctrl": "选择物料后自动带入" },
-        { "name": "行备注", "type": "input", "required": false, "ctrl": "文本输入" }
-      ],
-      "formLineActions": [
-        { "name": "新增", "type": "primary" },
-        { "name": "批量删除", "type": "danger" }
-      ],
+      "formLineFields": [],
+      "formLineActions": [],
       "formLineTabLabel": "物料",
-      "formLineTip": "物料信息由物料编码 / 物料名称 / 规格型号 / 物料种类拼接；发货数量与体积必填；至少保留一行",
-      "formFooterActions": [
-        { "name": "取消", "type": "default" },
-        { "name": "确认", "type": "primary" }
-      ]
+      "formLineTip": "",
+      "formFooterActions": []
     },
     "lg-waybill": {
       "id": "lg-waybill",
@@ -21580,22 +21552,30 @@ window.WMS_PAGE_CONFIGS = {
             { "field": "总数量", "title": "总数量", "width": 100 },
             { "field": "申请部门", "title": "申请部门", "width": 100 },
             { "field": "申请人", "title": "申请人", "width": 90 },
-            { "field": "用车类型", "title": "用车类型", "width": 90 },
+            { "field": "用车类型", "title": "用车类型", "width": 160 },
+            { "field": "运输类型", "title": "运输类型", "width": 100 },
+            { "field": "运费单价（元）", "title": "运费单价（元）", "width": 120 },
             { "field": "车型要求", "title": "车型要求", "width": 110 },
             { "field": "是否带托盘", "title": "是否带托盘", "width": 90 },
             { "field": "特殊要求", "title": "特殊要求", "width": 130 },
             { "field": "计划发货时间", "title": "计划发货时间", "width": 140 },
             { "field": "要求送达时间", "title": "要求送达时间", "width": 140 },
+            { "field": "预计到货时间", "title": "预计到货时间", "width": 140 },
             { "field": "承运商名称", "title": "承运商名称", "width": 140 },
             { "field": "车牌号", "title": "车牌号", "width": 100 },
             { "field": "车挂号", "title": "车挂号", "width": 100 },
             { "field": "司机姓名", "title": "司机姓名", "width": 90 },
             { "field": "司机电话", "title": "司机电话", "width": 120 },
-            { "field": "_actions", "title": "行操作", "width": 200, "fixed": "right", "slot": "row_actions" }
+            { "field": "送货车牌号（专线）", "title": "送货车牌号（专线）", "width": 140 },
+            { "field": "送货车挂号（专线）", "title": "送货车挂号（专线）", "width": 140 },
+            { "field": "送货司机（专线）", "title": "送货司机（专线）", "width": 120 },
+            { "field": "送货司机电话（专线）", "title": "送货司机电话（专线）", "width": 140 },
+            { "field": "_actions", "title": "行操作", "width": 260, "fixed": "right", "slot": "row_actions" }
           ],
           "rowOps": [
             { "name": "派车", "desc": "打开运单派车分配弹窗" },
             { "name": "取消派车", "desc": "清空派车信息并回退为待派车" },
+            { "name": "二次派车（专线）", "desc": "填写专线中转二次送货车辆与司机信息并反写至运单" },
             { "name": "详情", "desc": "查看运单全量属性与在途轨迹" }
           ]
         }
@@ -21620,11 +21600,14 @@ window.WMS_PAGE_CONFIGS = {
             { "name": "申请部门" },
             { "name": "申请人" },
             { "name": "用车类型" },
+            { "name": "运输类型" },
+            { "name": "运费单价（元）" },
             { "name": "车型要求" },
             { "name": "是否带托盘" },
             { "name": "特殊要求" },
             { "name": "计划发货时间" },
-            { "name": "要求送达时间" }
+            { "name": "要求送达时间" },
+            { "name": "预计到货时间" }
           ]
         },
         {
@@ -21942,7 +21925,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "关联派车申请单号",
+              "name": "关联发货单号",
               "type": "input"
             },
             {
@@ -21957,7 +21940,7 @@ window.WMS_PAGE_CONFIGS = {
             "关联出库单号"
           ],
           "queryMore": [
-            "关联派车申请单号",
+            "关联发货单号",
             "提货车辆"
           ],
           "toolbar": [
@@ -22079,7 +22062,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "只读"
         },
         {
-          "name": "关联派车申请单号",
+          "name": "关联发货单号",
           "type": "readonly",
           "required": false,
           "ctrl": "只读"

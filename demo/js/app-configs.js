@@ -542,7 +542,7 @@ window.APP_CFG = (function () {
       poNo: 'PO20250801001',
       planDate: '2025-08-05',
       docType: '标准业务',
-      logisticsNo: 'PC2026081001',
+      logisticsNo: 'DN2026081201',
       materialSummary: 'RM-LI2CO3 电池级碳酸锂 / Li2CO3≥99.5% / 原料',
       lines: cloneLines(),
     },
@@ -556,7 +556,7 @@ window.APP_CFG = (function () {
       poNo: 'PO20250801012',
       planDate: '2025-08-06',
       docType: '紧急业务',
-      logisticsNo: 'PC2026081002',
+      logisticsNo: 'DN2026081202',
       materialSummary: 'RM-LI2CO3 电池级碳酸锂 / 原料',
       lines: [
         {
