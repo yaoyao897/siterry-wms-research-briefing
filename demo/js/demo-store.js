@@ -19,8 +19,9 @@ window.WMS_DEMO_STORE = (function () {
     待运输: '待运输',
     发运中: '运输中',
     运输中: '运输中',
-    已签收: '已签收',
-    已到达: '已签收',
+    已签收: '待结算',
+    已到达: '待结算',
+    待结算: '待结算',
   };
   const STATUS_TO_APP = {
     待执行: '待执行',
@@ -34,6 +35,7 @@ window.WMS_DEMO_STORE = (function () {
     发运中: '运输中',
     已签收: '已签收',
     已到达: '已签收',
+    待结算: '已签收',
   };
 
   function emptyState() {
@@ -243,7 +245,10 @@ window.WMS_DEMO_STORE = (function () {
     if (doc.status) {
       const pcStatus = STATUS_TO_PC[doc.status] || doc.status;
       if (pageId === 'lg-waybill') {
-        if (next['状态'] !== undefined) next['状态'] = pcStatus;
+        // 已完成/已关闭以 PC 结算或关闭为准，不被 APP 签收状态覆盖
+        if (next['状态'] !== undefined && !['已完成', '已关闭'].includes(next['状态'])) {
+          next['状态'] = pcStatus;
+        }
       } else if (next['单据状态'] !== undefined) {
         next['单据状态'] = pcStatus;
       } else if (next['状态'] !== undefined) {
@@ -255,6 +260,9 @@ window.WMS_DEMO_STORE = (function () {
     }
     if (pageId === 'lg-waybill' && doc.预计到货时间) {
       next['预计到货时间'] = doc.预计到货时间;
+    }
+    if (pageId === 'lg-waybill' && doc.实际装货时间) {
+      next['实际装货时间'] = doc.实际装货时间;
     }
     return next;
   }

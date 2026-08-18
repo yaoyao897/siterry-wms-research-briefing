@@ -319,8 +319,8 @@ window.APP_CFG = (function () {
     'trust-in-count': flow('受托入库-计数', 'count', { hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '入库数量' }),
 
     // 销售（计数也有工序）
-    'so-ship-serial': flow('销售发货-流水码', 'serial', { isOut: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', serialScanTitle: '添加发货扫码' }),
-    'so-ship-count': flow('销售发货-计数', 'count', { isOut: true, hasProcess: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', qtyLabel: '发货数量' }),
+    'so-ship-serial': flow('销售发货-流水码', 'serial', { isOut: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '销售订单', serialScanTitle: '添加发货扫码', docsKey: 'soShip' }),
+    'so-ship-count': flow('销售发货-计数', 'count', { isOut: true, hasProcess: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '销售订单', qtyLabel: '发货数量', docsKey: 'soShip' }),
     'so-rma-serial': flow('销售退货-流水码', 'serial', { docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', serialScanTitle: '添加退货扫码' }),
     'so-rma-count': flow('销售退货-计数', 'count', { hasProcess: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '关联销售订单', qtyLabel: '退货数量' }),
 
@@ -1029,8 +1029,38 @@ window.APP_CFG = (function () {
     },
   ];
 
+  const noticesSoShip = [
+    {
+      id: 'SO-S0001',
+      status: '待执行',
+      partner: '宁德时代新能源',
+      supplier: '宁德时代新能源',
+      refNo: 'SO2026080001',
+      stockNo: 'BH2026080001',
+      planDate: '2026-08-01',
+      docType: '标准发货',
+      logisticsNo: 'DN2026081201',
+      materialSummary: '钢瓶 / φ219 / 成品',
+      lines: cloneLines(),
+    },
+    {
+      id: 'SO-S0005',
+      status: '待执行',
+      partner: '宁德时代新能源',
+      supplier: '宁德时代新能源',
+      refNo: 'SO2026080006',
+      stockNo: '',
+      planDate: '2026-08-06',
+      docType: '纯贸易直送',
+      logisticsNo: '',
+      materialSummary: '电池级碳酸锂',
+      lines: cloneLines(),
+    },
+  ];
+
   const docsMap = {
     default: noticesDefault,
+    soShip: noticesSoShip,
     inner: noticesInner,
     stock: noticesStock,
     'pkg-scrap': noticesPkgScrap,
