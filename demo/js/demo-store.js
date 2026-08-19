@@ -22,6 +22,8 @@ window.WMS_DEMO_STORE = (function () {
     已签收: '待结算',
     已到达: '待结算',
     待结算: '待结算',
+    待放行: '待放行',
+    已放行: '已放行',
   };
   const STATUS_TO_APP = {
     待执行: '待执行',
@@ -36,6 +38,8 @@ window.WMS_DEMO_STORE = (function () {
     已签收: '已签收',
     已到达: '已签收',
     待结算: '已签收',
+    待放行: '待放行',
+    已放行: '已完成',
   };
 
   function emptyState() {
@@ -232,6 +236,7 @@ window.WMS_DEMO_STORE = (function () {
     if (pageId === 'lg-ship' || pageId === 'lg-pickup' || pageId === 'lg-sign') return row;
     const id =
       row['运单号'] ||
+      row['出门条单号'] ||
       row['提货单号'] ||
       row['签收单号'] ||
       row['单号'] ||
@@ -244,7 +249,11 @@ window.WMS_DEMO_STORE = (function () {
     const next = Object.assign({}, row);
     if (doc.status) {
       const pcStatus = STATUS_TO_PC[doc.status] || doc.status;
-      if (pageId === 'lg-waybill') {
+      if (pageId === 'lg-gatepass') {
+        next['出门条状态'] = doc.status === '已完成' ? '已放行' : (pcStatus || doc.status);
+        if (doc.放行时间) next['放行时间'] = doc.放行时间;
+        if (doc.放行人) next['放行人'] = doc.放行人;
+      } else if (pageId === 'lg-waybill') {
         // 已完成/已关闭以 PC 结算或关闭为准，不被 APP 签收状态覆盖
         if (next['状态'] !== undefined && !['已完成', '已关闭'].includes(next['状态'])) {
           next['状态'] = pcStatus;
@@ -274,6 +283,8 @@ window.WMS_DEMO_STORE = (function () {
     if (!hit) return doc;
     const next = doc;
     if (hit.status) next.status = STATUS_TO_APP[hit.status] || hit.status;
+    if (hit.放行时间) next.releaseAt = hit.放行时间;
+    if (hit.放行人) next.releaseBy = hit.放行人;
     if (hit.预计到货时间) next.eta = hit.预计到货时间;
     if (hit.lastEnroute) {
       next.enroute = Object.assign({}, next.enroute || {}, {

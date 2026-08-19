@@ -82,10 +82,14 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .doc-card__hd{height:44px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--navy),var(--navy-deep));color:#fff}
 .doc-card__no{font-size:15px;font-weight:600}
 .doc-card__bd{padding:12px}
+.doc-card__ft{padding:0 12px 12px;display:flex;justify-content:flex-end;gap:8px}
 .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:13px}
 .doc-grid .full{grid-column:1/-1}
 .doc-label{color:#8C8C8C;font-size:12px;margin-right:4px}
-.doc-card__ft{padding:0 12px 12px;display:flex;justify-content:flex-end}
+.doc-expand{margin-top:10px;padding-top:10px;border-top:1px dashed #E8E8E8}
+.doc-mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.doc-mini-table th,.doc-mini-table td{border:1px solid #F0F0F0;padding:4px 6px;text-align:left;color:#262626}
+.doc-mini-table th{background:#FAFAFA;color:#8C8C8C;font-weight:500}
 .tag{display:inline-block;padding:0 8px;height:22px;line-height:20px;font-size:12px;border-radius:4px;border:1px solid transparent}
 .tag-b{color:#1A4099;background:#EEF2F8;border-color:#C5D4EB}
 .tag-o{color:#FA8C16;background:#FFF7E6;border-color:#FFD591}
@@ -203,7 +207,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
             <a href="./app.html" class="on">APP</a>
@@ -252,14 +256,14 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               </div>
               <div class="m-scroll">
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
-                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张匹配{{ flowMode==='waybill' ? '运单' : (isLoadFlow ? '装卸单' : '单据') }}</p>
+                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张{{ flowMode==='gatepass' ? '待放行出门条' : ('匹配' + (flowMode==='waybill' ? '运单' : (isLoadFlow ? '装卸单' : '单据'))) }}</p>
                 <div v-if="!filteredNotices.length" class="empty">{{ flowMeta.emptyDocs || '暂无待执行单据' }}</div>
                 <div v-for="n in filteredNotices" :key="n.id" class="doc-card">
                   <div class="doc-card__hd">
                     <span class="doc-card__no">{{ n.id }}</span>
                     <span class="tag" :class="statusTag(n.status)">{{ n.status }}</span>
                   </div>
-                  <div class="doc-card__bd" @click="flowMode==='waybill' && toggleExpand('doc', n.id)">
+                  <div class="doc-card__bd" @click="(flowMode==='waybill' || flowMode==='gatepass') && toggleExpand('doc', n.id)">
                     <div class="doc-grid" v-if="flowMode==='waybill'">
                       <div><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
                       <div><span class="doc-label">用车类型</span>{{ n.shipMode }}</div>
@@ -274,6 +278,55 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                         <div class="full"><span class="doc-label">实际到达</span>{{ n.actualArrive || '—' }}</div>
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
                       </template>
+                    </div>
+                    <div class="doc-grid" v-else-if="flowMode==='gatepass'">
+                      <div><span class="doc-label">来源类型</span>{{ n.sourceType }}</div>
+                      <div><span class="doc-label">关联出库单</span>{{ n.outNo }}</div>
+                      <div class="full"><span class="doc-label">提货车辆</span>{{ n.plate }} / {{ n.driver }} ({{ n.phone }})</div>
+                      <div class="full"><span class="doc-label">发货/收货</span>{{ n.shipFrom }} → {{ n.shipTo }}</div>
+                      <div class="full"><span class="doc-label">出厂物料</span>{{ n.materialSummary }}</div>
+                      <div class="full"><span class="doc-label">生成时间</span>{{ n.createTime }}</div>
+                      <div class="full doc-expand" v-if="isExpanded('doc', n.id)">
+                        <div style="font-weight:600;color:#262626;margin-bottom:6px">物料明细</div>
+                        <table class="doc-mini-table">
+                          <thead>
+                            <tr>
+                              <th>物料编码</th>
+                              <th>物料名称</th>
+                              <th>规格型号</th>
+                              <th>批号</th>
+                              <th>出库数量</th>
+                              <th>单位</th>
+                              <th>实发重量</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(ln, i) in (n.lines||[])" :key="i">
+                              <td>{{ ln.code }}</td>
+                              <td>{{ ln.name }}</td>
+                              <td>{{ ln.spec }}</td>
+                              <td>{{ ln.lot }}</td>
+                              <td>{{ ln.qty }}</td>
+                              <td>{{ ln.unit }}</td>
+                              <td>{{ ln.weight }}</td>
+                            </tr>
+                            <tr v-if="!(n.lines||[]).length"><td colspan="7">暂无物料明细</td></tr>
+                          </tbody>
+                        </table>
+                        <div style="margin-top:10px;font-weight:600;color:#262626;margin-bottom:6px">派车与运单信息</div>
+                        <div class="doc-grid">
+                          <div><span class="doc-label">关联派车单号</span>{{ n.dispatchNo || '—' }}</div>
+                          <div><span class="doc-label">承运商名称</span>{{ n.carrier || '—' }}</div>
+                          <div><span class="doc-label">装卸要求</span>{{ n.loadReq || '—' }}</div>
+                          <div><span class="doc-label">封签号</span>{{ n.sealNo || '—' }}</div>
+                        </div>
+                        <div style="margin-top:10px;font-weight:600;color:#262626;margin-bottom:6px">出库经办人</div>
+                        <div class="doc-grid">
+                          <div><span class="doc-label">出库仓管员</span>{{ n.warehouseMan || '—' }}</div>
+                          <div><span class="doc-label">出库过账时间</span>{{ n.postTime || '—' }}</div>
+                          <div class="full"><span class="doc-label">单据备注</span>{{ n.remark || '—' }}</div>
+                        </div>
+                      </div>
                     </div>
                     <div class="doc-grid" v-else-if="isLoadFlow">
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
@@ -313,8 +366,9 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                     <div><span class="k">实盘件数</span><span class="v">{{ n.donePcs ?? 0 }}</span></div>
                     <div><span class="k">待盘件数</span><span class="v" :class="{ zero: (n.pendingPcs||0)===0 }">{{ n.pendingPcs ?? 0 }}</span></div>
                   </div>
-                  <div class="doc-card__ft" style="gap:8px">
-                    <button v-if="flowMode==='stocktake'" class="btn-sm" @click="openStockExec(n)">执行 ›</button>
+                  <div class="doc-card__ft">
+                    <button v-if="flowMode==='gatepass'" class="btn-sm" style="width:76px;font-weight:600" @click.stop="confirmGatepass(n)">确认</button>
+                    <button v-else-if="flowMode==='stocktake'" class="btn-sm" @click="openStockExec(n)">执行 ›</button>
                     <button v-else class="btn-sm" @click="openDocAction(n)">执行</button>
                   </div>
                 </div>
@@ -556,7 +610,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               </div>
             </div>
 
-            <!-- ===== 执行页 · 罐区 ===== -->
+            <!-- ===== 执行页 · 罐区（按模块 PRD 分型） ===== -->
             <template v-else-if="view==='exec' && activeExecMode==='tank'">
               <div class="m-nav">
                 <button class="m-nav__back" @click="backFromExec">←</button>
@@ -570,57 +624,179 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                     <div><span class="k">物料规格：</span>{{ currentLine.spec }}</div>
                     <div><span class="k">物料种类：</span>{{ currentLine.kind }}</div>
                     <div><span class="k">库存单位：</span>{{ currentLine.unit }}</div>
-                    <div><span class="k">批号：</span>{{ currentLine.lot }}</div>
+                    <div v-if="tankExec==='in' || tankExec==='out'"><span class="k">批号：</span>{{ currentLine.lot }}</div>
+                    <div v-if="flowMeta.extraInfoLabel"><span class="k">{{ flowMeta.extraInfoLabel }}：</span>{{ currentNotice.partner }}</div>
                     <div><span class="k">备注：</span>{{ currentLine.remark }}</div>
                   </div>
                   <div class="info-card__badge"><span class="k">未完成件数</span><span class="v">{{ currentLine.remainPcs }}</span></div>
                 </div>
-                <div class="sec">
-                  <div class="sec__title">{{ flowMeta.addMatTitle || '添加厂外物料' }}</div>
-                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码 / 输入，回车确认" /></div>
-                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认" /></div>
-                </div>
-                <div class="sec">
-                  <div class="sec__title">添加原料信息</div>
-                  <div class="field"><label><span class="req">*</span>物料批号</label><input :value="currentLine.lot" readonly /></div>
-                  <div class="field"><label><span class="req">*</span>生产日期</label><input v-model="form.prodDate" type="date" /></div>
-                  <div class="field"><label>有效期</label><input v-model="form.validDate" type="date" /></div>
-                  <div class="field"><label><span class="req">*</span>生产厂家</label><input v-model="form.maker" /></div>
-                  <div class="field"><label><span class="req">*</span>数量</label><input v-model.number="form.qty" type="number" min="0" /></div>
-                </div>
-                <div class="sec">
-                  <div class="sec__title">添加库内储罐</div>
-                  <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="输入后回车 / 失焦校验" @keyup.enter="addTankRow" /></div>
-                  <div class="field">
-                    <label><span class="req">*</span>储罐编号</label>
-                    <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+
+                <!-- 入库类：采购入库 / 委外收货 / 受托收料 / 其他入库 -->
+                <template v-if="tankExec==='in'">
+                  <div class="sec">
+                    <div class="sec__title">{{ flowMeta.addMatTitle || '添加厂外物料' }}</div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码 / 输入，回车确认" /></div>
+                    <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认" /></div>
                   </div>
-                </div>
-                <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
-                <div class="sec" style="padding:0;overflow:hidden">
-                  <div class="table-scroll">
-                    <table class="scan-table">
-                      <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th><th class="col-op">操作</th></tr></thead>
-                      <tbody>
-                        <tr v-for="(r,i) in tankRows" :key="'tank-'+i">
-                          <td>
-                            <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
-                            <span v-else>{{ r.barcode }}</span>
-                          </td>
-                          <td>
-                            <a v-if="flowMeta.hasProcess" class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a>
-                            <span v-else>{{ r.tankNo }}</span>
-                          </td>
-                          <td>{{ r.loc }}</td>
-                          <td>{{ r.beforeQty }}</td>
-                          <td>{{ r.beforeLot }}</td>
-                          <td>{{ r.afterQty }}</td>
-                          <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div class="sec">
+                    <div class="sec__title">添加原料信息</div>
+                    <div class="field"><label><span class="req">*</span>物料批号</label><input :value="currentLine.lot" readonly /></div>
+                    <div class="field"><label><span class="req">*</span>生产日期</label><input v-model="form.prodDate" type="date" /></div>
+                    <div class="field"><label>有效期</label><input v-model="form.validDate" type="date" /></div>
+                    <div class="field"><label><span class="req">*</span>生产厂家</label><input v-model="form.maker" :placeholder="flowId==='oth-in-tank' ? '手工录入' : '自动带入，可改'" /></div>
+                    <div class="field"><label><span class="req">*</span>数量</label><input v-model.number="form.qty" type="number" min="0" /></div>
                   </div>
-                </div>
+                  <div class="sec">
+                    <div class="sec__title">添加库内储罐</div>
+                    <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="输入后回车 / 失焦校验" @keyup.enter="addTankRow" /></div>
+                    <div class="field">
+                      <label><span class="req">*</span>储罐编号</label>
+                      <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                    </div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in tankRows" :key="'tank-in-'+i">
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a></td>
+                            <td>{{ r.loc }}</td>
+                            <td>{{ r.beforeQty }}</td>
+                            <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
+                            <td><input v-model.number="r.afterQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 生产领料：线边仓储罐 + 库内包材 -->
+                <template v-else-if="tankExec==='pick'">
+                  <div class="sec">
+                    <div class="sec__title">添加线边仓/库内储罐</div>
+                    <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="储罐条码，回车录入" @keyup.enter="addTankRow" /></div>
+                    <div class="field">
+                      <label><span class="req">*</span>储罐编号</label>
+                      <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title" style="display:flex;justify-content:space-between;align-items:center">
+                      <span>添加库内包材</span>
+                      <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openRecommend">查看推荐条码</button>
+                    </div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，回车" @keyup.enter="addTankPkgScan" /></div>
+                    <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认" @keyup.enter="addTankPkgScan" /></div>
+                    <div class="field"><label>领料数量</label><input v-model.number="form.pkgQty" type="number" min="0" placeholder="输入后回车确认" @keyup.enter="addTankPkgScan" /></div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>包材编号</th><th>数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th>外包材编号</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="'tank-pick-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></td>
+                            <td><input v-model.number="r.qty" type="number" min="0" style="width:48px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td>{{ r.fromLoc }}</td>
+                            <td>{{ r.lot }}</td>
+                            <td>{{ r.process }}</td>
+                            <td>{{ r.outer }}</td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 生产退料：库内储罐 + 线边仓包材 -->
+                <template v-else-if="tankExec==='ret'">
+                  <div class="sec">
+                    <div class="sec__title">添加库内储罐</div>
+                    <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="储罐条码，回车录入" @keyup.enter="addTankRow" /></div>
+                    <div class="field">
+                      <label><span class="req">*</span>储罐编号</label>
+                      <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">添加线边仓包材</div>
+                    <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，回车" @keyup.enter="addTankPkgScan" /></div>
+                    <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="输入，回车确认" @keyup.enter="addTankPkgScan" /></div>
+                    <div class="field"><label>退料数量</label><input v-model.number="form.pkgQty" type="number" min="0" placeholder="输入后回车确认" @keyup.enter="addTankPkgScan" /></div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>包材编号</th><th>数量</th><th>入库库位</th><th>批号</th><th>原位置</th><th>当前工序</th><th>外包材</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="'tank-ret-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.pkgNo }}</a></td>
+                            <td><input v-model.number="r.qty" type="number" min="0" style="width:48px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td>{{ r.inLoc }}</td>
+                            <td>{{ r.lot }}</td>
+                            <td>{{ r.fromLoc }}</td>
+                            <td>{{ r.process }}</td>
+                            <td>{{ r.outer }}</td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- 其他出库：出库方向 + 库内储罐 -->
+                <template v-else>
+                  <div class="sec">
+                    <div class="sec__title">出库方向</div>
+                    <div class="field">
+                      <label><span class="req">*</span>出库方向</label>
+                      <select v-model="form.outDir">
+                        <option value="">请选择</option>
+                        <option value="出至厂外">出至厂外</option>
+                        <option value="出至线边仓">出至线边仓</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">添加库内储罐</div>
+                    <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="输入后回车 / 失焦校验" @keyup.enter="addTankRow" /></div>
+                    <div class="field">
+                      <label><span class="req">*</span>储罐编号</label>
+                      <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                    </div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>出库前量</th><th>出库前批号</th><th>出库后量</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in tankRows" :key="'tank-out-'+i">
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
+                            <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a></td>
+                            <td>{{ r.loc }}</td>
+                            <td>{{ r.beforeQty }}</td>
+                            <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
+                            <td><input v-model.number="r.afterQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
                 <div class="sec" v-if="flowMeta.hasProcess">
                   <div class="sec__title">工序（可批量执行）</div>
                   <div class="process-tabs">
@@ -629,11 +805,26 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                   </div>
                 </div>
                 <div class="sec">
-                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" /></div>
                   <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
                 </div>
               </div>
               <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+
+              <div v-if="lotDetailVisible" style="position:absolute;inset:0;z-index:21;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;border-radius:20px">
+                <div style="width:100%;background:#fff;border-radius:12px;overflow:hidden">
+                  <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid #eee">批号详情</div>
+                  <table class="scan-table">
+                    <thead><tr><th>批号</th><th>数量</th></tr></thead>
+                    <tbody>
+                      <tr v-for="(d,i) in lotDetailRows" :key="'lot-'+i"><td>{{ d.lot }}</td><td>{{ d.qty }}</td></tr>
+                    </tbody>
+                  </table>
+                  <div style="padding:12px 16px;text-align:center">
+                    <button type="button" class="btn-primary" style="width:auto;padding:8px 28px;height:auto" @click="lotDetailVisible=false">取消</button>
+                  </div>
+                </div>
+              </div>
             </template>
 
             <!-- ===== 执行页 · 计数 / 装卸 ===== -->
@@ -1641,7 +1832,7 @@ const STORE = window.WMS_DEMO_STORE;
 createApp({
   setup() {
     const menu = CFG.menu;
-    const defaultOpeneds = ['home', 'wh', 'wh-po', 'wh-prod', 'wh-os', 'pkg-mgmt', 'lg'];
+    const defaultOpeneds = ['home', 'wh', 'wh-po', 'wh-prod', 'wh-os', 'pkg-mgmt', 'lg', 'gate'];
     const view = ref('home');
     const flowId = ref('po-in-serial');
     const menuActive = ref('app-home');
@@ -1839,7 +2030,7 @@ createApp({
     const form = reactive({
       loc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '丁A',
       prodDate: '2025-08-01', validDate: '2026-08-01', maker: '天齐锂业股份有限公司', qty: 25,
-      lotIn: '', inQty: null, remark: '', lineSideWh: '',
+      lotIn: '', inQty: null, remark: '', lineSideWh: '', pkgQty: null, outDir: '',
       splitCount: 5, splitScalar: 10, mergeBarcode: '', outerBarcode: '', outerNo: '',
     });
     const procForm = reactive({ text: '', num: null, date: '2025-08-05', sel: '', opt: '1' });
@@ -1869,6 +2060,15 @@ createApp({
     const flowMode = computed(() => flowMeta.value.mode || 'serial');
     const isLineSidePick = computed(() => flowMeta.value.execVariant === 'line-side-pick');
     const isLoadFlow = computed(() => flowMeta.value.execVariant === 'load');
+    const tankExec = computed(() => {
+      const v = flowMeta.value.execVariant || '';
+      if (v === 'tank-pick') return 'pick';
+      if (v === 'tank-ret') return 'ret';
+      if (v === 'tank-out') return 'out';
+      return 'in';
+    });
+    const lotDetailVisible = ref(false);
+    const lotDetailRows = ref([]);
     const loadProcs = computed(() => (currentLine.value && currentLine.value.procs) || []);
     const activeExecMode = computed(() => {
       if (flowMode.value === 'stocktake') return stockExecOverride.value || 'serial';
@@ -1953,10 +2153,15 @@ createApp({
         list = list.filter(n => ['待运输', '运输中', '待发运', '发运中'].includes(n.status));
         list = list.slice().sort((a, b) => String(a.planLoad || '').localeCompare(String(b.planLoad || '')) || String(a.id || '').localeCompare(String(b.id || '')));
       }
+      if (flowMode.value === 'gatepass') {
+        list = list.filter(n => n.status === '待放行');
+        list = list.slice().sort((a, b) => String(b.createTime || '').localeCompare(String(a.createTime || '')) || String(b.id || '').localeCompare(String(a.id || '')));
+      }
       if (!kw) return list;
       const blob = (n) => {
         const pts = [...(n.loads || []), ...(n.unloads || [])].map(p => [p.unit, p.place, p.shipNo, p.contact].join(' ')).join(' ');
-        return [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.stockNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode, n.shipNos, n.phone, pts].join(' ');
+        const lineBlob = (n.lines || []).map(ln => [ln.code, ln.name, ln.spec, ln.lot].join(' ')).join(' ');
+        return [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.stockNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode, n.shipNos, n.phone, n.sourceType, n.outNo, n.shipFrom, n.shipTo, n.materialName, n.spec, pts, lineBlob].join(' ');
       };
       return list.filter(n => blob(n).includes(kw));
     });
@@ -1999,7 +2204,12 @@ createApp({
     });
 
     const scanQtySum = computed(() => scanRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
-    const tankQtySum = computed(() => tankRows.value.reduce((s, r) => s + Number(r.afterQty || 0), 0));
+    const tankQtySum = computed(() => {
+      if (tankExec.value === 'out') {
+        return tankRows.value.reduce((s, r) => s + Number(r.qty || Math.max(0, Number(r.beforeQty || 0) - Number(r.afterQty || 0))), 0);
+      }
+      return tankRows.value.reduce((s, r) => s + Number(r.afterQty || 0), 0);
+    });
     const innerQtySum = computed(() => innerRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
     const allLinesDone = computed(() => (currentNotice.value?.lines || []).every(l => l.status === '已完成' || l.status === '已关闭'));
     const splitRemain = computed(() => {
@@ -2014,7 +2224,7 @@ createApp({
     });
 
     function statusTag(s) {
-      return { '待执行': 'tag-b', '待完成': 'tag-b', '执行中': 'tag-o', '已完成': 'tag-g', '已关闭': 'tag-gr', '待发运': 'tag-b', '发运中': 'tag-o', '待确认': 'tag-b', '已确认': 'tag-g', '待运输': 'tag-b', '运输中': 'tag-o', '已签收': 'tag-g', '待派车': 'tag-p' }[s] || 'tag-gr';
+      return { '待执行': 'tag-b', '待完成': 'tag-b', '执行中': 'tag-o', '已完成': 'tag-g', '已关闭': 'tag-gr', '待发运': 'tag-b', '发运中': 'tag-o', '待确认': 'tag-b', '已确认': 'tag-g', '待运输': 'tag-b', '运输中': 'tag-o', '已签收': 'tag-g', '待派车': 'tag-p', '待放行': 'tag-o', '已放行': 'tag-g', '已作废': 'tag-gr' }[s] || 'tag-gr';
     }
     function toast(msg) { ElementPlus.ElMessage.info(msg); }
     function goHome() {
@@ -2161,6 +2371,10 @@ createApp({
         view.value = 'waybill-exec';
         return;
       }
+      if (flowMode.value === 'gatepass') {
+        confirmGatepass(n);
+        return;
+      }
       view.value = 'materials';
     }
     function openStockExec(n, mode) {
@@ -2171,15 +2385,15 @@ createApp({
       resetExecForm();
       if (takeMode === 'serial') {
         stockRows.value = [
-          { status: '待盘', barcode: 'TM001', pkgNo: '/', name: '钢瓶', loc: 'A-01-03', planQty: 100, actualQty: 100, abnormal: false, isNew: false },
-          { status: '正常', barcode: 'TM002', pkgNo: 'GP001', name: '铝瓶', loc: 'A-02-01', planQty: 150, actualQty: 150, abnormal: false, isNew: false },
-          { status: '待盘', barcode: 'TM003', pkgNo: '/', name: '管件', loc: 'B-01-02', planQty: 200, actualQty: 200, abnormal: false, isNew: false },
+          { status: '待盘', barcode: 'TM001', pkgNo: '/', name: '电池级碳酸锂', loc: 'A-01-03', planQty: 100, actualQty: 100, abnormal: false, isNew: false },
+          { status: '正常', barcode: 'TM002', pkgNo: 'GP001', name: '电池级氢氧化锂', loc: 'A-02-01', planQty: 150, actualQty: 150, abnormal: false, isNew: false },
+          { status: '待盘', barcode: 'TM003', pkgNo: '/', name: '电池级硫酸锂', loc: 'B-01-02', planQty: 200, actualQty: 200, abnormal: false, isNew: false },
         ];
       } else {
         stockRows.value = [
-          { status: '正常', wh: 'CK-A', loc: 'A-01', name: '钢瓶', planQty: 500, actualQty: 500, abnormal: false },
-          { status: '待盘', wh: 'CK-A', loc: 'A-02', name: '铝瓶', planQty: 300, actualQty: 300, abnormal: false },
-          { status: '盘亏', wh: 'CK-B', loc: 'B-01', name: '管件', planQty: 200, actualQty: 180, abnormal: false },
+          { status: '正常', wh: 'CK-A', loc: 'A-01', name: '电池级碳酸锂', planQty: 500, actualQty: 500, abnormal: false },
+          { status: '待盘', wh: 'CK-A', loc: 'A-02', name: '电池级氢氧化锂', planQty: 300, actualQty: 300, abnormal: false },
+          { status: '盘亏', wh: 'CK-B', loc: 'B-01', name: '电池级硫酸锂', planQty: 200, actualQty: 180, abnormal: false },
         ];
       }
       view.value = 'exec';
@@ -2287,6 +2501,8 @@ createApp({
       form.inQty = null;
       form.remark = '';
       form.lineSideWh = '';
+      form.pkgQty = null;
+      form.outDir = '';
       form.maker = currentNotice.value?.partner || currentNotice.value?.supplier || '';
       processTab.value = '包装检查';
     }
@@ -2300,7 +2516,19 @@ createApp({
       } else if (flowMode.value === 'serial') {
         scanRows.value = [...CFG.scanRowsSerial];
       }
-      if (flowMode.value === 'tank') tankRows.value = [...CFG.tankRows];
+      if (flowMode.value === 'tank') {
+        if (tankExec.value === 'pick') {
+          scanRows.value = JSON.parse(JSON.stringify(CFG.scanRowsPick || []));
+          tankRows.value = [];
+        } else if (tankExec.value === 'ret') {
+          scanRows.value = JSON.parse(JSON.stringify(CFG.scanRowsTankRet || CFG.scanRowsPick || []));
+          tankRows.value = [];
+        } else if (tankExec.value === 'out') {
+          tankRows.value = JSON.parse(JSON.stringify(CFG.tankRowsOut || CFG.tankRows || []));
+        } else {
+          tankRows.value = JSON.parse(JSON.stringify(CFG.tankRows || []));
+        }
+      }
       view.value = 'exec';
     }
     function backFromExec(opts) {
@@ -2352,20 +2580,79 @@ createApp({
       form.barcode = r.barcode;
       form.pkgNo = r.pkgNo;
       recommendVisible.value = false;
-      addPickScan();
+      if (tankExec.value === 'pick' || tankExec.value === 'ret') {
+        form.pkgQty = r.qty || 10;
+        addTankPkgScan();
+      } else {
+        addPickScan();
+      }
     }
     function addTankRow() {
-      const code = form.tankBarcode.trim() || ('TK' + String(tankRows.value.length + 1).padStart(3, '0'));
+      if (!form.tankNo) {
+        ElementPlus.ElMessage.error('储罐编号为必填，请完善表单');
+        return;
+      }
+      const code = form.tankBarcode.trim() || ('TK' + String((tankExec.value === 'pick' || tankExec.value === 'ret' ? scanRows.value.length : tankRows.value.length) + 1).padStart(3, '0'));
+      if (tankExec.value === 'pick' || tankExec.value === 'ret') {
+        scanRows.value.push({
+          barcode: code,
+          pkgNo: form.tankNo,
+          qty: Number(form.pkgQty) || 20,
+          fromLoc: tankExec.value === 'ret' ? '线边仓' : 'A01-01',
+          inLoc: 'A01-01',
+          lot: currentLine.value?.lot || 'LOT-Li-2026001',
+          process: '包装检查',
+          outer: '—',
+          done: false,
+        });
+        form.tankBarcode = '';
+        toast('已添加储罐明细');
+        return;
+      }
+      const before = tankExec.value === 'out' ? 20 : 10;
+      const addQty = Number(form.qty) || (tankExec.value === 'out' ? 8 : 25);
       tankRows.value.push({
         barcode: code,
         tankNo: form.tankNo,
         loc: 'A01-01',
-        beforeQty: 10,
-        beforeLot: currentLine.value?.lot || '—',
-        afterQty: Number(form.qty) || 25,
+        beforeQty: before,
+        beforeLot: currentLine.value?.lot || 'lot001',
+        afterQty: tankExec.value === 'out' ? Math.max(0, before - addQty) : addQty,
+        qty: addQty,
+        lotDetails: [{ lot: currentLine.value?.lot || 'lot001', qty: before }],
       });
       form.tankBarcode = '';
       toast('已添加储罐明细');
+    }
+    function addTankPkgScan() {
+      const code = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!code && !pkg) return;
+      const qty = Number(form.pkgQty);
+      if (!(qty > 0)) {
+        ElementPlus.ElMessage.error(tankExec.value === 'ret' ? '物料数量必须填写正数，请修改' : '物料领料数量必须填写正数');
+        return;
+      }
+      scanRows.value.push({
+        barcode: code || ('TMP' + Date.now()),
+        pkgNo: pkg || '—',
+        qty: qty,
+        fromLoc: tankExec.value === 'ret' ? '线边仓' : 'A01-01',
+        inLoc: 'A01-01',
+        lot: currentLine.value?.lot || 'LOT-Li-2026001',
+        process: '包装检查',
+        outer: '—',
+        done: false,
+      });
+      form.barcode = '';
+      form.pkgNo = '';
+      form.pkgQty = null;
+      toast('已添加扫码明细');
+    }
+    function openLotDetail(row) {
+      const details = row.lotDetails || String(row.beforeLot || '').split(',').filter(Boolean).map((lot, i) => ({ lot: lot.trim(), qty: i === 0 ? 5 : 15 }));
+      lotDetailRows.value = details;
+      lotDetailVisible.value = true;
     }
     function addInnerScan() {
       const code = form.barcode.trim() || form.pkgNo.trim();
@@ -2409,14 +2696,14 @@ createApp({
     }
     function goProcessBatch(name) {
       if (!flowMeta.value.hasProcess) return;
-      const matched = scanRows.value.filter(r => (r.process || '').includes(name.replace('检查', '')) || r.process === name);
-      if (isLineSidePick.value && !scanRows.value.some(r => r.process === name && !r.done)) {
-        ElementPlus.ElMessage.error('部分条码不满足当前工序执行条件，请核对数据');
+      const tankScan = tankExec.value === 'pick' || tankExec.value === 'ret';
+      if ((isLineSidePick.value || tankScan) && !scanRows.value.some(r => r.process === name && !r.done)) {
+        ElementPlus.ElMessage.error(tankScan ? '列表不存在当前工序待执行数据，不可批量操作' : '部分条码不满足当前工序执行条件，请核对数据');
         return;
       }
       processTab.value = name;
       processRef.value = (currentNotice.value?.id || '') + ' · 批量';
-      if (isLineSidePick.value) {
+      if (isLineSidePick.value || tankScan) {
         scanRows.value.forEach(r => { if (r.process === name) r.done = true; });
         toast('当前条码工序执行完成');
       }
@@ -2431,7 +2718,7 @@ createApp({
         return;
       }
       Object.assign(pkgSrc, {
-        status: '在用', material: 'A001 钢瓶 / φ219', spec: 'φ219', unit: 'Kg', remain: 100, lot: 'LOT20250801', loaded: true,
+        status: '在用', material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料', spec: 'Li2CO3≥99.5%', unit: 'KG', remain: 100, lot: 'LOT-Li-2026001', loaded: true,
       });
       toast('条码信息加载完成');
     }
@@ -2483,7 +2770,7 @@ createApp({
         return;
       }
       Object.assign(pkgSrc, {
-        status: '在用', material: 'A001 钢瓶 / φ219', spec: 'φ219', unit: 'Kg', remain: 40, lot: 'LOT20250801', loaded: true,
+        status: '在用', material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料', spec: 'Li2CO3≥99.5%', unit: 'KG', remain: 40, lot: 'LOT-Li-2026001', loaded: true,
       });
       toast('主条码信息加载完成');
     }
@@ -2597,6 +2884,40 @@ createApp({
       const i = expandedIds.value.indexOf(k);
       if (i >= 0) expandedIds.value.splice(i, 1);
       else expandedIds.value.push(k);
+    }
+    function confirmGatepass(n) {
+      if (!n) return;
+      const hit = STORE ? STORE.getDoc(n.id) : null;
+      const already = n.status !== '待放行' || (hit && ['已完成', '已放行'].includes(hit.status));
+      if (already) {
+        n.status = '已完成';
+        ElementPlus.ElMessage.warning('该出门条已由其他门卫放行，已为您刷新列表');
+        bumpStore();
+        return;
+      }
+      const html = [
+        '<div style="text-align:left;line-height:1.7;font-size:13px;color:#262626">',
+        '<div>出门条号：' + (n.id || '—') + '</div>',
+        '<div>提货车辆：' + (n.plate || '—') + ' (' + (n.driver || '—') + ')</div>',
+        '<div>出厂物料：' + (n.materialName || n.materialSummary || '—') + '</div>',
+        '<div>出厂数量：' + (n.qtyText || '—') + '</div>',
+        '<div style="margin-top:8px">是否确认核验无误，准予车辆出厂放行？</div>',
+        '</div>',
+      ].join('');
+      ElementPlus.ElMessageBox.confirm(html, '出厂放行确认', {
+        confirmButtonText: '确认放行',
+        cancelButtonText: '取消',
+        type: 'warning',
+        dangerouslyUseHTMLString: true,
+      }).then(() => {
+        const stamp = nowStamp();
+        const by = operator || '门卫-张三';
+        n.status = '已完成';
+        n.releaseAt = stamp;
+        n.releaseBy = by;
+        syncDocToStore(n.id, '已完成', { action: '出门条放行', 放行时间: stamp, 放行人: by, source: 'APP' });
+        ElementPlus.ElMessage.success('出门条放行确认成功');
+      }).catch(() => {});
     }
     function canSignPoint(p) {
       const loads = (currentNotice.value && currentNotice.value.loads) || [];
@@ -2881,8 +3202,17 @@ createApp({
       if (mode === 'count' && !(form.inQty > 0)) {
         ElementPlus.ElMessage.error((flowMeta.value.qtyLabel || '数量') + '必须填写正数'); return;
       }
-      if (mode === 'tank' && !form.tankNo) {
+      if (mode === 'tank' && tankExec.value === 'out' && !form.outDir) {
+        ElementPlus.ElMessage.error('出库方向为必填项，请选择出库去向'); return;
+      }
+      if (mode === 'tank' && tankExec.value !== 'pick' && tankExec.value !== 'ret' && !form.tankNo) {
         ElementPlus.ElMessage.error('储罐编号为必填'); return;
+      }
+      if (mode === 'tank' && (tankExec.value === 'pick' || tankExec.value === 'ret')) {
+        if (scanRows.value.some(r => !(Number(r.qty) > 0))) {
+          ElementPlus.ElMessage.error(tankExec.value === 'ret' ? '物料数量必须填写正数，请修改' : '物料领料数量必须填写正数');
+          return;
+        }
       }
       ElementPlus.ElMessageBox.confirm('是否确认提交当前执行作业？', '提交确认', {
         confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
@@ -2955,14 +3285,14 @@ createApp({
       currentNotice, currentLine, processTab, processRef, stubTitle,
       stockRows, pkgSearch, pkgDetail, pkgForm, pkgEditable, pkgQueryPairs,
       operator, tanks, scanRows, tankRows, innerRows, form, procForm,
-      recommendVisible, lineSideWhOptions, recommendBarcodes,
+      recommendVisible, lotDetailVisible, lotDetailRows, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute,
-      flowMeta, flowTitle, flowMode, activeExecMode, isLineSidePick, isLoadFlow, loadProcs, headerHint, filteredHome, filteredNotices,
+      flowMeta, flowTitle, flowMode, activeExecMode, isLineSidePick, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       scanQtySum, tankQtySum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
       statusTag, toast, goHome, openStub, openModule, onMenuSelect,
       openMaterials, openDocAction, openStockExec, openExec, backFromExec,
-      addSerialScan, addPickScan, addTankRow, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch,
+      addSerialScan, addPickScan, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail,
       addStockScan, onStockQtyChange,
       openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,
@@ -2972,6 +3302,7 @@ createApp({
       addPkgDocScan, goPkgProcessBatch, submitPkgDoc,
       openPickup, openSign, openEnroute, goWayProc, confirmPickup, confirmSign, submitEnroute,
       openWaybillAdd, toggleExpand, isExpanded, canSignPoint, addWayPhoto, markWayLine, wayLineDiff,
+      confirmGatepass,
       submitExec, submitProcess,
       // 消息中心/个人中心
       msgSubTab, msgReadSeg, auditSeg, initiateSeg,
