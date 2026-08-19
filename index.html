@@ -764,7 +764,8 @@ function buildNav() {
         { id: 'progress', idx: '01', name: '项目进度' },
         { id: 'proto', idx: '02', name: '原型进度' },
         { id: 'blueprint', idx: '03', name: '蓝图确认计划' },
-        { id: 'overview', idx: '04', name: '场景总览' }
+        { id: 'interfaces', idx: '04', name: '接口集成' },
+        { id: 'overview', idx: '05', name: '场景总览' }
       ]
     },
     {
@@ -1029,6 +1030,220 @@ function renderProgress() {
     <p class="muted" style="margin-top:12px">调研阶段待讨论项已全部关闭，蓝图与原型 100% 确认完成。<strong>2026年8月20日上午10:00 召开蓝图确认总结与签署会议</strong>。远期：十月底初步验收（无数据）；十一月底最终验收（带数据）。</p>
   </div>`;
 }
+
+
+const interfacesData = [{"id": 1, "cat": "基础主数据", "name": "物料列表（物料主数据）", "mod": "物料档案", "target": "ERP (用友U9) · 物料清单", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时/定时", "trigger": "ERP物料档案新增/变更时", "desc": "同步物料编码、规格、单位、换算率及存货属性", "status": "✅ 已确认"}, {"id": 2, "cat": "基础主数据", "name": "客户列表（客户档案）", "mod": "客户档案", "target": "ERP (用友U9) · 客户管理", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时/定时", "trigger": "ERP客户档案新增/变更时", "desc": "同步客户编码、全称、送货地址、联系人及电话", "status": "✅ 已确认"}, {"id": 3, "cat": "基础主数据", "name": "供应商列表（供应商档案）", "mod": "供应商档案", "target": "ERP (用友U9) · 供应商管理", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时/定时", "trigger": "ERP供应商档案新增/变更时", "desc": "同步供应商编码、全称、联系方式及结算档案", "status": "✅ 已确认"}, {"id": 4, "cat": "业务订单", "name": "采购订单（正常采购）", "mod": "采购来料通知", "target": "ERP (用友U9) · 采购管理 (PO)", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时下发", "trigger": "ERP采购订单审核完成后触发", "desc": "下发正常采购订单明细、交期与供应商，驱动收料通知", "status": "✅ 已确认"}, {"id": 5, "cat": "业务订单", "name": "销售订单（销售与受托）", "mod": "备货/预出货/发货", "target": "ERP (用友U9) · 销售管理 (SO)", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时下发", "trigger": "ERP销售订单审核完成后触发", "desc": "下发销售订单与受托加工订单，驱动备货与预出货", "status": "✅ 已确认"}, {"id": 6, "cat": "业务订单", "name": "委外加工订单（委外采购）", "mod": "委外通知", "target": "ERP (用友U9) · 委外采购 (SubPO)", "dir": "ERP ──► WMS", "dirType": "in", "sync": "实时下发", "trigger": "ERP委外加工订单审核完成后触发", "desc": "下发委外加工订单及 BOM 清单，驱动发料与收货", "status": "✅ 已确认"}, {"id": 7, "cat": "财务结算", "name": "物流服务类采购订单", "mod": "运费结算 (YFJS)", "target": "ERP (用友U9) · 采购服务PO", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "运单签收且运费核算完成后触发", "desc": "依据运费参照表生成物流采购订单推ERP挂账结算", "status": "✅ 已确认"}, {"id": 8, "cat": "仓储过账", "name": "采购入库单", "mod": "采购入库单 (CGRK)", "target": "ERP (用友U9) · 库存管理 (GR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "质检合格且上架/打罐完成后触发", "desc": "回写 ERP 采购入库单办理资产过账", "status": "✅ 已确认"}, {"id": 9, "cat": "仓储过账", "name": "采购退料单", "mod": "采购退料出库单 (CGTL)", "target": "ERP (用友U9) · 采购退货 (PRN)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "采购退料扫码出库复核完成后触发", "desc": "回写 ERP 采购退货单办理资产冲减", "status": "✅ 已确认"}, {"id": 10, "cat": "仓储过账", "name": "委外发料出库单", "mod": "委外发料出库单 (WWCK)", "target": "ERP (用友U9) · 委外发料 (SubGI)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "委外原料扫码发料装车完成后触发", "desc": "回写 ERP 委外发料单办理材料出库过账", "status": "✅ 已确认"}, {"id": 11, "cat": "仓储过账", "name": "委外退料入库单", "mod": "委外退料入库单 (WWTL)", "target": "ERP (用友U9) · 委外退料 (SubWTR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "委外余料退回扫码上架完成后触发", "desc": "回写 ERP 委外退料单办理材料入库过账", "status": "✅ 已确认"}, {"id": 12, "cat": "仓储过账", "name": "委外完工入库单", "mod": "委外完工入库单 (WWRK)", "target": "ERP (用友U9) · 委外完工 (SubGR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "委外产成品完工扫码入库完成后触发", "desc": "回写 ERP 委外加工入库单过账", "status": "✅ 已确认"}, {"id": 13, "cat": "仓储过账", "name": "委外退货出库单", "mod": "委外退货出库单 (WWTCK)", "target": "ERP (用友U9) · 委外退货 (SubGI-R)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "委外不合格品扫码出库完成后触发", "desc": "回写 ERP 委外退货单办理过账", "status": "✅ 已确认"}, {"id": 14, "cat": "仓储过账", "name": "生产领料出库单", "mod": "生产领料出库单 (SCLCK)", "target": "ERP (用友U9) · 调拨管理 (Transfer)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "车间领料/直投扫码出库后触发", "desc": "推送 ERP 调拨单（主仓至线边仓）", "status": "✅ 已确认"}, {"id": 15, "cat": "仓储过账", "name": "生产退料入库单", "mod": "生产退料入库单 (SCTRK)", "target": "ERP (用友U9) · 调拨管理 (Transfer)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "车间余料扫码退回主仓后触发", "desc": "推送 ERP 调拨单（线边仓至主仓）", "status": "✅ 已确认"}, {"id": 16, "cat": "仓储过账", "name": "生产完工入库单", "mod": "生产完工入库单 (SCWG)", "target": "ERP (用友U9) · 完工入库 (FGR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "产线成品扫码打托入库后触发", "desc": "回写 ERP 产成品入库单办理资产入账", "status": "✅ 已确认"}, {"id": 17, "cat": "仓储管控", "name": "销售预出货单", "mod": "销售预出货单 (XSYCH)", "target": "ERP (用友U9) · 库存锁定 (Alloc)", "dir": "WMS 协同 ERP", "dirType": "sync", "sync": "事件触发", "trigger": "销售备货通知预配合格批号后触发", "desc": "库内合格批号预分配锁库，状态协同 ERP", "status": "✅ 已确认"}, {"id": 18, "cat": "仓储过账", "name": "销售发货出库单", "mod": "销售出库单 (XSCK)", "target": "ERP (用友U9) · 销售出库 (GI-SO)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "销售发货扫码装车放行后触发", "desc": "回写 ERP 销售出库单办理销售收入确认", "status": "✅ 已确认"}, {"id": 19, "cat": "仓储过账", "name": "销售退货入库单", "mod": "销售退货入库单 (XSTRK)", "target": "ERP (用友U9) · 销售退货 (GR-SR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "客户退货扫码入库上架后触发", "desc": "回写 ERP 销售退货单办理红冲入库过账", "status": "✅ 已确认"}, {"id": 20, "cat": "仓储过账", "name": "受托来料入库单", "mod": "受托来料入库单 (STRK)", "target": "ERP (用友U9) · 杂收管理 (OGR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "客户受托原料卸车扫码入库后触发", "desc": "回写 ERP 杂项入库单（对应 ERP 杂收）", "status": "✅ 已确认"}, {"id": 21, "cat": "仓储过账", "name": "受托退料出库单", "mod": "受托退料出库单 (STTL)", "target": "ERP (用友U9) · 杂发管理 (OGI)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "受托余料/不良退回扫码出库后触发", "desc": "回写 ERP 杂项出库单（对应 ERP 杂发）", "status": "✅ 已确认"}, {"id": 22, "cat": "仓储过账", "name": "其他入库单", "mod": "其他入库单 (QTRK)", "target": "ERP (用友U9) · 杂收管理 (OGR)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "非采购类杂项入库扫码完成后触发", "desc": "回写 ERP 杂收单（对应 ERP 杂收）", "status": "✅ 已确认"}, {"id": 23, "cat": "仓储过账", "name": "其他出库单", "mod": "其他出库单 (QTCK)", "target": "ERP (用友U9) · 杂发管理 (OGI)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "非销售类杂项出库扫码完成后触发", "desc": "回写 ERP 杂发单（对应 ERP 杂发）", "status": "✅ 已确认"}, {"id": 24, "cat": "仓储过账", "name": "库内移库单", "mod": "移库执行单 (YKZX)", "target": "ERP (用友U9) · 调拨管理 (Transfer)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "跨仓库/跨厂区移库扫码确认后触发", "desc": "回写 ERP 仓库调拨单办理出入库过账", "status": "✅ 已确认"}, {"id": 25, "cat": "仓储过账", "name": "库内转序", "mod": "转序执行单 (ZXZX)", "target": "ERP (用友U9) · 形态转换 (Transformation)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "变更料号、批号工序转序扫码确认后", "desc": "对接 ERP 办理形态转换过账", "status": "✅ 已确认"}, {"id": 26, "cat": "仓储过账", "name": "报废出库单", "mod": "报废执行单 (BFZX)", "target": "ERP (用友U9) · 不良品报废 (Scrap)", "dir": "WMS ──► ERP", "dirType": "out", "sync": "事件触发", "trigger": "不良品/过期物料报废扫码后触发", "desc": "回写 ERP 不良品报废出库单过账", "status": "✅ 已确认"}, {"id": 27, "cat": "质量检验", "name": "采购来料送检请验单", "mod": "采样请验单", "target": "LIMS 质检系统 · 采样送检管理", "dir": "WMS ──► LIMS", "dirType": "lims_out", "sync": "事件触发", "trigger": "采购到货卸车采样完成后触发", "desc": "自动推送 LIMS 采样送检请验单（来料检类型）", "status": "✅ 已确认"}, {"id": 28, "cat": "质量检验", "name": "采购来料检验结果报告", "mod": "质检结果单", "target": "LIMS 质检系统 · 检验报告管理", "dir": "LIMS ──► WMS", "dirType": "lims_in", "sync": "事件触发", "trigger": "LIMS化验完成并出具判定结果后触发", "desc": "推送检验报告与判定结果，解锁物料/更新批次状态", "status": "✅ 已确认"}, {"id": 29, "cat": "质量检验", "name": "库内报检/成品送检请验单", "mod": "采样请验单", "target": "LIMS 质检系统 · 采样送检管理", "dir": "WMS ──► LIMS", "dirType": "lims_out", "sync": "事件触发", "trigger": "产线成品入库、复检及转序后触发", "desc": "自动推送 LIMS 成品检验请验单", "status": "✅ 已确认"}, {"id": 30, "cat": "质量检验", "name": "生产成品/库内检验结果报告", "mod": "质检结果单", "target": "LIMS 质检系统 · 检验报告管理", "dir": "LIMS ──► WMS", "dirType": "lims_in", "sync": "事件触发", "trigger": "LIMS成品化验合格并出具COA后触发", "desc": "推送化验报告与合格证，释放条码/变更质检状态", "status": "✅ 已确认"}, {"id": 31, "cat": "系统协同", "name": "企业微信消息通知推送", "mod": "消息中心", "target": "企业微信 · 消息总线 (Message API)", "dir": "WMS ──► 企微", "dirType": "wechat", "sync": "事件触发", "trigger": "质检合格/到货/发货/冻结预警时触发", "desc": "质检/到货/发货/冻结预警实时推送企微消息", "status": "✅ 已确认"}, {"id": 32, "cat": "系统协同", "name": "企业微信审批通知推送", "mod": "审批中心", "target": "企业微信 · 审批卡片 (Approval API)", "dir": "WMS ──► 企微", "dirType": "wechat", "sync": "事件触发", "trigger": "发起派车/报废/盘点差异审批时触发", "desc": "派车/报废/盘点差异等业务审批推送企微待办卡片", "status": "✅ 已确认"}, {"id": 33, "cat": "系统协同", "name": "统一平台待办及消息对接", "mod": "统一门户集成", "target": "集团统一工作台 · 待办中心 (Todo API)", "dir": "WMS ──► 平台", "dirType": "wechat", "sync": "事件触发", "trigger": "产生待处理仓储物流业务待办时触发", "desc": "WMS 关键待办及预警同步至集团统一工作台", "status": "✅ 已确认"}];
+
+function renderInterfaces() {
+  pageTitle.textContent = '四、系统接口与集成蓝图';
+
+  const mmdCode = `flowchart TB
+    subgraph ERP["用友 U9 ERP 系统"]
+      direction TB
+      E1["基础主数据\n(物料/客户/供应商)"]
+      E2["业务订单\n(采购/销售/委外订单)"]
+      E3["资产与过账\n(入库/退料/出库/调拨/杂发)"]
+      E4["财务结算\n(物流服务采购挂账)"]
+    end
+
+    subgraph WMS["思特瑞 WMS / TMS 仓储物流系统 (万物智汇)"]
+      direction TB
+      W1["条码与空间建模\n(批次/货位/包材)"]
+      W2["仓储作业执行\n(扫码入库/质检/打托/出库)"]
+      W3["物流调度管理\n(派车/运单/随车单/出门条)"]
+      W4["业务协同与控制\n(预出货锁库/形态转换/报废)"]
+    end
+
+    subgraph LIMS["LIMS 质量管理系统"]
+      direction TB
+      L1["采样请验申请接收\n(来料检/成品检/复检)"]
+      L2["化验报告与合格证出具\n(判定合格/不合格/释放)"]
+    end
+
+    subgraph PORTAL["企业微信 / 集团统一工作台"]
+      direction TB
+      P1["实时消息预警\n(质检/到货/发货/冻结)"]
+      P2["移动审批卡片\n(派车/报废/盘点差异)"]
+      P3["统一待办聚合\n(工作台集成)"]
+    end
+
+    %% ERP to WMS
+    E1 -- "① 基础主数据同步 (3项)" --> W1
+    E2 -- "② 上游业务订单下发 (3项)" --> W2
+    
+    %% WMS to ERP
+    W2 -- "③ 仓储过账回写 (19项)" --> E3
+    W3 -- "④ 物流采购订单 (1项)" --> E4
+    W4 -. "⑤ 预出货锁库状态协同" .-> E3
+
+    %% WMS to LIMS
+    W2 -- "⑥ 送检请验申请 (2项)" --> L1
+    L2 -- "⑦ 检验结果与报告回传 (2项)" --> W2
+
+    %% WMS to Portal
+    W2 -- "⑧ 预警消息推送 (1项)" --> P1
+    W3 -- "⑨ 派车审批待办 (1项)" --> P2
+    W4 -- "⑩ 报废/盘点审批与待办 (2项)" --> P3
+
+    classDef erpNode fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#1e1b4b;
+    classDef wmsNode fill:#d1fae5,stroke:#059669,stroke-width:2.5px,color:#064e3b;
+    classDef limsNode fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f;
+    classDef portalNode fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#1e293b;
+
+    class E1,E2,E3,E4 erpNode;
+    class W1,W2,W3,W4 wmsNode;
+    class L1,L2 limsNode;
+    class P1,P2,P3 portalNode;
+  `;
+
+  content.innerHTML = `
+  <!-- 系统集成架构可视化看板 -->
+  <div class="card" style="border: 2px solid #3b82f6; background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%); margin-bottom: 24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:26px;">🌐</span>
+        <div>
+          <h3 style="font-size:18px; font-weight:700; color:#1e40af; margin:0;">系统集成拓扑与数据流向总览</h3>
+          <div style="font-size:13px; color:#2563eb; margin-top:2px;">WMS/TMS 核心中枢 · 连接 ERP(用友U9) / LIMS 质检 / 企业微信统一门户</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 33 项标准接口</span>
+        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 3 大系统互通</span>
+        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 100% 确认完成</span>
+      </div>
+    </div>
+
+    <!-- 接口统计指标矩阵 -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">集成系统数</div>
+        <div style="font-size:22px; font-weight:700; color:#1e40af">3 <span style="font-size:12px; font-weight:normal; color:var(--muted)">大核心系统</span></div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">标准接口总数</div>
+        <div style="font-size:22px; font-weight:700; color:#059669">33 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (100%)</span></div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">上游数据下发</div>
+        <div style="font-size:22px; font-weight:700; color:#2563eb">6 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (ERP➔WMS)</span></div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">仓储过账回写</div>
+        <div style="font-size:22px; font-weight:700; color:#0d9488">20 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS➔ERP)</span></div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">质量检验交互</div>
+        <div style="font-size:22px; font-weight:700; color:#d97706">4 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS◄►LIMS)</span></div>
+      </div>
+      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+        <div style="font-size:12px; color:var(--muted)">企微与统一门户</div>
+        <div style="font-size:22px; font-weight:700; color:#7c3aed">3 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS➔企微)</span></div>
+      </div>
+    </div>
+
+    <!-- 架构拓扑渲染容器 -->
+    <div style="background:#ffffff; border:1px solid #d8dee8; border-radius:10px; padding:16px;">
+      <div style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        <span>📊</span> 系统集成数据流向拓扑图
+      </div>
+      <div id="interfaceMmdFrame" style="min-height:360px; display:flex; align-items:center; justify-content:center;">
+        <div class="loading">正在加载系统集成拓扑图…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 接口明细清单表格与分类筛选 -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <div>
+        <h3 style="margin:0;">系统接口清单明细对照表（共 33 项标准接口）</h3>
+        <div class="muted" style="font-size:12px; margin-top:2px;">按业务领域归类 · 支持按数据方向与业务分类精准筛选</div>
+      </div>
+      <div class="tabs" id="interfaceFilterTabs" style="margin:0;">
+        <button type="button" class="active" data-cat="all">全部 (33)</button>
+        <button type="button" data-cat="基础主数据">主数据 (3)</button>
+        <button type="button" data-cat="业务订单">业务订单 (3)</button>
+        <button type="button" data-cat="仓储过账">仓储过账 (19)</button>
+        <button type="button" data-cat="质量检验">质检交互 (4)</button>
+        <button type="button" data-cat="系统协同">企微/协同 (3)</button>
+        <button type="button" data-cat="财务结算">财务结算 (1)</button>
+      </div>
+    </div>
+
+    <table style="font-size:12.5px;">
+      <thead>
+        <tr>
+          <th style="width:50px; text-align:center;">序号</th>
+          <th style="width:90px; text-align:center;">业务领域</th>
+          <th style="width:160px;">接口名称</th>
+          <th style="width:130px;">本系统模块</th>
+          <th style="width:180px;">三方系统及模块</th>
+          <th style="width:120px; text-align:center;">数据流向</th>
+          <th style="width:90px; text-align:center;">同步机制</th>
+          <th>触发逻辑与需求说明</th>
+          <th style="width:80px; text-align:center;">状态</th>
+        </tr>
+      </thead>
+      <tbody id="interfaceTableBody">
+      </tbody>
+    </table>
+  </div>`;
+
+  // Render Mermaid Topology
+  const mmdEl = document.getElementById('interfaceMmdFrame');
+  mermaid.render('ifmmd_' + Date.now(), mmdCode).then(({ svg }) => {
+    mmdEl.innerHTML = svg;
+    mmdEl.querySelectorAll('.cluster rect').forEach((r) => {
+      r.setAttribute('stroke', '#334155');
+      r.setAttribute('stroke-width', '2.5');
+      r.style.stroke = '#334155';
+      r.style.strokeWidth = '2.5px';
+    });
+  }).catch(err => {
+    mmdEl.innerHTML = `<pre style="color:red;padding:12px">${String(err)}</pre>`;
+  });
+
+  function renderInterfaceTable(filterCat) {
+    const list = filterCat === 'all' 
+      ? interfacesData 
+      : interfacesData.filter(d => d.cat === filterCat);
+
+    const rows = list.map(d => {
+      let badgeStyle = 'background:#f1f5f9; color:#475569;';
+      if (d.dirType === 'in') badgeStyle = 'background:#dbeafe; color:#1e40af;';
+      else if (d.dirType === 'out') badgeStyle = 'background:#d1fae5; color:#065f46;';
+      else if (d.dirType === 'lims_out' || d.dirType === 'lims_in') badgeStyle = 'background:#fef3c7; color:#92400e;';
+      else if (d.dirType === 'wechat') badgeStyle = 'background:#ede9fe; color:#5b21b6;';
+
+      return `
+      <tr>
+        <td style="text-align:center; font-weight:700; color:#1f497d;">${d.id}</td>
+        <td style="text-align:center;"><span style="background:#f8fafc; border:1px solid #e2e8f0; padding:2px 8px; border-radius:4px; font-size:11.5px; font-weight:600;">${d.cat}</span></td>
+        <td><strong style="color:var(--text);">${d.name}</strong></td>
+        <td style="color:#475569;">${d.mod}</td>
+        <td style="color:#334155; font-size:12px;">${d.target}</td>
+        <td style="text-align:center;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; ${badgeStyle}">${d.dir}</span></td>
+        <td style="text-align:center; color:#64748b; font-size:12px;">${d.sync}</td>
+        <td style="color:#374151; font-size:12px; line-height:1.5;">${d.desc}</td>
+        <td style="text-align:center;"><span class="status-pill done" style="font-size:11px; padding:2px 8px;">${d.status}</span></td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('interfaceTableBody').innerHTML = rows;
+  }
+
+  renderInterfaceTable('all');
+
+  document.querySelectorAll('#interfaceFilterTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#interfaceFilterTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderInterfaceTable(btn.dataset.cat);
+    });
+  });
+}
+
 
 function renderOverview() {
   pageTitle.textContent = '四、业务流程总览';
@@ -1504,6 +1719,7 @@ async function navigate(page) {
   if (page === 'progress') return renderProgress();
   if (page === 'proto') return renderProtoProgress();
   if (page === 'blueprint') return renderBlueprintPlan();
+  if (page === 'interfaces') return renderInterfaces();
   if (page === 'overview') return renderOverview();
   if (page === 'plan') return renderPlan();
   const scene = scenes.find(s => s.id === page);
@@ -1535,7 +1751,7 @@ if (edgeBtn) {
 
 buildNav();
 const initial = (location.hash || '#progress').slice(1);
-navigate(scenes.some(s => s.id === initial) || ['progress','proto','blueprint','overview','plan'].includes(initial) ? initial : 'progress');
+navigate(scenes.some(s => s.id === initial) || ['progress','proto','blueprint','interfaces','overview','plan'].includes(initial) ? initial : 'progress');
 </script>
 </body>
 </html>
