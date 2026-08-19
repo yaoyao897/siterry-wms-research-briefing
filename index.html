@@ -1087,7 +1087,7 @@ function renderInterfaces() {
   pageTitle.textContent = '四、系统接口与集成蓝图';
 
   content.innerHTML = `
-  <!-- 高保真深色中枢集成拓扑大屏 (带 SVG 动态导线与节点连线) -->
+  <!-- 高保真深色中枢集成拓扑大屏 (支持卡片自由拖拽与导线动态吸附) -->
   <div class="integration-board" style="
     background: #080e1a;
     background-image: 
@@ -1102,6 +1102,7 @@ function renderInterfaces() {
     color: #e2e8f0;
     position: relative;
     overflow-x: auto;
+    user-select: none;
   ">
     <!-- 拓扑图顶部状态横幅 -->
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
@@ -1109,24 +1110,25 @@ function renderInterfaces() {
         <span style="font-size:22px; filter:drop-shadow(0 0 8px #00f2fe);">⚡</span>
         <div>
           <div style="font-size:17px; font-weight:700; color:#38bdf8; letter-spacing:0.5px;">四川思特瑞锂业 WMS · 跨系统集成总线架构图</div>
-          <div style="font-size:12px; color:#94a3b8; margin-top:2px;">全业务数据流向拓扑 · 覆盖 ERP (用友U9) / LIMS 质检 / 企业微信统一工作台 (共 33 项标准接口)</div>
+          <div style="font-size:12px; color:#94a3b8; margin-top:2px;">💡 提示：所有系统卡片均支持<b>按住鼠标自由拖拽</b>，连线与端口将实时自适应流动吸附</div>
         </div>
       </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button type="button" id="btnResetTopology" style="background:#1e293b; color:#94a3b8; border:1px solid #334155; padding:5px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:all 0.2s ease;">🔄 复位布局</button>
         <span style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">ERP 接入: 26 项</span>
         <span style="background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">LIMS 接入: 4 项</span>
         <span style="background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">企微接入: 3 项</span>
       </div>
     </div>
 
-    <!-- 拓扑三栏栅格容器 (带 SVG 连线层) -->
-    <div id="topoContainer" style="display:grid; grid-template-columns: 310px 1fr 310px; gap: 48px; align-items: center; min-width: 1080px; position: relative; padding: 20px 0;">
+    <!-- 拓扑三栏栅格容器 (带 SVG 连线层与拖拽卡片) -->
+    <div id="topoContainer" style="display:grid; grid-template-columns: 310px 1fr 310px; gap: 48px; align-items: center; min-width: 1080px; position: relative; padding: 20px 0; min-height:560px;">
 
       <!-- SVG 动态拓扑导线连接层 -->
       <svg id="topoSvgWires" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:15; overflow:visible;"></svg>
 
-      <!-- 左侧：用友 U9 ERP 系统节点 -->
-      <div id="boxErp" style="
+      <!-- 左侧：用友 U9 ERP 系统节点 (Draggable) -->
+      <div id="boxErp" class="draggable-node" style="
         background: #0d1527;
         border: 1px solid #1e3a8a;
         border-radius: 12px;
@@ -1134,10 +1136,14 @@ function renderInterfaces() {
         padding: 16px 14px;
         position: relative;
         z-index: 20;
+        cursor: grab;
+        touch-action: none;
       ">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(59, 130, 246, 0.2);">
+        <div class="drag-handle" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(59, 130, 246, 0.2);">
           <div>
-            <div style="font-size:15px; font-weight:700; color:#60a5fa;">用友 U9 ERP</div>
+            <div style="font-size:15px; font-weight:700; color:#60a5fa; display:flex; align-items:center; gap:6px;">
+              <span>☰</span> 用友 U9 ERP
+            </div>
             <div style="font-size:11px; color:#64748b;">账务 / 主数据源头 · 业财联动</div>
           </div>
           <span style="background:#1e3a8a; color:#93c5fd; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">26 项接口</span>
@@ -1188,8 +1194,8 @@ function renderInterfaces() {
         "></div>
       </div>
 
-      <!-- 中间：万物智汇 X-WMS 核心中枢节点 -->
-      <div id="boxWms" style="
+      <!-- 中间：万物智汇 X-WMS 核心中枢节点 (Draggable) -->
+      <div id="boxWms" class="draggable-node" style="
         background: #091624;
         border: 2px solid #06b6d4;
         border-radius: 16px;
@@ -1197,8 +1203,10 @@ function renderInterfaces() {
         padding: 22px 18px;
         position: relative;
         z-index: 20;
+        cursor: grab;
+        touch-action: none;
       ">
-        <div style="text-align:center; margin-bottom:18px;">
+        <div class="drag-handle" style="text-align:center; margin-bottom:18px;">
           <div style="font-size:19px; font-weight:800; color:#22d3ee; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:8px;">
             <span>🏢</span> 万物智汇 X-WMS 仓储物流管理系统
           </div>
@@ -1252,14 +1260,16 @@ function renderInterfaces() {
       <!-- 右侧：LIMS 质检系统 & 企业微信统一工作台 -->
       <div style="display:flex; flex-direction:column; gap:24px; position:relative; z-index:20;">
 
-        <!-- 节点 1：LIMS 质检系统 -->
-        <div id="boxLims" style="
+        <!-- 节点 1：LIMS 质检系统 (Draggable) -->
+        <div id="boxLims" class="draggable-node" style="
           background: #181207;
           border: 1px solid #b45309;
           border-radius: 12px;
           box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
           padding: 14px;
           position: relative;
+          cursor: grab;
+          touch-action: none;
         ">
           <!-- 左侧连接端点 -->
           <div id="portLims" style="
@@ -1276,9 +1286,11 @@ function renderInterfaces() {
             z-index: 25;
           "></div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(245, 158, 11, 0.2);">
+          <div class="drag-handle" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(245, 158, 11, 0.2);">
             <div>
-              <div style="font-size:14px; font-weight:700; color:#fbbf24;">LIMS 质检系统</div>
+              <div style="font-size:14px; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:6px;">
+                <span>☰</span> LIMS 质检系统
+              </div>
               <div style="font-size:11px; color:#78350f;">采样请验 · 化验报告 · COA判定</div>
             </div>
             <span style="background:#78350f; color:#fde68a; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">4 项接口</span>
@@ -1292,14 +1304,16 @@ function renderInterfaces() {
           </div>
         </div>
 
-        <!-- 节点 2：企业微信 / 集团统一工作台 -->
-        <div id="boxWechat" style="
+        <!-- 节点 2：企业微信 / 集团统一工作台 (Draggable) -->
+        <div id="boxWechat" class="draggable-node" style="
           background: #140d21;
           border: 1px solid #7e22ce;
           border-radius: 12px;
           box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
           padding: 14px;
           position: relative;
+          cursor: grab;
+          touch-action: none;
         ">
           <!-- 左侧连接端点 -->
           <div id="portWechat" style="
@@ -1316,9 +1330,11 @@ function renderInterfaces() {
             z-index: 25;
           "></div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(168, 85, 247, 0.2);">
+          <div class="drag-handle" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(168, 85, 247, 0.2);">
             <div>
-              <div style="font-size:14px; font-weight:700; color:#c084fc;">企业微信 / 统一门户</div>
+              <div style="font-size:14px; font-weight:700; color:#c084fc; display:flex; align-items:center; gap:6px;">
+                <span>☰</span> 企业微信 / 统一门户
+              </div>
               <div style="font-size:11px; color:#6b21a8;">实时预警 · 移动审批 · 待办聚合</div>
             </div>
             <span style="background:#581c87; color:#e9d5ff; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">3 项接口</span>
@@ -1407,7 +1423,7 @@ function renderInterfaces() {
     svg.setAttribute('viewBox', `0 0 ${cRect.width} ${cRect.height}`);
 
     const makeBezier = (p1, p2) => {
-      const dx = (p2.x - p1.x) * 0.5;
+      const dx = Math.max(30, Math.abs(p2.x - p1.x) * 0.5);
       return `M ${p1.x} ${p1.y} C ${p1.x + dx} ${p1.y}, ${p2.x - dx} ${p2.y}, ${p2.x} ${p2.y}`;
     };
 
@@ -1462,8 +1478,72 @@ function renderInterfaces() {
     `;
   }
 
+  // 绑定卡片自由拖拽与动态连线吸附功能
+  function bindDraggableNodes() {
+    const nodes = document.querySelectorAll('.draggable-node');
+    nodes.forEach(node => {
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let origX = 0, origY = 0;
+
+      node.onpointerdown = (e) => {
+        if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.custom-scroll')) {
+          return;
+        }
+        e.preventDefault();
+        isDragging = true;
+        node.style.cursor = 'grabbing';
+        node.style.zIndex = '30';
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        // 读取当前位移
+        const currentTransform = node.style.transform;
+        const match = currentTransform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        origX = match ? parseFloat(match[1]) : 0;
+        origY = match ? parseFloat(match[2]) : 0;
+
+        node.setPointerCapture(e.pointerId);
+      };
+
+      node.onpointermove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        node.style.transform = `translate(${origX + dx}px, ${origY + dy}px)`;
+        requestAnimationFrame(drawTopologyWires);
+      };
+
+      const endDrag = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        node.style.cursor = 'grab';
+        node.style.zIndex = '20';
+        drawTopologyWires();
+      };
+
+      node.onpointerup = endDrag;
+      node.onpointercancel = endDrag;
+    });
+
+    const btnReset = document.getElementById('btnResetTopology');
+    if (btnReset) {
+      btnReset.onclick = () => {
+        nodes.forEach(node => {
+          node.style.transform = 'translate(0px, 0px)';
+        });
+        setTimeout(drawTopologyWires, 50);
+      };
+    }
+  }
+
   // 延迟微任务与 Resize 监听确保 DOM 尺寸就绪
-  setTimeout(drawTopologyWires, 80);
+  setTimeout(() => {
+    drawTopologyWires();
+    bindDraggableNodes();
+  }, 80);
+
   window.removeEventListener('resize', window._wmsTopoResize);
   window._wmsTopoResize = drawTopologyWires;
   window.addEventListener('resize', window._wmsTopoResize);
