@@ -455,6 +455,55 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 .gantt-legend i {
   width: 12px; height: 12px; border-radius: 3px; display: inline-block;
 }
+
+/* 拓扑图胶囊按钮与深色电路由样式 */
+.topo-pill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 1.3;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.topo-pill:hover {
+  filter: brightness(1.25);
+  transform: translateX(2px);
+}
+.topo-pill.blue {
+  background: rgba(30, 58, 138, 0.35);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+.topo-pill.teal {
+  background: rgba(13, 148, 136, 0.25);
+  color: #5eead4;
+  border: 1px solid rgba(20, 184, 166, 0.35);
+}
+.topo-pill.amber {
+  background: rgba(180, 83, 9, 0.3);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.topo-pill.purple {
+  background: rgba(126, 34, 206, 0.3);
+  color: #e9d5ff;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
 </style>
 </head>
 <body>
@@ -1037,119 +1086,255 @@ const interfacesData = [{"id": 1, "cat": "基础主数据", "name": "物料列�
 function renderInterfaces() {
   pageTitle.textContent = '四、系统接口与集成蓝图';
 
-  const mmdCode = `flowchart TB
-    subgraph ERP["用友 U9 ERP 系统"]
-      direction TB
-      E1["基础主数据\n(物料/客户/供应商)"]
-      E2["业务订单\n(采购/销售/委外订单)"]
-      E3["资产与过账\n(入库/退料/出库/调拨/杂发)"]
-      E4["财务结算\n(物流服务采购挂账)"]
-    end
-
-    subgraph WMS["思特瑞 WMS / TMS 仓储物流系统 (万物智汇)"]
-      direction TB
-      W1["条码与空间建模\n(批次/货位/包材)"]
-      W2["仓储作业执行\n(扫码入库/质检/打托/出库)"]
-      W3["物流调度管理\n(派车/运单/随车单/出门条)"]
-      W4["业务协同与控制\n(预出货锁库/形态转换/报废)"]
-    end
-
-    subgraph LIMS["LIMS 质量管理系统"]
-      direction TB
-      L1["采样请验申请接收\n(来料检/成品检/复检)"]
-      L2["化验报告与合格证出具\n(判定合格/不合格/释放)"]
-    end
-
-    subgraph PORTAL["企业微信 / 集团统一工作台"]
-      direction TB
-      P1["实时消息预警\n(质检/到货/发货/冻结)"]
-      P2["移动审批卡片\n(派车/报废/盘点差异)"]
-      P3["统一待办聚合\n(工作台集成)"]
-    end
-
-    %% ERP to WMS
-    E1 -- "① 基础主数据同步 (3项)" --> W1
-    E2 -- "② 上游业务订单下发 (3项)" --> W2
-    
-    %% WMS to ERP
-    W2 -- "③ 仓储过账回写 (19项)" --> E3
-    W3 -- "④ 物流采购订单 (1项)" --> E4
-    W4 -. "⑤ 预出货锁库状态协同" .-> E3
-
-    %% WMS to LIMS
-    W2 -- "⑥ 送检请验申请 (2项)" --> L1
-    L2 -- "⑦ 检验结果与报告回传 (2项)" --> W2
-
-    %% WMS to Portal
-    W2 -- "⑧ 预警消息推送 (1项)" --> P1
-    W3 -- "⑨ 派车审批待办 (1项)" --> P2
-    W4 -- "⑩ 报废/盘点审批与待办 (2项)" --> P3
-
-    classDef erpNode fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#1e1b4b;
-    classDef wmsNode fill:#d1fae5,stroke:#059669,stroke-width:2.5px,color:#064e3b;
-    classDef limsNode fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f;
-    classDef portalNode fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#1e293b;
-
-    class E1,E2,E3,E4 erpNode;
-    class W1,W2,W3,W4 wmsNode;
-    class L1,L2 limsNode;
-    class P1,P2,P3 portalNode;
-  `;
-
   content.innerHTML = `
-  <!-- 系统集成架构可视化看板 -->
-  <div class="card" style="border: 2px solid #3b82f6; background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%); margin-bottom: 24px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+  <!-- 高保真深色中枢集成拓扑大屏 (参考企业级中枢架构设计) -->
+  <div class="integration-board" style="
+    background: #080e1a;
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+    border-radius: 14px;
+    border: 1px solid #1e293b;
+    padding: 24px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+    color: #e2e8f0;
+    position: relative;
+    overflow-x: auto;
+  ">
+    <!-- 拓扑图顶部状态横幅 -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:26px;">🌐</span>
+        <span style="font-size:22px; filter:drop-shadow(0 0 8px #00f2fe);">⚡</span>
         <div>
-          <h3 style="font-size:18px; font-weight:700; color:#1e40af; margin:0;">系统集成拓扑与数据流向总览</h3>
-          <div style="font-size:13px; color:#2563eb; margin-top:2px;">WMS/TMS 核心中枢 · 连接 ERP(用友U9) / LIMS 质检 / 企业微信统一门户</div>
+          <div style="font-size:17px; font-weight:700; color:#38bdf8; letter-spacing:0.5px;">四川思特瑞锂业 WMS · 跨系统集成总线架构图</div>
+          <div style="font-size:12px; color:#94a3b8; margin-top:2px;">全业务数据流向拓扑 · 覆盖 ERP (用友U9) / LIMS 质检 / 企业微信统一工作台 (共 33 项标准接口)</div>
         </div>
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 33 项标准接口</span>
-        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 3 大系统互通</span>
-        <span class="status-pill done" style="font-size:12px; padding:4px 12px;">✅ 100% 确认完成</span>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <span style="background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">ERP 接入: 26 项</span>
+        <span style="background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">LIMS 接入: 4 项</span>
+        <span style="background:rgba(168,85,247,0.12); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">企微接入: 3 项</span>
       </div>
     </div>
 
-    <!-- 接口统计指标矩阵 -->
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:20px;">
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">集成系统数</div>
-        <div style="font-size:22px; font-weight:700; color:#1e40af">3 <span style="font-size:12px; font-weight:normal; color:var(--muted)">大核心系统</span></div>
-      </div>
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">标准接口总数</div>
-        <div style="font-size:22px; font-weight:700; color:#059669">33 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (100%)</span></div>
-      </div>
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">上游数据下发</div>
-        <div style="font-size:22px; font-weight:700; color:#2563eb">6 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (ERP➔WMS)</span></div>
-      </div>
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">仓储过账回写</div>
-        <div style="font-size:22px; font-weight:700; color:#0d9488">20 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS➔ERP)</span></div>
-      </div>
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">质量检验交互</div>
-        <div style="font-size:22px; font-weight:700; color:#d97706">4 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS◄►LIMS)</span></div>
-      </div>
-      <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="font-size:12px; color:var(--muted)">企微与统一门户</div>
-        <div style="font-size:22px; font-weight:700; color:#7c3aed">3 <span style="font-size:12px; font-weight:normal; color:var(--muted)">项 (WMS➔企微)</span></div>
-      </div>
-    </div>
+    <!-- 拓扑三栏栅格容器 -->
+    <div style="display:grid; grid-template-columns: 310px 1fr 310px; gap: 36px; align-items: center; min-width: 1040px; position: relative;">
 
-    <!-- 架构拓扑渲染容器 -->
-    <div style="background:#ffffff; border:1px solid #d8dee8; border-radius:10px; padding:16px;">
-      <div style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-        <span>📊</span> 系统集成数据流向拓扑图
+      <!-- 左侧：用友 U9 ERP 系统节点 -->
+      <div style="
+        background: #0d1527;
+        border: 1px solid #1e3a8a;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(30, 58, 138, 0.25);
+        padding: 16px 14px;
+        position: relative;
+      ">
+        <!-- 节点头部 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(59, 130, 246, 0.2);">
+          <div>
+            <div style="font-size:15px; font-weight:700; color:#60a5fa;">用友 U9 ERP</div>
+            <div style="font-size:11px; color:#64748b;">账务 / 主数据源头 · 业财联动</div>
+          </div>
+          <span style="background:#1e3a8a; color:#93c5fd; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">26 项接口</span>
+        </div>
+
+        <!-- 接口条目清单 -->
+        <div style="display:flex; flex-direction:column; gap:5px; max-height:480px; overflow-y:auto; padding-right:2px;" class="custom-scroll">
+          <div class="topo-pill blue"><span>#1 物料列表同步</span> <span>→</span></div>
+          <div class="topo-pill blue"><span>#2 客户列表同步</span> <span>→</span></div>
+          <div class="topo-pill blue"><span>#3 供应商列表同步</span> <span>→</span></div>
+          <div class="topo-pill blue"><span>#4 采购订单下发</span> <span>→</span></div>
+          <div class="topo-pill blue"><span>#5 销售订单下发</span> <span>→</span></div>
+          <div class="topo-pill blue"><span>#6 委外加工订单下发</span> <span>→</span></div>
+          <div class="topo-pill teal"><span>#7 物流服务采购订单</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#8 采购入库单过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#9 采购退料单冲减</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#10 委外发料出库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#11 委外退料入库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#12 委外完工入库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#13 委外退货出库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#14 生产领料出库单</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#15 生产退料入库单</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#16 生产完工入库过账</span> <span>←</span></div>
+          <div class="topo-pill purple"><span>#17 销售预出货锁定</span> <span>↔</span></div>
+          <div class="topo-pill teal"><span>#18 销售发货出库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#19 销售退货入库过账</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#20 受托来料入库 (杂收)</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#21 受托退料出库 (杂发)</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#22 其他入库单 (杂收)</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#23 其他出库单 (杂发)</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#24 库内移库调拨单</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#25 库内转序形态转换</span> <span>←</span></div>
+          <div class="topo-pill teal"><span>#26 不良报废出库单</span> <span>←</span></div>
+        </div>
+
+        <!-- 右侧连接点与标签 -->
+        <div style="
+          position: absolute;
+          right: -24px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">
+          <div style="width:12px; height:12px; border-radius:50%; background:#60a5fa; box-shadow:0 0 10px #3b82f6;"></div>
+          <span style="font-size:11px; color:#93c5fd; background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #3b82f6; white-space:nowrap;">ERP 专线</span>
+        </div>
       </div>
-      <div id="interfaceMmdFrame" style="min-height:360px; display:flex; align-items:center; justify-content:center;">
-        <div class="loading">正在加载系统集成拓扑图…</div>
+
+      <!-- 中间：万物智汇 X-WMS 核心中枢节点 -->
+      <div style="
+        background: #091624;
+        border: 2px solid #06b6d4;
+        border-radius: 16px;
+        box-shadow: 0 0 35px rgba(6, 182, 212, 0.2);
+        padding: 22px 18px;
+        position: relative;
+      ">
+        <!-- 中枢头部 -->
+        <div style="text-align:center; margin-bottom:18px;">
+          <div style="font-size:19px; font-weight:800; color:#22d3ee; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>🏢</span> 万物智汇 X-WMS 仓储物流管理系统
+          </div>
+          <div style="font-size:12px; color:#67e8f9; margin-top:2px;">思特瑞锂业核心业务中枢 · 库内/物流/条码/质检全流程闭环</div>
+        </div>
+
+        <!-- 中枢四大核心模块卡片 -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          
+          <!-- 基础数据 -->
+          <div style="background:#0f2338; border:1px solid #155e75; border-radius:10px; padding:10px 12px;">
+            <div style="font-size:13px; font-weight:700; color:#38bdf8; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <span>📁</span> 基础数据
+            </div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">
+              物料 / 客户 / 供应商 · 仓储资料 · 采购/销售/委外订单 · 包材/储罐档案 · 标签/条码规则配置
+            </div>
+          </div>
+
+          <!-- 仓储管理 -->
+          <div style="background:#0f2338; border:1px solid #0f766e; border-radius:10px; padding:10px 12px;">
+            <div style="font-size:13px; font-weight:700; color:#34d399; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <span>📦</span> 仓储管理
+            </div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">
+              采购入库/退料 · 生产领料/退料/完工 · 销售发货/退货 · 库内移库·盘点·转序·报废 · 受托代工
+            </div>
+          </div>
+
+          <!-- 物流调度 (TMS) -->
+          <div style="background:#0f2338; border:1px solid #0369a1; border-radius:10px; padding:10px 12px;">
+            <div style="font-size:13px; font-weight:700; color:#7dd3fc; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <span>🚚</span> 物流调度 (TMS)
+            </div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">
+              派车申请 · 运单调度 · 随车同行单 · 门卫出门条核销 · 运费核算挂账 (推送 ERP)
+            </div>
+          </div>
+
+          <!-- 条码·质检·协同 -->
+          <div style="background:#0f2338; border:1px solid #854d0e; border-radius:10px; padding:10px 12px;">
+            <div style="font-size:13px; font-weight:700; color:#fde047; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+              <span>🏷️</span> 条码·质检·协同
+            </div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.5;">
+              一物一码/包装批次履历 · 采样送检/COA报告 · 异常冻结 · 企微消息通知与移动审批
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 左右两侧中枢连接端口 -->
+        <div style="position:absolute; left:-7px; top:50%; width:12px; height:12px; border-radius:50%; background:#22d3ee; box-shadow:0 0 10px #06b6d4;"></div>
+        <div style="position:absolute; right:-7px; top:35%; width:12px; height:12px; border-radius:50%; background:#fbbf24; box-shadow:0 0 10px #f59e0b;"></div>
+        <div style="position:absolute; right:-7px; top:70%; width:12px; height:12px; border-radius:50%; background:#c084fc; box-shadow:0 0 10px #a855f7;"></div>
       </div>
+
+      <!-- 右侧：LIMS 质检系统 & 企业微信统一工作台 -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+
+        <!-- 节点 1：LIMS 质检系统 -->
+        <div style="
+          background: #181207;
+          border: 1px solid #b45309;
+          border-radius: 12px;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+          padding: 14px;
+          position: relative;
+        ">
+          <!-- 左侧连接点与标签 -->
+          <div style="
+            position: absolute;
+            left: -24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          ">
+            <span style="font-size:11px; color:#fde68a; background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #f59e0b; white-space:nowrap;">LIMS 专线</span>
+            <div style="width:12px; height:12px; border-radius:50%; background:#fbbf24; box-shadow:0 0 10px #f59e0b;"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(245, 158, 11, 0.2);">
+            <div>
+              <div style="font-size:14px; font-weight:700; color:#fbbf24;">LIMS 质检系统</div>
+              <div style="font-size:11px; color:#78350f;">采样请验 · 化验报告 · COA判定</div>
+            </div>
+            <span style="background:#78350f; color:#fde68a; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">4 项接口</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div class="topo-pill amber"><span>#27 采购来料采样送检</span> <span>→</span></div>
+            <div class="topo-pill amber"><span>#28 采购来料检验结果报告</span> <span>←</span></div>
+            <div class="topo-pill amber"><span>#29 库内报检/成品送检请验</span> <span>→</span></div>
+            <div class="topo-pill amber"><span>#30 生产成品/库内检验结果</span> <span>←</span></div>
+          </div>
+        </div>
+
+        <!-- 节点 2：企业微信 / 集团统一工作台 -->
+        <div style="
+          background: #140d21;
+          border: 1px solid #7e22ce;
+          border-radius: 12px;
+          box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+          padding: 14px;
+          position: relative;
+        ">
+          <!-- 左侧连接点与标签 -->
+          <div style="
+            position: absolute;
+            left: -24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          ">
+            <span style="font-size:11px; color:#e9d5ff; background:#1e293b; padding:2px 6px; border-radius:4px; border:1px solid #a855f7; white-space:nowrap;">企微专线</span>
+            <div style="width:12px; height:12px; border-radius:50%; background:#c084fc; box-shadow:0 0 10px #a855f7;"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid rgba(168, 85, 247, 0.2);">
+            <div>
+              <div style="font-size:14px; font-weight:700; color:#c084fc;">企业微信 / 统一门户</div>
+              <div style="font-size:11px; color:#6b21a8;">实时预警 · 移动审批 · 待办聚合</div>
+            </div>
+            <span style="background:#581c87; color:#e9d5ff; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600;">3 项接口</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <div class="topo-pill purple"><span>#31 质检/到货/发货/冻结预警通知</span> <span>←</span></div>
+            <div class="topo-pill purple"><span>#32 派车/报废/盘点差异审批卡片</span> <span>←</span></div>
+            <div class="topo-pill purple"><span>#33 集团工作台统一待办推送</span> <span>←</span></div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -1190,20 +1375,6 @@ function renderInterfaces() {
     </table>
   </div>`;
 
-  // Render Mermaid Topology
-  const mmdEl = document.getElementById('interfaceMmdFrame');
-  mermaid.render('ifmmd_' + Date.now(), mmdCode).then(({ svg }) => {
-    mmdEl.innerHTML = svg;
-    mmdEl.querySelectorAll('.cluster rect').forEach((r) => {
-      r.setAttribute('stroke', '#334155');
-      r.setAttribute('stroke-width', '2.5');
-      r.style.stroke = '#334155';
-      r.style.strokeWidth = '2.5px';
-    });
-  }).catch(err => {
-    mmdEl.innerHTML = `<pre style="color:red;padding:12px">${String(err)}</pre>`;
-  });
-
   function renderInterfaceTable(filterCat) {
     const list = filterCat === 'all' 
       ? interfacesData 
@@ -1242,6 +1413,7 @@ function renderInterfaces() {
       renderInterfaceTable(btn.dataset.cat);
     });
   });
+});
 }
 
 
