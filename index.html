@@ -527,7 +527,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       <div class="meta">2026-08-20 · 调研与蓝图设计 100% 完成 · 原型与33项接口已全部核对确认 · 蓝图确认与签署准备就绪</div>
     </div>
     <div class="topbar-actions">
-      <a class="proto-link" href="./demo/" target="_blank" rel="noopener">原型方案</a>
+      <a class="proto-link" href="../../../04-Demo原型/01-源代码/思特瑞WMS_Demo.html" target="_blank" rel="noopener">原型方案</a>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -810,6 +810,7 @@ function buildNav() {
       icon: '📊',
       collapsed: false,
       items: [
+        { id: 'cover', idx: '00', name: '会议封面' },
         { id: 'progress', idx: '01', name: '项目进度' },
         { id: 'proto', idx: '02', name: '原型进度' },
         { id: 'blueprint', idx: '03', name: '蓝图确认计划' },
@@ -901,6 +902,185 @@ function setActive(page) {
     }
   });
 }
+
+
+function renderCover() {
+  pageTitle.textContent = '思特瑞锂业 WMS · 蓝图阶段性总结会议';
+
+  content.innerHTML = `
+  <div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- 会议主视觉 Hero 展板 -->
+    <div style="
+      background: linear-gradient(135deg, #0b192c 0%, #1e3a8a 50%, #0f172a 100%);
+      border-radius: 18px;
+      padding: 42px 36px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 24px;
+    ">
+      <!-- 装饰背景光效 -->
+      <div style="position:absolute; right:-40px; top:-40px; width:320px; height:320px; background:radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%); pointer-events:none;"></div>
+      <div style="position:absolute; left:20%; bottom:-60px; width:260px; height:260px; background:radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%); pointer-events:none;"></div>
+
+      <div style="position:relative; z-index:2;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+          <span style="background:rgba(56, 189, 248, 0.2); color:#7dd3fc; border:1px solid rgba(56, 189, 248, 0.4); padding:4px 14px; border-radius:20px; font-size:12.5px; font-weight:700; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:6px;">
+            <span>🚩</span> 阶段重大里程碑
+          </span>
+          <span style="background:rgba(34, 197, 94, 0.2); color:#86efac; border:1px solid rgba(34, 197, 94, 0.4); padding:4px 14px; border-radius:20px; font-size:12.5px; font-weight:700;">
+            ✅ 蓝图确认就绪 100%
+          </span>
+          <span style="color:#94a3b8; font-size:13px; margin-left:auto;">📅 2026年08月20日 10:00 - 12:00</span>
+        </div>
+
+        <h1 style="font-size:32px; font-weight:800; line-height:1.25; margin:0 0 10px 0; color:#ffffff; letter-spacing:0.5px;">
+          四川思特瑞锂业有限公司 · WMS 仓储物流管理系统
+        </h1>
+        <h2 style="font-size:23px; font-weight:700; color:#38bdf8; margin:0 0 14px 0; letter-spacing:0.5px;">
+          业务蓝图阶段性总结与确认签署会议
+        </h2>
+        <p style="font-size:14px; color:#cbd5e1; max-width:850px; line-height:1.6; margin:0 0 24px 0;">
+          本次会议旨在全面汇报并核准思特瑞锂业 WMS 项目调研与蓝图设计成果，涵盖 <b>12 大核心业务场景</b> 端到端流程方案、<b>129 个软硬件功能点</b> 高保真交互原型、<b>33 项跨系统集成接口</b> 规范，正式推进《业务蓝图与验收标准确认书》签署与下阶段研发落地。
+        </p>
+
+        <!-- 快速导览按钮组 -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <button type="button" onclick="navigate('progress')" style="background:#0284c7; color:#fff; border:none; padding:9px 20px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(2,132,199,0.4); transition:all 0.2s ease;">
+            <span>📊</span> 进入项目总览
+          </button>
+          <button type="button" onclick="navigate('proto')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+            <span>📱</span> 原型核准清单 (129项)
+          </button>
+          <button type="button" onclick="navigate('interfaces')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+            <span>⚡</span> 系统集成拓扑 (33接口)
+          </button>
+          <button type="button" onclick="navigate('blueprint')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+            <span>📑</span> 蓝图确认计划
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 大核心成果量化指标卡片 -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:24px;">
+      <div class="card" style="margin:0; border-left:4px solid #0284c7; padding:18px 20px;">
+        <div style="font-size:12.5px; color:#64748b; font-weight:600;">核心业务场景覆盖</div>
+        <div style="font-size:28px; font-weight:800; color:#0f172a; margin:4px 0;">12 <span style="font-size:14px; font-weight:600; color:#64748b;">个完整场景</span></div>
+        <div style="font-size:12px; color:#475569;">覆盖来料、领料、完工、出库、移库、转序、受托及物流</div>
+      </div>
+
+      <div class="card" style="margin:0; border-left:4px solid #10b981; padding:18px 20px;">
+        <div style="font-size:12.5px; color:#64748b; font-weight:600;">软硬件原型功能点</div>
+        <div style="font-size:28px; font-weight:800; color:#10b981; margin:4px 0;">129 <span style="font-size:14px; font-weight:600; color:#64748b;">项 (100% 确认)</span></div>
+        <div style="font-size:12px; color:#475569;">PC 管理端 72 项 + 移动 APP/PDA 端 57 项</div>
+      </div>
+
+      <div class="card" style="margin:0; border-left:4px solid #8b5cf6; padding:18px 20px;">
+        <div style="font-size:12.5px; color:#64748b; font-weight:600;">跨系统集成接口</div>
+        <div style="font-size:28px; font-weight:800; color:#8b5cf6; margin:4px 0;">33 <span style="font-size:14px; font-weight:600; color:#64748b;">项标准接口</span></div>
+        <div style="font-size:12px; color:#475569;">ERP 用友U9 (26项) + LIMS (4项) + 企微协同 (3项)</div>
+      </div>
+
+      <div class="card" style="margin:0; border-left:4px solid #f59e0b; padding:18px 20px;">
+        <div style="font-size:12.5px; color:#64748b; font-weight:600;">蓝图确认状态</div>
+        <div style="font-size:28px; font-weight:800; color:#d97706; margin:4px 0;">签署就绪 <span style="font-size:14px; font-weight:600; color:#10b981;">Ready</span></div>
+        <div style="font-size:12px; color:#475569;">现场调研、答疑、问题闭环与确认书全量完备</div>
+      </div>
+    </div>
+
+    <!-- 会议概况与核心议程双栏展板 -->
+    <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:20px; margin-bottom:24px;">
+
+      <!-- 左侧：会议概况与三方职责 -->
+      <div class="card" style="margin:0; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <h3 style="margin:0 0 16px 0; color:#1f497d; font-size:16px; display:flex; align-items:center; gap:8px;">
+            <span>🏢</span> 会议概况与三方协同
+          </h3>
+
+          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+            <div style="display:flex; gap:12px; align-items:flex-start; padding-bottom:10px; border-bottom:1px dashed #e2e8f0;">
+              <span style="color:#64748b; min-width:70px; font-weight:600;">客户单位：</span>
+              <span style="color:#0f172a; font-weight:700;">四川思特瑞锂业有限公司（甲方）</span>
+            </div>
+            <div style="display:flex; gap:12px; align-items:flex-start; padding-bottom:10px; border-bottom:1px dashed #e2e8f0;">
+              <span style="color:#64748b; min-width:70px; font-weight:600;">实施单位：</span>
+              <span style="color:#0284c7; font-weight:700;">万物智汇（X-WMS 实施团队 · 丙方）</span>
+            </div>
+            <div style="display:flex; gap:12px; align-items:flex-start; padding-bottom:10px; border-bottom:1px dashed #e2e8f0;">
+              <span style="color:#64748b; min-width:70px; font-weight:600;">协同单位：</span>
+              <span style="color:#475569; font-weight:600;">用友网络 / LIMS 厂商（乙方）</span>
+            </div>
+            <div style="display:flex; gap:12px; align-items:flex-start; padding-bottom:10px; border-bottom:1px dashed #e2e8f0;">
+              <span style="color:#64748b; min-width:70px; font-weight:600;">会议地点：</span>
+              <span style="color:#0f172a;">思特瑞锂业 1号会议室 / 腾讯会议线上联动</span>
+            </div>
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <span style="color:#64748b; min-width:70px; font-weight:600;">参会对象：</span>
+              <span style="color:#475569; line-height:1.5;">高层领导、仓储部、物流部、品保部、生产部、财务部、IT信息部及实施项目组成员</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-top:16px;">
+          <div style="font-size:12px; color:#475569; font-weight:600;">💡 会议主旨：</div>
+          <div style="font-size:12px; color:#64748b; margin-top:2px;">统一业务共识 · 锚定功能范围 · 签署蓝图确认书 · 开启系统开发与落地</div>
+        </div>
+      </div>
+
+      <!-- 右侧：会议四大核心议程 -->
+      <div class="card" style="margin:0;">
+        <h3 style="margin:0 0 16px 0; color:#1f497d; font-size:16px; display:flex; align-items:center; gap:8px;">
+          <span>📋</span> 会议核心议程与汇报内容
+        </h3>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="background:#22c55e; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">1</div>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:#15803d;">调研回顾与 12 大业务流程方案核准</div>
+              <div style="font-size:12px; color:#166534; margin-top:2px; line-height:1.45;">汇报 12 大业务场景（采购、委外、生产领退料、完工、销售出库、转序形态转换、受托加工等）端到端标准化方案。</div>
+            </div>
+          </div>
+
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="background:#3b82f6; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">2</div>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:#1d4ed8;">129 项软硬件原型高保真交互演示</div>
+              <div style="font-size:12px; color:#1e40af; margin-top:2px; line-height:1.45;">演示 PC 管理端（72项）及 APP 移动作业端（57项），核准台账、任务流转、扫码质检与发运控制等全部交互细节。</div>
+            </div>
+          </div>
+
+          <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="background:#a855f7; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">3</div>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:#7e22ce;">33 项跨系统集成接口规范定版</div>
+              <div style="font-size:12px; color:#6b21a8; margin-top:2px; line-height:1.45;">确认与用友 U9 ERP（26项）、LIMS 质检（4项）、企业微信（3项）的数据流向、触发机制与异常容错规范。</div>
+            </div>
+          </div>
+
+          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start;">
+            <div style="background:#f59e0b; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">4</div>
+            <div>
+              <div style="font-size:13.5px; font-weight:700; color:#b45309;">《蓝图与验收标准确认书》签署与下阶段排期</div>
+              <div style="font-size:12px; color:#92400e; margin-top:2px; line-height:1.45;">甲乙丙三方签署蓝图确认书，正式确立系统验收基准，明确系统研发、接口联调、培训上线实施里程碑。</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  `;
+}
+
 
 function renderProgress() {
   pageTitle.textContent = '一、项目进度与蓝图确认签署';
@@ -2060,6 +2240,7 @@ async function navigate(page) {
   location.hash = page;
   content.classList.remove('scene-mode');
   closeFullscreen();
+  if (page === 'cover') return renderCover();
   if (page === 'progress') return renderProgress();
   if (page === 'proto') return renderProtoProgress();
   if (page === 'blueprint') return renderBlueprintPlan();
@@ -2094,8 +2275,8 @@ if (edgeBtn) {
 }
 
 buildNav();
-const initial = (location.hash || '#progress').slice(1);
-navigate(scenes.some(s => s.id === initial) || ['progress','proto','blueprint','interfaces','overview','plan'].includes(initial) ? initial : 'progress');
+const initial = (location.hash || '#cover').slice(1);
+navigate(scenes.some(s => s.id === initial) || ['cover','progress','proto','blueprint','interfaces','overview','plan'].includes(initial) ? initial : 'cover');
 </script>
 </body>
 </html>
