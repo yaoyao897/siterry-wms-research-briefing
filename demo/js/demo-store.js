@@ -19,9 +19,9 @@ window.WMS_DEMO_STORE = (function () {
     待运输: '待运输',
     发运中: '运输中',
     运输中: '运输中',
-    已签收: '待结算',
-    已到达: '待结算',
-    待结算: '待结算',
+    已签收: '已完成',
+    已到达: '已完成',
+    待结算: '已完成',
     待放行: '待放行',
     已放行: '已放行',
   };
@@ -254,9 +254,20 @@ window.WMS_DEMO_STORE = (function () {
         if (doc.放行时间) next['放行时间'] = doc.放行时间;
         if (doc.放行人) next['放行人'] = doc.放行人;
       } else if (pageId === 'lg-waybill') {
-        // 已完成/已关闭以 PC 结算或关闭为准，不被 APP 签收状态覆盖
-        if (next['状态'] !== undefined && !['已完成', '已关闭'].includes(next['状态'])) {
-          next['状态'] = pcStatus;
+        // 已关闭以 PC 关闭为准；已完成可被 APP 签收推进，但结算态由 PC 结算锁定
+        if (next['状态'] !== undefined && next['状态'] !== '已关闭') {
+          if (!['已完成'].includes(next['状态']) || ['已签收', '已到达', '待结算'].includes(doc.status)) {
+            next['状态'] = pcStatus;
+          }
+        }
+        // APP 签收完成 → 运单已完成 + 结算待结算；PC 已结算不回退
+        if (['已签收', '已到达', '待结算'].includes(doc.status)) {
+          if (next['结算状态'] !== '已结算') next['结算状态'] = '待结算';
+          if (next['状态'] !== '已关闭') next['状态'] = '已完成';
+        }
+        if (doc.status === '已完成' && (doc.action === 'settle' || doc.结算状态 === '已结算')) {
+          next['结算状态'] = '已结算';
+          if (next['状态'] !== '已关闭') next['状态'] = '已完成';
         }
       } else if (next['单据状态'] !== undefined) {
         next['单据状态'] = pcStatus;
@@ -272,6 +283,9 @@ window.WMS_DEMO_STORE = (function () {
     }
     if (pageId === 'lg-waybill' && doc.实际装货时间) {
       next['实际装货时间'] = doc.实际装货时间;
+    }
+    if (pageId === 'lg-waybill' && doc.实际到货时间) {
+      next['实际到货时间'] = doc.实际到货时间;
     }
     return next;
   }

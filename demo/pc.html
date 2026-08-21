@@ -541,6 +541,10 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <el-input v-if="f.name==='用车类型' && formModel['用车类型']==='其他'" v-model="formModel['用车类型其他']" placeholder="请填写其他用车类型" style="margin-top:8px"></el-input>
               </div>
               <el-input v-else-if="f.type==='picker'" :model-value="formModel[f.name]||''" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
+              <div v-else-if="f.type==='upload'" style="display:flex;align-items:center;gap:8px;width:100%">
+                <el-button size="small" @click="formModel[f.name]=(formModel[f.name]&&formModel[f.name]!=='—')?formModel[f.name]:((f.name||'附件')+'.pdf'); ElMessage.success('Demo：已模拟上传附件')">上传</el-button>
+                <span style="font-size:12px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ formModel[f.name] || '未上传' }}</span>
+              </div>
               <el-input v-else-if="f.type==='textarea'" v-model="formModel[f.name]" type="textarea" :rows="3" placeholder="请输入"></el-input>
               <el-switch v-else-if="f.type==='switch'" v-model="formSwitch[f.name]" active-text="启用" inactive-text="禁用"></el-switch>
               <el-input v-else v-model="formModel[f.name]" placeholder="请输入"></el-input>
@@ -571,6 +575,10 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <el-input v-if="f.name==='用车类型' && formModel['用车类型']==='其他'" v-model="formModel['用车类型其他']" placeholder="请填写其他用车类型" style="margin-top:8px"></el-input>
               </div>
               <el-input v-else-if="f.type==='picker'" :model-value="formModel[f.name]||''" readonly class="demo-picker-input" placeholder="请点击选择" @click="openPicker(f.name)"></el-input>
+            <div v-else-if="f.type==='upload'" style="display:flex;align-items:center;gap:8px;width:100%">
+              <el-button size="small" @click="formModel[f.name]=(formModel[f.name]&&formModel[f.name]!=='—')?formModel[f.name]:((f.name||'附件')+'.pdf'); ElMessage.success('Demo：已模拟上传附件')">上传</el-button>
+              <span style="font-size:12px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ formModel[f.name] || '未上传' }}</span>
+            </div>
             <el-input v-else-if="f.type==='textarea'" v-model="formModel[f.name]" type="textarea" :rows="3" placeholder="请输入"></el-input>
             <el-switch v-else-if="f.type==='switch'" v-model="formSwitch[f.name]" active-text="启用" inactive-text="禁用"></el-switch>
             <el-input v-else v-model="formModel[f.name]" placeholder="请输入"></el-input>
@@ -1434,7 +1442,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
   
   
   <!-- 运单结算弹窗 -->
-  <el-dialog v-model="settleVisible" class="demo-dialog--biz" :title="'运单结算 · 生成 ERP 采购订单 (已选 ' + settleRows.length + ' 笔待结算运单)'" width="960px" top="6vh" align-center destroy-on-close append-to-body>
+  <el-dialog v-model="settleVisible" class="demo-dialog--biz" :title="'运单结算 · 生成 ERP 采购订单 (已选 ' + settleRows.length + ' 笔待结算运单)'" width="1100px" top="6vh" align-center destroy-on-close append-to-body>
     <el-form label-width="148px">
       <section class="demo-form-section">
         <h4 class="demo-form-section__title"><span>1. ERP 采购订单表头信息</span></h4>
@@ -1463,6 +1471,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
           <el-table-column type="index" label="序号" width="72" align="center"></el-table-column>
           <el-table-column prop="运单号" label="运单号" width="140"></el-table-column>
           <el-table-column prop="关联发货单" label="关联发货单" width="140" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="客户名称" label="客户名称" width="140" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="出/入库单号" label="出/入库单号" width="150" show-overflow-tooltip></el-table-column>
           <el-table-column label="运费服务采购单位" width="130" align="center">
             <template #default>{{ settleForm.采购单位 || 'Pcs' }}</template>
           </el-table-column>
@@ -1471,7 +1481,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               <el-input-number v-model="row._price" :min="0" :precision="2" :step="10" size="small" controls-position="right" style="width:100%"></el-input-number>
             </template>
           </el-table-column>
-          <el-table-column label="备注" min-width="180">
+          <el-table-column label="备注" min-width="160">
             <template #default="{row}">
               <el-input v-model="row._memo" size="small" placeholder="费用补充或现场异常说明"></el-input>
             </template>
@@ -1484,7 +1494,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
           <span style="margin-left:24px">总发货数量: <strong>{{ totalSettleQty }}</strong></span>
           <span style="margin-left:24px">总运费: <strong style="color:#0f766e">¥{{ totalSettleFee.toFixed(2) }}</strong></span>
         </div>
-        <div style="margin-top:8px;font-size:12px;color:#94a3b8">💡 提示: 点击【确认结算】后将自动调用 ERP 接口生成采购订单，回写 ERP 采购订单号并将运单置为已完成。</div>
+        <div style="margin-top:8px;font-size:12px;color:#94a3b8">💡 提示: 点击【确认结算】后将自动调用 ERP 接口生成采购订单，回写 ERP 采购订单号并将结算状态置为已结算。</div>
       </section>
     </el-form>
     <template #footer>
@@ -2149,7 +2159,7 @@ const app = createApp({
           if(op.name==='派车') return st==='待派车' || st==='待运输';
           if(op.name==='取消派车') return st==='待运输';
           if(op.name==='二次派车（专线）' || op.name==='二次派车' || op.name==='专线派车'){
-            return trans==='专线' && ['待运输','运输中','待结算','已完成'].includes(st);
+            return trans==='专线' && ['待运输','运输中','已完成'].includes(st);
           }
           return true;
         });
@@ -2201,7 +2211,7 @@ const app = createApp({
       return ops;
     }
     function isDetailTagField(name){
-      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态';
+      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态';
     }
     function detailFieldLabel(f){
       const name = f?.name || f || '';
@@ -2210,7 +2220,7 @@ const app = createApp({
     }
     function isBizLinkField(name){
       if(!name || name==='发货单号' || name==='运单号' || name==='提货单号' || name==='签收单号' || name==='编号') return false;
-      return name.includes('运单') || name.includes('派车') || name.includes('仓储') || name.includes('发货单') || name.includes('提货') || name.includes('签收单');
+      return name.includes('运单') || name.includes('派车') || name.includes('仓储') || name.includes('发货单') || name.includes('提货') || name.includes('签收单') || name==='关联订单号' || name==='关联出库单号' || name.includes('出库单') || name.includes('入库单');
     }
     function onBizLink(field, value){
       if(!value || value==='—') return;
@@ -2368,10 +2378,26 @@ const app = createApp({
       const pad = n => String(n).padStart(2,'0');
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
+    function settleCustomerName(r){
+      if(r['客户名称'] && r['客户名称']!=='—') return r['客户名称'];
+      const ord = String(r['订单号']||'');
+      const parts = ord.split(/\s*\/\s*/);
+      if(parts.length>=2 && parts[1].trim()) return parts[1].trim();
+      return '—';
+    }
+    function settleIoDocNo(r){
+      if(r['出/入库单号'] && r['出/入库单号']!=='—') return r['出/入库单号'];
+      if(r['关联出库单号'] && r['关联出库单号']!=='—') return r['关联出库单号'];
+      const lines = Array.isArray(r._lines) ? r._lines : [];
+      const nos = [...new Set(lines.map(l=> l['关联仓储通知单']).filter(x=> x && x!=='—'))];
+      return nos.length ? nos.join('、') : '—';
+    }
     function openSettleModal(){
       const rows = tableData.value.filter(r=> selectedIds.value.includes(r.id));
       settleRows.value = rows.map(r=>({
         ...r,
+        客户名称: settleCustomerName(r),
+        '出/入库单号': settleIoDocNo(r),
         _price: parseSettlePrice(r['运费单价（元）'] || r['结算总金额（元）']),
         _memo: (r['结算备注'] && r['结算备注']!=='—') ? r['结算备注'] : ''
       }));
@@ -2411,7 +2437,8 @@ const app = createApp({
         src['结算人'] = '张三';
         src['结算时间'] = stamp;
         src['状态'] = '已完成';
-        if(STORE && src['运单号']) STORE.setDocStatus(src['运单号'], '已完成', { source:'PC', action:'settle', ERP采购订单号: poNo });
+        src['结算状态'] = '已结算';
+        if(STORE && src['运单号']) STORE.setDocStatus(src['运单号'], '已完成', { source:'PC', action:'settle', 结算状态:'已结算', ERP采购订单号: poNo });
       });
       settleVisible.value = false;
       selectedIds.value = [];
@@ -2570,7 +2597,7 @@ const app = createApp({
     function ensureSignFromWaybill(way){
       const wayNo = way && way['运单号'];
       const st = way && way['状态'];
-      if(!wayNo || !['运输中','已到达','已签收','待结算','已完成'].includes(st)) return '';
+      if(!wayNo || !['运输中','已到达','已签收','已完成'].includes(st)) return '';
       const hit = signList().find(s => s['关联运单号']===wayNo);
       if(hit) return hit['签收单号'] || '';
       const pk = pickupList().find(p => p['关联运单号']===wayNo) || {};
@@ -2579,10 +2606,11 @@ const app = createApp({
       const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
       const rcNo = nextRcNo();
       const srcLines = (pk._lines && pk._lines.length) ? pk._lines : (way._lines || []);
+      const settle = way && way['结算状态'];
       signList().unshift({
         id: 'rc-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
         签收单号: rcNo,
-        状态: (st==='已签收' || st==='待结算' || st==='已完成') ? '已完成' : '待执行',
+        状态: (st==='已签收' || st==='已完成' || settle==='待结算' || settle==='已结算') ? '已完成' : '待执行',
         关联运单号: wayNo,
         关联提货单号: pk['提货单号'] || '—',
         关联发货单号: pk['关联发货单号'] || String(way['关联发货单']||'').split(/[、,，]/)[0] || '—',
@@ -2983,6 +3011,20 @@ const app = createApp({
         if(!dictTypeId.value) return [];
         list = rows.filter(r=> r.typeId===dictTypeId.value);
       }
+      const enrichWaybillPoints = (r)=>{
+        if(pageId.value!=='lg-waybill') return r;
+        const lines = Array.isArray(r._lines) ? r._lines : [];
+        const joinPts = (key, cur)=>{
+          if(cur && cur!=='—') return cur;
+          const vals = [...new Set(lines.map(l=> String(l[key]||'').trim()).filter(v=> v && v!=='—'))];
+          return vals.length ? vals.join('、') : (cur || '—');
+        };
+        const next = Object.assign({}, r);
+        next['装货点'] = joinPts('装货点', r['装货点']);
+        next['卸货点'] = joinPts('卸货点', r['卸货点']);
+        return next;
+      };
+      list = list.map(enrichWaybillPoints);
       if(!STORE) return list;
       return list.map(r => STORE.overlayPcRow(pageId.value, r));
     });
@@ -3004,7 +3046,7 @@ const app = createApp({
     const canSettleWaybill = computed(()=>{
       if(pageId.value!=='lg-waybill' || !selectedIds.value.length) return false;
       const rows = tableData.value.filter(r=> selectedIds.value.includes(r.id));
-      return rows.length>0 && rows.every(r=> r['状态']==='待结算');
+      return rows.length>0 && rows.every(r=> r['结算状态']==='待结算');
     });
     const totalSettleQty = computed(()=>{
       const n = settleRows.value.reduce((s,r)=> s + parseSettleQty(r['总数量']), 0);
@@ -3328,9 +3370,9 @@ const app = createApp({
         return;
       }
       if(btn.name==='结算' && pageId.value==='lg-waybill'){
-        if(!selectedIds.value.length){ ElMessage.warning('请至少勾选一条状态为【待结算】的运单进行结算'); return; }
+        if(!selectedIds.value.length){ ElMessage.warning('请至少勾选一条结算状态为【待结算】的运单进行结算'); return; }
         const rows = tableData.value.filter(r=> selectedIds.value.includes(r.id));
-        if(rows.some(r=> r['状态']!=='待结算')){ ElMessage.warning('勾选列表中包含非【待结算】状态的运单，请重新筛选勾选'); return; }
+        if(rows.some(r=> r['结算状态']!=='待结算')){ ElMessage.warning('勾选列表中包含非【待结算】结算状态的运单，请重新筛选勾选'); return; }
         openSettleModal();
         return;
       }
@@ -4567,6 +4609,18 @@ const app = createApp({
         运单号: wayNo,
         状态: '待派车',
         关联发货单: dns.join('、'),
+        关联订单类型: (()=>{
+          const ord = String(first['订单号']||first['关联订单号']||'');
+          if(/^SO/i.test(ord) || first['用车类型']==='发货') return '销售订单';
+          if(/^PO/i.test(ord) || first['用车类型']==='提货') return '采购订单';
+          if(/^WW/i.test(ord)) return '委外订单';
+          return first['关联订单类型'] || '—';
+        })(),
+        关联订单号: (()=>{
+          const ord = String(first['关联订单号']||first['订单号']||'');
+          return (ord.split(/\s*\/\s*/)[0]||'').trim() || '—';
+        })(),
+        关联出库单号: first['关联出库单号'] || first['出/入库单号'] || '—',
         物料信息: [...new Set(rows.map(r=> r['物料信息']).filter(Boolean))].join('；'),
         总数量: String(qtySum),
         申请部门: first['申请部门']||'',
@@ -4574,6 +4628,8 @@ const app = createApp({
         用车类型: first['用车类型']||'',
         运输类型: mergeForm.运输类型,
         '运费单价（元）': mergeForm.运费单价===undefined || mergeForm.运费单价===null ? '' : String(mergeForm.运费单价).trim(),
+        装货点: [...new Set(rows.map(r=> r['装货点']).filter(v=> v && v!=='—'))].join('、') || '—',
+        卸货点: [...new Set(rows.map(r=> r['卸货点']).filter(v=> v && v!=='—'))].join('、') || '—',
         车型要求: first['车型要求']||'',
         是否带托盘: first['是否带托盘']||'',
         特殊要求: first['特殊要求']||'—',
@@ -4581,6 +4637,9 @@ const app = createApp({
         实际装货时间: '—',
         要求送达时间: rows.map(r=> r['要求送达时间']).filter(Boolean).sort()[0] || '—',
         预计到货时间: '—',
+        实际到货时间: '—',
+        客户名称: (String(first['订单号']||'').split(/\s*\/\s*/)[1]||'').trim() || '—',
+        '出/入库单号': '—',
         订单号: first['订单号']||'',
         合同号: first['合同号']||'',
         采购订单: first['采购订单']||'',
@@ -5847,7 +5906,8 @@ const app = createApp({
         '待审核':'tag-p','审核中':'tag-b','已通过':'tag-g','已拒绝':'tag-gr','已驳回':'tag-gr',
         '待调度':'tag-b','已调度':'tag-g',
         '未签收':'tag-gr','部分签收':'tag-p',
-        '待派车':'tag-b','待运输':'tag-y','运输中':'tag-w','待结算':'tag-c','已完成':'tag-g',
+        '待派车':'tag-b','待运输':'tag-y','运输中':'tag-w','已完成':'tag-g',
+        '/':'tag-gr','待结算':'tag-c','已结算':'tag-g',
         '待发运':'tag-b','已到达':'tag-g','已签收':'tag-g','已取消':'tag-gr',
         '未确认':'tag-gr','已确认':'tag-g',
         '普货':'tag-b','危货':'tag-w',
@@ -5867,8 +5927,9 @@ const app = createApp({
           ((MOCK['lg-waybill']||{}).main||[]).forEach(w=>{
             const over = STORE.overlayPcRow('lg-waybill', w);
             const st = over['状态'] || w['状态'];
-            ensureSignFromWaybill(Object.assign({}, w, { 状态: st }));
-            if(st==='已签收' || st==='待结算' || st==='已完成'){
+            const settle = over['结算状态'] || w['结算状态'];
+            ensureSignFromWaybill(Object.assign({}, w, { 状态: st, 结算状态: settle }));
+            if(st==='已签收' || st==='已完成' || settle==='待结算' || settle==='已结算'){
               patchSignsByWaybill(w['运单号'], { 状态: '已完成', 收货确认状态: '已确认' }, true);
             }
           });

@@ -3086,6 +3086,7 @@ createApp({
         if (STORE && wbId) {
           STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'sign', signer: signForm.signer });
           STORE.setDocStatus(wbId, currentNotice.value.status, { source: 'APP', action: 'sign' });
+          STORE.patchDoc(wbId, { 实际到货时间: nowStamp() });
           STORE.appendFlow({ docId: wbId, type: '签收确认', source: 'APP', summary: `卸货点 ${wayPoint.value.id || ''} 现场照片确认签收` });
         }
         ElementPlus.ElMessage.success('签收确认已提交');

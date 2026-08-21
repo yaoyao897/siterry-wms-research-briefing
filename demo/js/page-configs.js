@@ -22892,6 +22892,11 @@ window.WMS_PAGE_CONFIGS = {
               "width": 130
             },
             {
+              "field": "车辆附件",
+              "title": "车辆附件",
+              "width": 140
+            },
+            {
               "field": "准牵引总质量",
               "title": "准牵引总质量",
               "width": 120
@@ -22909,6 +22914,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "挂车运输证有效期",
               "title": "挂车运输证有效期",
+              "width": 140
+            },
+            {
+              "field": "挂车附件",
+              "title": "挂车附件",
               "width": 140
             },
             {
@@ -22942,6 +22952,11 @@ window.WMS_PAGE_CONFIGS = {
               "width": 130
             },
             {
+              "field": "驾驶证附件",
+              "title": "驾驶证附件",
+              "width": 140
+            },
+            {
               "field": "从业资格证号",
               "title": "从业资格证号",
               "width": 160
@@ -22950,6 +22965,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "从业资格证有效期",
               "title": "从业资格证有效期",
               "width": 150
+            },
+            {
+              "field": "从业资格证附件",
+              "title": "从业资格证附件",
+              "width": 140
             },
             {
               "field": "押运员姓名",
@@ -22965,6 +22985,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "押运资格证有效期",
               "title": "押运资格证有效期",
               "width": 150
+            },
+            {
+              "field": "押运资格证附件",
+              "title": "押运资格证附件",
+              "width": 140
             },
             {
               "field": "备注",
@@ -23033,6 +23058,10 @@ window.WMS_PAGE_CONFIGS = {
           "type": "date"
         },
         {
+          "name": "车辆附件",
+          "type": "upload"
+        },
+        {
           "name": "准牵引总质量",
           "type": "input"
         },
@@ -23064,6 +23093,10 @@ window.WMS_PAGE_CONFIGS = {
           "type": "date"
         },
         {
+          "name": "挂车附件",
+          "type": "upload"
+        },
+        {
           "name": "司机姓名",
           "type": "input"
         },
@@ -23080,12 +23113,20 @@ window.WMS_PAGE_CONFIGS = {
           "type": "date"
         },
         {
+          "name": "驾驶证附件",
+          "type": "upload"
+        },
+        {
           "name": "从业资格证号",
           "type": "input"
         },
         {
           "name": "从业资格证有效期",
           "type": "date"
+        },
+        {
+          "name": "从业资格证附件",
+          "type": "upload"
         },
         {
           "name": "押运员姓名",
@@ -23098,6 +23139,10 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "押运资格证有效期",
           "type": "date"
+        },
+        {
+          "name": "押运资格证附件",
+          "type": "upload"
         },
         {
           "name": "备注",
@@ -23143,6 +23188,11 @@ window.WMS_PAGE_CONFIGS = {
               "type": "date"
             },
             {
+              "name": "车辆附件",
+              "type": "upload",
+              "ctrl": "上传主车行驶证/运输证等附件"
+            },
+            {
               "name": "准牵引总质量",
               "type": "input",
               "ctrl": "吨，保留两位小数"
@@ -23179,6 +23229,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "挂车运输证有效期",
               "type": "date"
+            },
+            {
+              "name": "挂车附件",
+              "type": "upload",
+              "ctrl": "上传挂车行驶证/运输证等附件"
             }
           ]
         },
@@ -23203,12 +23258,22 @@ window.WMS_PAGE_CONFIGS = {
               "type": "date"
             },
             {
+              "name": "驾驶证附件",
+              "type": "upload",
+              "ctrl": "上传驾驶证附件"
+            },
+            {
               "name": "从业资格证号",
               "type": "input"
             },
             {
               "name": "从业资格证有效期",
               "type": "date"
+            },
+            {
+              "name": "从业资格证附件",
+              "type": "upload",
+              "ctrl": "上传从业资格证附件"
             }
           ]
         },
@@ -23226,6 +23291,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "押运资格证有效期",
               "type": "date"
+            },
+            {
+              "name": "押运资格证附件",
+              "type": "upload",
+              "ctrl": "上传押运资格证附件"
             },
             {
               "name": "备注",
@@ -25006,10 +25076,35 @@ window.WMS_PAGE_CONFIGS = {
                 "待派车",
                 "待运输",
                 "运输中",
-                "待结算",
                 "已完成",
                 "已关闭"
               ]
+            },
+            {
+              "name": "结算状态",
+              "type": "select",
+              "options": [
+                "/",
+                "待结算",
+                "已结算"
+              ]
+            },
+            {
+              "name": "关联订单类型",
+              "type": "select",
+              "options": [
+                "销售订单",
+                "采购订单",
+                "委外订单"
+              ]
+            },
+            {
+              "name": "关联订单号",
+              "type": "input"
+            },
+            {
+              "name": "关联出库单号",
+              "type": "input"
             },
             {
               "name": "物料信息",
@@ -25044,6 +25139,10 @@ window.WMS_PAGE_CONFIGS = {
             "运单状态"
           ],
           "queryMore": [
+            "结算状态",
+            "关联订单类型",
+            "关联订单号",
+            "关联出库单号",
             "物料信息",
             "申请部门",
             "司机",
@@ -25054,7 +25153,7 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "结算",
               "type": "primary",
-              "desc": "勾选待结算运单，生成 ERP 采购订单并完成结算"
+              "desc": "勾选结算状态为待结算的运单，生成 ERP 采购订单并完成结算"
             },
             {
               "name": "关闭",
@@ -25080,9 +25179,32 @@ window.WMS_PAGE_CONFIGS = {
               "slot": "tag"
             },
             {
+              "field": "结算状态",
+              "title": "结算状态",
+              "width": 110,
+              "slot": "tag"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
               "width": 180,
+              "slot": "link"
+            },
+            {
+              "field": "关联订单类型",
+              "title": "关联订单类型",
+              "width": 120
+            },
+            {
+              "field": "关联订单号",
+              "title": "关联订单号",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联出库单号",
+              "title": "关联出库单号",
+              "width": 150,
               "slot": "link"
             },
             {
@@ -25121,6 +25243,16 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
+              "field": "装货点",
+              "title": "装货点",
+              "width": 180
+            },
+            {
+              "field": "卸货点",
+              "title": "卸货点",
+              "width": 180
+            },
+            {
               "field": "车型要求",
               "title": "车型要求",
               "width": 110
@@ -25153,6 +25285,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "预计到货时间",
               "title": "预计到货时间",
+              "width": 140
+            },
+            {
+              "field": "实际到货时间",
+              "title": "实际到货时间",
               "width": 140
             },
             {
@@ -25244,10 +25381,22 @@ window.WMS_PAGE_CONFIGS = {
               "name": "状态"
             },
             {
+              "name": "结算状态"
+            },
+            {
               "name": "运单号"
             },
             {
               "name": "关联发货单"
+            },
+            {
+              "name": "关联订单类型"
+            },
+            {
+              "name": "关联订单号"
+            },
+            {
+              "name": "关联出库单号"
             },
             {
               "name": "物料信息"
@@ -25271,6 +25420,12 @@ window.WMS_PAGE_CONFIGS = {
               "name": "运费单价（元）"
             },
             {
+              "name": "装货点"
+            },
+            {
+              "name": "卸货点"
+            },
+            {
               "name": "车型要求"
             },
             {
@@ -25290,6 +25445,9 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "预计到货时间"
+            },
+            {
+              "name": "实际到货时间"
             },
             {
               "name": "订单号"
