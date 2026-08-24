@@ -66,11 +66,11 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .menu-icon{width:16px;height:16px;margin-right:8px;flex-shrink:0;stroke:currentColor;fill:none}
 .menu-badge{color:var(--color-badge);font-size:12px;margin-left:2px;font-weight:400}
 .app-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
-.app-header{height:52px;padding:0 20px;background:#fff;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between}
-.app-header .el-breadcrumb{margin-bottom:0;padding:0}
+.app-header{height:52px;padding:0 20px;background:#fff;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.app-header .el-breadcrumb{margin-bottom:0;padding:0;flex:1;min-width:0;overflow:hidden}
 .app-header .el-breadcrumb__inner{font-size:13px;color:var(--color-text-secondary);font-weight:400}
 .app-header .el-breadcrumb__item:last-child .el-breadcrumb__inner{color:var(--color-text-main);font-weight:500}
-.app-header__actions{display:flex;gap:8px;align-items:center;padding-right:88px}
+.app-header__actions{display:flex;gap:8px;align-items:center;padding-right:88px;flex-shrink:0}
 .app-header__icon{width:32px;height:32px;border:1px solid var(--color-border);border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--color-text-normal)}
 .app-header__icon:hover,.app-header__icon.on{border-color:var(--color-btn-link);color:var(--color-btn-link)}
 .app-header__icon.on{background:var(--color-menu-active-bg)}
@@ -83,14 +83,17 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .back-overview{
   display:inline-flex;align-items:center;padding:6px 12px;font-size:13px;line-height:1.2;
   border:1px solid var(--color-border);border-radius:4px;background:#fff;
-  color:var(--color-text-normal);text-decoration:none;white-space:nowrap;
+  color:var(--color-text-normal);text-decoration:none;white-space:nowrap;flex-shrink:0;
 }
 .back-overview:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
 .demo-scope-tip{
   max-width:min(440px,46vw);
   font-size:12px;line-height:1.45;font-weight:600;
-  color:#8B0000;text-align:right;
+  color:#8B0000;text-align:right;flex-shrink:1;min-width:0;
 }
+body.remarks-open .demo-scope-tip{display:none}
+.mode-switch{flex-shrink:0}
+.sync-chip{flex-shrink:0}
 /* 页面 PRD 备注：按钮置顶常驻，弹窗打开时仍可点；右侧面板无遮罩、挤压主区不挡原型 */
 :root{--remarks-panel-w:400px}
 .remarks-toggle{
@@ -103,8 +106,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 }
 .remarks-toggle:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
 .remarks-toggle.on{color:#fff!important;background:var(--color-btn-primary)!important;border-color:var(--color-btn-primary)!important}
-body.remarks-open .app-header__actions{padding-right:calc(var(--remarks-panel-w) + 88px)}
-body.remarks-open .remarks-toggle{right:calc(var(--remarks-panel-w) + 16px)}
+body.remarks-open .remarks-toggle{right:calc(var(--remarks-panel-w) + 16px);min-width:88px}
 .remarks-drawer{
   position:fixed;top:0;right:0;bottom:0;width:var(--remarks-panel-w);z-index:10040;
   background:#fff;border-left:1px solid var(--color-border);
