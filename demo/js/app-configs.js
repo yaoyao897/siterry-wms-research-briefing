@@ -78,8 +78,6 @@ window.APP_CFG = (function () {
             leaf('trust-recv-tank', '受托收料-罐区'),
             leaf('trust-ret-serial', '受托退料-流水码'),
             leaf('trust-ret-count', '受托退料-计数'),
-            leaf('trust-in-serial', '受托入库-流水码'),
-            leaf('trust-in-count', '受托入库-计数'),
           ],
         },
         {
@@ -209,8 +207,6 @@ window.APP_CFG = (function () {
         homeItem('trust-recv-tank', '受托收料-罐区', '🛢️'),
         homeItem('trust-ret-serial', '受托退料-流水码', '📤'),
         homeItem('trust-ret-count', '受托退料-计数', '📤'),
-        homeItem('trust-in-serial', '受托入库-流水码', '✅'),
-        homeItem('trust-in-count', '受托入库-计数', '✅'),
       ],
     },
     {
@@ -329,8 +325,6 @@ window.APP_CFG = (function () {
     'trust-recv-tank': flow('受托收料-罐区', 'tank', { partnerLabel: '委托方名称', refLabel: '关联受托订单', execVariant: 'tank-in', addMatTitle: '添加客户来料' }),
     'trust-ret-serial': flow('受托退料-流水码', 'serial', { isOut: true, partnerLabel: '委托方名称', refLabel: '关联受托订单', serialScanTitle: '添加退料扫码' }),
     'trust-ret-count': flow('受托退料-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '退料数量' }),
-    'trust-in-serial': flow('受托入库-流水码', 'serial', { partnerLabel: '委托方名称', refLabel: '关联受托订单' }),
-    'trust-in-count': flow('受托入库-计数', 'count', { hasProcess: false, partnerLabel: '委托方名称', refLabel: '关联受托订单', qtyLabel: '入库数量' }),
 
     // 销售（计数也有工序）
     'so-ship-serial': flow('销售发货-流水码', 'serial', { isOut: true, docKind: 'customer', partnerLabel: '客户名称', refLabel: '销售订单', serialScanTitle: '添加发货扫码', docsKey: 'soShip' }),
@@ -557,30 +551,30 @@ window.APP_CFG = (function () {
 
   const noticesDefault = [
     {
-      // 与 PC wh-po-in「单号」PO-I0001 同源联动
-      id: 'PO-I0001',
+      // 与 PC wh-po-in「单号」CGST202608120001 同源联动
+      id: 'CGST202608120001',
       status: '待执行',
       partner: '天齐锂业股份有限公司',
       supplier: '天齐锂业股份有限公司',
-      refNo: 'PO20250801001',
-      poNo: 'PO20250801001',
+      refNo: 'CGDD202608121001',
+      poNo: 'CGDD202608121001',
       planDate: '2025-08-05',
       docType: '标准业务',
-      logisticsNo: 'DN2026081201',
+      logisticsNo: 'WLFH202608121201',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: cloneLines(),
     },
     {
-      // 与 PC wh-po-in「单号」PO-I0002 同源联动
-      id: 'PO-I0002',
+      // 与 PC wh-po-in「单号」CGST202608120002 同源联动
+      id: 'CGST202608120002',
       status: '执行中',
       partner: '赣锋锂业集团股份有限公司',
       supplier: '赣锋锂业集团股份有限公司',
-      refNo: 'PO20250801012',
-      poNo: 'PO20250801012',
+      refNo: 'CGDD202608121012',
+      poNo: 'CGDD202608121012',
       planDate: '2025-08-06',
       docType: '紧急业务',
-      logisticsNo: 'DN2026081202',
+      logisticsNo: 'WLFH202608121202',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
         {
@@ -605,7 +599,7 @@ window.APP_CFG = (function () {
 
   const noticesInner = [
     {
-      id: 'YK202508010001',
+      id: 'YKT202508010001',
       status: '待执行',
       partner: '原料仓 A01',
       refNo: '成品仓 B02',
@@ -621,7 +615,7 @@ window.APP_CFG = (function () {
       lines: [],
     },
     {
-      id: 'ZX202508010001',
+      id: 'ZXSQ202508010001',
       status: '执行中',
       partner: '原料仓 A01',
       refNo: '线边仓 X01',
@@ -640,7 +634,7 @@ window.APP_CFG = (function () {
 
   const noticesStock = [
     {
-      id: 'PD202508010001',
+      id: 'PDJH202508010001',
       status: '待执行',
       partner: '原料仓',
       refNo: '全盘',
@@ -659,7 +653,7 @@ window.APP_CFG = (function () {
       lines: cloneLines(),
     },
     {
-      id: 'PD202508010002',
+      id: 'PDJH202508010002',
       status: '执行中',
       partner: '成品仓',
       refNo: '抽盘',
@@ -678,7 +672,7 @@ window.APP_CFG = (function () {
       lines: cloneLines().slice(0, 2),
     },
     {
-      id: 'PD202508010003',
+      id: 'PDJH202508010003',
       status: '已完成',
       partner: '万物智汇',
       refNo: '全盘',
@@ -752,7 +746,7 @@ window.APP_CFG = (function () {
 
   const noticesPkgScrap = [
     {
-      id: 'BF202508060001',
+      id: 'QTRT202508060001',
       status: '待执行',
       partner: 'A产线',
       refNo: '一车间',
@@ -765,7 +759,7 @@ window.APP_CFG = (function () {
       lines: [],
     },
     {
-      id: 'BF202508060002',
+      id: 'QTRT202508060002',
       status: '执行中',
       partner: 'B产线',
       refNo: '二车间',
@@ -781,7 +775,7 @@ window.APP_CFG = (function () {
 
   const noticesPkgFreeze = [
     {
-      id: 'DJ202508060001',
+      id: 'ZXDJ202508060001',
       status: '待执行',
       partner: 'A产线',
       refNo: '一车间',
@@ -797,7 +791,7 @@ window.APP_CFG = (function () {
 
   const noticesPkgUnfreeze = [
     {
-      id: 'JD202508060001',
+      id: 'QTCT202508060001',
       status: '待执行',
       partner: 'A产线',
       refNo: '一车间',
@@ -813,10 +807,10 @@ window.APP_CFG = (function () {
 
   const waybills = [
     {
-      // 与 PC WY2026081201 同源：待运输，可提货
-      id: 'WY2026081201',
+      // 与 PC WLYD202608121201 同源：待运输，可提货
+      id: 'WLYD202608121201',
       status: '待运输',
-      dispatchNo: 'PC2026081203',
+      dispatchNo: 'PCSQ202608121203',
       shipMode: '发货',
       driver: '赵六',
       plate: '川A12345',
@@ -824,16 +818,16 @@ window.APP_CFG = (function () {
       planLoad: '2026-08-12 10:00',
       scheduleAt: '2026-08-11 16:30',
       route: '思特瑞原料仓 → 无锡客户B卸货区',
-      shipNos: 'DN2026081201',
+      shipNos: 'WLFH202608121201',
       remark: '防雨',
       actualDepart: '—',
       actualArrive: '—',
       loads: [
         {
-          id: 'TH2026081201',
+          id: 'WLTD202608121201',
           type: 'load',
           status: '待确认',
-          shipNo: 'DN2026081201',
+          shipNo: 'WLFH202608121201',
           unit: '四川思特瑞科技',
           place: '思特瑞原料仓',
           contact: '王五 / 13800001111',
@@ -852,10 +846,10 @@ window.APP_CFG = (function () {
       ],
       unloads: [
         {
-          id: 'RC2026081301',
+          id: 'WLQS202608121301',
           type: 'unload',
           status: '待确认',
-          shipNo: 'DN2026081201',
+          shipNo: 'WLFH202608121201',
           unit: '无锡客户B',
           place: '无锡客户B卸货区',
           contact: '周工 / 13700003333',
@@ -876,10 +870,10 @@ window.APP_CFG = (function () {
       enroute: { location: '', remark: '', updatedAt: '' },
     },
     {
-      // 与 PC YD2026080101 同源：运输中，提货已完成，可签收/在途
-      id: 'YD2026080101',
+      // 与 PC WLYD202608120101 同源：运输中，提货已完成，可签收/在途
+      id: 'WLYD202608120101',
       status: '运输中',
-      dispatchNo: 'PC2026081001',
+      dispatchNo: 'PCSQ202608121001',
       shipMode: '发货',
       driver: '钱七',
       plate: '川B67890',
@@ -887,16 +881,16 @@ window.APP_CFG = (function () {
       planLoad: '2026-08-11 08:00',
       scheduleAt: '2026-08-10 12:00',
       route: '常州一号库装货台 → 苏州园区卸货区',
-      shipNos: 'DN2026081101',
+      shipNos: 'WLFH202608121101',
       remark: '防潮',
       actualDepart: '2026-08-11 08:35',
       actualArrive: '—',
       loads: [
         {
-          id: 'TH2026081101',
+          id: 'WLTD202608121101',
           type: 'load',
           status: '已确认',
-          shipNo: 'DN2026081101',
+          shipNo: 'WLFH202608121101',
           unit: '四川思特瑞科技',
           place: '常州一号库装货台',
           contact: '仓库值班 / 0519-88880001',
@@ -915,10 +909,10 @@ window.APP_CFG = (function () {
       ],
       unloads: [
         {
-          id: 'RC2026081201',
+          id: 'WLQS202608121201',
           type: 'unload',
           status: '待确认',
-          shipNo: 'DN2026081101',
+          shipNo: 'WLFH202608121101',
           unit: '苏州园区',
           place: '苏州园区卸货区',
           contact: '收货员 / 0512-66660002',
@@ -1000,7 +994,7 @@ window.APP_CFG = (function () {
 
   const noticesLoad = [
     {
-      id: 'ZX202508060001',
+      id: 'ZXSQ202508060001',
       status: '待执行',
       docType: '装货',
       planDate: '2025-08-07 08:00',
@@ -1015,7 +1009,7 @@ window.APP_CFG = (function () {
       lines: JSON.parse(JSON.stringify(loadLineTpl)),
     },
     {
-      id: 'ZX202508060002',
+      id: 'ZXSQ202508060002',
       status: '执行中',
       docType: '卸货',
       planDate: '2025-08-08 06:00',
@@ -1055,24 +1049,24 @@ window.APP_CFG = (function () {
 
   const noticesSoShip = [
     {
-      id: 'SO-S0001',
+      id: 'XSFT202608120001',
       status: '待执行',
       partner: '宁德时代新能源',
       supplier: '宁德时代新能源',
-      refNo: 'SO2026080001',
-      stockNo: 'BH2026080001',
+      refNo: 'XSDD202608120001',
+      stockNo: 'BHT202608120001',
       planDate: '2026-08-01',
       docType: '标准发货',
-      logisticsNo: 'DN2026081201',
+      logisticsNo: 'WLFH202608121201',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: cloneLines(),
     },
     {
-      id: 'SO-S0005',
+      id: 'XSFT202608120005',
       status: '待执行',
       partner: '宁德时代新能源',
       supplier: '宁德时代新能源',
-      refNo: 'SO2026080006',
+      refNo: 'XSDD202608120006',
       stockNo: '',
       planDate: '2026-08-06',
       docType: '纯贸易直送',
@@ -1084,7 +1078,7 @@ window.APP_CFG = (function () {
 
   const gatepasses = [
     {
-      id: 'CMT202608190002',
+      id: 'CMMD202608120002',
       status: '待放行',
       sourceType: '委外发料',
       outNo: 'WWCK20260819003',
@@ -1098,7 +1092,7 @@ window.APP_CFG = (function () {
       materialSummary: '工业级碳酸锂 (50包 / 1.250 T)',
       qtyText: '50 袋 (1.250 T)',
       createTime: '2026-08-19 15:10',
-      dispatchNo: 'PC2026081903',
+      dispatchNo: 'PCSQ202608121903',
       carrier: '四川顺达物流',
       loadReq: '防潮防震',
       sealNo: 'FQ-260819-03',
@@ -1110,7 +1104,7 @@ window.APP_CFG = (function () {
       ],
     },
     {
-      id: 'CMT202608190001',
+      id: 'CMMD202608120001',
       status: '待放行',
       sourceType: '销售发货',
       outNo: 'XSCK20260819001',
@@ -1124,7 +1118,7 @@ window.APP_CFG = (function () {
       materialSummary: '微粉级氢氧化锂 (100袋 / 2.500 T)',
       qtyText: '100 袋 (2.500 T)',
       createTime: '2026-08-19 14:30',
-      dispatchNo: 'PC2026081901',
+      dispatchNo: 'PCSQ202608121901',
       carrier: '成都众达运输',
       loadReq: '防潮，轻拿轻放',
       sealNo: 'FQ-260819-01',
@@ -1137,7 +1131,7 @@ window.APP_CFG = (function () {
       ],
     },
     {
-      id: 'CMT202608180008',
+      id: 'CMMD202608120008',
       status: '已完成',
       sourceType: '采购退料',
       outNo: 'CGTK20260818002',
@@ -1153,7 +1147,7 @@ window.APP_CFG = (function () {
       createTime: '2026-08-18 09:20',
       releaseAt: '2026-08-18 10:05',
       releaseBy: '门卫-王五',
-      dispatchNo: 'PC2026081802',
+      dispatchNo: 'PCSQ202608121802',
       carrier: '供应商自提',
       loadReq: '—',
       sealNo: 'FQ-260818-02',
@@ -1165,7 +1159,7 @@ window.APP_CFG = (function () {
       ],
     },
     {
-      id: 'CMT202608180009',
+      id: 'CMMD202608120009',
       status: '已作废',
       sourceType: '其他出库',
       outNo: 'QTCK20260818001',

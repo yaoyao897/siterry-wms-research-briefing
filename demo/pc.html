@@ -91,8 +91,64 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
   font-size:12px;line-height:1.45;font-weight:600;
   color:#8B0000;text-align:right;
 }
-.remarks-toggle{position:fixed;top:10px;right:168px;z-index:3100;width:auto;min-width:104px;padding:0 12px;gap:6px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+/* 页面 PRD 备注：按钮置顶常驻，弹窗打开时仍可点；右侧面板无遮罩、挤压主区不挡原型 */
+:root{--remarks-panel-w:400px}
+.remarks-toggle{
+  position:fixed;top:10px;right:16px;z-index:10050;
+  height:32px;min-width:72px;padding:0 14px;gap:6px;
+  border:1px solid var(--color-border);border-radius:4px;
+  background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);
+  color:var(--color-text-normal);font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.remarks-toggle:hover{border-color:var(--color-btn-link);color:var(--color-btn-link)}
 .remarks-toggle.on{color:#fff!important;background:var(--color-btn-primary)!important;border-color:var(--color-btn-primary)!important}
+body.remarks-open .remarks-toggle{right:calc(var(--remarks-panel-w) + 16px)}
+.remarks-drawer{
+  position:fixed;top:0;right:0;bottom:0;width:var(--remarks-panel-w);z-index:10040;
+  background:#fff;border-left:1px solid var(--color-border);
+  box-shadow:-4px 0 16px rgba(0,0,0,.08);
+  display:flex;flex-direction:column;transform:translateX(100%);
+  transition:transform .2s ease;
+}
+.remarks-drawer.is-open{transform:translateX(0)}
+.remarks-drawer__hd{
+  flex-shrink:0;height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--color-border);background:#FAFAFA;
+}
+.remarks-drawer__title{font-size:14px;font-weight:600;color:var(--color-text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.remarks-drawer__close{
+  width:28px;height:28px;border:none;border-radius:4px;background:transparent;
+  color:var(--color-text-secondary);font-size:18px;line-height:1;cursor:pointer;
+}
+.remarks-drawer__close:hover{background:rgba(0,0,0,.06);color:var(--color-text-main)}
+.remarks-drawer__body{flex:1;min-height:0;overflow:auto;padding:14px 16px 24px}
+.remarks-sec{margin-bottom:18px}
+.remarks-sec__h{
+  margin:0 0 10px;padding:6px 10px;font-size:13px;font-weight:600;
+  color:var(--color-btn-primary);background:#EEF2F8;border-radius:4px;
+}
+.remarks-sec__p{margin:0 0 8px;font-size:13px;line-height:1.65;color:var(--color-text-normal)}
+.remarks-sec__field{margin:0 0 10px;font-size:13px;line-height:1.65;color:var(--color-text-normal)}
+.remarks-sec__field strong{color:var(--color-text-main);font-weight:600}
+.remarks-sec__list,.remarks-sec__ol{margin:6px 0 0;padding-left:1.35em;font-size:13px;line-height:1.65}
+.remarks-sec__list li,.remarks-sec__ol li{margin-bottom:4px}
+.remarks-empty{padding:24px 8px;text-align:center;color:var(--color-text-secondary);font-size:13px;line-height:1.6}
+body.remarks-open #app{
+  width:calc(100% - var(--remarks-panel-w));
+  max-width:calc(100% - var(--remarks-panel-w));
+}
+body.remarks-open .el-overlay,
+body.remarks-open .el-overlay-dialog{
+  width:calc(100% - var(--remarks-panel-w))!important;
+  right:var(--remarks-panel-w)!important;left:0!important;
+}
+@media (max-width:900px){
+  :root{--remarks-panel-w:min(360px,92vw)}
+  body.remarks-open #app{width:100%;max-width:100%}
+  body.remarks-open .el-overlay,
+  body.remarks-open .el-overlay-dialog{width:100%!important;right:0!important}
+}
 .app-body{flex:1;min-height:0;padding:12px 12px 16px;overflow:hidden;background:var(--color-bg-page);display:flex;flex-direction:column}
 .page-panel{background:#fff;flex:1;min-height:0;display:flex;flex-direction:column}
 .app-breadcrumb{margin-bottom:12px;font-size:13px;padding:0 8px}
@@ -261,7 +317,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .field-remark{width:100%;margin-top:5px;padding:6px 8px;font-size:12px;line-height:1.45;color:#8C6D1F;background:#FFFBE6;border-left:3px solid #FAAD14;border-radius:2px}
 .dialog-remarks-summary{max-height:22vh;overflow-y:auto;margin-top:12px;padding:10px 12px;background:#F7F9FC;border:1px solid var(--color-border);border-radius:4px;font-size:12px;line-height:1.6}
 .dialog-remarks-summary__title{position:sticky;top:-10px;margin:-10px -12px 8px;padding:8px 12px;background:#EEF2F8;color:var(--color-btn-primary);font-size:13px;font-weight:600}
-@media (max-width:900px){.remarks-board{grid-template-columns:1fr}.remarks-toggle{right:152px}.demo-form-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.remarks-board{grid-template-columns:1fr}.demo-form-grid{grid-template-columns:1fr}}
 /* 时长/有效期：数值 + 单位下拉（flex 并排；禁止 append 内嵌 select） */
 .demo-valid-period{display:flex;width:100%;min-width:0;align-items:stretch;gap:0;overflow:visible}
 .demo-valid-period__value,
@@ -345,6 +401,37 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 </head>
 <body>
 <div id="app" v-cloak>
+  <!-- 页面 PRD 备注：置顶常驻，弹窗打开时仍可点 -->
+  <button type="button" class="remarks-toggle" :class="{ on: remarksOpen }" @click="toggleRemarks" title="查看本页页面说明">
+    {{ remarksOpen ? '收起备注' : '备注' }}
+  </button>
+  <aside class="remarks-drawer" :class="{ 'is-open': remarksOpen }" aria-label="页面说明">
+    <div class="remarks-drawer__hd">
+      <span class="remarks-drawer__title">{{ remarksTitle }}</span>
+      <button type="button" class="remarks-drawer__close" @click="closeRemarks" aria-label="关闭">×</button>
+    </div>
+    <div class="remarks-drawer__body">
+      <template v-if="remarksNote && (remarksNote.sections||[]).length">
+        <section class="remarks-sec" v-for="(sec, si) in remarksNote.sections" :key="si">
+          <h4 class="remarks-sec__h">{{ sec.heading }}</h4>
+          <template v-for="(blk, bi) in (sec.blocks||[])" :key="bi">
+            <p v-if="blk.type==='p'" class="remarks-sec__p">{{ blk.text }}</p>
+            <div v-else-if="blk.type==='field'" class="remarks-sec__field">
+              <strong>{{ blk.name }}：</strong><span v-if="blk.text">{{ blk.text }}</span>
+              <ul v-if="(blk.list||[]).length" class="remarks-sec__list">
+                <li v-for="(it, ii) in blk.list" :key="ii">{{ it }}</li>
+              </ul>
+            </div>
+            <ol v-else-if="blk.type==='ol'" class="remarks-sec__ol">
+              <li v-for="(it, ii) in (blk.items||[])" :key="ii">{{ it }}</li>
+            </ol>
+          </template>
+        </section>
+      </template>
+      <div v-else class="remarks-empty">当前页面暂无页面说明。<br/>请先在 PRD「页面PRD.md」维护后再同步到 Demo。</div>
+    </div>
+  </aside>
+
   <div class="app-shell">
     <aside class="app-aside">
       <div class="app-aside__logo">思特瑞 WMS Demo</div>
@@ -759,7 +846,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
             <span class="list-toolbar__title">{{ page.detailEnrouteTitle || '在途打卡轨迹' }}</span>
           </div>
         </div>
-        <el-empty v-if="!detailEnrouteRows.length" description="暂无在途打卡（司机在 APP 打卡后将在此展示）" :image-size="64"></el-empty>
+        <el-empty v-if="!detailEnrouteRows.length" description="暂无在途打卡（承运商集中流转/在途节点录入后在此展示）" :image-size="64"></el-empty>
         <el-table v-else class="demo-data-table demo-data-table--striped" :data="detailEnrouteRows" border stripe style="width:100%" max-height="280">
           <el-table-column type="index" label="序号" width="72"></el-table-column>
           <el-table-column v-for="f in (page.detailEnrouteFields||[])" :key="f.name" :prop="f.name" :label="f.name" :min-width="colMinWidth(f.name)" show-overflow-tooltip></el-table-column>
@@ -803,7 +890,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
           </div>
         </div>
         <p style="margin:0 0 10px;color:#64748b;font-size:12px">数据来自 APP「更新在途信息」，按记录时间倒序；点击左侧箭头可展开经纬度 / 照片 / 工序摘要。PC 仅只读查看。</p>
-        <el-empty v-if="!detailEnrouteRows.length" description="暂无在途信息（司机在 APP 更新后将在此展示）" :image-size="64"></el-empty>
+        <el-empty v-if="!detailEnrouteRows.length" description="暂无在途信息（承运商录入/更新后在此展示）" :image-size="64"></el-empty>
         <el-table v-else class="demo-data-table demo-data-table--striped" :data="detailEnrouteRows" border stripe style="width:100%" max-height="360">
           <el-table-column type="expand">
             <template #default="{ row }">
@@ -1689,6 +1776,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
 <script src="./js/page-configs.js"></script>
 <script src="./js/mock-rows.js"></script>
+<script src="./js/page-prd-notes.js"></script>
 <script src="./js/demo-store.js"></script>
 <script>
 const { createApp, ref, computed, reactive, watch, onMounted, onBeforeUnmount, nextTick } = Vue;
@@ -1782,6 +1870,21 @@ const app = createApp({
     const pageNum = ref(1);
     const pageSize = ref(20);
     const formVisible = ref(false);
+    const remarksOpen = ref(false);
+    const PAGE_PRD_NOTES = window.WMS_PAGE_PRD_NOTES || {};
+    const remarksNote = computed(()=> PAGE_PRD_NOTES[pageId.value] || null);
+    const remarksTitle = computed(()=> (remarksNote.value && remarksNote.value.title) || ((page.value && page.value.title) ? (page.value.title + ' · 页面说明') : '页面说明'));
+    function syncRemarksBodyClass(){
+      document.body.classList.toggle('remarks-open', !!remarksOpen.value);
+    }
+    function toggleRemarks(){
+      remarksOpen.value = !remarksOpen.value;
+      syncRemarksBodyClass();
+    }
+    function closeRemarks(){
+      remarksOpen.value = false;
+      syncRemarksBodyClass();
+    }
     const formMode = ref('add');
     const formSwitch = reactive({ '启用状态': true });
     const formModel = reactive({});
@@ -1936,6 +2039,11 @@ const app = createApp({
       if(pageId.value==='wwpo') return (formMode.value==='add'?'新增':'编辑') + '委外加工订单';
       if(pageId.value==='wh-insp-scheme') return (formMode.value==='add'?'新增':'编辑') + '巡检方案';
       if(pageId.value==='wh-insp-plan') return (formMode.value==='add'||formMode.value==='copy'?'新增':'编辑') + '巡检计划';
+      if(pageId.value==='mat-list'){
+        if(formMode.value==='add') return '新增物料';
+        if(formMode.value==='copy') return '复制物料';
+        return '编辑物料' + (formModel['物料编码'] ? (' — ' + formModel['物料编码']) : '');
+      }
       return (formMode.value==='add'?'新增':'编辑') + ' · ' + (page.value?.title||'');
     });
     const formDialogWidth = computed(()=>{
@@ -2019,6 +2127,39 @@ const app = createApp({
       if(!m) return 'KG';
       if(kind==='so') return m['销售单位']||m['基本单位']||'KG';
       return m['采购单位']||m['基本单位']||'KG';
+    }
+    function matCodeInUse(code){
+      const c = codeOf(code);
+      if(!c) return false;
+      const hitRow = (r)=>{
+        if(!r || typeof r !== 'object') return false;
+        if(r['物料编码']===c) return true;
+        const mi = r['物料信息'];
+        return !!(mi && codeOf(mi)===c);
+      };
+      const walk = (node)=>{
+        if(!node) return false;
+        if(Array.isArray(node)) return node.some(walk);
+        if(typeof node === 'object'){
+          if(hitRow(node)) return true;
+          return Object.values(node).some(walk);
+        }
+        return false;
+      };
+      const mock = window.WMS_MOCK_ROWS || MOCK;
+      return Object.entries(mock).some(([pid, val])=> pid!=='mat-list' && walk(val));
+    }
+    function applyMatListQuery(rows, q){
+      return (rows||[]).filter(r=>{
+        const codeKw = String(q['物料编码']||'').trim();
+        const nameKw = String(q['物料名称']||'').trim();
+        if(codeKw && !String(r['物料编码']||'').includes(codeKw)) return false;
+        if(nameKw && !String(r['物料名称']||'').includes(nameKw)) return false;
+        if(q['物料规格'] && r['物料规格']!==q['物料规格']) return false;
+        if(q['物料种类'] && r['物料种类']!==q['物料种类']) return false;
+        if(q['启用状态'] && r['启用状态']!==q['启用状态']) return false;
+        return true;
+      });
     }
     function serialLotOf(matInfo){
       const code = codeOf(matInfo);
@@ -3025,6 +3166,10 @@ const app = createApp({
         return next;
       };
       list = list.map(enrichWaybillPoints);
+      if(pageId.value==='mat-list'){
+        list = applyMatListQuery(list, query);
+        list = list.slice().sort((a,b)=> String(b['创建时间']||'').localeCompare(String(a['创建时间']||'')));
+      }
       if(!STORE) return list;
       return list.map(r => STORE.overlayPcRow(pageId.value, r));
     });
@@ -3166,7 +3311,10 @@ const app = createApp({
     function onTabChange(){
       selectedIds.value=[]; pageNum.value=1; queryExpanded.value=false; nextTick(resetQueryModel);
     }
-    function onQuery(){ pageNum.value=1; ElMessage.success('已查询（Mock，无真实过滤）'); }
+    function onQuery(){
+      pageNum.value=1;
+      ElMessage.success(pageId.value==='mat-list' ? '已按条件筛选' : '已查询（Mock，无真实过滤）');
+    }
     function onResetQuery(){ resetQueryModel(); queryExpanded.value=false; pageNum.value=1; }
     function openForm(mode){
       formMode.value = mode || 'add';
@@ -3185,6 +3333,21 @@ const app = createApp({
       else if(pageId.value==='lg-ship') formLineRows.value = [emptyShipLine(1)];
       else if(pageId.value==='lg-dispatch'){
         formLineRows.value = [emptyDispatchLine(1)];
+      }
+      else if(pageId.value==='mat-list'){
+        formLineRows.value = [];
+        if((mode||'add')==='add'){
+          Object.assign(formModel, {
+            管理方式: '条码管理',
+            有效期单位: '天',
+            基本单位: 'KG',
+            库存单位: 'KG',
+            生产单位: 'KG',
+            采购单位: 'KG',
+            销售单位: 'KG'
+          });
+          formSwitch['启用状态'] = true;
+        }
       }
       else if(pageId.value==='wwpo'){
         formLineRows.value = [];
@@ -3459,6 +3622,13 @@ const app = createApp({
             ElMessage.warning('该考核方案已关联执行计划，不可删除'); return;
           }
         }
+        if(pageId.value==='mat-list'){
+          const rows = tableData.value.filter(r=> selectedIds.value.includes(r.id));
+          if(rows.some(r=> matCodeInUse(r['物料编码']))){
+            ElMessage.warning('此数据正在使用，不可删除');
+            return;
+          }
+        }
         const title = btn.name.includes('关闭') ? '关闭确认' : '删除确认';
         const tip = pageId.value==='wwpo'
           ? '确认删除选中的待执行委外加工订单？删除后无法恢复。'
@@ -3588,6 +3758,15 @@ const app = createApp({
               ElMessage.success('删除成功');
               return;
             }
+            if(pageId.value==='mat-list'){
+              const set = new Set(selectedIds.value);
+              const list = (MOCK['mat-list']||{}).main || [];
+              MOCK['mat-list'].main = list.filter(r=> !set.has(r.id));
+              selectedIds.value = [];
+              bumpStore();
+              ElMessage.success('物料已删除');
+              return;
+            }
             ElMessage.success(btn.name.includes('关闭')?'已关闭':'已删除');
           }).catch(()=>{});
         return;
@@ -3612,6 +3791,10 @@ const app = createApp({
           }
         });
         formModel._editId = row.id;
+        if(pageId.value==='mat-list' && op.name==='复制'){
+          formModel['物料编码'] = '';
+          delete formModel._editId;
+        }
         if(pageId.value==='wh-prod-issue' || pageId.value==='wh-prod-ret' || pageId.value==='wh-prod-in' || pageId.value==='wh-so-preout'){
           const lines = ((MOCK[pageId.value]||{}).detailLines||[]).map((r,i)=>({_i:i+1, ...r}));
           formLineRows.value = lines.length ? lines : [];
@@ -4918,6 +5101,58 @@ const app = createApp({
         ElMessage.success(formMode.value==='add' ? '承运商已新增' : '承运商已保存');
         return;
       }
+      if(pageId.value==='mat-list'){
+        const code = String(formModel['物料编码']||'').trim();
+        const name = String(formModel['物料名称']||'').trim();
+        if(!code){ ElMessage.warning('请填写物料编码'); return; }
+        if(!name){ ElMessage.warning('请填写物料名称'); return; }
+        if(!formModel['物料规格']){ ElMessage.warning('请选择物料规格'); return; }
+        if(!formModel['物料种类']){ ElMessage.warning('请选择物料种类'); return; }
+        if(!formModel['基本单位']){ ElMessage.warning('请选择基本单位'); return; }
+        if(!formModel['库存单位'] || !formModel['生产单位'] || !formModel['采购单位'] || !formModel['销售单位']){
+          ElMessage.warning('请完善各计量单位'); return;
+        }
+        if(!formModel['管理方式']){ ElMessage.warning('请选择管理方式'); return; }
+        const exp = String(formModel['有效期']||'').trim();
+        if(exp && (!/^\d+$/.test(exp) || Number(exp)<=0)){ ElMessage.warning('有效期须为正整数'); return; }
+        const list = ((MOCK['mat-list'] = MOCK['mat-list'] || {}).main = (MOCK['mat-list'].main || []));
+        const isAdd = formMode.value==='add' || formMode.value==='copy';
+        if(list.some(r=> r['物料编码']===code && (isAdd || r.id!==formModel._editId))){
+          ElMessage.warning('物料编码已存在，请重新输入'); return;
+        }
+        const payload = {
+          物料编码: code,
+          物料名称: name,
+          物料规格: formModel['物料规格']||'',
+          物料种类: formModel['物料种类']||'',
+          有效期: exp || '',
+          有效期单位: formModel['有效期单位'] || '天',
+          基本单位: formModel['基本单位']||'',
+          库存单位: formModel['库存单位']||'',
+          生产单位: formModel['生产单位']||'',
+          采购单位: formModel['采购单位']||'',
+          销售单位: formModel['销售单位']||'',
+          管理方式: formModel['管理方式']||'条码管理',
+          备注: formModel['备注'] || '—',
+          启用状态: formSwitch['启用状态']===false ? '禁用' : '启用'
+        };
+        if(isAdd){
+          const d = new Date();
+          const stamp = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
+          payload.id = 'mat-' + Date.now();
+          payload.创建人 = '张三';
+          payload.创建时间 = stamp;
+          list.unshift(payload);
+        } else {
+          const cur = list.find(r=> r.id===formModel._editId);
+          if(!cur){ ElMessage.warning('未找到待编辑物料'); return; }
+          Object.assign(cur, payload, { id: cur.id, 创建人: cur['创建人'], 创建时间: cur['创建时间'] });
+        }
+        formVisible.value=false;
+        bumpStore();
+        ElMessage.success(isAdd ? (formMode.value==='copy' ? '物料复制新增成功' : '物料新增成功') : '物料保存成功');
+        return;
+      }
       if(false /*lg-order removed*/){
         if(!formModel['发货单位']){ ElMessage.warning('请选择发货单位'); return; }
         if(!formModel['收货单位']){ ElMessage.warning('请选择收货单位'); return; }
@@ -5305,6 +5540,12 @@ const app = createApp({
       ElMessage.success('检验结果已确认');
     }
     function onFormSelectChange(f){
+      if(pageId.value==='mat-list' && f && f.name==='基本单位'){
+        const u = formModel['基本单位'];
+        if(u){
+          ['库存单位','生产单位','采购单位','销售单位'].forEach(k=>{ formModel[k] = u; });
+        }
+      }
       if(f && f.name==='订单类型'){
         formModel['订单号'] = '';
         if(formModel['配送类型']!=='供应商直送') formModel['合同号'] = '';
@@ -5950,10 +6191,14 @@ const app = createApp({
         });
       }
     });
-    onBeforeUnmount(()=>{ if(typeof unsubStore==='function') unsubStore(); });
+    onBeforeUnmount(()=>{
+      if(typeof unsubStore==='function') unsubStore();
+      document.body.classList.remove('remarks-open');
+    });
 
     return {
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
+      remarksOpen, remarksNote, remarksTitle, toggleRemarks, closeRemarks,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseWaybill, canCloseInspPlan, canSettleWaybill, canDeleteKpiPlan,
       formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, activeFormFields, activeFormLineFields, formLineRows,
       kpiCfgVisible, kpiGrades, kpiGradeSel, kpiProjects, kpiProjSel, kpiScoreVisible, kpiScoreReadonly, kpiScoreVendor, kpiScoreProjects, kpiScoreExplain, kpiScoreRemark, kpiScoreTotal, kpiScoreGrade, kpiVendorRows, kpiVendorCols, kpiVendorSel,

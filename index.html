@@ -527,7 +527,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       <div class="meta">2026-08-20 · 调研与蓝图设计 100% 完成 · 原型与33项接口已全部核对确认 · 蓝图确认与签署准备就绪</div>
     </div>
     <div class="topbar-actions">
-      <a class="proto-link" href="./demo/" target="_blank" rel="noopener">原型方案</a>
+      <a class="proto-link" href="../../../04-Demo原型/01-源代码/思特瑞WMS_Demo.html" target="_blank" rel="noopener">原型方案</a>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -568,7 +568,8 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       }
     ],
     "statusHtml": "<ol>\n<li>建单：正常采购/备品备件在 OA 提交采购需求后采购部 ERP 下采购订单；委外采购在 OA 提交委外申请后 ERP 下委外采购订单；<strong>受托加工由业务/销售在 ERP 直接创建受托加工订单</strong>。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送/提货：采购或业务在 OA 发起派车需求，物流部与承运商确定运输内容后，下推来料通知；</p>\n<p>   - 对方配送（供应商/加工厂/客户自送）：对方按计划送达；。</p>\n<ol>\n<li>货物到场后，装卸工卸车并移至库房（受托入<strong>受托来料仓</strong>），线下记录装卸情况。</li>\n<li>收货形态分支：</li>\n</ol>\n<p>   - 包装类（吨袋/小包装/半成品/受托原料等）：库管粘贴待检标签（吨袋）后，仓管通知业务/采购在 ERP 办理入库过账（<strong>采购入库 / 委外入库 / 受托来料入库</strong>）；同步质检员取样质检（混检，不合格再逐袋检；Lims），合格后粘贴合格标签（入库与质检并行，不等待质检结果）。</p>\n<p>   - 槽车（仅正常采购）：质检员按一车一检取样并在 Lims 录入；同时现场工人打入储罐，仓管通知采购在 ERP 办理入库过账（入库与质检并行）。</p>\n<p>   - 备品备件：不贴码、不质检；仓管/采购在 ERP 直接按数量办理入库；领用等出库亦在 ERP 按数量办理。</p>",
-    "tobeHtml": "<ol>\n<li><strong>建单</strong>：正常采购/备品备件——需求部门在 <strong>ERP 提请购单</strong>，采购在 ERP 新增采购订单；委外采购——业务/销售在 ERP 新增委外采购订单；受托加工——业务/销售在 ERP 新增受托加工订单。</li>\n<li><strong>订单同步</strong>：ERP 推送采购/委外/受托订单至 WMS（<strong>无 MES</strong>，不推送 MES）。</li>\n<li><strong>配送 / 到货通知</strong>：</li>\n</ol>\n<p>   - 我方配送/提货：业务/采购在 WMS 新增派车申请 → 物流部执行审批并确认承运 → 物流部在 WMS 下推来料通知单（关联对应订单）；</p>\n<p>   - 对方配送/客户自送：业务/采购在 WMS 直接新增来料通知单。</p>\n<ol>\n<li><strong>到厂收货</strong>：装卸工完成卸车并移至库房（受托入受托来料仓）→ 在 WMS 登记装卸单。</li>\n<li><strong>收货形态</strong>（入库与质检并行，不等待质检结果）：</li>\n</ol>\n<p>   - <strong>包装类</strong>（含受托原料）：库管在 WMS 打印并粘贴条码（须在扫码入库前完成）→ 执行扫码入库生成对应入库单 → WMS 推送入库数据至 ERP；同步质检员执行取样质检 → 在 Lims 录入 → Lims 推送质检结果至 WMS 条码档案。</p>\n<p>   - <strong>槽车</strong>（仅正常采购）：质检员执行一车一检取样并在 Lims 录入；现场完成打入储罐；库管在 WMS 办理槽车入库（选储罐+数量）→ WMS 推送至 ERP；Lims 事后推送结果至 WMS。</p>\n<p>   - <strong>备品备件</strong>：不质检；在 WMS <strong>按批号维度登记数量入库</strong> → WMS 推送至 ERP（非最小包装扫码入库）。</p>\n<p>| 业务类型 | ERP前置/订单 | 来料通知 | WMS/ERP入库单据 | 目标仓 |</p>\n<p>| --- | --- | --- | --- | --- |</p>\n<p>| 正常采购 | 请购单 → 采购订单 | 来料通知单 | 采购入库 | 原辅料仓/储罐 |</p>\n<p>| 委外采购 | 委外采购订单 | 来料通知单 | 委外入库 | 半成品/成品仓 |</p>\n<p>| 受托加工 | 受托加工订单 | 来料通知单 | 受托来料入库 | 受托加工来料仓 |</p>\n<p>| 备品备件 | 请购单 → 采…</p>"
+    "tobeHtml": "<ol>\n<li><strong>建单</strong>：正常采购/备品备件——需求部门在 <strong>ERP 提请购单</strong>，采购在 ERP 新增采购订单；委外采购——业务/销售在 ERP 新增委外采购订单；受托加工——业务/销售在 ERP 新增受托加工订单。</li>\n<li><strong>订单同步</strong>：ERP 推送采购/委外/受托订单至 WMS（<strong>无 MES</strong>，不推送 MES）。</li>\n<li><strong>配送 / 到货通知</strong>：</li>\n</ol>\n<p>   - 我方配送/提货：业务/采购在 WMS 新增派车申请 → 物流部执行审批并确认承运 → 物流部在 WMS 下推来料通知单（关联对应订单）；</p>\n<p>   - 对方配送/客户自送：业务/采购在 WMS 直接新增来料通知单。</p>\n<ol>\n<li><strong>到厂收货</strong>：装卸工完成卸车并移至库房（受托入受托来料仓）→ 在 WMS 登记装卸单。</li>\n<li><strong>收货形态</strong>（入库与质检并行，不等待质检结果）：</li>\n</ol>\n<p>   - <strong>包装类</strong>（含受托原料）：库管在 WMS 打印并粘贴条码（须在扫码入库前完成）→ 执行扫码入库生成对应入库单 → WMS 推送入库数据至 ERP；同步质检员执行取样质检 → 在 Lims 录入 → Lims 推送质检结果至 WMS 条码档案。</p>\n<p>   - <strong>槽车</strong>（仅正常采购）：质检员执行一车一检取样并在 Lims 录入；现场完成打入储罐；库管在 WMS 办理槽车入库（选储罐+数量）→ WMS 推送至 ERP；Lims 事后推送结果至 WMS。</p>\n<p>   - <strong>备品备件</strong>：不质检；在 WMS <strong>按批号维度登记数量入库</strong> → WMS 推送至 ERP（非最小包装扫码入库）。</p>\n<p>| 业务类型 | ERP前置/订单 | 来料通知 | WMS/ERP入库单据 | 目标仓 |</p>\n<p>| --- | --- | --- | --- | --- |</p>\n<p>| 正常采购 | 请购单 → 采购订单 | 来料通知单 | 采购入库 | 原辅料仓/储罐 |</p>\n<p>| 委外采购 | 委外采购订单 | 来料通知单 | 委外入库 | 半成品/成品仓 |</p>\n<p>| 受托加工 | 受托加工订单 | 来料通知单 | 受托来料入库 | 受托加工来料仓 |</p>\n<p>| 备品备件 | 请购单 → 采…</p>",
+    "tobeSummary": "采购来料合格不合格均提前办理扫码入库（入待检暂存区）；入库与质检并行，质检合格释放为可用库存并推ERP入库过账，质检不合格异常冻结并触发退料流程。"
   },
   {
     "id": "s2",
@@ -640,11 +641,11 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       },
       {
         "label": "To-Be",
-        "code": "flowchart TB\n    subgraph 系统颜色说明[\"系统颜色说明\"]\n        direction LR\n        LEG1[在ERP执行]:::erp ~~~ LEG2[在WMS执行]:::wms ~~~ LEG3[在Lims执行]:::lims ~~~ LEG4[在线下执行]:::manual ~~~ LEG5[人工·线框]:::wms ~~~ LEG6[系统自动·线框]:::wmsAuto\n    end\n\n    subgraph sgQc[\"质检部门\"]\n        D1[质检在Lims执行完成成品质检]:::lims\n        D2[系统自动在WMS执行合格批号条码推送WMS建档]:::wmsAuto\n        D3[质检在Lims执行发起生产入库申请并勾选条码]:::lims\n    end\n\n    subgraph sgWh[\"生产\"]\n        P1[业务在线下执行打印并粘贴条码至吨袋]:::manual\n    end\n\n    subgraph sgWh2[\"库管/装卸工\"]\n        B1[库管在线下执行成品入库货物转移]:::manual\n        B2[库管在WMS执行登记装卸单]:::wms\n        C1[库管在WMS执行扫码确认入库]:::wms\n        E1[系统自动在ERP执行推送入库数据至ERP过账]:::erpAuto\n        C3[库管在WMS执行新增转仓申请单]:::wms\n        C4[库管在WMS执行扫码转仓过账]:::wms\n        E2[系统自动在ERP执行推送转仓数据至ERP更新库存]:::erpAuto\n    end\n\n    LEG4 ~~~ sgQc\n\n    D1 --> D2\n    D2 --> P1\n    P1 --> D3\n    D3 --> B1\n    B1 --> B2\n    B2 --> C1\n    C1 --> E1\n    E1 --> C3\n    C3 --> C4\n    C4 --> E2\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style 系统颜色说明 fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgQc fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh2 fill:#f3f4f6,stroke:#d1d5db,color:#111827"
+        "code": "flowchart TB\n    subgraph 系统颜色说明[\"系统颜色说明\"]\n        direction LR\n        LEG1[在ERP执行]:::erp ~~~ LEG2[在WMS执行]:::wms ~~~ LEG3[在Lims执行]:::lims ~~~ LEG4[在线下执行]:::manual ~~~ LEG5[人工·线框]:::wms ~~~ LEG6[系统自动·线框]:::wmsAuto\n    end\n\n    subgraph sgQc[\"质检部门\"]\n        D1[质检在Lims执行完成成品质检]:::lims\n        D2[系统自动在WMS执行合格批号条码推送WMS建档]:::wmsAuto\n        D3[质检在WMS执行发起生产入库申请<br/>自产/受托加工完工并勾选条码]:::wms\n    end\n\n    subgraph sgWh[\"生产\"]\n        P1[业务在线下执行打印并粘贴条码至吨袋]:::manual\n    end\n\n    subgraph sgWh2[\"库管/装卸工\"]\n        B1[库管在线下执行成品入库货物转移]:::manual\n        B2[库管在WMS执行登记装卸单]:::wms\n        C1[库管在WMS执行扫码确认入库]:::wms\n        E1[系统自动在ERP执行推送入库数据至ERP过账]:::erpAuto\n        C3[库管在WMS执行新增转仓申请单]:::wms\n        C4[库管在WMS执行扫码转仓过账]:::wms\n        E2[系统自动在ERP执行推送转仓数据至ERP更新库存]:::erpAuto\n    end\n\n    LEG4 ~~~ sgQc\n\n    D1 --> D2\n    D2 --> P1\n    P1 --> D3\n    D3 --> B1\n    B1 --> B2\n    B2 --> C1\n    C1 --> E1\n    E1 --> C3\n    C3 --> C4\n    C4 --> E2\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style 系统颜色说明 fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgQc fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh2 fill:#f3f4f6,stroke:#d1d5db,color:#111827"
       }
     ],
     "statusHtml": "<p>质检在Lims完成质检数据工作，成品合格后由质量部通知库管在ERP办理生产入库，再办理转仓。</p>",
-    "tobeHtml": "<ol>\n<li>质检在Lims完成质检数据工作，成品合格后推送WMS合格的批号条码，自动创建成品条码档案数据。</li>\n<li>生产打印并粘贴条码至成品吨袋上。</li>\n<li>质检部在WMS发起生产入库申请，勾选可入库的条码。</li>\n<li>装卸工完成货物转移，并在WMS完成装卸单登记。</li>\n<li>库管在WMS扫码确认后，WMS推送入库数据至ERP过账。</li>\n<li>库管在WMS新增转仓申请单；再扫码办理转仓；WMS推送转仓数据至ERP更新库存。</li>\n</ol>"
+    "tobeHtml": "<ol>\n<li>质检在Lims完成质检数据工作，成品合格后推送WMS合格的批号条码，自动创建成品条码档案数据。</li>\n<li>生产打印并粘贴条码至成品吨袋上。</li>\n<li>质检部在WMS发起生产入库申请（业务类型：自产完工 / 受托加工完工；受托完成品不再单独建「受托入库」菜单），勾选可入库的条码。</li>\n<li>装卸工完成货物转移，并在WMS完成装卸单登记。</li>\n<li>库管在WMS扫码确认后，WMS推送入库数据至ERP过账。</li>\n<li>库管在WMS新增转仓申请单；再扫码办理转仓；WMS推送转仓数据至ERP更新库存。</li>\n</ol>"
   },
   {
     "id": "s6",
@@ -775,7 +776,8 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
     "tobeHtml": "<ol><li>需求部门在 <strong>WMS 发起派车申请单</strong>（业务类型选择「设备运输/杂项运输」）。</li><li>派车申请审批通过后，<strong>物流部在 WMS 将申请单拆分为发货单</strong>（1 装货点 + 1 卸货点）；物流部将多张发货单<strong>合并下发为运单</strong>。</li><li><strong>承运商在 WMS 接收运单并执行派车</strong>（录入车牌与司机），装货完成后<strong>登记提货单</strong>确认起运。</li><li>运输途中由<strong>承运商收集在途信息后统一在 WMS 更新在途状态</strong>；运抵后由<strong>承运商收集现场交接凭证录入签收单</strong>，完成到站卸货与全单签收。</li><li>运单签收完成后，系统不自动推送运费采购单；由<strong>物流部在 WMS 根据运单和线下签字后的随车发货单对账完成后，勾选运单进行结算操作，然后推送至 ERP 生成采购单（运输费用）</strong>。</li></ol>",
     "tobeSummary": "覆盖设备搬迁与杂项非仓储物资运输，不关联仓库出入库，纯走派车→发货单→运单→提货单→签收单→物流部对账结算推ERP采购单闭环。"
   }
-]</script>
+]
+</script>
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
@@ -1886,7 +1888,6 @@ function renderProtoProgress() {
     { id:37, side:'PC', m1:'仓储管理', m2:'生产', m3:'生产入库', desc:'生产入库功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-07' },
     { id:38, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托收料', desc:'受托收料功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库管理员', time:'2026-08-07' },
     { id:39, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托退料', desc:'受托退料功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-07' },
-    { id:40, side:'PC', m1:'仓储管理', m2:'受托', m3:'受托入库', desc:'受托入库功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-07' },
     { id:41, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售备货', desc:'销售备货功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库管理员', time:'2026-08-07' },
     { id:42, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售发货', desc:'销售发货功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-07' },
     { id:43, side:'PC', m1:'仓储管理', m2:'销售', m3:'销售退货', desc:'销售退货功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库管理员', time:'2026-08-07' },
@@ -1955,8 +1956,6 @@ function renderProtoProgress() {
     { id:103, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托收料-罐区', desc:'受托收料-罐区功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库管理员', time:'2026-08-14' },
     { id:104, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托退料-流水码', desc:'受托退料-流水码功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
     { id:105, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托退料-计数', desc:'受托退料-计数功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
-    { id:106, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托入库-流水码', desc:'受托入库-流水码功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
-    { id:107, side:'APP', m1:'仓储管理', m2:'受托', m3:'受托入库-计数', desc:'受托入库-计数功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
     { id:108, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售发货-流水码', desc:'销售发货-流水码功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
     { id:109, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售发货-计数', desc:'销售发货-计数功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库操作员', time:'2026-08-14' },
     { id:110, side:'APP', m1:'仓储管理', m2:'销售', m3:'销售退货-流水码', desc:'销售退货-流水码功能操作与管理', dStatus:'✅ 已完成', cStatus:'✅ 已确认', role:'仓库管理员', time:'2026-08-14' },
