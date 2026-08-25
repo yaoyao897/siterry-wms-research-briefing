@@ -253,7 +253,7 @@ window.WMS_DEMO_STORE = (function () {
         next['出门条状态'] = doc.status === '已完成' ? '已放行' : (pcStatus || doc.status);
         if (doc.放行时间) next['放行时间'] = doc.放行时间;
         if (doc.放行人) next['放行人'] = doc.放行人;
-      } else if (pageId === 'lg-waybill') {
+      } else if (pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier') {
         // 已关闭以 PC 关闭为准；已完成可被 APP 签收推进，但结算态由 PC 结算锁定
         if (next['状态'] !== undefined && next['状态'] !== '已关闭') {
           if (!['已完成'].includes(next['状态']) || ['已签收', '已到达', '待结算'].includes(doc.status)) {
@@ -275,17 +275,27 @@ window.WMS_DEMO_STORE = (function () {
         next['状态'] = pcStatus;
       }
     }
-    if (doc.lastEnroute && next['备注'] !== undefined && (pageId === 'lg-waybill')) {
+    if (doc.lastEnroute && next['备注'] !== undefined && (pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier')) {
       next['备注'] = 'APP在途：' + doc.lastEnroute;
     }
-    if (pageId === 'lg-waybill' && doc.预计到货时间) {
+    if ((pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier') && doc.预计到货时间) {
       next['预计到货时间'] = doc.预计到货时间;
     }
-    if (pageId === 'lg-waybill' && doc.实际装货时间) {
+    if ((pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier') && doc.实际装货时间) {
       next['实际装货时间'] = doc.实际装货时间;
     }
-    if (pageId === 'lg-waybill' && doc.实际到货时间) {
+    if ((pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier') && doc.实际到货时间) {
       next['实际到货时间'] = doc.实际到货时间;
+    }
+    if (pageId === 'lg-waybill' || pageId === 'lg-waybill-carrier') {
+      const fleetKeys = [
+        '车牌号', '车挂号', '司机姓名', '司机电话', '驾驶证号', '从业资格证号',
+        '押运员姓名', '押运员资格证号',
+        '送货车牌号（专线）', '送货车挂号（专线）', '送货司机（专线）', '送货司机电话（专线）', '送货中转备注',
+      ];
+      fleetKeys.forEach(function (k) {
+        if (doc[k] !== undefined && doc[k] !== null && doc[k] !== '') next[k] = doc[k];
+      });
     }
     return next;
   }
@@ -307,6 +317,19 @@ window.WMS_DEMO_STORE = (function () {
         remark: (next.enroute && next.enroute.remark) || 'APP已同步',
       });
     }
+    if (hit.车牌号 !== undefined) next.plate = hit.车牌号 === '—' ? '' : hit.车牌号;
+    if (hit.车挂号 !== undefined) next.trailer = hit.车挂号 === '—' ? '' : hit.车挂号;
+    if (hit.司机姓名 !== undefined) next.driver = hit.司机姓名 === '—' ? '' : hit.司机姓名;
+    if (hit.司机电话 !== undefined) next.phone = hit.司机电话 === '—' ? '' : hit.司机电话;
+    if (hit.驾驶证号 !== undefined) next.licenseNo = hit.驾驶证号 === '—' ? '' : hit.驾驶证号;
+    if (hit.从业资格证号 !== undefined) next.certNo = hit.从业资格证号 === '—' ? '' : hit.从业资格证号;
+    if (hit.押运员姓名 !== undefined) next.escort = hit.押运员姓名 === '—' ? '' : hit.押运员姓名;
+    if (hit.押运员资格证号 !== undefined) next.escortCert = hit.押运员资格证号 === '—' ? '' : hit.押运员资格证号;
+    if (hit['送货车牌号（专线）'] !== undefined) next.secondaryPlate = hit['送货车牌号（专线）'] === '—' ? '' : hit['送货车牌号（专线）'];
+    if (hit['送货车挂号（专线）'] !== undefined) next.secondaryTrailer = hit['送货车挂号（专线）'] === '—' ? '' : hit['送货车挂号（专线）'];
+    if (hit['送货司机（专线）'] !== undefined) next.secondaryDriver = hit['送货司机（专线）'] === '—' ? '' : hit['送货司机（专线）'];
+    if (hit['送货司机电话（专线）'] !== undefined) next.secondaryPhone = hit['送货司机电话（专线）'] === '—' ? '' : hit['送货司机电话（专线）'];
+    if (hit['送货中转备注'] !== undefined) next.secondaryRemark = hit['送货中转备注'] === '—' ? '' : hit['送货中转备注'];
     if (Array.isArray(next.loads)) {
       next.loads.forEach((p) => {
         const pt = getPoint(doc.id, p.id);
@@ -347,6 +370,51 @@ window.WMS_DEMO_STORE = (function () {
       window.dispatchEvent(new CustomEvent('wms-demo-sync', { detail: { type: 'sync', reason: 'reset' } }));
     } catch (e) { /* ignore */ }
     return state;
+  }
+
+  /* ---- MOCK 数据持久化（用户在 PC 端新增/编辑/删除的列表行） ---- */
+  const MOCK_KEY = 'wms-demo-mock-v1';
+
+  function saveMock(mockObj) {
+    if (!mockObj) return;
+    try {
+      localStorage.setItem(MOCK_KEY, JSON.stringify(mockObj));
+    } catch (e) {
+      console.warn('[WMS_DEMO_STORE] MOCK localStorage 写入失败', e);
+    }
+  }
+
+  function loadMock() {
+    try {
+      const raw = localStorage.getItem(MOCK_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function hydrateMock(target) {
+    const saved = loadMock();
+    if (!saved || !target) return;
+    Object.keys(saved).forEach(function (pageKey) {
+      const src = saved[pageKey];
+      if (src && typeof src === 'object') {
+        if (!target[pageKey]) {
+          target[pageKey] = src;
+        } else if (Array.isArray(src) && Array.isArray(target[pageKey])) {
+          target[pageKey] = src;
+        } else if (typeof src === 'object' && !Array.isArray(src)) {
+          Object.keys(src).forEach(function (tabKey) {
+            if (!target[pageKey]) target[pageKey] = {};
+            target[pageKey][tabKey] = src[tabKey];
+          });
+        }
+      }
+    });
+  }
+
+  function resetMock() {
+    try { localStorage.removeItem(MOCK_KEY); } catch (e) { /* ignore */ }
   }
 
   function snapshot() {
@@ -395,5 +463,9 @@ window.WMS_DEMO_STORE = (function () {
     overlayPcRow: overlayPcRow,
     overlayAppDoc: overlayAppDoc,
     hydrateAppDocs: hydrateAppDocs,
+    saveMock: saveMock,
+    loadMock: loadMock,
+    hydrateMock: hydrateMock,
+    resetMock: resetMock,
   };
 })();

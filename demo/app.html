@@ -82,7 +82,14 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .doc-card__hd{height:44px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--navy),var(--navy-deep));color:#fff}
 .doc-card__no{font-size:15px;font-weight:600}
 .doc-card__bd{padding:12px}
-.doc-card__ft{padding:0 12px 12px;display:flex;justify-content:flex-end;gap:8px}
+.doc-card__ft{padding:0 12px 12px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.status-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;-webkit-overflow-scrolling:touch}
+.status-tabs::-webkit-scrollbar{display:none}
+.status-tab{flex-shrink:0;height:30px;padding:0 12px;border:1px solid var(--color-border);border-radius:15px;background:#fff;color:var(--color-text-normal);font-size:12px;cursor:pointer}
+.status-tab.on{background:var(--color-primary);border-color:var(--color-primary);color:#fff;font-weight:600}
+.carrier-login{margin:0 12px 10px;padding:8px 10px;border-radius:8px;background:#EEF2F8;color:#1A4099;font-size:12px}
+.field select{width:100%;height:40px;border:1px solid var(--color-border);border-radius:8px;padding:0 10px;font-size:14px;background:#fff;color:var(--color-text-main)}
+.field select:disabled,.field input:disabled{background:#F5F5F5;color:#8C8C8C}
 .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:13px}
 .doc-grid .full{grid-column:1/-1}
 .doc-label{color:#8C8C8C;font-size:12px;margin-right:4px}
@@ -255,16 +262,41 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                 <button v-if="flowMeta.showDocAdd !== false" class="m-nav__right" @click="flowMode==='waybill' ? openWaybillAdd() : toast('新增单据（Demo）')">新增</button>
               </div>
               <div class="m-scroll">
+                <div v-if="flowMode==='waybill-carrier'" class="carrier-login">当前登录：{{ flowMeta.carrierDispatcher || '王调度' }} · {{ flowMeta.carrierName || '顺丰物流' }}</div>
+                <div v-if="flowMode==='waybill-carrier'" class="status-tabs">
+                  <button
+                    v-for="t in (flowMeta.statusTabs || [])"
+                    :key="t"
+                    class="status-tab"
+                    :class="{ on: carrierStatusTab===t }"
+                    @click="carrierStatusTab=t"
+                  >{{ t }}<template v-if="t!=='全部'"> ({{ carrierStatusCount(t) }})</template></button>
+                </div>
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
-                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张{{ flowMode==='gatepass' ? '待放行出门条' : ('匹配' + (flowMode==='waybill' ? '运单' : (isLoadFlow ? '装卸单' : '单据'))) }}</p>
+                <p v-if="docKw" class="hint">找到 {{ filteredNotices.length }} 张{{ flowMode==='gatepass' ? '待放行出门条' : (flowMode==='waybill-carrier' ? '匹配运单' : ('匹配' + (flowMode==='waybill' ? '运单' : (isLoadFlow ? '装卸单' : '单据')))) }}</p>
                 <div v-if="!filteredNotices.length" class="empty">{{ flowMeta.emptyDocs || '暂无待执行单据' }}</div>
                 <div v-for="n in filteredNotices" :key="n.id" class="doc-card">
                   <div class="doc-card__hd">
                     <span class="doc-card__no">{{ n.id }}</span>
                     <span class="tag" :class="statusTag(n.status)">{{ n.status }}</span>
                   </div>
-                  <div class="doc-card__bd" @click="(flowMode==='waybill' || flowMode==='gatepass') && toggleExpand('doc', n.id)">
-                    <div class="doc-grid" v-if="flowMode==='waybill'">
+                  <div class="doc-card__bd" @click="(flowMode==='waybill' || flowMode==='waybill-carrier' || flowMode==='gatepass') && toggleExpand('doc', n.id)">
+                    <div class="doc-grid" v-if="flowMode==='waybill-carrier'">
+                      <div class="full"><span class="doc-label">关联发货单</span>{{ n.shipNos || '—' }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary || '—' }}</div>
+                      <div><span class="doc-label">运输类型</span>{{ n.transportType || '—' }}</div>
+                      <div><span class="doc-label">用车类型</span>{{ n.shipMode || '—' }}</div>
+                      <div class="full"><span class="doc-label">计划装货</span>{{ n.planLoad || '—' }}</div>
+                      <div class="full" v-if="n.plate"><span class="doc-label">已派车辆</span>{{ n.plate }}{{ n.trailer ? ' / ' + n.trailer : '' }} ({{ n.driver || '—' }} / {{ n.phone || '—' }})</div>
+                      <div class="full"><span class="doc-label">装卸货点</span>{{ n.route || '—' }}</div>
+                      <template v-if="isExpanded('doc', n.id)">
+                        <div><span class="doc-label">承运商</span>{{ n.carrier || '—' }}</div>
+                        <div><span class="doc-label">车型要求</span>{{ n.vehicleReq || '—' }}</div>
+                        <div class="full" v-if="n.transportType==='专线' && (n.secondaryPlate || n.secondaryDriver)"><span class="doc-label">专线送货</span>{{ n.secondaryPlate || '—' }}{{ n.secondaryTrailer ? ' / ' + n.secondaryTrailer : '' }} ({{ n.secondaryDriver || '—' }} / {{ n.secondaryPhone || '—' }})</div>
+                        <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      </template>
+                    </div>
+                    <div class="doc-grid" v-else-if="flowMode==='waybill'">
                       <div><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
                       <div><span class="doc-label">用车类型</span>{{ n.shipMode }}</div>
                       <div><span class="doc-label">司机</span>{{ n.driver }} / {{ n.plate }}</div>
@@ -367,7 +399,16 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
                     <div><span class="k">待盘件数</span><span class="v" :class="{ zero: (n.pendingPcs||0)===0 }">{{ n.pendingPcs ?? 0 }}</span></div>
                   </div>
                   <div class="doc-card__ft">
-                    <button v-if="flowMode==='gatepass'" class="btn-sm" style="width:76px;font-weight:600" @click.stop="confirmGatepass(n)">确认</button>
+                    <template v-if="flowMode==='waybill-carrier'">
+                      <button v-if="n.status==='待派车'" class="btn-sm" @click.stop="openCarrierAssign(n)">派车</button>
+                      <template v-else-if="n.status==='待运输'">
+                        <button class="btn-sm" @click.stop="cancelCarrierAssign(n)">取消派车</button>
+                        <button v-if="n.transportType==='专线'" class="btn-sm" @click.stop="openCarrierSecondary(n)">二次派车</button>
+                        <button class="btn-sm" @click.stop="openCarrierAssign(n)">重新派车</button>
+                      </template>
+                      <button v-else-if="(n.status==='运输中' || n.status==='已完成') && n.transportType==='专线'" class="btn-sm" @click.stop="openCarrierSecondary(n)">二次派车</button>
+                    </template>
+                    <button v-else-if="flowMode==='gatepass'" class="btn-sm" style="width:76px;font-weight:600" @click.stop="confirmGatepass(n)">确认</button>
                     <button v-else-if="flowMode==='stocktake'" class="btn-sm" @click="openStockExec(n)">执行 ›</button>
                     <button v-else class="btn-sm" @click="openDocAction(n)">执行</button>
                   </div>
@@ -1216,6 +1257,87 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
               <div class="m-footer"><button class="btn-primary" @click="submitPkgDoc">提交</button></div>
             </template>
 
+            <!-- ===== 承运商派车执行 ===== -->
+            <template v-else-if="view==='carrier-assign'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">←</button>
+                <div class="m-nav__title">运单派车分配</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">运单基本信息</div>
+                  <div class="field"><label>运单单号</label><input :value="currentNotice.id" readonly disabled /></div>
+                  <div class="field"><label>关联发货单</label><input :value="currentNotice.shipNos || '—'" readonly disabled /></div>
+                  <div class="field"><label>物料信息</label><input :value="currentNotice.materialSummary || '—'" readonly disabled /></div>
+                  <div class="field"><label>运输类型</label><input :value="currentNotice.transportType || '—'" readonly disabled /></div>
+                  <div class="field"><label>用车类型</label><input :value="currentNotice.shipMode || '—'" readonly disabled /></div>
+                  <div class="field"><label>计划装货</label><input :value="currentNotice.planLoad || '—'" readonly disabled /></div>
+                  <div class="field"><label>起止路线</label><input :value="currentNotice.route || '—'" readonly disabled /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">车辆指派</div>
+                  <div class="field"><label>承运商名称</label><input :value="carrierAssignForm.carrier" readonly disabled /></div>
+                  <div class="field">
+                    <label><span class="req">*</span>主车车牌号</label>
+                    <select v-model="carrierAssignForm.plate" @change="onCarrierVehicleChange">
+                      <option value="">请选择主车车牌号</option>
+                      <option v-for="v in carrierVehicleOpts" :key="v.plate" :value="v.plate">{{ v.plate }} ({{ v.emission }}/{{ v.scope }})</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>挂车车牌号</label>
+                    <select v-model="carrierAssignForm.trailer">
+                      <option value="">可不选 / 清空</option>
+                      <option v-for="t in carrierTrailerOpts" :key="t" :value="t">{{ t }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">驾驶员及押运员资质 (档案带出·只读)</div>
+                  <div class="field"><label>司机姓名</label><input v-model="carrierAssignForm.driver" readonly disabled placeholder="档案自动带出" /></div>
+                  <div class="field"><label>司机电话</label><input v-model="carrierAssignForm.phone" readonly disabled placeholder="档案自动带出" /></div>
+                  <div class="field"><label>驾驶证号</label><input v-model="carrierAssignForm.licenseNo" readonly disabled /></div>
+                  <div class="field"><label>从业资格证号</label><input v-model="carrierAssignForm.certNo" readonly disabled /></div>
+                  <div class="field"><label>押运员姓名</label><input v-model="carrierAssignForm.escort" readonly disabled placeholder="危货适用" /></div>
+                  <div class="field"><label>押运资格证号</label><input v-model="carrierAssignForm.escortCert" readonly disabled /></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button class="btn-sm" style="flex:1;height:44px" @click="view='docs'">取消</button>
+                <button class="btn-primary" style="flex:1" @click="submitCarrierAssign">确认派车</button>
+              </div>
+            </template>
+
+            <!-- ===== 承运商二次派车 ===== -->
+            <template v-else-if="view==='carrier-secondary'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="view='docs'">←</button>
+                <div class="m-nav__title">二次派车 (专线送货)</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">运单首程信息</div>
+                  <div class="field"><label>运单单号</label><input :value="currentNotice.id" readonly disabled /></div>
+                  <div class="field"><label>关联发货单</label><input :value="currentNotice.shipNos || '—'" readonly disabled /></div>
+                  <div class="field"><label>物料信息</label><input :value="currentNotice.materialSummary || '—'" readonly disabled /></div>
+                  <div class="field"><label>承运商</label><input :value="currentNotice.carrier || '—'" readonly disabled /></div>
+                  <div class="field"><label>首程车辆/司机</label><input :value="(currentNotice.plate || '—') + ' (' + (currentNotice.driver || '—') + ' / ' + (currentNotice.phone || '—') + ')'" readonly disabled /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">专线二次送货车辆与司机信息</div>
+                  <div class="field"><label><span class="req">*</span>送货车牌号(专线)</label><input v-model="carrierSecondaryForm.plate" placeholder="如川A66666" /></div>
+                  <div class="field"><label>送货车挂号(专线)</label><input v-model="carrierSecondaryForm.trailer" placeholder="选填" /></div>
+                  <div class="field"><label><span class="req">*</span>送货司机(专线)</label><input v-model="carrierSecondaryForm.driver" placeholder="末端送货司机" /></div>
+                  <div class="field"><label><span class="req">*</span>送货司机电话(专线)</label><input v-model="carrierSecondaryForm.phone" placeholder="11位手机号" maxlength="11" /></div>
+                  <div class="field"><label>中转送货备注</label><textarea v-model="carrierSecondaryForm.remark" rows="3" placeholder="中转网点/交接说明"></textarea></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button class="btn-sm" style="flex:1;height:44px" @click="view='docs'">取消</button>
+                <button class="btn-primary" style="flex:1" @click="submitCarrierSecondary">确认保存</button>
+              </div>
+            </template>
+
             <!-- ===== 运单执行 ===== -->
             <template v-else-if="view==='waybill-exec'">
               <div class="m-nav">
@@ -1838,6 +1960,14 @@ createApp({
     const menuActive = ref('app-home');
     const homeKw = ref('');
     const docKw = ref('');
+    const carrierStatusTab = ref('全部');
+    const carrierAssignForm = reactive({
+      carrier: '', plate: '', trailer: '', driver: '', phone: '',
+      licenseNo: '', certNo: '', escort: '', escortCert: '',
+    });
+    const carrierSecondaryForm = reactive({
+      plate: '', trailer: '', driver: '', phone: '', remark: '',
+    });
     const currentNotice = ref(CFG.notices[0]);
     const currentLine = ref(CFG.notices[0].lines[0]);
     const storeTick = ref(0);
@@ -2090,7 +2220,7 @@ createApp({
     });
     const headerHint = computed(() => {
       if (view.value === 'home') return 'APP 首页 · 仓储 / 包材 / 物流可点通';
-      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', msg: '消息中心', mine: '个人中心', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息' };
+      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', msg: '消息中心', mine: '个人中心', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息', 'carrier-assign': '派车执行', 'carrier-secondary': '二次派车' };
       return `${flowTitle.value} · ${map[view.value] || view.value}`;
     });
 
@@ -2153,6 +2283,14 @@ createApp({
         list = list.filter(n => ['待运输', '运输中', '待发运', '发运中'].includes(n.status));
         list = list.slice().sort((a, b) => String(a.planLoad || '').localeCompare(String(b.planLoad || '')) || String(a.id || '').localeCompare(String(b.id || '')));
       }
+      if (flowMode.value === 'waybill-carrier') {
+        const carrier = flowMeta.value.carrierName || (CFG.carrierDemo && CFG.carrierDemo.name) || '顺丰物流';
+        list = list.filter(n => (n.carrier || carrier) === carrier && n.status !== '已关闭');
+        if (carrierStatusTab.value && carrierStatusTab.value !== '全部') {
+          list = list.filter(n => n.status === carrierStatusTab.value);
+        }
+        list = list.slice().sort((a, b) => String(a.planLoad || '').localeCompare(String(b.planLoad || '')) || String(a.id || '').localeCompare(String(b.id || '')));
+      }
       if (flowMode.value === 'gatepass') {
         list = list.filter(n => n.status === '待放行');
         list = list.slice().sort((a, b) => String(b.createTime || '').localeCompare(String(a.createTime || '')) || String(b.id || '').localeCompare(String(a.id || '')));
@@ -2161,10 +2299,28 @@ createApp({
       const blob = (n) => {
         const pts = [...(n.loads || []), ...(n.unloads || [])].map(p => [p.unit, p.place, p.shipNo, p.contact].join(' ')).join(' ');
         const lineBlob = (n.lines || []).map(ln => [ln.code, ln.name, ln.spec, ln.lot].join(' ')).join(' ');
-        return [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.stockNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.route, n.shipMode, n.loadArea, n.remark, n.creator, n.takeMode, n.shipNos, n.phone, n.sourceType, n.outNo, n.shipFrom, n.shipTo, n.materialName, n.spec, pts, lineBlob].join(' ');
+        return [n.id, n.partner, n.supplier, n.refNo, n.poNo, n.stockNo, n.materialSummary, n.logisticsNo, n.dispatchNo, n.docType, n.driver, n.plate, n.trailer, n.route, n.shipMode, n.transportType, n.shipNos, n.carrier, n.loadArea, n.remark, n.creator, n.takeMode, n.phone, n.sourceType, n.outNo, n.shipFrom, n.shipTo, n.materialName, n.spec, pts, lineBlob].join(' ');
       };
       return list.filter(n => blob(n).includes(kw));
     });
+    const carrierVehicleOpts = computed(() => (CFG.carrierVehicles || []).slice());
+    const carrierTrailerOpts = computed(() => {
+      const names = [];
+      (CFG.carrierVehicles || []).forEach((v) => {
+        const t = String(v.trailer || '').trim();
+        if (t && !names.includes(t)) names.push(t);
+      });
+      return names;
+    });
+    function carrierStatusCount(tab) {
+      const carrier = flowMeta.value.carrierName || (CFG.carrierDemo && CFG.carrierDemo.name) || '顺丰物流';
+      const key = flowMeta.value.docsKey || 'waybillCarrier';
+      let list = (CFG.docsMap && CFG.docsMap[key]) || [];
+      if (STORE) STORE.hydrateAppDocs(list);
+      list = list.filter(n => (n.carrier || carrier) === carrier && n.status !== '已关闭');
+      if (tab && tab !== '全部') list = list.filter(n => n.status === tab);
+      return list.length;
+    }
     const recentEnroute = computed(() => (enrouteHistory.value || []).slice(0, 3));
     const wayProcFields = computed(() => {
       const name = processTab.value || '';
@@ -2282,6 +2438,7 @@ createApp({
       flowId.value = id;
       menuActive.value = id;
       docKw.value = '';
+      carrierStatusTab.value = '全部';
       stockExecOverride.value = '';
       const meta = CFG.flowMeta[id];
       wayBackView.value = 'exec';
@@ -2970,6 +3127,150 @@ createApp({
         ElementPlus.ElMessage.success('运单创建成功');
       }).catch(() => {});
     }
+    function findCarrierDoc(id) {
+      const list = (CFG.docsMap && CFG.docsMap.waybillCarrier) || [];
+      return list.find(n => n.id === id) || null;
+    }
+    function openCarrierAssign(n) {
+      currentNotice.value = n;
+      Object.assign(carrierAssignForm, {
+        carrier: n.carrier || flowMeta.value.carrierName || '顺丰物流',
+        plate: n.plate || '',
+        trailer: n.trailer || '',
+        driver: n.driver || '',
+        phone: n.phone || '',
+        licenseNo: n.licenseNo || '',
+        certNo: n.certNo || '',
+        escort: n.escort || '',
+        escortCert: n.escortCert || '',
+      });
+      view.value = 'carrier-assign';
+    }
+    function onCarrierVehicleChange() {
+      const v = (CFG.carrierVehicles || []).find(x => x.plate === carrierAssignForm.plate) || {};
+      carrierAssignForm.trailer = v.trailer || '';
+      carrierAssignForm.driver = v.driver || '';
+      carrierAssignForm.phone = v.phone || '';
+      carrierAssignForm.licenseNo = v.licenseNo || '';
+      carrierAssignForm.certNo = v.certNo || '';
+      carrierAssignForm.escort = v.escort || '';
+      carrierAssignForm.escortCert = v.escortCert || '';
+    }
+    function submitCarrierAssign() {
+      if (!carrierAssignForm.plate) { ElementPlus.ElMessage.warning('请选择主车车牌号'); return; }
+      if (!String(carrierAssignForm.driver || '').trim() || !String(carrierAssignForm.phone || '').trim()) {
+        ElementPlus.ElMessage.warning('所选主车档案未关联驾驶员姓名或联系电话，请先完善车辆档案'); return;
+      }
+      const n = currentNotice.value || {};
+      if (n.isDanger && (!String(carrierAssignForm.escort || '').trim() || !String(carrierAssignForm.escortCert || '').trim())) {
+        ElementPlus.ElMessage.warning('本运单包含危险品物料，所选车辆档案未关联押运员资质，请先完善车辆档案'); return;
+      }
+      const doc = findCarrierDoc(n.id) || n;
+      Object.assign(doc, {
+        status: '待运输',
+        plate: carrierAssignForm.plate,
+        trailer: carrierAssignForm.trailer || '',
+        driver: carrierAssignForm.driver,
+        phone: carrierAssignForm.phone,
+        licenseNo: carrierAssignForm.licenseNo || '',
+        certNo: carrierAssignForm.certNo || '',
+        escort: carrierAssignForm.escort || '',
+        escortCert: carrierAssignForm.escortCert || '',
+        carrier: carrierAssignForm.carrier,
+      });
+      if (STORE) {
+        STORE.setDocStatus(doc.id, '待运输', {
+          source: 'APP',
+          action: 'assign',
+          车牌号: doc.plate,
+          车挂号: doc.trailer || '—',
+          司机姓名: doc.driver,
+          司机电话: doc.phone,
+          驾驶证号: doc.licenseNo || '—',
+          从业资格证号: doc.certNo || '—',
+          押运员姓名: doc.escort || '—',
+          押运员资格证号: doc.escortCert || '—',
+          承运商名称: doc.carrier,
+        });
+      }
+      bumpStore();
+      view.value = 'docs';
+      ElementPlus.ElMessage.success('派车成功，运单已更新为待运输状态');
+    }
+    function cancelCarrierAssign(n) {
+      ElementPlus.ElMessageBox.confirm('确认取消该运单的派车分配？取消后运单状态将重置为待派车。', '提示', {
+        confirmButtonText: '确认取消', cancelButtonText: '取消', type: 'warning',
+      }).then(() => {
+        const doc = findCarrierDoc(n.id) || n;
+        Object.assign(doc, {
+          status: '待派车',
+          plate: '', trailer: '', driver: '', phone: '',
+          licenseNo: '', certNo: '', escort: '', escortCert: '',
+        });
+        if (STORE) {
+          STORE.setDocStatus(doc.id, '待派车', {
+            source: 'APP',
+            action: 'unassign',
+            车牌号: '—',
+            车挂号: '—',
+            司机姓名: '—',
+            司机电话: '—',
+            驾驶证号: '—',
+            从业资格证号: '—',
+            押运员姓名: '—',
+            押运员资格证号: '—',
+          });
+        }
+        bumpStore();
+        ElementPlus.ElMessage.success('已取消派车分配，运单恢复为待派车状态');
+      }).catch(() => {});
+    }
+    function openCarrierSecondary(n) {
+      if (n.status === '待派车') {
+        ElementPlus.ElMessage.warning('请先完成首程派车后再进行专线二次派车');
+        return;
+      }
+      currentNotice.value = n;
+      Object.assign(carrierSecondaryForm, {
+        plate: n.secondaryPlate || '',
+        trailer: n.secondaryTrailer || '',
+        driver: n.secondaryDriver || '',
+        phone: n.secondaryPhone || '',
+        remark: n.secondaryRemark || '',
+      });
+      view.value = 'carrier-secondary';
+    }
+    function submitCarrierSecondary() {
+      if (!String(carrierSecondaryForm.plate || '').trim()) { ElementPlus.ElMessage.warning('请输入末端送货车牌号'); return; }
+      if (!String(carrierSecondaryForm.driver || '').trim()) { ElementPlus.ElMessage.warning('请输入末端送货司机姓名'); return; }
+      if (!String(carrierSecondaryForm.phone || '').trim()) { ElementPlus.ElMessage.warning('请输入末端送货司机电话'); return; }
+      if (!/^1\d{10}$/.test(String(carrierSecondaryForm.phone).trim())) {
+        ElementPlus.ElMessage.warning('请输入正确的 11 位送货司机手机号'); return;
+      }
+      const n = currentNotice.value || {};
+      const doc = findCarrierDoc(n.id) || n;
+      Object.assign(doc, {
+        secondaryPlate: String(carrierSecondaryForm.plate).trim(),
+        secondaryTrailer: String(carrierSecondaryForm.trailer || '').trim(),
+        secondaryDriver: String(carrierSecondaryForm.driver).trim(),
+        secondaryPhone: String(carrierSecondaryForm.phone).trim(),
+        secondaryRemark: String(carrierSecondaryForm.remark || '').trim(),
+      });
+      if (STORE) {
+        STORE.patchDoc(doc.id, {
+          source: 'APP',
+          action: 'secondary-assign',
+          '送货车牌号（专线）': doc.secondaryPlate,
+          '送货车挂号（专线）': doc.secondaryTrailer || '—',
+          '送货司机（专线）': doc.secondaryDriver,
+          '送货司机电话（专线）': doc.secondaryPhone,
+          '送货中转备注': doc.secondaryRemark || '—',
+        });
+      }
+      bumpStore();
+      view.value = 'docs';
+      ElementPlus.ElMessage.success('二次派车（专线）信息保存成功，已反写至运单');
+    }
     function openPickup(p) {
       if (p.status === '已确认') { toast('该装货点已提货'); return; }
       wayPoint.value = p;
@@ -3282,7 +3583,8 @@ createApp({
     });
 
     return {
-      menu, defaultOpeneds, view, flowId, menuActive, homeKw, docKw,
+      menu, defaultOpeneds, view, flowId, menuActive, homeKw, docKw, carrierStatusTab,
+      carrierAssignForm, carrierSecondaryForm, carrierVehicleOpts, carrierTrailerOpts, carrierStatusCount,
       currentNotice, currentLine, processTab, processRef, stubTitle,
       stockRows, pkgSearch, pkgDetail, pkgForm, pkgEditable, pkgQueryPairs,
       operator, tanks, scanRows, tankRows, innerRows, form, procForm,
@@ -3302,7 +3604,8 @@ createApp({
       addOuterScan, removeOuterRow, submitPkgOuter,
       addPkgDocScan, goPkgProcessBatch, submitPkgDoc,
       openPickup, openSign, openEnroute, goWayProc, confirmPickup, confirmSign, submitEnroute,
-      openWaybillAdd, toggleExpand, isExpanded, canSignPoint, addWayPhoto, markWayLine, wayLineDiff,
+      openWaybillAdd, openCarrierAssign, onCarrierVehicleChange, submitCarrierAssign, cancelCarrierAssign, openCarrierSecondary, submitCarrierSecondary,
+      toggleExpand, isExpanded, canSignPoint, addWayPhoto, markWayLine, wayLineDiff,
       confirmGatepass,
       submitExec, submitProcess,
       // 消息中心/个人中心
