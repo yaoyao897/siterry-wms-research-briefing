@@ -51,6 +51,15 @@ window.WMS_DEMO_STORE = (function () {
       flows: [],
       inventory: {},
       points: {},
+      /** APP 采购入库 → PC wh-po-in 三 Tab 联动缓存 */
+      whPoIn: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whPoRet: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whOsIssue: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whProdIssue: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whProdRet: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whOsRetMat: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whOsRecv: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      whOsRetGoods: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
     };
   }
 
@@ -239,6 +248,7 @@ window.WMS_DEMO_STORE = (function () {
       row['出门条单号'] ||
       row['提货单号'] ||
       row['签收单号'] ||
+      row['入库单号'] ||
       row['单号'] ||
       row['派车申请单号'] ||
       row['发货单号'] ||
@@ -358,6 +368,1382 @@ window.WMS_DEMO_STORE = (function () {
     return null;
   }
 
+  function ensureWhPoIn(s) {
+    if (!s.whPoIn) s.whPoIn = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whPoIn.notices) s.whPoIn.notices = {};
+    if (!s.whPoIn.tab2) s.whPoIn.tab2 = {};
+    if (!s.whPoIn.tab3) s.whPoIn.tab3 = {};
+    if (!s.whPoIn.drafts) s.whPoIn.drafts = {};
+    return s.whPoIn;
+  }
+
+  /**
+   * APP 采购入库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   rkId, rkStatus, rkRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhPoInFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhPoIn(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.rkId && payload.rkRow) {
+        const prevRk = wp.tab2[payload.rkId] || {};
+        wp.tab2[payload.rkId] = Object.assign({}, prevRk, payload.rkRow, {
+          入库单号: payload.rkId,
+          单据状态: payload.rkStatus || payload.rkRow['单据状态'] || prevRk['单据状态'] || '执行中',
+          关联收料通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['入库单号'] || payload.rkId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          入库单号: fr['入库单号'] || payload.rkId || prev['入库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.rkStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'po-in',
+      });
+      if (payload.rkId) {
+        s.docs[payload.rkId] = Object.assign({}, s.docs[payload.rkId] || {}, {
+          id: payload.rkId,
+          status: payload.rkStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'po-in',
+        });
+      }
+    }, payload.action || 'wh-po-in');
+  }
+
+  function getWhPoInDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whPoIn || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhPoInDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhPoIn(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-po-in-draft-clear');
+  }
+
+  /** 将 APP 写入的采购入库缓存合并进 PC MOCK['wh-po-in'] */
+  function applyWhPoInToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-po-in']) return false;
+    const wp = load().whPoIn;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-po-in'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (rkId) {
+      const src = wp.tab2[rkId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['入库单号'] || '') === rkId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 入库单号: rkId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 入库单号: rkId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const rkId = src['入库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['入库单号'] || '') === String(rkId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhPoRet(s) {
+    if (!s.whPoRet) s.whPoRet = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whPoRet.notices) s.whPoRet.notices = {};
+    if (!s.whPoRet.tab2) s.whPoRet.tab2 = {};
+    if (!s.whPoRet.tab3) s.whPoRet.tab3 = {};
+    if (!s.whPoRet.drafts) s.whPoRet.drafts = {};
+    return s.whPoRet;
+  }
+
+  /**
+   * APP 采购退料出库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   ckId, ckStatus, ckRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhPoRetFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhPoRet(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          出库单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '执行中',
+          关联退料通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['出库单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          出库单号: fr['出库单号'] || payload.ckId || prev['出库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'po-ret',
+      });
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'po-ret',
+        });
+      }
+    }, payload.action || 'wh-po-ret');
+  }
+
+  function getWhPoRetDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whPoRet || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhPoRetDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhPoRet(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-po-ret-draft-clear');
+  }
+
+  /** 将 APP 写入的采购退料出库缓存合并进 PC MOCK['wh-po-ret'] */
+  function applyWhPoRetToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-po-ret']) return false;
+    const wp = load().whPoRet;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-po-ret'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['出库单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 出库单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 出库单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['出库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['出库单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhOsIssue(s) {
+    if (!s.whOsIssue) s.whOsIssue = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whOsIssue.notices) s.whOsIssue.notices = {};
+    if (!s.whOsIssue.tab2) s.whOsIssue.tab2 = {};
+    if (!s.whOsIssue.tab3) s.whOsIssue.tab3 = {};
+    if (!s.whOsIssue.drafts) s.whOsIssue.drafts = {};
+    return s.whOsIssue;
+  }
+
+  function ensureWhProdIssue(s) {
+    if (!s.whProdIssue) s.whProdIssue = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whProdIssue.notices) s.whProdIssue.notices = {};
+    if (!s.whProdIssue.tab2) s.whProdIssue.tab2 = {};
+    if (!s.whProdIssue.tab3) s.whProdIssue.tab3 = {};
+    if (!s.whProdIssue.drafts) s.whProdIssue.drafts = {};
+    return s.whProdIssue;
+  }
+
+  /**
+   * APP 生产领料出库写入 PC 同源缓存（wh-prod-issue）
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?, skipNotice?,
+   *   ckId, ckStatus, ckRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhProdIssueFromApp(payload) {
+    if (!payload) return load();
+    const skipNotice = !!payload.skipNotice;
+    if (!skipNotice && !payload.noticeId) return load();
+    if (skipNotice && !payload.ckId) return load();
+    return mutate((s) => {
+      const wp = ensureWhProdIssue(s);
+      const noticeId = payload.noticeId;
+      if (!skipNotice && noticeId) {
+        const prevNotice = wp.notices[noticeId] || {};
+        wp.notices[noticeId] = Object.assign({}, prevNotice, {
+          status: payload.noticeStatus || prevNotice.status,
+          lines: payload.noticeLines || prevNotice.lines,
+          row: payload.noticeRow || prevNotice.row,
+          updatedAt: nowStr(),
+        });
+      }
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        const linkNotice = skipNotice
+          ? (payload.ckRow['关联领料申请单号'] || '—')
+          : noticeId;
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          出库单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '执行中',
+          关联领料申请单号: linkNotice,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['出库单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          出库单号: fr['出库单号'] || payload.ckId || prev['出库单号'],
+          申请单号: fr['申请单号'] || (skipNotice ? '—' : noticeId),
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      if (!skipNotice && noticeId) {
+        s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+          id: noticeId,
+          status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'prod-pick',
+        });
+      }
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'prod-pick',
+        });
+      }
+    }, payload.action || 'wh-prod-issue');
+  }
+
+  function getWhProdIssueDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whProdIssue || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhProdIssueDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhProdIssue(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-prod-issue-draft-clear');
+  }
+
+  /** 将 APP 写入的生产领料出库缓存合并进 PC MOCK['wh-prod-issue'] */
+  function applyWhProdIssueToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-prod-issue']) return false;
+    const wp = load().whProdIssue;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-prod-issue'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['出库单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 出库单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 出库单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['出库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        if (src.key && r.key && String(r.key) === String(src.key)) return true;
+        if (barcode && barcode !== '—') {
+          return String(r['条码号'] || '') === String(barcode)
+            && String(r['出库单号'] || '') === String(ckId || '');
+        }
+        return String(r['出库单号'] || '') === String(ckId || '')
+          && String(r['原位置'] || '') === String(src['原位置'] || '')
+          && String(r['物料批号'] || '') === String(src['物料批号'] || '')
+          && String(r['档案类型'] || '') === String(src['档案类型'] || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1), key: src.key || key }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhProdRet(s) {
+    if (!s.whProdRet) s.whProdRet = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whProdRet.notices) s.whProdRet.notices = {};
+    if (!s.whProdRet.tab2) s.whProdRet.tab2 = {};
+    if (!s.whProdRet.tab3) s.whProdRet.tab3 = {};
+    if (!s.whProdRet.drafts) s.whProdRet.drafts = {};
+    return s.whProdRet;
+  }
+
+  /**
+   * APP 生产退料入库写入 PC 同源缓存（wh-prod-ret）
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   rkId, rkStatus, rkRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhProdRetFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhProdRet(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.rkId && payload.rkRow) {
+        const prevRk = wp.tab2[payload.rkId] || {};
+        wp.tab2[payload.rkId] = Object.assign({}, prevRk, payload.rkRow, {
+          入库单号: payload.rkId,
+          单据状态: payload.rkStatus || payload.rkRow['单据状态'] || prevRk['单据状态'] || '执行中',
+          关联退料申请单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['入库单号'] || payload.rkId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          入库单号: fr['入库单号'] || payload.rkId || prev['入库单号'],
+          申请单号: fr['申请单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.rkStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'prod-ret',
+      });
+      if (payload.rkId) {
+        s.docs[payload.rkId] = Object.assign({}, s.docs[payload.rkId] || {}, {
+          id: payload.rkId,
+          status: payload.rkStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'prod-ret',
+        });
+      }
+    }, payload.action || 'wh-prod-ret');
+  }
+
+  function getWhProdRetDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whProdRet || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhProdRetDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhProdRet(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-prod-ret-draft-clear');
+  }
+
+  /** 将 APP 写入的生产退料入库缓存合并进 PC MOCK['wh-prod-ret'] */
+  function applyWhProdRetToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-prod-ret']) return false;
+    const wp = load().whProdRet;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-prod-ret'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (rkId) {
+      const src = wp.tab2[rkId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['入库单号'] || '') === rkId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 入库单号: rkId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 入库单号: rkId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const rkId = src['入库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['入库单号'] || '') === String(rkId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  /**
+   * APP 委外发料出库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   ckId, ckStatus, ckRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhOsIssueFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsIssue(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          出库单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '执行中',
+          关联发料通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['出库单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          出库单号: fr['出库单号'] || payload.ckId || prev['出库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'os-issue',
+      });
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'os-issue',
+        });
+      }
+    }, payload.action || 'wh-os-issue');
+  }
+
+  function getWhOsIssueDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whOsIssue || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhOsIssueDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsIssue(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-os-issue-draft-clear');
+  }
+
+  /** 将 APP 写入的委外发料出库缓存合并进 PC MOCK['wh-os-issue'] */
+  function applyWhOsIssueToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-os-issue']) return false;
+    const wp = load().whOsIssue;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-os-issue'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['出库单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 出库单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 出库单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['出库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['出库单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhOsRetMat(s) {
+    if (!s.whOsRetMat) s.whOsRetMat = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whOsRetMat.notices) s.whOsRetMat.notices = {};
+    if (!s.whOsRetMat.tab2) s.whOsRetMat.tab2 = {};
+    if (!s.whOsRetMat.tab3) s.whOsRetMat.tab3 = {};
+    if (!s.whOsRetMat.drafts) s.whOsRetMat.drafts = {};
+    return s.whOsRetMat;
+  }
+
+  /**
+   * APP 委外退料入库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   rkId, rkStatus, rkRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhOsRetMatFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRetMat(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.rkId && payload.rkRow) {
+        const prevRk = wp.tab2[payload.rkId] || {};
+        wp.tab2[payload.rkId] = Object.assign({}, prevRk, payload.rkRow, {
+          退料单号: payload.rkId,
+          单据状态: payload.rkStatus || payload.rkRow['单据状态'] || prevRk['单据状态'] || '退料中',
+          关联退料通知单号: noticeId,
+          关联通知单: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['退料单号'] || payload.rkId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          退料单号: fr['退料单号'] || payload.rkId || prev['退料单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.rkStatus || prev['流水状态'] || '退料中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'os-ret-mat',
+      });
+      if (payload.rkId) {
+        s.docs[payload.rkId] = Object.assign({}, s.docs[payload.rkId] || {}, {
+          id: payload.rkId,
+          status: payload.rkStatus || '退料中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'os-ret-mat',
+        });
+      }
+    }, payload.action || 'wh-os-ret-mat');
+  }
+
+  function getWhOsRetMatDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whOsRetMat || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhOsRetMatDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRetMat(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-os-ret-mat-draft-clear');
+  }
+
+  /** 将 APP 写入的委外退料入库缓存合并进 PC MOCK['wh-os-ret-mat'] */
+  function applyWhOsRetMatToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-os-ret-mat']) return false;
+    const wp = load().whOsRetMat;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-os-ret-mat'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (rkId) {
+      const src = wp.tab2[rkId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['退料单号'] || '') === rkId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 退料单号: rkId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 退料单号: rkId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const rkId = src['退料单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['退料单号'] || '') === String(rkId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhOsRecv(s) {
+    if (!s.whOsRecv) s.whOsRecv = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whOsRecv.notices) s.whOsRecv.notices = {};
+    if (!s.whOsRecv.tab2) s.whOsRecv.tab2 = {};
+    if (!s.whOsRecv.tab3) s.whOsRecv.tab3 = {};
+    if (!s.whOsRecv.drafts) s.whOsRecv.drafts = {};
+    return s.whOsRecv;
+  }
+
+  /**
+   * APP 委外收货入库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   rkId, rkStatus, rkRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhOsRecvFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRecv(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.rkId && payload.rkRow) {
+        const prevRk = wp.tab2[payload.rkId] || {};
+        wp.tab2[payload.rkId] = Object.assign({}, prevRk, payload.rkRow, {
+          收货单号: payload.rkId,
+          入库单号: payload.rkId,
+          单据状态: payload.rkStatus || payload.rkRow['单据状态'] || prevRk['单据状态'] || '执行中',
+          关联收货通知单号: noticeId,
+          关联通知单: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['收货单号'] || fr['入库单号'] || payload.rkId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          收货单号: fr['收货单号'] || fr['入库单号'] || payload.rkId || prev['收货单号'],
+          入库单号: fr['入库单号'] || fr['收货单号'] || payload.rkId || prev['入库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.rkStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'os-recv',
+      });
+      if (payload.rkId) {
+        s.docs[payload.rkId] = Object.assign({}, s.docs[payload.rkId] || {}, {
+          id: payload.rkId,
+          status: payload.rkStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'os-recv',
+        });
+      }
+    }, payload.action || 'wh-os-recv');
+  }
+
+  function getWhOsRecvDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whOsRecv || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhOsRecvDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRecv(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-os-recv-draft-clear');
+  }
+
+  /** 将 APP 写入的委外收货入库缓存合并进 PC MOCK['wh-os-recv'] */
+  function applyWhOsRecvToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-os-recv']) return false;
+    const wp = load().whOsRecv;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-os-recv'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (rkId) {
+      const src = wp.tab2[rkId];
+      const idx = page.tab2.findIndex(function (r) {
+        return String(r['收货单号'] || r['入库单号'] || '') === rkId;
+      });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 收货单号: rkId, 入库单号: rkId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 收货单号: rkId, 入库单号: rkId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const rkId = src['收货单号'] || src['入库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['收货单号'] || r['入库单号'] || '') === String(rkId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhOsRetGoods(s) {
+    if (!s.whOsRetGoods) s.whOsRetGoods = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whOsRetGoods.notices) s.whOsRetGoods.notices = {};
+    if (!s.whOsRetGoods.tab2) s.whOsRetGoods.tab2 = {};
+    if (!s.whOsRetGoods.tab3) s.whOsRetGoods.tab3 = {};
+    if (!s.whOsRetGoods.drafts) s.whOsRetGoods.drafts = {};
+    return s.whOsRetGoods;
+  }
+
+  /**
+   * APP 委外退货出库写入 PC 同源缓存
+   * payload: {
+   *   noticeId, noticeStatus, noticeRow?, noticeLines?,
+   *   ckId, ckStatus, ckRow,
+   *   flowRows: [{ key?, ...tab3 fields }],
+   *   draftKey?, draft?, clearDraft?
+   * }
+   */
+  function upsertWhOsRetGoodsFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRetGoods(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          退货单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '退货中',
+          关联退货通知单号: noticeId,
+          关联通知单: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['退货单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          退货单号: fr['退货单号'] || payload.ckId || prev['退货单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '退货中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'os-rma',
+      });
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '退货中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'os-rma',
+        });
+      }
+    }, payload.action || 'wh-os-ret-goods');
+  }
+
+  function getWhOsRetGoodsDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whOsRetGoods || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhOsRetGoodsDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhOsRetGoods(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-os-ret-goods-draft-clear');
+  }
+
+  /** 将 APP 写入的委外退货出库缓存合并进 PC MOCK['wh-os-ret-goods'] */
+  function applyWhOsRetGoodsToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-os-ret-goods']) return false;
+    const wp = load().whOsRetGoods;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-os-ret-goods'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['退货单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 退货单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 退货单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['退货单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['退货单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
   function reset() {
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -393,6 +1779,38 @@ window.WMS_DEMO_STORE = (function () {
     }
   }
 
+  function mockRowKey(r) {
+    if (!r || typeof r !== 'object') return '';
+    return String(r.id || r['单号'] || r['入库单号'] || r['运单号'] || r['发货单号'] || r['事件编号'] || r['采购订单号'] || r['物料编码'] || '');
+  }
+
+  /** 持久化行优先，但源码 Mock 上有而缓存缺失的 `_lines` 等子表予以回补，避免详情操作列丢失 */
+  function mergeMockRows(saved, fresh) {
+    if (!Array.isArray(saved)) return Array.isArray(fresh) ? fresh : saved;
+    if (!Array.isArray(fresh) || !fresh.length) return saved;
+    const byKey = {};
+    fresh.forEach(function (r) {
+      const k = mockRowKey(r);
+      if (k) byKey[k] = r;
+    });
+    return saved.map(function (r) {
+      const k = mockRowKey(r);
+      const base = k ? byKey[k] : null;
+      if (!base) return r;
+      const next = Object.assign({}, base, r);
+      if ((!Array.isArray(r._lines) || !r._lines.length) && Array.isArray(base._lines) && base._lines.length) {
+        next._lines = JSON.parse(JSON.stringify(base._lines));
+      }
+      if ((!Array.isArray(r._addrs) || !r._addrs.length) && Array.isArray(base._addrs) && base._addrs.length) {
+        next._addrs = JSON.parse(JSON.stringify(base._addrs));
+      }
+      if ((!Array.isArray(r._pickLines) || !r._pickLines.length) && Array.isArray(base._pickLines) && base._pickLines.length) {
+        next._pickLines = JSON.parse(JSON.stringify(base._pickLines));
+      }
+      return next;
+    });
+  }
+
   function hydrateMock(target) {
     const saved = loadMock();
     if (!saved || !target) return;
@@ -402,11 +1820,15 @@ window.WMS_DEMO_STORE = (function () {
         if (!target[pageKey]) {
           target[pageKey] = src;
         } else if (Array.isArray(src) && Array.isArray(target[pageKey])) {
-          target[pageKey] = src;
+          target[pageKey] = mergeMockRows(src, target[pageKey]);
         } else if (typeof src === 'object' && !Array.isArray(src)) {
           Object.keys(src).forEach(function (tabKey) {
             if (!target[pageKey]) target[pageKey] = {};
-            target[pageKey][tabKey] = src[tabKey];
+            if (Array.isArray(src[tabKey]) && Array.isArray(target[pageKey][tabKey])) {
+              target[pageKey][tabKey] = mergeMockRows(src[tabKey], target[pageKey][tabKey]);
+            } else {
+              target[pageKey][tabKey] = src[tabKey];
+            }
           });
         }
       }
@@ -463,6 +1885,38 @@ window.WMS_DEMO_STORE = (function () {
     overlayPcRow: overlayPcRow,
     overlayAppDoc: overlayAppDoc,
     hydrateAppDocs: hydrateAppDocs,
+    upsertWhPoInFromApp: upsertWhPoInFromApp,
+    getWhPoInDraft: getWhPoInDraft,
+    clearWhPoInDraft: clearWhPoInDraft,
+    applyWhPoInToMock: applyWhPoInToMock,
+    upsertWhPoRetFromApp: upsertWhPoRetFromApp,
+    getWhPoRetDraft: getWhPoRetDraft,
+    clearWhPoRetDraft: clearWhPoRetDraft,
+    applyWhPoRetToMock: applyWhPoRetToMock,
+    upsertWhOsIssueFromApp: upsertWhOsIssueFromApp,
+    getWhOsIssueDraft: getWhOsIssueDraft,
+    clearWhOsIssueDraft: clearWhOsIssueDraft,
+    applyWhOsIssueToMock: applyWhOsIssueToMock,
+    upsertWhProdIssueFromApp: upsertWhProdIssueFromApp,
+    getWhProdIssueDraft: getWhProdIssueDraft,
+    clearWhProdIssueDraft: clearWhProdIssueDraft,
+    applyWhProdIssueToMock: applyWhProdIssueToMock,
+    upsertWhProdRetFromApp: upsertWhProdRetFromApp,
+    getWhProdRetDraft: getWhProdRetDraft,
+    clearWhProdRetDraft: clearWhProdRetDraft,
+    applyWhProdRetToMock: applyWhProdRetToMock,
+    upsertWhOsRetMatFromApp: upsertWhOsRetMatFromApp,
+    getWhOsRetMatDraft: getWhOsRetMatDraft,
+    clearWhOsRetMatDraft: clearWhOsRetMatDraft,
+    applyWhOsRetMatToMock: applyWhOsRetMatToMock,
+    upsertWhOsRecvFromApp: upsertWhOsRecvFromApp,
+    getWhOsRecvDraft: getWhOsRecvDraft,
+    clearWhOsRecvDraft: clearWhOsRecvDraft,
+    applyWhOsRecvToMock: applyWhOsRecvToMock,
+    upsertWhOsRetGoodsFromApp: upsertWhOsRetGoodsFromApp,
+    getWhOsRetGoodsDraft: getWhOsRetGoodsDraft,
+    clearWhOsRetGoodsDraft: clearWhOsRetGoodsDraft,
+    applyWhOsRetGoodsToMock: applyWhOsRetGoodsToMock,
     saveMock: saveMock,
     loadMock: loadMock,
     hydrateMock: hydrateMock,
