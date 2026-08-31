@@ -5459,7 +5459,9 @@ window.WMS_PAGE_CONFIGS = {
               "type": "select",
               "options": [
                 "初始化",
-                "仓库"
+                "仓库",
+                "线边仓",
+                "厂外"
               ]
             }
           ],
@@ -5647,110 +5649,19 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "Switch 开关"
         }
       ],
-      "detailFields": [
+      "detailFields": [],
+      "detailSections": [
         {
-          "name": "条码号",
-          "spec": ""
+          "title": "基本信息",
+          "fields": ["条码号", "储罐编号", "储罐类型", "充装介质", "容积", "备注"]
         },
         {
-          "name": "储罐编号",
-          "spec": ""
+          "title": "状态信息",
+          "fields": ["使用状态", "库存状态", "库存位置", "启用状态"]
         },
         {
-          "name": "储罐类型",
-          "spec": ""
-        },
-        {
-          "name": "充装介质",
-          "spec": ""
-        },
-        {
-          "name": "容积",
-          "spec": ""
-        },
-        {
-          "name": "使用状态",
-          "spec": ""
-        },
-        {
-          "name": "库存状态",
-          "spec": ""
-        },
-        {
-          "name": "库存位置",
-          "spec": ""
-        },
-        {
-          "name": "物料信息",
-          "spec": ""
-        },
-        {
-          "name": "物料批号",
-          "spec": ""
-        },
-        {
-          "name": "建档数量",
-          "spec": ""
-        },
-        {
-          "name": "当前数量",
-          "spec": ""
-        },
-        {
-          "name": "库存单位",
-          "spec": ""
-        },
-        {
-          "name": "供应商信息",
-          "spec": ""
-        },
-        {
-          "name": "生产厂家",
-          "spec": ""
-        },
-        {
-          "name": "生产日期",
-          "spec": ""
-        },
-        {
-          "name": "有效期",
-          "spec": ""
-        },
-        {
-          "name": "失效日期",
-          "spec": ""
-        },
-        {
-          "name": "当前步骤",
-          "spec": ""
-        },
-        {
-          "name": "当前单据号",
-          "spec": ""
-        },
-        {
-          "name": "所属阶段",
-          "spec": ""
-        },
-        {
-          "name": "最新操作人",
-          "spec": ""
-        },
-        {
-          "name": "最新操作时间",
-          "spec": ""
-        },
-        {
-          "name": "备注",
-          "spec": ""
-        },
-        {
-          "name": "启用状态",
-          "spec": ""
-        },
-        {
-          "name": "创建时间",
-          "spec": ""
+          "title": "业务进度信息",
+          "fields": ["当前步骤", "当前单据号", "所属阶段", "最新操作人", "最新操作时间", "创建时间"]
         }
       ],
       "hasEdit": true,
@@ -5760,28 +5671,20 @@ window.WMS_PAGE_CONFIGS = {
       "formSectionTitle": "储罐档案信息",
       "formLineFields": [],
       "formLineActions": [],
+      "detailLineTitle": "物料明细",
       "detailLineFields": [
-        {
-          "name": "物料编码"
-        },
-        {
-          "name": "物料名称"
-        },
-        {
-          "name": "物料规格"
-        },
-        {
-          "name": "物料种类"
-        },
-        {
-          "name": "物料批号"
-        },
-        {
-          "name": "数量"
-        },
-        {
-          "name": "库存单位"
-        }
+        { "name": "物料编码" },
+        { "name": "物料名称" },
+        { "name": "物料规格" },
+        { "name": "物料种类" },
+        { "name": "库存单位" },
+        { "name": "当前数量" },
+        { "name": "批号" },
+        { "name": "生产厂家" },
+        { "name": "供应商名称" },
+        { "name": "生产日期" },
+        { "name": "有效期" },
+        { "name": "失效日期" }
       ]
     },
     "app-view-cfg": {

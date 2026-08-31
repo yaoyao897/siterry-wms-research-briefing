@@ -1,8 +1,9 @@
 /**
  * 思特瑞 WMS Demo · 数据字典种子与字段绑定
- * - 各业务单据的「单据类型」独立成一张字典（采购收料通知单单据类型 / 采购退料通知单单据类型 …）
+ * - L1 通知/申请类单据各自维护「单据类型」字典（如采购收料通知单单据类型）
+ * - L2 执行类单据（入库单/出库单等）无独立字典：单据类型直接继承关联 L1 单据
  * - 物料种类、客户类型、储罐类型等共享字典按模块分组
- * - PC/APP 下拉通过 optionsFor(pageId, field, tab, MOCK.dict) 读取启用项，实现数据联动
+ * - PC/APP 下拉通过 optionsFor(pageId, field, tab, MOCK.dict) 读取启用项
  */
 window.WMS_DICT = (function () {
   function g(id, code, name, parent, remark) {
@@ -59,34 +60,22 @@ window.WMS_DICT = (function () {
     t('d-pkg-spec', 'PKG_SPEC', '包装规格', 'g-pkg', ''),
 
     t('d-po-in-n', 'DOC_PO_IN_NOTICE', '采购收料通知单单据类型', 'g-wh-po', ''),
-    t('d-po-in-o', 'DOC_PO_IN_ORDER', '采购入库单单据类型', 'g-wh-po', ''),
     t('d-po-ret-n', 'DOC_PO_RET_NOTICE', '采购退料通知单单据类型', 'g-wh-po', ''),
-    t('d-po-ret-o', 'DOC_PO_RET_OUT', '采购退料出库单单据类型', 'g-wh-po', ''),
     t('d-os-iss-n', 'DOC_OS_ISSUE_NOTICE', '委外发料通知单单据类型', 'g-wh-os', ''),
-    t('d-os-iss-o', 'DOC_OS_ISSUE_OUT', '委外发料出库单单据类型', 'g-wh-os', ''),
     t('d-os-ret-n', 'DOC_OS_RET_NOTICE', '委外退料通知单单据类型', 'g-wh-os', ''),
-    t('d-os-ret-o', 'DOC_OS_RET_IN', '委外退料入库单单据类型', 'g-wh-os', ''),
     t('d-os-rcv-n', 'DOC_OS_RECV_NOTICE', '委外收货通知单单据类型', 'g-wh-os', ''),
-    t('d-os-rcv-o', 'DOC_OS_RECV_IN', '委外收货入库单单据类型', 'g-wh-os', ''),
     t('d-os-rma-n', 'DOC_OS_RMA_NOTICE', '委外退货通知单单据类型', 'g-wh-os', ''),
-    t('d-os-rma-o', 'DOC_OS_RMA_OUT', '委外退货出库单单据类型', 'g-wh-os', ''),
     t('d-pr-iss-n', 'DOC_PROD_ISSUE_NOTICE', '生产领料申请单单据类型', 'g-wh-prod', ''),
-    t('d-pr-iss-o', 'DOC_PROD_ISSUE_OUT', '生产领料出库单单据类型', 'g-wh-prod', ''),
     t('d-pr-ret-n', 'DOC_PROD_RET_NOTICE', '生产退料申请单单据类型', 'g-wh-prod', ''),
-    t('d-pr-ret-o', 'DOC_PROD_RET_IN', '生产退料入库单单据类型', 'g-wh-prod', ''),
     t('d-pr-in-n', 'DOC_PROD_IN_NOTICE', '生产入库申请单单据类型', 'g-wh-prod', ''),
-    t('d-pr-in-o', 'DOC_PROD_IN_ORDER', '生产入库单单据类型', 'g-wh-prod', ''),
     t('d-pr-biz', 'PROD_IN_BIZ', '生产入库业务类型', 'g-wh-prod', ''),
     t('d-pr-pick-t', 'PROD_ISSUE_PICK_TYPE', '生产领料领料类型', 'g-wh-prod', '生产领料 / 备品备件领料'),
     t('d-cs-rcv-n', 'DOC_CS_RECV_NOTICE', '受托收料通知单单据类型', 'g-wh-cs', ''),
     t('d-cs-ret-n', 'DOC_CS_RET_NOTICE', '受托退料通知单单据类型', 'g-wh-cs', ''),
     t('d-so-prep', 'DOC_SO_PREP', '备货通知单单据类型', 'g-wh-so', ''),
     t('d-so-pre-n', 'DOC_SO_PREOUT_NOTICE', '销售预出货通知单单据类型', 'g-wh-so', ''),
-    t('d-so-pre-o', 'DOC_SO_PREOUT_OUT', '销售预出货出库单单据类型', 'g-wh-so', ''),
     t('d-so-ship', 'DOC_SO_SHIP_NOTICE', '销售发货通知单单据类型', 'g-wh-so', ''),
-    t('d-so-ship-o', 'DOC_SO_SHIP_OUT', '销售发货出库单单据类型', 'g-wh-so', ''),
     t('d-so-ret', 'DOC_SO_RET_NOTICE', '销售退货通知单单据类型', 'g-wh-so', ''),
-    t('d-so-ret-in', 'DOC_SO_RET_IN', '销售退货入库单单据类型', 'g-wh-so', ''),
     t('d-oth-in', 'DOC_OTH_IN_NOTICE', '其他入库通知单单据类型', 'g-wh-oth', ''),
     t('d-oth-out', 'DOC_OTH_OUT_NOTICE', '其他出库通知单单据类型', 'g-wh-oth', ''),
     t('d-in-dir', 'IN_DIR', '入库方向', 'g-wh-oth', ''),
@@ -139,30 +128,20 @@ window.WMS_DICT = (function () {
       ['PALLET', '吨袋+托架'], ['TKR', '槽车散装/储罐'], ['NONE', '计数/无包材'], ['L40', '40L']
     ]))
     .concat(itemsOf('d-po-in-n', [['STD', '标准采购入库'], ['URG', '紧急采购入库']]))
-    .concat(itemsOf('d-po-in-o', [['ORD', '采购入库单']]))
     .concat(itemsOf('d-po-ret-n', [['STD', '标准采购退料'], ['URG', '紧急采购退料']]))
-    .concat(itemsOf('d-po-ret-o', [['OUT', '采购退料出库单']]))
     .concat(itemsOf('d-os-iss-n', [['STD', '标准委外发料'], ['URG', '紧急委外发料']]))
-    .concat(itemsOf('d-os-iss-o', [['OUT', '委外发料']]))
     .concat(itemsOf('d-os-ret-n', [['STD', '标准委外退料'], ['URG', '紧急委外退料'], ['URG2', '紧急退料']]))
-    .concat(itemsOf('d-os-ret-o', [['IN', '委外退料']]))
     .concat(itemsOf('d-os-rcv-n', [['STD', '标准委外收货'], ['URG', '紧急委外收货']]))
-    .concat(itemsOf('d-os-rcv-o', [['IN', '委外收货']]))
     .concat(itemsOf('d-os-rma-n', [['STD', '标准委外退货'], ['URG', '紧急委外退货']]))
-    .concat(itemsOf('d-os-rma-o', [['OUT', '委外退货']]))
     .concat(itemsOf('d-pr-iss-n', [['APP', '生产领料申请单']]))
-    .concat(itemsOf('d-pr-iss-o', [['OUT', '生产领料出库单']]))
     .concat(itemsOf('d-pr-ret-n', [['APP', '生产退料申请单']]))
-    .concat(itemsOf('d-pr-ret-o', [['IN', '生产退料入库单']]))
     .concat(itemsOf('d-pr-in-n', [['APP', '生产入库申请单']]))
-    .concat(itemsOf('d-pr-in-o', [['ORD', '生产入库单']]))
     .concat(itemsOf('d-pr-biz', [['SELF', '自产完工'], ['CS', '受托加工完工']]))
     .concat(itemsOf('d-pr-pick-t', [['PROD', '生产领料'], ['SPARE', '备品备件领料']]))
     .concat(itemsOf('d-cs-rcv-n', [['N', '受托收料通知单'], ['A', '受托收料']]))
     .concat(itemsOf('d-cs-ret-n', [['N', '受托退料通知单'], ['A', '受托退料']]))
     .concat(itemsOf('d-so-prep', [['NML', '正常备货'], ['URG', '紧急备货']]))
     .concat(itemsOf('d-so-pre-n', [['NML', '标准预出货'], ['URG', '紧急预出货'], ['SMP', '样品预出货']]))
-    .concat(itemsOf('d-so-pre-o', [['OUT', '销售预出货出库单']]))
     .concat(itemsOf('d-so-ship', [['NML', '标准发货'], ['URG', '紧急发货'], ['SMP', '样品发货']]))
     .concat(itemsOf('d-so-ret', [['NML', '标准退货'], ['REJ', '拒收退货'], ['EXG', '换货退货']]))
     .concat(itemsOf('d-oth-in', [['GAIN', '盘盈入库'], ['SMPL', '样品入库'], ['RD', '研发入库']]))
@@ -220,40 +199,43 @@ window.WMS_DICT = (function () {
     'wh-prod-in|业务类型': 'PROD_IN_BIZ',
     'wh-po-in|单据类型': 'DOC_PO_IN_NOTICE',
     'wh-po-in|tab1|单据类型': 'DOC_PO_IN_NOTICE',
-    'wh-po-in|tab2|单据类型': 'DOC_PO_IN_ORDER',
+    'wh-po-in|tab2|单据类型': 'DOC_PO_IN_NOTICE',
     'wh-po-ret|单据类型': 'DOC_PO_RET_NOTICE',
     'wh-po-ret|tab1|单据类型': 'DOC_PO_RET_NOTICE',
-    'wh-po-ret|tab2|单据类型': 'DOC_PO_RET_OUT',
+    'wh-po-ret|tab2|单据类型': 'DOC_PO_RET_NOTICE',
     'wh-os-issue|单据类型': 'DOC_OS_ISSUE_NOTICE',
     'wh-os-issue|tab1|单据类型': 'DOC_OS_ISSUE_NOTICE',
-    'wh-os-issue|tab2|单据类型': 'DOC_OS_ISSUE_OUT',
+    'wh-os-issue|tab2|单据类型': 'DOC_OS_ISSUE_NOTICE',
     'wh-os-ret-mat|单据类型': 'DOC_OS_RET_NOTICE',
     'wh-os-ret-mat|tab1|单据类型': 'DOC_OS_RET_NOTICE',
-    'wh-os-ret-mat|tab2|单据类型': 'DOC_OS_RET_IN',
+    'wh-os-ret-mat|tab2|单据类型': 'DOC_OS_RET_NOTICE',
     'wh-os-recv|单据类型': 'DOC_OS_RECV_NOTICE',
     'wh-os-recv|tab1|单据类型': 'DOC_OS_RECV_NOTICE',
-    'wh-os-recv|tab2|单据类型': 'DOC_OS_RECV_IN',
+    'wh-os-recv|tab2|单据类型': 'DOC_OS_RECV_NOTICE',
     'wh-os-ret-goods|单据类型': 'DOC_OS_RMA_NOTICE',
     'wh-os-ret-goods|tab1|单据类型': 'DOC_OS_RMA_NOTICE',
-    'wh-os-ret-goods|tab2|单据类型': 'DOC_OS_RMA_OUT',
+    'wh-os-ret-goods|tab2|单据类型': 'DOC_OS_RMA_NOTICE',
     'wh-prod-issue|单据类型': 'DOC_PROD_ISSUE_NOTICE',
     'wh-prod-issue|tab1|单据类型': 'DOC_PROD_ISSUE_NOTICE',
-    'wh-prod-issue|tab2|单据类型': 'DOC_PROD_ISSUE_OUT',
+    'wh-prod-issue|tab2|单据类型': 'DOC_PROD_ISSUE_NOTICE',
     'wh-prod-ret|单据类型': 'DOC_PROD_RET_NOTICE',
     'wh-prod-ret|tab1|单据类型': 'DOC_PROD_RET_NOTICE',
-    'wh-prod-ret|tab2|单据类型': 'DOC_PROD_RET_IN',
+    'wh-prod-ret|tab2|单据类型': 'DOC_PROD_RET_NOTICE',
     'wh-prod-in|单据类型': 'DOC_PROD_IN_NOTICE',
     'wh-prod-in|tab1|单据类型': 'DOC_PROD_IN_NOTICE',
-    'wh-prod-in|tab2|单据类型': 'DOC_PROD_IN_ORDER',
+    'wh-prod-in|tab2|单据类型': 'DOC_PROD_IN_NOTICE',
     'wh-cs-recv|单据类型': 'DOC_CS_RECV_NOTICE',
     'wh-cs-ret|单据类型': 'DOC_CS_RET_NOTICE',
     'wh-so-prep|单据类型': 'DOC_SO_PREP',
     'wh-so-preout|单据类型': 'DOC_SO_PREOUT_NOTICE',
     'wh-so-preout|tab1|单据类型': 'DOC_SO_PREOUT_NOTICE',
-    'wh-so-preout|tab2|单据类型': 'DOC_SO_PREOUT_OUT',
+    'wh-so-preout|tab2|单据类型': 'DOC_SO_PREOUT_NOTICE',
     'wh-so-ship|单据类型': 'DOC_SO_SHIP_NOTICE',
+    'wh-so-ship|tab1|单据类型': 'DOC_SO_SHIP_NOTICE',
+    'wh-so-ship|tab2|单据类型': 'DOC_SO_SHIP_NOTICE',
     'wh-so-ret|单据类型': 'DOC_SO_RET_NOTICE',
-    'wh-so-ret|tab2|单据类型': 'DOC_SO_RET_IN',
+    'wh-so-ret|tab1|单据类型': 'DOC_SO_RET_NOTICE',
+    'wh-so-ret|tab2|单据类型': 'DOC_SO_RET_NOTICE',
     'wh-other-in|单据类型': 'DOC_OTH_IN_NOTICE',
     'wh-other-out|单据类型': 'DOC_OTH_OUT_NOTICE',
     'wh-load|单据类型': 'DOC_LOAD_NOTICE',
@@ -301,6 +283,17 @@ window.WMS_DICT = (function () {
   ['prod-pick-serial', 'prod-pick-count', 'prod-pick-tank'].forEach(function (fid) {
     binds[fid + '|领料类型'] = 'PROD_ISSUE_PICK_TYPE';
   });
+
+  const deprecatedTypeCodes = {
+    DOC_PO_IN_ORDER: 1, DOC_PO_RET_OUT: 1, DOC_OS_ISSUE_OUT: 1, DOC_OS_RET_IN: 1,
+    DOC_OS_RECV_IN: 1, DOC_OS_RMA_OUT: 1, DOC_PROD_ISSUE_OUT: 1, DOC_PROD_RET_IN: 1,
+    DOC_PROD_IN_ORDER: 1, DOC_SO_PREOUT_OUT: 1, DOC_SO_SHIP_OUT: 1, DOC_SO_RET_IN: 1
+  };
+  const deprecatedTypeIds = {
+    'd-po-in-o': 1, 'd-po-ret-o': 1, 'd-os-iss-o': 1, 'd-os-ret-o': 1,
+    'd-os-rcv-o': 1, 'd-os-rma-o': 1, 'd-pr-iss-o': 1, 'd-pr-ret-o': 1,
+    'd-pr-in-o': 1, 'd-so-pre-o': 1, 'd-so-ship-o': 1, 'd-so-ret-in': 1
+  };
 
   function liveDict(mockDict) {
     if (mockDict && Array.isArray(mockDict.types) && mockDict.types.length) return mockDict;
@@ -400,6 +393,20 @@ window.WMS_DICT = (function () {
       const want = knownParent[row.编码];
       if (want != null) row.上级字典 = want;
     });
+    const dropTypeIds = {};
+    dict.types = dict.types.filter(function (row) {
+      if (!row) return false;
+      if (deprecatedTypeCodes[row.编码] || deprecatedTypeIds[row.id]) {
+        dropTypeIds[row.id] = true;
+        return false;
+      }
+      return true;
+    });
+    if (Object.keys(dropTypeIds).length) {
+      dict.main = dict.main.filter(function (row) {
+        return row && !dropTypeIds[row.typeId];
+      });
+    }
     return before !== JSON.stringify({ types: dict.types, main: dict.main });
   }
 

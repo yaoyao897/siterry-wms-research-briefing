@@ -251,16 +251,29 @@ body.remarks-open .el-overlay-dialog{
 .query-area,.list-area,.query-card,.list-card{background:transparent;border:none;border-radius:0;box-shadow:none}
 .query-area,.query-card{padding:16px 20px 12px;margin-bottom:0;flex-shrink:0}
 .query-area__row,.query-card__row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.query-area__fields,.query-card__fields{flex:1;min-width:0}
-.query-area__actions,.query-card__actions{display:flex;gap:8px;flex-shrink:0;padding-top:4px;align-items:center;align-self:flex-start}
+.query-area__fields,.query-card__fields{flex:1 1 520px;min-width:0}
+.query-area__actions,.query-card__actions{display:flex;gap:8px;flex-shrink:0;padding-top:4px;align-items:center;align-self:flex-start;margin-left:auto}
 .query-area__actions .el-dropdown .el-button-group,.query-card__actions .el-dropdown .el-button-group{display:inline-flex}
 .query-area__actions .el-dropdown .el-button-group>.el-button--primary:first-child,.query-card__actions .el-dropdown .el-button-group>.el-button--primary:first-child{border-top-right-radius:0;border-bottom-right-radius:0}
 .query-area__actions .el-dropdown .el-button-group>.el-button--primary:last-child,.query-card__actions .el-dropdown .el-button-group>.el-button--primary:last-child{border-top-left-radius:0;border-bottom-left-radius:0;padding:8px 10px}
-.query-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:16px;row-gap:4px;width:100%;align-items:start}
-.query-form.el-form--inline .el-form-item{display:flex;align-items:center;margin:0;width:100%;min-width:0;height:32px}
-.query-form .el-form-item__label{width:var(--query-label-width,118px)!important;padding-right:8px;justify-content:flex-end;flex-shrink:0;height:32px;line-height:32px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.query-form{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));
+  column-gap:16px;row-gap:8px;width:100%;align-items:start;
+}
+.query-form.el-form--inline .el-form-item{display:flex;align-items:center;margin:0;width:100%;min-width:0;min-height:32px;height:auto}
+.query-form .el-form-item__label{width:var(--query-label-width,118px)!important;padding-right:8px;justify-content:flex-end;flex-shrink:0;min-height:32px;height:32px;line-height:32px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .query-form .el-form-item__content{flex:1;min-width:0;line-height:32px}
 .query-form .el-input,.query-form .el-select,.query-form .el-date-editor.el-input,.query-form .el-date-editor.el-input__wrapper{width:100%!important}
+/* 备注面板展开后：查询区自动减列，操作按钮换行到底部右侧 */
+body.remarks-open .query-form{
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,248px),1fr));
+  --query-label-width:104px;
+}
+body.remarks-open .query-area__fields,body.remarks-open .query-card__fields{flex:1 1 100%}
+body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
+  flex:1 1 100%;justify-content:flex-end;margin-left:0;padding-top:0;
+}
 .list-area,.list-card{flex:1;min-height:0;display:flex;flex-direction:column}
 .flow-guide{margin:0 20px 12px;border:1px solid #D6E4FF;border-radius:4px;background:#fff;flex-shrink:0;overflow:hidden}
 .flow-guide .el-collapse{border:0}
@@ -1036,7 +1049,7 @@ body.remarks-open .el-overlay-dialog{
   </el-dialog>
 
   <!-- 详情 -->
-  <el-dialog v-model="detailVisible" class="demo-dialog--biz" :title="detailDialogTitle" :width="['lg-waybill','lg-waybill-carrier','lg-dispatch','lg-ship','lg-pickup','lg-sign','lg-kpi-plan','lg-kpi-record','wh-so-prep','wh-po-in','wh-po-ret','wh-os-issue','wh-os-ret-mat','wh-os-recv','wh-os-ret-goods','wh-prod-issue','wh-prod-ret','wh-prod-in','wh-other-in','wh-other-out','wh-so-preout','wh-so-ship','wh-so-ret','wh-direct-xfer','wh-load'].includes(pageId)?(pageId==='wh-so-prep'?'min(1280px, 98vw)':'min(1100px, 96vw)'):'min(960px, 96vw)'" top="6vh" align-center destroy-on-close append-to-body>
+  <el-dialog v-model="detailVisible" class="demo-dialog--biz" :title="detailDialogTitle" :width="['lg-waybill','lg-waybill-carrier','lg-dispatch','lg-ship','lg-pickup','lg-sign','lg-kpi-plan','lg-kpi-record','wh-so-prep','wh-po-in','wh-po-ret','wh-os-issue','wh-os-ret-mat','wh-os-recv','wh-os-ret-goods','wh-prod-issue','wh-prod-ret','wh-prod-in','wh-other-in','wh-other-out','wh-so-preout','wh-so-ship','wh-so-ret','wh-direct-xfer','wh-load','tank-arch'].includes(pageId)?(pageId==='wh-so-prep'?'min(1280px, 98vw)':'min(1100px, 96vw)'):'min(960px, 96vw)'" top="6vh" align-center destroy-on-close append-to-body>
     <template v-if="page">
       <template v-if="(page.detailSections||[]).length">
         <section class="demo-form-section" v-for="sec in page.detailSections" :key="sec.title">
@@ -1197,7 +1210,11 @@ body.remarks-open .el-overlay-dialog{
       </section>
     </template>
     <template #footer>
-      <el-button type="primary" @click="detailVisible=false">关闭</el-button>
+      <template v-if="pageId==='tank-arch'">
+        <el-button @click="detailVisible=false">返回</el-button>
+        <el-button v-if="canEditTankArch(detailRow)" type="primary" @click="onTankArchDetailEdit">编辑</el-button>
+      </template>
+      <el-button v-else type="primary" @click="detailVisible=false">关闭</el-button>
     </template>
   </el-dialog>
 
@@ -2168,8 +2185,8 @@ body.remarks-open .el-overlay-dialog{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
-<script src="./js/page-configs.js?v=1.3.242"></script>
-<script src="./js/mock-rows.js?v=1.3.242"></script>
+<script src="./js/page-configs.js?v=1.3.245"></script>
+<script src="./js/mock-rows.js?v=1.3.245"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/page-prd-notes.js"></script>
 <script src="./js/remarks-markdown.js"></script>
@@ -3792,7 +3809,7 @@ const app = createApp({
       return ops;
     }
     function isDetailTagField(name){
-      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定';
+      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态' || name==='使用状态' || name==='库存状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定';
     }
     function detailFieldLabel(f){
       const name = f?.name || f || '';
@@ -4812,6 +4829,39 @@ const app = createApp({
         已完成数量: r['已完成数量'] != null && r['已完成数量'] !== '' ? r['已完成数量'] : '0',
         未完成数量: r['未完成数量'] != null && r['未完成数量'] !== '' ? r['未完成数量'] : (r['计划数量'] || ''),
       });
+    }
+    function canEditTankArch(row){
+      return !!(row && row['使用状态']==='在用' && row['库存状态']==='初始化');
+    }
+    function onTankArchDetailEdit(){
+      const row = detailRow.value;
+      if(!canEditTankArch(row)){
+        ElMessage.warning('当前储罐状态不允许编辑');
+        return;
+      }
+      detailVisible.value = false;
+      onRowOp({ name: '编辑' }, row);
+    }
+    function tankDetailLinesFromRow(row){
+      if(!row) return [];
+      if(Array.isArray(row._lines) && row._lines.length) return row._lines;
+      const info = String(row['物料信息']||'').trim();
+      if(!info || info==='—') return [];
+      const parts = info.split('/').map(s=> String(s).trim());
+      return [{
+        物料编码: parts[0] || '—',
+        物料名称: parts[1] || '—',
+        物料规格: parts[2] || '—',
+        物料种类: parts[3] || '—',
+        库存单位: row['库存单位'] || '—',
+        当前数量: row['当前数量'] != null && row['当前数量'] !== '' ? row['当前数量'] : '0',
+        批号: row['物料批号'] || row['批号'] || '—',
+        生产厂家: row['生产厂家'] || '—',
+        供应商名称: row['供应商名称'] || row['供应商信息'] || '—',
+        生产日期: row['生产日期'] || '—',
+        有效期: row['有效期'] || '—',
+        失效日期: row['失效日期'] || '—'
+      }];
     }
     function isDetailLineRowActionVisible(a, row){
       if(a!=='批量建档') return true;
@@ -7607,6 +7657,9 @@ const app = createApp({
         detailLineRows.value = shipLinesOf(row);
       } else if(pageId.value==='wh-so-prep'){
         detailLineRows.value = (mockLines||[]).map(r=>({...r}));
+      } else if(pageId.value==='tank-arch'){
+        const lines = Array.isArray(row?._lines) && row._lines.length ? row._lines : tankDetailLinesFromRow(row);
+        detailLineRows.value = lines.map(r=>({...r}));
       } else if(mockLines && mockLines.length){
         detailLineRows.value = mockLines.map(r=>({...r}));
       } else if((page.value?.detailLineFields||[]).length){
@@ -14063,7 +14116,7 @@ const app = createApp({
       jobLogiMode, jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows, formBarcodeSelected,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeCollapsed, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,
       visibleTypeFormFields, dictTypeOptions,
-      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, addrPopoverField,
       resetDemoStore, storeTick,
       openPicker, onPickerOk, onGenerateBatch, onBatchDeleteLines, onBatchOk, refreshSerialExpire,
