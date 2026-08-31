@@ -60,6 +60,8 @@ window.WMS_DEMO_STORE = (function () {
       whOsRetMat: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
       whOsRecv: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
       whOsRetGoods: { notices: {}, tab2: {}, tab3: {}, drafts: {} },
+      /** 备货通知 · 生产入库提交绑码明细缓存（APP → PC） */
+      whSoPrep: {},
     };
   }
 
@@ -694,6 +696,492 @@ window.WMS_DEMO_STORE = (function () {
       const idx = page.tab3.findIndex(function (r) {
         return String(r['条码号'] || '') === String(barcode || '')
           && String(r['出库单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhSoPreout(s) {
+    if (!s.whSoPreout) s.whSoPreout = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whSoPreout.notices) s.whSoPreout.notices = {};
+    if (!s.whSoPreout.tab2) s.whSoPreout.tab2 = {};
+    if (!s.whSoPreout.tab3) s.whSoPreout.tab3 = {};
+    if (!s.whSoPreout.drafts) s.whSoPreout.drafts = {};
+    return s.whSoPreout;
+  }
+
+  /**
+   * APP 销售预出货出库写入 PC 同源缓存（wh-so-preout tab1/2/3）
+   */
+  function upsertWhSoPreoutFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoPreout(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          出库单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '执行中',
+          关联通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['出库单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          出库单号: fr['出库单号'] || payload.ckId || prev['出库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'so-preout',
+      });
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'so-preout',
+        });
+      }
+    }, payload.action || 'wh-so-preout');
+  }
+
+  function getWhSoPreoutDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whSoPreout || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhSoPreoutDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoPreout(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-so-preout-draft-clear');
+  }
+
+  function applyWhSoPreoutToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-so-preout']) return false;
+    const wp = load().whSoPreout;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-so-preout'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(3);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(3);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['出库单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 出库单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 出库单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['出库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['出库单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhSoShip(s) {
+    if (!s.whSoShip) s.whSoShip = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whSoShip.notices) s.whSoShip.notices = {};
+    if (!s.whSoShip.tab2) s.whSoShip.tab2 = {};
+    if (!s.whSoShip.tab3) s.whSoShip.tab3 = {};
+    if (!s.whSoShip.drafts) s.whSoShip.drafts = {};
+    return s.whSoShip;
+  }
+
+  /**
+   * APP 销售发货出库写入 PC 同源缓存（wh-so-ship tab1/2/3）
+   */
+  function upsertWhSoShipFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoShip(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.ckId && payload.ckRow) {
+        const prevCk = wp.tab2[payload.ckId] || {};
+        wp.tab2[payload.ckId] = Object.assign({}, prevCk, payload.ckRow, {
+          出库单号: payload.ckId,
+          单据状态: payload.ckStatus || payload.ckRow['单据状态'] || prevCk['单据状态'] || '执行中',
+          关联通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['出库单号'] || payload.ckId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          出库单号: fr['出库单号'] || payload.ckId || prev['出库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.ckStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'so-ship',
+      });
+      if (payload.ckId) {
+        s.docs[payload.ckId] = Object.assign({}, s.docs[payload.ckId] || {}, {
+          id: payload.ckId,
+          status: payload.ckStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'so-ship',
+        });
+      }
+    }, payload.action || 'wh-so-ship');
+  }
+
+  function getWhSoShipDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whSoShip || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhSoShipDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoShip(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-so-ship-draft-clear');
+  }
+
+  function applyWhSoShipToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-so-ship']) return false;
+    const wp = load().whSoShip;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-so-ship'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(3);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(3);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (ckId) {
+      const src = wp.tab2[ckId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['出库单号'] || '') === ckId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 出库单号: ckId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 出库单号: ckId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const ckId = src['出库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['出库单号'] || '') === String(ckId || '');
+      });
+      if (idx >= 0) {
+        page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
+      } else {
+        page.tab3.unshift(Object.assign({ id: String(page.tab3.length + 1) }, src));
+      }
+      changed = true;
+    });
+
+    return changed;
+  }
+
+  function ensureWhSoRet(s) {
+    if (!s.whSoRet) s.whSoRet = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whSoRet.notices) s.whSoRet.notices = {};
+    if (!s.whSoRet.tab2) s.whSoRet.tab2 = {};
+    if (!s.whSoRet.tab3) s.whSoRet.tab3 = {};
+    if (!s.whSoRet.drafts) s.whSoRet.drafts = {};
+    return s.whSoRet;
+  }
+
+  /**
+   * APP 销售退货入库写入 PC 同源缓存（wh-so-ret tab1/2/3）
+   */
+  function upsertWhSoRetFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoRet(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.rkId && payload.rkRow) {
+        const prevRk = wp.tab2[payload.rkId] || {};
+        wp.tab2[payload.rkId] = Object.assign({}, prevRk, payload.rkRow, {
+          入库单号: payload.rkId,
+          单据状态: payload.rkStatus || payload.rkRow['单据状态'] || prevRk['单据状态'] || '执行中',
+          关联通知单号: noticeId,
+          updatedAt: nowStr(),
+        });
+      }
+      (payload.flowRows || []).forEach(function (fr) {
+        if (!fr) return;
+        const key = fr.key || ((fr['入库单号'] || payload.rkId || '') + '::' + (fr['条码号'] || ''));
+        if (!key || key === '::') return;
+        const prev = wp.tab3[key] || {};
+        wp.tab3[key] = Object.assign({}, prev, fr, {
+          key: key,
+          入库单号: fr['入库单号'] || payload.rkId || prev['入库单号'],
+          通知单号: fr['通知单号'] || noticeId,
+          流水状态: fr['流水状态'] || payload.rkStatus || prev['流水状态'] || '执行中',
+          updatedAt: nowStr(),
+        });
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '执行中',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'so-rma',
+      });
+      if (payload.rkId) {
+        s.docs[payload.rkId] = Object.assign({}, s.docs[payload.rkId] || {}, {
+          id: payload.rkId,
+          status: payload.rkStatus || '执行中',
+          noticeId: noticeId,
+          source: 'APP',
+          updatedAt: nowStr(),
+          action: payload.action || 'so-rma',
+        });
+      }
+    }, payload.action || 'wh-so-ret');
+  }
+
+  function getWhSoRetDraft(draftKey) {
+    if (!draftKey) return null;
+    const wp = load().whSoRet || {};
+    return (wp.drafts && wp.drafts[draftKey]) || null;
+  }
+
+  function clearWhSoRetDraft(draftKey) {
+    if (!draftKey) return load();
+    return mutate((s) => {
+      const wp = ensureWhSoRet(s);
+      delete wp.drafts[draftKey];
+    }, 'wh-so-ret-draft-clear');
+  }
+
+  function applyWhSoRetToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-so-ret']) return false;
+    const wp = load().whSoRet;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-so-ret'];
+    page.tab1 = page.tab1 || [];
+    page.tab2 = page.tab2 || [];
+    page.tab3 = page.tab3 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x.id || '') === String(ln.lineNo)
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(3);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(3);
+          changed = true;
+        });
+      } else if (Array.isArray(patch.lines) && patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    Object.keys(wp.tab2 || {}).forEach(function (rkId) {
+      const src = wp.tab2[rkId];
+      const idx = page.tab2.findIndex(function (r) { return String(r['入库单号'] || '') === rkId; });
+      if (idx >= 0) {
+        page.tab2[idx] = Object.assign({}, page.tab2[idx], src, { 入库单号: rkId });
+      } else {
+        page.tab2.unshift(Object.assign({ id: String(page.tab2.length + 1) }, src, { 入库单号: rkId }));
+      }
+      changed = true;
+    });
+
+    Object.keys(wp.tab3 || {}).forEach(function (key) {
+      const src = wp.tab3[key];
+      const barcode = src['条码号'];
+      const rkId = src['入库单号'];
+      const idx = page.tab3.findIndex(function (r) {
+        return String(r['条码号'] || '') === String(barcode || '')
+          && String(r['入库单号'] || '') === String(rkId || '');
       });
       if (idx >= 0) {
         page.tab3[idx] = Object.assign({}, page.tab3[idx], src);
@@ -1744,6 +2232,123 @@ window.WMS_DEMO_STORE = (function () {
     return changed;
   }
 
+  /**
+   * APP 生产入库提交：将入库条码追加到备货通知「备货明细」
+   * barcodes: [{ barcode, material, lot, packSpec, qty, loc, picker?, time? }]
+   */
+  function appendBarcodesToPrepNotice(prepNo, barcodes, meta) {
+    const no = String(prepNo || '').trim();
+    if (!no || no === '—') return load();
+    const list = Array.isArray(barcodes) ? barcodes : [];
+    if (!list.length) return load();
+    meta = meta || {};
+    const picker = meta.picker || 'APP入库';
+    const stamp = meta.time || nowStr();
+    return mutate((s) => {
+      if (!s.whSoPrep) s.whSoPrep = {};
+      const cur = s.whSoPrep[no] || { pickLines: [], 已备数量: '0.000', 备货状态: '待执行', 备货数量: null };
+      const lines = Array.isArray(cur.pickLines) ? cur.pickLines.slice() : [];
+      const exists = new Set(lines.map((r) => String(r['条码号'] || '')));
+      list.forEach((b, i) => {
+        if (!b) return;
+        const code = String(b.barcode || b['条码号'] || '').trim();
+        if (!code || exists.has(code)) return;
+        exists.add(code);
+        const qty = Number(b.qty != null ? b.qty : b['数量']);
+        lines.push({
+          id: 'prod-in-' + Date.now() + '-' + i + '-' + code,
+          存储位置: b.loc || b['存储位置'] || b['所在库位'] || '—',
+          条码号: code,
+          包装规格: b.packSpec || b['包装规格'] || '—',
+          来源单号: b.sourceNo || b['来源单号'] || '—',
+          来源条码号: b.sourceBarcode || b['来源条码号'] || '—',
+          物料信息: b.material || b['物料信息'] || '',
+          物料批号: b.lot || b['物料批号'] || b['批号'] || '',
+          客户批号: b.custLot || b['客户批号'] || '—',
+          当前数量: qty > 0 ? Number(qty).toFixed(3) : '1.000',
+          库存单位: b.unit || b['库存单位'] || '—',
+          供应商信息: b.supplier || b['供应商信息'] || '—',
+          生产厂家: b.maker || b['生产厂家'] || '—',
+          生产日期: b.prodDate || b['生产日期'] || '—',
+          有效期: b.validPeriod || b['有效期'] || '—',
+          失效日期: b.expireDate || b['失效日期'] || '—',
+          绑定状态: b.bindStatus || b['绑定状态'] || '未绑定',
+          当前绑定外包材: b.bindOuter || b['当前绑定外包材'] || '—',
+          _from: 'prod-in',
+        });
+      });
+      const sum = lines.reduce((acc, r) => acc + (Number(r['当前数量'] ?? r['数量']) || 0), 0);
+      const plan = meta.planQty != null ? Number(meta.planQty)
+        : (cur.备货数量 != null ? Number(cur.备货数量) : null);
+      let status = '待执行';
+      if (sum > 0) {
+        if (plan != null && plan > 0 && sum >= plan) status = '已完成';
+        else status = '执行中';
+      }
+      s.whSoPrep[no] = {
+        pickLines: lines,
+        已备数量: sum.toFixed(3),
+        备货状态: status,
+        备货数量: plan,
+        updatedAt: nowStr(),
+      };
+    }, meta.action || 'prep-bind-from-prod-in');
+  }
+
+  /** 将 store 中的备货绑码明细合并进 PC Mock */
+  function applyWhSoPrepToMock(MOCK) {
+    if (!MOCK) return false;
+    const s = load();
+    const map = s.whSoPrep || {};
+    const keys = Object.keys(map);
+    if (!keys.length) return false;
+    if (!MOCK['wh-so-prep']) MOCK['wh-so-prep'] = { main: [] };
+    if (!Array.isArray(MOCK['wh-so-prep'].main)) MOCK['wh-so-prep'].main = [];
+    let changed = false;
+    keys.forEach(function (no) {
+      const patch = map[no];
+      if (!patch) return;
+      const row = MOCK['wh-so-prep'].main.find(function (r) {
+        return String(r['备货通知单号'] || '') === String(no);
+      });
+      if (!row) return;
+      // 首次合并时记下计划量，便于状态计算
+      if (patch.备货数量 == null && row['备货数量'] != null) {
+        patch.备货数量 = Number(row['备货数量']) || 0;
+        const sum = (patch.pickLines || []).reduce(function (acc, r) {
+          return acc + (Number(r['当前数量'] != null ? r['当前数量'] : r['数量']) || 0);
+        }, 0);
+        const plan = Number(patch.备货数量) || 0;
+        if (sum <= 0) patch.备货状态 = '待执行';
+        else if (plan > 0 && sum >= plan) patch.备货状态 = '已完成';
+        else patch.备货状态 = '执行中';
+        patch.已备数量 = sum.toFixed(3);
+      }
+      const baseLines = Array.isArray(row._pickLines) ? row._pickLines : [];
+      const byCode = {};
+      baseLines.forEach(function (r) {
+        const c = String(r['条码号'] || '');
+        if (c) byCode[c] = r;
+      });
+      (patch.pickLines || []).forEach(function (r) {
+        const c = String(r['条码号'] || '');
+        if (c) byCode[c] = Object.assign({}, byCode[c] || {}, r);
+      });
+      row._pickLines = Object.keys(byCode).map(function (k) { return byCode[k]; });
+      const sum = row._pickLines.reduce(function (acc, r) {
+        return acc + (Number(r['当前数量'] != null ? r['当前数量'] : r['数量']) || 0);
+      }, 0);
+      const plan = Number(row['备货数量']) || 0;
+      row['已备数量'] = sum.toFixed(3);
+      if (sum <= 0) row['备货状态'] = '待执行';
+      else if (plan > 0 && sum >= plan) row['备货状态'] = '已完成';
+      else row['备货状态'] = '执行中';
+      changed = true;
+    });
+    if (changed) saveMock(MOCK);
+    return changed;
+  }
+
   function reset() {
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -1809,6 +2414,18 @@ window.WMS_DEMO_STORE = (function () {
       }
       return next;
     });
+  }
+
+  /** 合并系统字典种子：按模块分组 + 各单据独立「单据类型」；保留用户新增项 */
+  function normalizeDictTypes(target) {
+    const catalog = window.WMS_DICT;
+    if (!target) return false;
+    if (catalog && typeof catalog.mergeInto === 'function') {
+      const changed = catalog.mergeInto(target);
+      if (changed) saveMock(target);
+      return changed;
+    }
+    return false;
   }
 
   function hydrateMock(target) {
@@ -1917,9 +2534,24 @@ window.WMS_DEMO_STORE = (function () {
     getWhOsRetGoodsDraft: getWhOsRetGoodsDraft,
     clearWhOsRetGoodsDraft: clearWhOsRetGoodsDraft,
     applyWhOsRetGoodsToMock: applyWhOsRetGoodsToMock,
+    upsertWhSoPreoutFromApp: upsertWhSoPreoutFromApp,
+    getWhSoPreoutDraft: getWhSoPreoutDraft,
+    clearWhSoPreoutDraft: clearWhSoPreoutDraft,
+    applyWhSoPreoutToMock: applyWhSoPreoutToMock,
+    upsertWhSoShipFromApp: upsertWhSoShipFromApp,
+    getWhSoShipDraft: getWhSoShipDraft,
+    clearWhSoShipDraft: clearWhSoShipDraft,
+    applyWhSoShipToMock: applyWhSoShipToMock,
+    upsertWhSoRetFromApp: upsertWhSoRetFromApp,
+    getWhSoRetDraft: getWhSoRetDraft,
+    clearWhSoRetDraft: clearWhSoRetDraft,
+    applyWhSoRetToMock: applyWhSoRetToMock,
+    appendBarcodesToPrepNotice: appendBarcodesToPrepNotice,
+    applyWhSoPrepToMock: applyWhSoPrepToMock,
     saveMock: saveMock,
     loadMock: loadMock,
     hydrateMock: hydrateMock,
+    normalizeDictTypes: normalizeDictTypes,
     resetMock: resetMock,
   };
 })();

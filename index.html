@@ -19,7 +19,7 @@
   --warn-bg: #fff7ed;
   --asis: #2563eb;
   --tobe: #059669;
-  --sidebar-w: 280px;
+  --sidebar-w: 300px;
   --radius: 12px;
   --shadow: 0 4px 20px rgba(26,35,50,.08);
   font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
@@ -142,6 +142,39 @@ body.sidebar-collapsed .sidebar-edge-toggle svg {
 .nav-folder.collapsed .nav-folder-body {
   display: none;
 }
+/* 与同级页面项对齐：业务场景 vs 接口集成 */
+.nav-folder.is-peer > .nav-folder-header {
+  font-size: 13px;
+  color: var(--text);
+  padding: 8px 10px;
+}
+.nav-folder.is-peer > .nav-folder-header .idx {
+  font-size: 12px;
+}
+.nav-folder.is-peer > .nav-folder-body {
+  margin-left: 10px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+/* 再下一层分组：采购与受托 / 生产作业 等 */
+.nav-folder.is-deep {
+  margin-top: 2px;
+}
+.nav-folder.is-deep > .nav-folder-header {
+  padding: 6px 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.nav-folder.is-deep button {
+  padding: 6px 8px;
+  font-size: 12.5px;
+}
+.nav-folder-header .idx {
+  flex: 0 0 20px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
 
 .nav button {
   width: 100%; text-align: left; border: 0; background: transparent;
@@ -189,6 +222,57 @@ body.sidebar-collapsed .sidebar-edge-toggle svg {
 .proto-link:hover { background: #1d4ed8; transform: translateY(-1px); }
 .proto-link:active { transform: none; }
 .content { padding: 16px 20px 40px; max-width: none; }
+.meeting-toc {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  margin: 0 auto 16px;
+  max-width: 1200px;
+  background: rgba(255,255,255,.94);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: sticky;
+  top: 70px;
+  z-index: 18;
+  box-shadow: 0 6px 18px rgba(15,23,42,.08);
+  backdrop-filter: blur(8px);
+}
+.meeting-toc-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-right: 4px;
+  letter-spacing: .02em;
+}
+.meeting-toc button {
+  border: 1px solid #dbe4f0;
+  background: #f8fafc;
+  color: #334155;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.meeting-toc button:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.meeting-toc button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.meeting-anchor {
+  scroll-margin-top: 140px;
+}
 .content.scene-mode { display: flex; flex-direction: column; min-height: calc(100vh - 70px); }
 .card.diagram-card { flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0; }
 
@@ -510,7 +594,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 <aside class="sidebar" id="sidebar">
   <div class="brand">
     <h1>思特瑞 WMS 仓储物流管理系统 · 业务蓝图确认总览</h1>
-    <p>业务流程 · 原型进度 · 蓝图确认计划</p>
+    <p>会议管理 · 进度管理 · 设计资料</p>
   </div>
   <nav class="nav" id="nav"></nav>
   <!-- 依附在右边框的折叠按钮 -->
@@ -527,7 +611,7 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       <div class="meta">2026-08-20 · 调研与蓝图设计 100% 完成 · 原型与33项接口已全部核对确认 · 蓝图确认与签署准备就绪</div>
     </div>
     <div class="topbar-actions">
-      <a class="proto-link" href="./demo/" target="_blank" rel="noopener">原型方案</a>
+      <a class="proto-link" href="../../../04-Demo原型/01-源代码/思特瑞WMS_Demo.html" target="_blank" rel="noopener">原型方案</a>
     </div>
   </div>
   <div class="content" id="content"></div>
@@ -709,11 +793,11 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
       },
       {
         "label": "To-Be",
-        "code": "flowchart TB\n    subgraph 系统颜色说明[\"系统颜色说明\"]\n        direction LR\n        LEG1[在ERP执行]:::erp ~~~ LEG2[在WMS执行]:::wms ~~~ LEG3[在线下执行]:::manual ~~~ LEG4[人工·线框]:::wms ~~~ LEG5[系统自动·线框]:::wmsAuto\n    end\n\n    subgraph sgBiz[\"销售\"]\n        A1[业务在ERP执行创建销售订单]:::erp\n        A2[业务在WMS执行发订单备货]:::wms\n        A4{业务判断配送方式?}:::wms\n        A5[需求方在WMS执行下达派车申请单]:::wms\n        A5a[审批人在WMS执行派车申请单审核通过]:::wms\n        A6b[业务在WMS执行手动新增销售发货通知单]:::wms\n    end\n\n    subgraph sgSys[\"系统自动\"]\n        S2[系统自动在WMS执行运单下发后生成销售发货通知单]:::wmsAuto\n    end\n\n    subgraph sgLog[\"物流部\"]\n        L1[\"物流部在WMS执行拆分派车申请单为发货单<br/>(1装货点+1卸货点)\"]:::wms\n        L2[物流部在WMS执行合并发货单下发为运单]:::wms\n        L3[物流部在WMS执行根据运单与线下签字随车发货单对账并勾选结算]:::wms\n    end\n\n    subgraph sgWh[\"库管/装卸工\"]\n        C1[库管在WMS执行挑选条码并完成备货绑定]:::wms\n        C2[库管在WMS执行扫码出库并校验备货条码]:::wms\n        C2b[库管在WMS执行完成装卸单登记]:::wms\n        C3[库管在WMS执行打印出门单]:::wms\n        C4[库管在线下执行货物装载]:::manual\n    end\n\n    subgraph sgVendor[\"承运商\"]\n        D0[承运商在WMS执行运单行操作点击【派车】录入车辆及司机]:::wms\n        D0a[系统自动在WMS执行更新运单状态为【待运输】]:::wmsAuto\n        D1[承运商在WMS执行提装货信息登记与确认]:::wms\n        D2{承运商判断是否多次装货?}:::wms\n        D3[承运商在WMS执行更新为出门在途状态]:::wms\n        D4[承运商收集在途信息后在WMS执行每日在途更新]:::wms\n        D5[承运商收集卸货信息后在WMS执行完成到站卸货确认]:::wms\n        D6{承运商判断是否多次卸货?}:::wms\n        D7[承运商在WMS执行完成全单签收运单终止]:::wms\n        D8[系统自动在ERP执行推送ERP生成采购单-运输费用]:::erpAuto\n    end\n\n    LEG3 ~~~ sgBiz\n\n    A1 --> A2\n    A2 --> C1\n    A2 --> A4\n    A4 -->|我方配送| A5\n    A5 --> A5a\n    A5a --> L1\n    L1 --> L2\n    L2 --> S2\n    S2 --> C2\n    L2 --> D0\n    D0 --> D0a\n    D0a --> C2\n    A4 -->|客户自提| A6b\n    A6b --> C2\n    C1 --> C2\n    C2 --> C2b\n    C2b --> C3\n    C3 --> C4\n    C4 --> D1\n    D1 --> D2\n    D2 -->|是-下一发货单| C2\n    D2 -->|装货完成| D3\n    D3 --> D4\n    D4 --> D5\n    D5 --> D6\n    D6 -->|是-下一卸货点| D5\n    D6 -->|全部完成| D7\n    D7 --> L3\n    L3 --> D8\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style 系统颜色说明 fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgBiz fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgSys fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgLog fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgVendor fill:#f3f4f6,stroke:#d1d5db,color:#111827"
+        "code": "flowchart TB\n    subgraph 系统颜色说明[\"系统颜色说明\"]\n        direction LR\n        LEG1[在ERP执行]:::erp ~~~ LEG2[在WMS执行]:::wms ~~~ LEG3[在线下执行]:::manual ~~~ LEG4[人工·线框]:::wms ~~~ LEG5[系统自动·线框]:::wmsAuto\n    end\n\n    subgraph sgBiz[\"销售部 / 业务\"]\n        A1[业务在ERP执行创建销售订单]:::erp\n        A2{发货业务类型判断?}:::wms\n        A2a[\"自产发货：发起订单备货通知单\n（库管挑选条码完成备货绑定）\"]:::wms\n        A2b[\"受托发货：关联销售预发货单\n（已由场景五转仓至待发区）\"]:::wms\n        A4{业务判断配送方式?}:::wms\n        A5[\"需求方在WMS下达派车申请单\n（自产选备货单 / 受托选预发货单）\"]:::wms\n        A5a[审批人在WMS执行派车申请单审核通过]:::wms\n        A6b[\"业务在WMS手动新增销售发货通知单\n（自产选备货单 / 受托选预发货单）\"]:::wms\n    end\n\n    subgraph sgSys[\"系统自动\"]\n        S2[系统自动在WMS执行运单下发后生成销售发货通知单]:::wmsAuto\n    end\n\n    subgraph sgLog[\"物流部\"]\n        L1[\"物流部在WMS执行拆分派车申请单为发货单<br/>(1装货点+1卸货点)\"]:::wms\n        L2[物流部在WMS执行合并发货单下发为运单]:::wms\n        L3[物流部在WMS执行根据运单与线下签字随车发货单对账并勾选结算]:::wms\n    end\n\n    subgraph sgWh[\"库管/装卸工\"]\n        C1[库管在WMS执行挑选条码并完成备货绑定]:::wms\n        C2[库管在WMS执行扫码出库并校验备货条码/批号]:::wms\n        C2b[库管在WMS执行完成装卸单登记]:::wms\n        C3[库管在WMS执行打印出门单]:::wms\n        C4[库管在线下执行货物装载]:::manual\n    end\n\n    subgraph sgVendor[\"承运商\"]\n        D0[承运商在WMS执行运单行操作点击【派车】录入车辆及司机]:::wms\n        D0a[系统自动在WMS执行更新运单状态为【待运输】]:::wmsAuto\n        D1[承运商在WMS执行提装货信息登记与确认]:::wms\n        D2{承运商判断是否多次装货?}:::wms\n        D3[承运商在WMS执行更新为出门在途状态]:::wms\n        D4[承运商收集在途信息后在WMS执行每日在途更新]:::wms\n        D5[承运商收集卸货信息后在WMS执行完成到站卸货确认]:::wms\n        D6{承运商判断是否多次卸货?}:::wms\n        D7[承运商在WMS执行完成全单签收运单终止]:::wms\n        D8[系统自动在ERP执行推送ERP生成采购单-运输费用]:::erpAuto\n    end\n\n    LEG3 ~~~ sgBiz\n\n    A1 --> A2\n    A2 -->|自产发货| A2a\n    A2a --> C1\n    A2a --> A4\n    A2 -->|受托发货| A2b\n    A2b --> A4\n    A4 -->|我方配送| A5\n    A5 --> A5a\n    A5a --> L1\n    L1 --> L2\n    L2 --> S2\n    S2 --> C2\n    L2 --> D0\n    D0 --> D0a\n    D0a --> C2\n    A4 -->|客户自提| A6b\n    A6b --> C2\n    C1 --> C2\n    C2 --> C2b\n    C2b --> C3\n    C3 --> C4\n    C4 --> D1\n    D1 --> D2\n    D2 -->|是-下一发货单| C2\n    D2 -->|装货完成| D3\n    D3 --> D4\n    D4 --> D5\n    D5 --> D6\n    D6 -->|是-下一卸货点| D5\n    D6 -->|全部完成| D7\n    D7 --> L3\n    L3 --> D8\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style 系统颜色说明 fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgBiz fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgSys fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgLog fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgVendor fill:#f3f4f6,stroke:#d1d5db,color:#111827"
       }
     ],
     "statusHtml": "<ol>\n<li>ERP 创建销售订单（如按吨计量）。</li>\n<li>OA 做订单备货（订单与备货 1:n）。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送：OA 发起派车申请（<strong>1车1单</strong>）；</p>\n<p>   - 客户自提：不做派车，直接进入发货通知。</p>\n<ol>\n<li>OA 下推销售发货通知单。</li>\n<li>仓库按通知发货出库（线下/ERP 过账方式：待确认），车辆离厂相关出门手续在 OA/线下办理。</li>\n</ol>",
-    "tobeHtml": "<ol>\n<li>ERP 创建销售订单。</li>\n<li><strong>订单备货</strong>在 WMS 下发后，仓管按备货内容<strong>挑选条码并完成备货绑定</strong>。</li>\n<li>配送方式分支：</li>\n</ol>\n<p>   - 我方配送：<strong>WMS 发起派车申请</strong>；审批通过后，由<strong>物流部在 WMS 创建发货单</strong>，<strong>发货单组成运单</strong>。<strong>一个发货单 = 一个装货点 + 一个卸货点</strong>（一车多点则对应多张发货单归入同一运单）；<strong>运单组成后自动生成销售发货通知单</strong>；</p>\n<p>   - 客户自提：跳过派车/发货单/运单；由<strong>销售在 WMS 手动新增销售发货通知单</strong>（门禁与交接方式：待确认）。</p>\n<ol>\n<li>库管根据<strong>销售发货通知单</strong>办理 <strong>销售扫码出库</strong>；若为订单备货物料，须<strong>校验扫码条码与备货绑定条码一致</strong>。</li>\n<li>装卸工在 WMS <strong>完成装卸单登记</strong>。</li>\n<li>在 <strong>WMS 打印出门单</strong>交门卫核对放行。</li>\n<li>仓库办完出库后，由装卸工完成装货，由<strong>承运商收集装货信息后统一在 WMS 完成提装货确认</strong>；若<strong>多次装货</strong>，则按发货单循环「出库扫码 → 装卸单登记 → 装货确认」直至装货完成。</li>\n<li>车辆出门后进入<strong>在途状态</strong>，由<strong>承运商收集在途信息后统一在 WMS 更新在途状态信息</strong>（司机不做具体更新操作）。</li>\n<li>车辆到达卸货点后，由<strong>承运商收集卸货与交接凭证在 WMS 完成卸货确认</strong>；若<strong>多次卸货</strong>，则按发货单循环卸货确认直至全单完成。</li>\n<li><strong>所有装货点、卸货点均确认完成后</strong>，运单完成；由<strong>物流部在 WMS 根据运单和线下签字后的随车发货单对账完成后，勾选运单进行结算操作，然后推送至 ERP 生成采购单（运输费用）</strong>（客户自提无运单则跳过本步）。</li>\n</ol>"
+    "tobeHtml": "<ol>\n<li>ERP 创建销售订单。</li>\n<li><strong>发货类型区分与前置单据关联</strong>：\n   - <strong>自产发货</strong>：销售在 WMS 下发<strong>订单备货通知单</strong>，仓管按备货内容<strong>挑选条码并完成备货绑定</strong>；后续派车申请与发货通知单<strong>关联订单备货通知单</strong>；\n   - <strong>受托发货</strong>：物料已在场景五生产完工后转仓至客户待发区，后续派车申请与发货通知单<strong>关联销售预发货单（受托预出货单）</strong>，直接从客户待发区按指定批号发货出库。</li>\n<li><strong>配送方式分支</strong>：\n   - <strong>我方配送</strong>：需求方在 WMS 发起<strong>派车申请</strong>（自产选备货单，受托选预发货单）→ 物流审批通过后创建发货单并组成运单 → <strong>运单下发后自动生成销售发货通知单</strong>；\n   - <strong>客户自提</strong>：跳过派车/发货单/运单；由销售在 WMS <strong>手动新增销售发货通知单</strong>（自产选备货单，受托选预发货单）。</li>\n<li><strong>销售扫码出库</strong>：库管根据销售发货通知单办理扫码出库：自产发货<strong>校验扫码条码与备货绑定条码一致</strong>；受托发货核对<strong>指定批号与客户仓库库存一致</strong>。</li>\n<li><strong>装卸单与出门单</strong>：装卸工在 WMS 完成装卸单登记；库管在 WMS 打印出门单交门卫核对放行。</li>\n<li><strong>承运商在途与签收</strong>：承运商在 WMS 录入车辆司机、提装货确认、在途更新、到站卸货确认及全单签收。</li>\n<li><strong>运费对账结算</strong>：物流部根据运单与线下随车单对账并结算，推送 ERP 生成运费采购单（自提跳过）。</li>\n</ol>\n<p>| 发货业务类型 | 前置单据 | 派车申请单关联 | 发货通知单关联 | 扫码出库校验要求 |</p>\n<p>| --- | --- | --- | --- | --- |</p>\n<p>| <strong>自产发货</strong> | 订单备货通知单（XSBH） | 关联<strong>订单备货通知单</strong> | 关联<strong>订单备货通知单</strong> | 校验条码与备货绑定条码一致 |</p>\n<p>| <strong>受托发货</strong> | 销售预发货单（XSYCH） | 关联<strong>销售预发货单</strong> | 关联<strong>销售预发货单</strong> | 从指定客户待发区按批号扫码出库 |</p>"
   },
   {
     "id": "s8",
@@ -811,6 +895,23 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
     "asisHtml": "<ol><li>设备搬迁、工程物资、废旧物资等非仓储物资运输时，由需求部门线下联系物流或承运商，无统一线上单据流程。</li><li>物流记录分散，运费核算与承运考核缺乏全链路凭据支持。</li></ol>",
     "tobeHtml": "<ol><li>需求部门在 <strong>WMS 发起派车申请单</strong>（业务类型选择「设备运输/杂项运输」）。</li><li>派车申请审批通过后，<strong>物流部在 WMS 将申请单拆分为发货单</strong>（1 装货点 + 1 卸货点）；物流部将多张发货单<strong>合并下发为运单</strong>。</li><li><strong>承运商在 WMS 接收运单并执行派车</strong>（录入车牌与司机），装货完成后<strong>登记提货单</strong>确认起运。</li><li>运输途中由<strong>承运商收集在途信息后统一在 WMS 更新在途状态</strong>；运抵后由<strong>承运商收集现场交接凭证录入签收单</strong>，完成到站卸货与全单签收。</li><li>运单签收完成后，系统不自动推送运费采购单；由<strong>物流部在 WMS 根据运单和线下签字后的随车发货单对账完成后，勾选运单进行结算操作，然后推送至 ERP 生成采购单（运输费用）</strong>。</li></ol>",
     "tobeSummary": "覆盖设备搬迁与杂项非仓储物资运输，不关联仓库出入库，纯走派车→发货单→运单→提货单→签收单→物流部对账结算推ERP采购单闭环。"
+  },
+  {
+    "id": "s17",
+    "title": "场景十七：库存盘点（扫码盘点 / 数量盘点）",
+    "diagrams": [
+      {
+        "label": "现状（As-Is）",
+        "code": "flowchart TB\n    subgraph sgColor[\"系统颜色说明\"]\n        direction LR\n        LEG1[在ERP执行]:::erp ~~~ LEG2[在线下执行]:::manual ~~~ LEG3[人工·线框]:::wms\n    end\n\n    subgraph sgWh[\"仓储部门\"]\n        direction TB\n        A1[仓管在ERP执行导出并打印纸质盘点单]:::erp --> A2[仓管在线下执行现场逐货位人工点数打勾]:::manual\n        A2 --> A3[仓管在Excel/线下执行汇总实盘数量并比对ERP账面]:::manual\n        A3 --> A4[仓管在ERP执行手工填报盘点记录台账]:::erp\n    end\n\n    sgColor ~~~ sgWh\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style sgColor fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827"
+      },
+      {
+        "label": "To-Be",
+        "code": "flowchart TB\n    subgraph sgColor[\"系统颜色说明\"]\n        direction LR\n        LEG1[在WMS执行]:::wms ~~~ LEG2[人工·线框]:::wms ~~~ LEG3[系统自动·线框]:::wmsAuto\n    end\n\n    subgraph sgWh[\"仓储部门\"]\n        direction TB\n        A1([开始]) --> A2[仓管在WMS执行新建盘点计划]:::wms\n        A2 --> A3[系统自动在WMS执行执行锁库]:::wmsAuto\n        A3 --> A4{仓管判断盘点类型?}:::wms\n        \n        %% 分支一：扫码盘点\n        A4 -->|1. 扫码盘点流水码| B1[库管在WMS/PDA执行扫码盘点逐件扫描流水码]:::wms\n        B1 --> D1[系统自动在WMS执行盘点完成解锁仓库]:::wmsAuto\n        \n        %% 分支二：数量盘点\n        A4 -->|2. 数量盘点计数| C1[仓管在WMS执行录入盘点仓库物料数量]:::wms\n        C1 --> C2[仓管在WMS执行核对数量]:::wms\n        C2 --> D1\n        \n        %% 汇合结束\n        D1 --> D2[仓管在WMS执行生成盘点记录并结束单据]:::wms\n        D2 --> AEND(((结束)))\n    end\n\n    sgColor ~~~ sgWh\n\n    classDef erp fill:#cfe2ff,stroke:#475569,stroke-width:2px;\n    classDef erpAuto fill:#cfe2ff,stroke:#b91c1c,stroke-width:2px;\n    classDef oa fill:#e5e7eb,stroke:#475569,stroke-width:2px;\n    classDef oaAuto fill:#e5e7eb,stroke:#b91c1c,stroke-width:2px;\n    classDef wms fill:#d1fae5,stroke:#475569,stroke-width:2px;\n    classDef wmsAuto fill:#d1fae5,stroke:#b91c1c,stroke-width:2px;\n    classDef lims fill:#ffedd5,stroke:#475569,stroke-width:2px;\n    classDef limsAuto fill:#ffedd5,stroke:#b91c1c,stroke-width:2px;\n    classDef mes fill:#ede9fe,stroke:#475569,stroke-width:2px;\n    classDef mesAuto fill:#ede9fe,stroke:#b91c1c,stroke-width:2px;\n    classDef manual fill:#ffffff,stroke:#475569,stroke-width:2px;\n\n    style sgColor fill:#f3f4f6,stroke:#d1d5db,color:#111827\n    style sgWh fill:#f3f4f6,stroke:#d1d5db,color:#111827"
+      }
+    ],
+    "statusHtml": "<ol>\n<li><strong>现状依赖纸质</strong>：月度与年度盘点主要通过 ERP 导出数据并线下打印纸质盘点表，由库管现场人工清点与打勾记录。</li>\n<li><strong>人工汇总记录</strong>：盘点数据由专人在 Excel 手工汇总比对并录入 ERP 记录，缺乏系统层面的库位锁定与流水码逐件扫码校验。</li>\n</ol>",
+    "tobeHtml": "<ol>\n<li><strong>核心原则</strong>：<strong>WMS 盘点无主动调整库存的逻辑，仅用于记录实盘内容与账实核对，生成盘点档案记录</strong>。</li>\n<li><strong>新建盘点计划</strong>：仓管在 WMS 新建盘点计划（指定盘点范围仓库/库位）。</li>\n<li><strong>统一执行锁库</strong>：无论扫码盘点还是数量盘点，<strong>创建计划后系统均自动执行锁库</strong>（锁定目标库位，防止作业交叉影响盘点准确性）。</li>\n<li><strong>按盘点类型开展实盘</strong>：\n   <p>- <strong>扫码盘点（流水码物料）</strong>：现场库管手持 PDA 逐件扫描实物流水条码进行全盘核验；</p>\n   <p>- <strong>数量盘点（计数物料）</strong>：仓管/库管在 WMS/PDA 录入各仓库/库位物料实测数量，并执行账实数量核对。</p>\n</li>\n<li><strong>解锁仓库与生成记录</strong>：实盘作业完成后，<strong>系统自动解锁仓库</strong>，仓管在 WMS 确认生成盘点记录并结束单据归档。</li>\n</ol>\n<p>| 盘点类型 | 锁库机制 | 核心实盘方式 | 结束与记录 |</p>\n<p>| --- | --- | --- | --- |</p>\n<p>| 扫码盘点 | 系统自动锁库 | PDA 逐件扫流水码/托盘 | 自动解锁仓库 → 生成盘点记录（不调库存） |</p>\n<p>| 数量盘点 | 系统自动锁库 | 录入实盘数量 → 核对数量 | 自动解锁仓库 → 结束单据生成台账（不调库存） |</p>",
+    "tobeSummary": "盘点核心定位为实盘记录与账实核对，系统不主动调整库存；创建计划后统一自动执行锁库，支持扫码盘点与数量盘点两种作业模式，盘点完成后系统自动解锁仓库并归档生成盘点记录。"
   }
 ]
 </script>
@@ -847,88 +948,145 @@ const nav = document.getElementById('nav');
 const content = document.getElementById('content');
 const pageTitle = document.getElementById('pageTitle');
 
-const staticPages = [
-  { id: 'progress', group: '开篇', label: '项目进度' },
-  { id: 'overview', group: '开篇', label: '场景总览' },
-  { id: 'plan', group: '收尾', label: '后续计划' },
-];
+const MEETING_IDS = new Set(['cover', 'progress', 'blueprint', 'meeting']);
+const STATIC_IDS = new Set(['cover', 'progress', 'proto', 'blueprint', 'interfaces', 'overview', 'plan', 'meeting']);
+
+const navShortNames = {
+  s1: '来料入库',
+  s2: '采购退料',
+  s2a: '受托加工收料',
+  s2b: '受托加工退料',
+  s2c: '受托加工预出货',
+  s3: '领料（生产/备件）',
+  s4: '罐区直接投料',
+  s5: '生产入库',
+  s6: '生产退料',
+  s7: '销售发货（自产/受托）',
+  s8: '销售退货',
+  s9: '销售退换货',
+  s10: '委外路径退货',
+  s11: '委外发料出库',
+  s12: '仓库间调拨',
+  s13: '设备与杂项运输',
+  s17: '库存盘点',
+};
+
+function sceneNavItem(id, idx) {
+  const s = scenes.find(x => x.id === id);
+  const fallback = s ? s.title.replace(/^场景[一二三四五六七八九十]+[：:]/, '') : id;
+  return { id, idx, name: navShortNames[id] || fallback };
+}
+
+function renderNavNodes(nodes, depth = 0) {
+  let html = '';
+  nodes.forEach(node => {
+    if (node.items) {
+      const icon = node.icon ? `<span>${node.icon}</span>` : '';
+      const idx = node.idx ? `<span class="idx">${node.idx}</span>` : '';
+      const depthClass = depth === 1 ? 'is-peer' : (depth >= 2 ? 'is-deep' : '');
+      html += `
+    <div class="nav-folder ${node.collapsed ? 'collapsed' : ''} ${depthClass}">
+      <div class="nav-folder-header">
+        <span class="nav-folder-title">${icon}${idx}<span>${node.title}</span></span>
+        <span class="nav-folder-arrow">▾</span>
+      </div>
+      <div class="nav-folder-body">${renderNavNodes(node.items, depth + 1)}</div>
+    </div>`;
+    } else {
+      html += `<button data-page="${node.id}"><span class="idx">${node.idx || ''}</span><span>${node.name}</span></button>`;
+    }
+  });
+  return html;
+}
 
 function buildNav() {
   const groups = [
     {
-      title: '项目概览',
-      icon: '📊',
+      title: '会议管理',
+      icon: '📋',
       collapsed: false,
       items: [
-        { id: 'cover', idx: '00', name: '会议封面' },
-        { id: 'progress', idx: '01', name: '项目进度' },
-        { id: 'proto', idx: '02', name: '原型进度' },
-        { id: 'blueprint', idx: '03', name: '蓝图确认计划' },
-        { id: 'interfaces', idx: '04', name: '接口集成' },
-        { id: 'overview', idx: '05', name: '场景总览' }
+        { id: 'cover', idx: '01', name: '总结会议' }
       ]
     },
     {
-      title: '入库流程 (场景1~9)',
-      icon: '📥',
-      collapsed: true,
-      items: scenes.slice(0, 9).map((s, i) => ({
-        id: s.id,
-        idx: String(i + 1).padStart(2, '0'),
-        name: s.title.replace(/^场景[一二三四五六七八九十]+[：:]/, '')
-      }))
-    },
-    {
-      title: '发货与运输 (场景10~16)',
-      icon: '📤',
-      collapsed: true,
-      items: scenes.slice(9).map((s, i) => ({
-        id: s.id,
-        idx: String(i + 10).padStart(2, '0'),
-        name: s.title.replace(/^场景[一二三四五六七八九十]+[：:]/, '')
-      }))
-    },
-    {
-      title: '收尾与规划',
-      icon: '🏁',
+      title: '进度管理',
+      icon: '📈',
       collapsed: false,
       items: [
-        { id: 'plan', idx: 'N', name: '后续计划' }
+        { id: 'proto', idx: '01', name: '原型进度' },
+        { id: 'plan', idx: '02', name: '后续计划' }
+      ]
+    },
+    {
+      title: '设计资料',
+      icon: '📁',
+      collapsed: false,
+      items: [
+        { id: 'interfaces', idx: '01', name: '接口集成' },
+        {
+          title: '业务场景',
+          idx: '02',
+          collapsed: false,
+          items: [
+            { id: 'overview', idx: '', name: '场景总览' },
+            {
+              title: '采购与受托',
+              collapsed: true,
+              items: [
+                sceneNavItem('s1', '01'),
+                sceneNavItem('s2', '02'),
+                sceneNavItem('s2a', '03'),
+                sceneNavItem('s2b', '04'),
+                sceneNavItem('s2c', '05'),
+              ]
+            },
+            {
+              title: '生产作业',
+              collapsed: true,
+              items: [
+                sceneNavItem('s3', '06'),
+                sceneNavItem('s4', '07'),
+                sceneNavItem('s5', '08'),
+                sceneNavItem('s6', '09'),
+              ]
+            },
+            {
+              title: '销售与发货',
+              collapsed: true,
+              items: [
+                sceneNavItem('s7', '10'),
+                sceneNavItem('s8', '11'),
+                sceneNavItem('s9', '12'),
+                sceneNavItem('s10', '13'),
+              ]
+            },
+            {
+              title: '委外、调拨与库内',
+              collapsed: true,
+              items: [
+                sceneNavItem('s11', '14'),
+                sceneNavItem('s12', '15'),
+                sceneNavItem('s13', '16'),
+                sceneNavItem('s17', '17'),
+              ]
+            }
+          ]
+        }
       ]
     }
   ];
 
-  let html = '';
-  groups.forEach((g, gIdx) => {
-    html += `
-    <div class="nav-folder ${g.collapsed ? 'collapsed' : ''}" data-group="${gIdx}">
-      <div class="nav-folder-header">
-        <span class="nav-folder-title"><span>${g.icon}</span> <span>${g.title}</span></span>
-        <span class="nav-folder-arrow">▾</span>
-      </div>
-      <div class="nav-folder-body">`;
-    
-    g.items.forEach(item => {
-      html += `<button data-page="${item.id}"><span class="idx">${item.idx}</span><span>${item.name}</span></button>`;
-    });
+  nav.innerHTML = renderNavNodes(groups);
 
-    html += `
-      </div>
-    </div>`;
-  });
-
-  nav.innerHTML = html;
-
-  // 直接在 DOM 上绑定文件夹标题的点击展开/折叠事件
   nav.querySelectorAll('.nav-folder-header').forEach(header => {
     header.addEventListener('click', (e) => {
       e.stopPropagation();
-      const folder = header.closest('.nav-folder');
-      if (folder) folder.classList.toggle('collapsed');
+      const folder = header.parentElement;
+      if (folder && folder.classList.contains('nav-folder')) folder.classList.toggle('collapsed');
     });
   });
 
-  // 绑定菜单按钮点击事件
   nav.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -937,18 +1095,16 @@ function buildNav() {
   });
 }
 
-function toggleFolder(gIdx) {
-  const folder = nav.querySelector(`.nav-folder[data-group="${gIdx}"]`);
-  if (folder) folder.classList.toggle('collapsed');
-}
-
 function setActive(page) {
   nav.querySelectorAll('button').forEach(b => {
     const isCurrent = b.dataset.page === page;
     b.classList.toggle('active', isCurrent);
     if (isCurrent) {
-      const parentFolder = b.closest('.nav-folder');
-      if (parentFolder) parentFolder.classList.remove('collapsed');
+      let folder = b.closest('.nav-folder');
+      while (folder) {
+        folder.classList.remove('collapsed');
+        folder = folder.parentElement ? folder.parentElement.closest('.nav-folder') : null;
+      }
     }
   });
 }
@@ -961,7 +1117,7 @@ function renderCover() {
   <div style="max-width: 1200px; margin: 0 auto;">
 
     <!-- 会议主视觉 Hero 展板 -->
-    <div style="
+    <div id="mt-hero" class="meeting-anchor" style="
       background: linear-gradient(135deg, #0b192c 0%, #1e3a8a 50%, #0f172a 100%);
       border-radius: 18px;
       padding: 42px 36px;
@@ -999,24 +1155,21 @@ function renderCover() {
 
         <!-- 快速导览按钮组 -->
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button type="button" onclick="navigate('progress')" style="background:#0284c7; color:#fff; border:none; padding:9px 20px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(2,132,199,0.4); transition:all 0.2s ease;">
-            <span>📊</span> 进入项目总览
-          </button>
-          <button type="button" onclick="navigate('proto')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+          <button type="button" onclick="navigate('proto')" style="background:#0284c7; color:#fff; border:none; padding:9px 20px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(2,132,199,0.4); transition:all 0.2s ease;">
             <span>📱</span> 原型核准清单 (129项)
           </button>
           <button type="button" onclick="navigate('interfaces')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
             <span>⚡</span> 系统集成拓扑 (33接口)
           </button>
-          <button type="button" onclick="navigate('blueprint')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
-            <span>📑</span> 蓝图确认计划
+          <button type="button" onclick="navigate('overview')" style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+            <span>🗂</span> 场景总览
           </button>
         </div>
       </div>
     </div>
 
     <!-- 4 大核心成果量化指标卡片 -->
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:24px;">
+    <div id="mt-metrics" class="meeting-anchor" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:24px;">
       <div class="card" style="margin:0; border-left:4px solid #0284c7; padding:18px 20px;">
         <div style="font-size:12.5px; color:#64748b; font-weight:600;">核心业务场景覆盖</div>
         <div style="font-size:28px; font-weight:800; color:#0f172a; margin:4px 0;">13 <span style="font-size:14px; font-weight:600; color:#64748b;">个完整场景</span></div>
@@ -1043,7 +1196,7 @@ function renderCover() {
     </div>
 
     <!-- 会议概况与核心议程双栏展板 -->
-    <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:20px; margin-bottom:24px;">
+    <div id="mt-agenda" class="meeting-anchor" style="display:grid; grid-template-columns: 1fr 1.2fr; gap:20px; margin-bottom:24px;">
 
       <!-- 左侧：会议概况与三方职责 -->
       <div class="card" style="margin:0; display:flex; flex-direction:column; justify-content:space-between;">
@@ -1180,7 +1333,7 @@ function renderProgress() {
 
   content.innerHTML = `
   <!-- 蓝图确认总结与签署专区 -->
-  <div class="card" style="border: 2px solid #10b981; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%); margin-bottom: 24px;">
+  <div id="mt-sign" class="card meeting-anchor" style="border: 2px solid #10b981; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%); margin-bottom: 24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size:26px;">🎯</span>
@@ -1278,7 +1431,7 @@ function renderProgress() {
   </div>
 
   <!-- 调研阶段任务计划与甘特图 -->
-  <div class="card">
+  <div id="mt-gantt" class="card meeting-anchor">
     <h3>调研阶段计划</h3>
     <table>
       <thead><tr><th>任务</th><th>计划起止</th><th>工期</th><th>成果物</th><th>责任</th><th>状态</th></tr></thead>
@@ -1582,7 +1735,50 @@ function renderInterfaces() {
     </div>
   </div>
 
-  <!-- 接口明细清单表格与分类筛选 -->
+  <!-- 整体推进里程碑卡片 -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <h3 style="margin:0;">跨系统接口对接 · 整体推进里程碑</h3>
+      <span class="status-pill doing" style="font-size:12px; padding:4px 12px;">推进中 · 接口专项</span>
+    </div>
+    <div style="background:rgba(56, 189, 248, 0.08); border-left:4px solid #0284c7; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:13px; color:#334155;">
+      💡 <strong>排期说明</strong>：具体实施日期参考 9~10 月日历。<span style="color:#e11d48; font-weight:600;">※ 备注：任务如有变动，后续事项自动顺延。</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:180px">阶段</th>
+          <th>工作内容</th>
+          <th style="width:160px">责任主体</th>
+          <th style="width:170px">计划周期</th>
+          <th style="width:220px">关键产出</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--text)">0、接口计划核对及对齐会议</strong></td>
+          <td>组织多方对齐会，明确责任边界、接口方案、技术协议及排期计划</td>
+          <td>双方项目经理、技术负责人</td>
+          <td><strong>2026.09.14</strong><br><span class="muted" style="font-size:12px">（周一）</span></td>
+          <td>《接口责任矩阵与排期》<br>《环境网络确认单》</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">1、接口清单逻辑核对与字段完善</strong></td>
+          <td>逐项梳理业务触发时机、流向逻辑，补充完善字段映射、转换规则与校验约束</td>
+          <td>双方业务顾问、接口架构师</td>
+          <td><strong>2026.09.15 ～ 09.18</strong><br><span class="muted" style="font-size:12px">（周二至周五）</span></td>
+          <td>《接口规范说明书 (API契约)》<br>《字段映射对照表》</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">2、接口双方开发及测试联调</strong></td>
+          <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
+          <td>双方开发团队、测试团队</td>
+          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td>《接口测试用例与记录》<br>《接口联调验收报告》</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
       <div>
@@ -1821,13 +2017,14 @@ function renderInterfaces() {
 
 function renderOverview() {
   pageTitle.textContent = '四、业务流程总览';
+  const numMap = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十'];
   const cards = scenes.map((s,i) => `
     <div class="overview-card" data-go="${s.id}">
-      <div class="n">场景 ${['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六'][i]}</div>
+      <div class="n">场景 ${numMap[i] || (i + 1)}</div>
       <div class="t">${s.title.replace(/^场景[一二三四五六七八九十]+[：:]/, '')}</div>
       <div class="muted" style="margin-top:8px">${s.diagrams.length} 张流程图</div>
     </div>`).join('');
-  content.innerHTML = `<div class="card"><h3>16 场景全覆盖</h3><div class="overview-grid">${cards}</div></div>`;
+  content.innerHTML = `<div class="card"><h3>${scenes.length} 场景全覆盖</h3><div class="overview-grid">${cards}</div></div>`;
   content.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.go)));
 }
 
@@ -1856,7 +2053,7 @@ function renderBlueprintPlan() {
   `).join('');
 
   content.innerHTML = `
-  <div class="card">
+  <div id="mt-schedule" class="card meeting-anchor">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
       <h3 style="margin:0;">原型核对与蓝图确认日程安排（2026.08.14 ～ 2026.08.20）</h3>
       <span class="status-pill done" style="font-size:13px; padding:4px 12px;">✅ 前序核对全部闭环 · 进入签署</span>
@@ -2113,16 +2310,64 @@ function renderProtoProgress() {
 function renderPlan() {
   pageTitle.textContent = '五、后续计划安排';
   content.innerHTML = `
-  <div class="card">
-    <h3>对齐 8 月 17 日蓝图确认</h3>
+  <div class="card" style="margin-bottom: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <h3 style="margin:0;">整体推进里程碑（跨系统接口对接）</h3>
+      <span class="status-pill doing" style="font-size:12px; padding:4px 12px;">推进中 · 接口专项</span>
+    </div>
+    <div style="background:rgba(56, 189, 248, 0.08); border-left:4px solid #0284c7; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:13px; color:#334155;">
+      💡 <strong>排期说明</strong>：具体日期参考 9~10 月实施日历。<span style="color:#e11d48; font-weight:600;">※ 备注：任务如有变动，后续事项自动顺延。</span>
+    </div>
     <table>
-      <thead><tr><th>时间</th><th>事项</th><th>产出</th></tr></thead>
+      <thead>
+        <tr>
+          <th style="width:180px">阶段</th>
+          <th>工作内容</th>
+          <th style="width:160px">责任主体</th>
+          <th style="width:170px">计划周期</th>
+          <th style="width:220px">关键产出</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>～7.24</td><td>需求调研完成；场景问题已全部讨论关闭</td><td>调研大纲 / 本汇报定稿</td></tr>
-        <tr><td>7.27～8.14</td><td>蓝图设计（按已确认 To-Be）</td><td>《项目业务蓝图/原型》</td></tr>
-        <tr><td><strong>8.17～8.21</strong></td><td><strong>蓝图确认</strong></td><td>《蓝图与验收标准确认书》</td></tr>
-        <tr><td>10 月底</td><td>系统初步验收（无数据）</td><td>初验纪要</td></tr>
-        <tr><td>11 月底</td><td>系统最终验收（带数据）</td><td>终验纪要</td></tr>
+        <tr>
+          <td><strong style="color:var(--text)">0、接口计划核对及对齐会议</strong></td>
+          <td>组织多方对齐会，明确责任边界、接口方案、技术协议及排期计划</td>
+          <td>双方项目经理、技术负责人</td>
+          <td><strong>2026.09.14</strong><br><span class="muted" style="font-size:12px">（周一）</span></td>
+          <td>《接口责任矩阵与排期》<br>《环境网络确认单》</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">1、接口清单逻辑核对与字段完善</strong></td>
+          <td>逐项梳理业务触发时机、流向逻辑，补充完善字段映射、转换规则与校验约束</td>
+          <td>双方业务顾问、接口架构师</td>
+          <td><strong>2026.09.15 ～ 09.18</strong><br><span class="muted" style="font-size:12px">（周二至周五）</span></td>
+          <td>《接口规范说明书 (API契约)》<br>《字段映射对照表》</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">2、接口双方开发及测试联调</strong></td>
+          <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
+          <td>双方开发团队、测试团队</td>
+          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td>《接口测试用例与记录》<br>《接口联调验收报告》</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <h3 style="margin:0;">项目全局阶段与验收节点</h3>
+      <span class="status-pill done" style="font-size:12px; padding:4px 12px;">蓝图已确认收官</span>
+    </div>
+    <table>
+      <thead><tr><th>时间</th><th>事项</th><th>产出</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>～7.24</td><td>需求调研完成；场景问题已全部讨论关闭</td><td>调研大纲 / 本汇报定稿</td><td><span class="status-pill done">已完成</span></td></tr>
+        <tr><td>7.27～8.14</td><td>蓝图设计（按已确认 To-Be）</td><td>《项目业务蓝图/原型》</td><td><span class="status-pill done">已完成</span></td></tr>
+        <tr><td><strong>8.17～8.21</strong></td><td><strong>蓝图确认</strong></td><td>《蓝图与验收标准确认书》《需求变更报告》</td><td><span class="status-pill done">已签署</span></td></tr>
+        <tr><td><strong>9.14～10.16</strong></td><td><strong>跨系统接口开发与测试联调</strong></td><td>33 项接口规范及联调验收报告</td><td><span class="status-pill doing">推进中</span></td></tr>
+        <tr><td>10 月底</td><td>系统初步验收（无数据）</td><td>初验纪要</td><td><span class="status-pill pending">待开展</span></td></tr>
+        <tr><td>11 月底</td><td>系统最终验收（带数据）</td><td>终验纪要</td><td><span class="status-pill pending">待开展</span></td></tr>
       </tbody>
     </table>
   </div>`;
@@ -2282,21 +2527,59 @@ async function renderScene(scene) {
   await showDiag(0);
 }
 
+function bindMeetingToc() {
+  const scroller = document.querySelector('.main');
+  const buttons = content.querySelectorAll('.meeting-toc [data-jump]');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const el = document.getElementById(btn.dataset.jump);
+      if (!el || !scroller) return;
+      const offset = 140;
+      const top = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - offset;
+      scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      buttons.forEach(b => b.classList.toggle('active', b === btn));
+    });
+  });
+}
+
+function renderMeeting() {
+  renderCover();
+  const coverHtml = content.innerHTML;
+  renderProgress();
+  const progressHtml = content.innerHTML;
+  renderBlueprintPlan();
+  const blueprintHtml = content.innerHTML;
+  pageTitle.textContent = '思特瑞锂业 WMS · 蓝图阶段性总结会议';
+  const tocHtml = `
+  <nav class="meeting-toc" aria-label="本页模块目录">
+    <span class="meeting-toc-label">本页目录</span>
+    <button type="button" data-jump="mt-hero">会议封面</button>
+    <button type="button" data-jump="mt-metrics">成果指标</button>
+    <button type="button" data-jump="mt-agenda">概况与议程</button>
+    <button type="button" data-jump="mt-sign">签署与交付</button>
+    <button type="button" data-jump="mt-gantt">调研计划</button>
+    <button type="button" data-jump="mt-schedule">核对日程</button>
+  </nav>`;
+  content.innerHTML = tocHtml + coverHtml + progressHtml + blueprintHtml;
+  bindMeetingToc();
+}
+
 async function navigate(page) {
-  setActive(page);
-  location.hash = page;
+  const resolved = MEETING_IDS.has(page) ? 'cover' : page;
+  setActive(resolved);
+  location.hash = resolved;
   content.classList.remove('scene-mode');
   closeFullscreen();
-  if (page === 'cover') return renderCover();
-  if (page === 'progress') return renderProgress();
-  if (page === 'proto') return renderProtoProgress();
-  if (page === 'blueprint') return renderBlueprintPlan();
-  if (page === 'interfaces') return renderInterfaces();
-  if (page === 'overview') return renderOverview();
-  if (page === 'plan') return renderPlan();
-  const scene = scenes.find(s => s.id === page);
+  if (resolved === 'cover') return renderMeeting();
+  if (resolved === 'proto') return renderProtoProgress();
+  if (resolved === 'interfaces') return renderInterfaces();
+  if (resolved === 'overview') return renderOverview();
+  if (resolved === 'plan') return renderPlan();
+  const scene = scenes.find(s => s.id === resolved);
   if (scene) await renderScene(scene);
 }
+
+window.navigate = navigate;
 
 
 // 侧边栏右边框折叠按钮功能与持久化
@@ -2323,7 +2606,7 @@ if (edgeBtn) {
 
 buildNav();
 const initial = (location.hash || '#cover').slice(1);
-navigate(scenes.some(s => s.id === initial) || ['cover','progress','proto','blueprint','interfaces','overview','plan'].includes(initial) ? initial : 'cover');
+navigate(scenes.some(s => s.id === initial) || STATIC_IDS.has(initial) ? initial : 'cover');
 </script>
 </body>
 </html>
