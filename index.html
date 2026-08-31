@@ -613,9 +613,9 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
   background: repeating-linear-gradient(
     90deg,
     transparent,
-    transparent calc(100% / 33 - 1px),
-    #e8edf3 calc(100% / 33 - 1px),
-    #e8edf3 calc(100% / 33)
+    transparent calc(100% / 40 - 1px),
+    #e8edf3 calc(100% / 40 - 1px),
+    #e8edf3 calc(100% / 40)
   );
 }
 .gantt.gantt-interface .gantt-track:last-child {
@@ -1879,7 +1879,7 @@ function renderInterfaces() {
           <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
           <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
           <td>双方开发团队、测试团队</td>
-          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td><strong>2026.09.21 ～ 10.23</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
           <td>接口API文档</td>
         </tr>
       </tbody>
@@ -2456,7 +2456,7 @@ function renderInterfacePlan() {
           <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
           <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
           <td>双方开发团队、测试团队</td>
-          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td><strong>2026.09.21 ～ 10.23</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
           <td><strong style="color:#0284c7;">接口API文档</strong></td>
         </tr>
       </tbody>
@@ -2468,7 +2468,7 @@ function renderInterfacePlan() {
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
       <div>
         <h3 style="margin:0;">接口对接推进排期甘特图</h3>
-        <div class="muted" style="font-size:12px; margin-top:3px;">周期：2026年9月14日 ～ 2026年10月16日 · 跨度 33 天（含节假日）</div>
+        <div class="muted" style="font-size:12px; margin-top:3px;">周期：2026年9月14日 ～ 2026年10月23日 · 跨度 40 天（含节假日）</div>
       </div>
       <div class="gantt-legend" style="margin:0;">
         <span><i style="background:linear-gradient(90deg, #ea580c, #f97316)"></i> 对齐会议</span>
@@ -2492,28 +2492,28 @@ function renderInterfacePlan() {
               <div class="gantt-axis">
                 <div class="gantt-axis-inner">
                   <span class="gantt-tick" style="left:0%; transform:translateX(0); text-align:left;">9/14<br>周一</span>
-                  <span class="gantt-tick" style="left:12.1%">9/18<br>周五</span>
-                  <span class="gantt-tick" style="left:21.2%">9/21<br>周一</span>
-                  <span class="gantt-tick" style="left:33.3%; color:#ea580c;">9/25<br>中秋休</span>
-                  <span class="gantt-tick" style="left:51.5%; color:#ea580c;">10/1~7<br>国庆休</span>
-                  <span class="gantt-tick" style="left:72.7%">10/8<br>复工</span>
-                  <span class="gantt-tick tick-end" style="left:100%">10/16<br>联调完成</span>
+                  <span class="gantt-tick" style="left:10%">9/18<br>周五</span>
+                  <span class="gantt-tick" style="left:17.5%">9/21<br>周一</span>
+                  <span class="gantt-tick" style="left:27.5%; color:#ea580c;">9/25<br>中秋休</span>
+                  <span class="gantt-tick" style="left:42.5%; color:#ea580c;">10/1~7<br>国庆休</span>
+                  <span class="gantt-tick" style="left:60%">10/8<br>复工</span>
+                  <span class="gantt-tick tick-end" style="left:100%">10/23<br>联调完成</span>
                 </div>
               </div>
               <div class="gantt-track">
-                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
-                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
-                <div class="gantt-bar milestone bar-compact" style="left:0%; width:6.5%;" title="9/14：接口计划核对及对齐会议（产出：接口计划表）"><span class="bar-text-long">9/14 对齐会议</span><span class="bar-text-short">会议</span></div>
+                <div style="position:absolute; top:0; bottom:0; left:27.5%; width:7.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:42.5%; width:17.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar milestone bar-compact" style="left:0%; width:2.5%;" title="9/14：接口计划核对及对齐会议（产出：接口计划表）"><span class="bar-text-long">9/14 对齐会议</span><span class="bar-text-short">会议</span></div>
               </div>
               <div class="gantt-track">
-                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
-                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
-                <div class="gantt-bar doing bar-compact" style="left:3.03%; width:12.12%;" title="9/15~9/18：接口清单逻辑核对与字段完善（产出：接口清单）"><span class="bar-text-long">9/15~18 清单确认</span><span class="bar-text-short">清单</span></div>
+                <div style="position:absolute; top:0; bottom:0; left:27.5%; width:7.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:42.5%; width:17.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar doing bar-compact" style="left:2.5%; width:10%;" title="9/15~9/18：接口清单逻辑核对与字段完善（产出：接口清单）"><span class="bar-text-long">9/15~18 清单确认</span><span class="bar-text-short">清单</span></div>
               </div>
               <div class="gantt-track">
-                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
-                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
-                <div class="gantt-bar todo" style="left:21.21%; width:78.79%;" title="9/21~10/16：接口双方开发及测试联调（产出：接口 API 文档）">9/21~10/16 开发联调（含节假日）</div>
+                <div style="position:absolute; top:0; bottom:0; left:27.5%; width:7.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:42.5%; width:17.5%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar todo" style="left:17.5%; width:82.5%;" title="9/21~10/23：接口双方开发及测试联调（产出：接口 API 文档）">9/21~10/23 开发联调（含节假日）</div>
               </div>
             </div>
           </div>
@@ -2567,7 +2567,7 @@ function renderPlan() {
           <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
           <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
           <td>双方开发团队、测试团队</td>
-          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td><strong>2026.09.21 ～ 10.23</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
           <td>接口API文档</td>
         </tr>
       </tbody>
@@ -2585,7 +2585,7 @@ function renderPlan() {
         <tr><td>～7.24</td><td>需求调研完成；场景问题已全部讨论关闭</td><td>调研大纲 / 本汇报定稿</td><td><span class="status-pill done">已完成</span></td></tr>
         <tr><td>7.27～8.14</td><td>蓝图设计（按已确认 To-Be）</td><td>《项目业务蓝图/原型》</td><td><span class="status-pill done">已完成</span></td></tr>
         <tr><td><strong>8.17～8.21</strong></td><td><strong>蓝图确认</strong></td><td>《蓝图与验收标准确认书》《需求变更报告》</td><td><span class="status-pill done">已签署</span></td></tr>
-        <tr><td><strong>9.14～10.16</strong></td><td><strong>跨系统接口开发与测试联调</strong></td><td>33 项接口规范及联调验收报告</td><td><span class="status-pill doing">推进中</span></td></tr>
+        <tr><td><strong>9.14～10.23</strong></td><td><strong>跨系统接口开发与测试联调</strong></td><td>33 项接口规范及联调验收报告</td><td><span class="status-pill doing">推进中</span></td></tr>
         <tr><td>10 月底</td><td>系统初步验收（无数据）</td><td>初验纪要</td><td><span class="status-pill pending">待开展</span></td></tr>
         <tr><td>11 月底</td><td>系统最终验收（带数据）</td><td>终验纪要</td><td><span class="status-pill pending">待开展</span></td></tr>
       </tbody>
