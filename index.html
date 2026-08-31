@@ -540,6 +540,111 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
   width: 12px; height: 12px; border-radius: 3px; display: inline-block;
 }
 
+/* 接口排期甘特图（左标签固定 + 右时间轴横向滚动） */
+.gantt.gantt-interface {
+  --gantt-label-w: 228px;
+  --gantt-timeline-min: 920px;
+}
+.gantt.gantt-interface .gantt-interface-body {
+  display: flex;
+  align-items: stretch;
+}
+.gantt.gantt-interface .gantt-labels-col {
+  flex: 0 0 var(--gantt-label-w);
+  width: var(--gantt-label-w);
+  border-right: 1px solid var(--border);
+  background: #fff;
+  z-index: 1;
+}
+.gantt.gantt-interface .gantt-labels-col .gantt-label {
+  display: flex;
+  align-items: flex-start;
+  min-height: 56px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--text);
+  white-space: normal;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+.gantt.gantt-interface .gantt-labels-col .gantt-label-head {
+  min-height: 42px;
+  align-items: center;
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 12px;
+}
+.gantt.gantt-interface .gantt-labels-col .gantt-label:last-child {
+  border-bottom: 0;
+}
+.gantt.gantt-interface .gantt-timeline-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.gantt.gantt-interface .gantt-timeline-inner {
+  min-width: var(--gantt-timeline-min);
+}
+.gantt.gantt-interface .gantt-axis {
+  height: 42px;
+  border-bottom: 1px solid var(--border);
+  background: #f8fafc;
+}
+.gantt.gantt-interface .gantt-tick {
+  font-size: 10px;
+  top: 6px;
+  line-height: 1.25;
+  max-width: 92px;
+  text-align: center;
+  transform: translateX(-50%);
+}
+.gantt.gantt-interface .gantt-tick.tick-end {
+  transform: translateX(-100%);
+  text-align: right;
+}
+.gantt.gantt-interface .gantt-track {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(100% / 33 - 1px),
+    #e8edf3 calc(100% / 33 - 1px),
+    #e8edf3 calc(100% / 33)
+  );
+}
+.gantt.gantt-interface .gantt-track:last-child {
+  border-bottom: 0;
+}
+.gantt.gantt-interface .gantt-bar {
+  top: 14px;
+  height: 28px;
+  font-size: 10px;
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: flex-start;
+}
+.gantt.gantt-interface .gantt-bar.bar-compact {
+  justify-content: center;
+  padding: 0 4px;
+}
+.gantt.gantt-interface .gantt-bar.bar-compact .bar-text-long {
+  display: none;
+}
+.gantt.gantt-interface .gantt-bar.bar-compact .bar-text-short {
+  display: inline;
+}
+.gantt.gantt-interface .gantt-bar .bar-text-short {
+  display: none;
+}
+
 /* 拓扑图胶囊按钮与深色电路由样式 */
 .topo-pill {
   display: flex;
@@ -1015,7 +1120,8 @@ function buildNav() {
       collapsed: false,
       items: [
         { id: 'proto', idx: '01', name: '原型进度' },
-        { id: 'plan', idx: '02', name: '后续计划' }
+        { id: 'interfacePlan', idx: '02', name: '接口计划' },
+        { id: 'plan', idx: '03', name: '后续计划' }
       ]
     },
     {
@@ -1756,25 +1862,25 @@ function renderInterfaces() {
       </thead>
       <tbody>
         <tr>
-          <td><strong style="color:var(--text)">0、接口计划核对及对齐会议</strong></td>
+          <td><strong style="color:var(--text)">接口计划核对及对齐会议</strong></td>
           <td>组织多方对齐会，明确责任边界、接口方案、技术协议及排期计划</td>
           <td>双方项目经理、技术负责人</td>
           <td><strong>2026.09.14</strong><br><span class="muted" style="font-size:12px">（周一）</span></td>
-          <td>《接口责任矩阵与排期》<br>《环境网络确认单》</td>
+          <td>接口计划表</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--text)">1、接口清单逻辑核对与字段完善</strong></td>
+          <td><strong style="color:var(--text)">接口清单逻辑核对与字段完善</strong></td>
           <td>逐项梳理业务触发时机、流向逻辑，补充完善字段映射、转换规则与校验约束</td>
           <td>双方业务顾问、接口架构师</td>
           <td><strong>2026.09.15 ～ 09.18</strong><br><span class="muted" style="font-size:12px">（周二至周五）</span></td>
-          <td>《接口规范说明书 (API契约)》<br>《字段映射对照表》</td>
+          <td>接口清单</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--text)">2、接口双方开发及测试联调</strong></td>
+          <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
           <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
           <td>双方开发团队、测试团队</td>
           <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
-          <td>《接口测试用例与记录》<br>《接口联调验收报告》</td>
+          <td>接口API文档</td>
         </tr>
       </tbody>
     </table>
@@ -2307,13 +2413,127 @@ function renderProtoProgress() {
   };
 }
 
+function renderInterfacePlan() {
+  pageTitle.textContent = '二、接口计划推进安排';
+  content.innerHTML = `
+  <div class="card" style="margin-bottom: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <div>
+        <h3 style="margin:0;">跨系统接口对接 · 整体推进里程碑</h3>
+        <div class="muted" style="font-size:12px; margin-top:3px;">基于用友 U9 ERP (26项)、LIMS 质检 (4项)、企业微信/统一门户 (3项) 共 33 项标准接口</div>
+      </div>
+      <span class="status-pill doing" style="font-size:12px; padding:4px 12px;">推进中 · 接口专项</span>
+    </div>
+    <div style="background:rgba(56, 189, 248, 0.08); border-left:4px solid #0284c7; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:13px; color:#334155;">
+      💡 <strong>排期说明</strong>：具体实施日期参考 9~10 月日历计划。<span style="color:#e11d48; font-weight:600;">※ 备注：任务如有变动，后续事项自动顺延。</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:200px">阶段</th>
+          <th>工作内容</th>
+          <th style="width:160px">责任主体</th>
+          <th style="width:170px">计划周期</th>
+          <th style="width:180px">关键产出</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--text)">接口计划核对及对齐会议</strong></td>
+          <td>组织多方对齐会，明确责任边界、接口方案、技术协议及排期计划</td>
+          <td>双方项目经理、技术负责人</td>
+          <td><strong>2026.09.14</strong><br><span class="muted" style="font-size:12px">（周一）</span></td>
+          <td><strong style="color:#0284c7;">接口计划表</strong></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">接口清单逻辑核对与字段完善</strong></td>
+          <td>逐项梳理业务触发时机、流向逻辑，补充完善字段映射、转换规则与校验约束</td>
+          <td>双方业务顾问、接口架构师</td>
+          <td><strong>2026.09.15 ～ 09.18</strong><br><span class="muted" style="font-size:12px">（周二至周五）</span></td>
+          <td><strong style="color:#0284c7;">接口清单</strong></td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
+          <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
+          <td>双方开发团队、测试团队</td>
+          <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
+          <td><strong style="color:#0284c7;">接口API文档</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 甘特图专区 -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+      <div>
+        <h3 style="margin:0;">接口对接推进排期甘特图</h3>
+        <div class="muted" style="font-size:12px; margin-top:3px;">周期：2026年9月14日 ～ 2026年10月16日 · 跨度 33 天（含节假日）</div>
+      </div>
+      <div class="gantt-legend" style="margin:0;">
+        <span><i style="background:linear-gradient(90deg, #ea580c, #f97316)"></i> 对齐会议</span>
+        <span><i style="background:linear-gradient(90deg, #d97706, #f59e0b)"></i> 清单完善</span>
+        <span><i style="background:linear-gradient(90deg, #2563eb, #38bdf8)"></i> 开发联调</span>
+        <span><i style="background:#e2e8f0; border:1px dashed #94a3b8;"></i> 法定休假</span>
+      </div>
+    </div>
+
+    <div class="gantt-wrap" style="margin-top:0;">
+      <div class="gantt gantt-interface">
+        <div class="gantt-interface-body">
+          <div class="gantt-labels-col">
+            <div class="gantt-label gantt-label-head">阶段与任务项</div>
+            <div class="gantt-label">接口计划核对及对齐会议</div>
+            <div class="gantt-label">接口清单逻辑核对与字段完善</div>
+            <div class="gantt-label">接口双方开发及测试联调</div>
+          </div>
+          <div class="gantt-timeline-scroll">
+            <div class="gantt-timeline-inner">
+              <div class="gantt-axis">
+                <div class="gantt-axis-inner">
+                  <span class="gantt-tick" style="left:0%; transform:translateX(0); text-align:left;">9/14<br>周一</span>
+                  <span class="gantt-tick" style="left:12.1%">9/18<br>周五</span>
+                  <span class="gantt-tick" style="left:21.2%">9/21<br>周一</span>
+                  <span class="gantt-tick" style="left:33.3%; color:#ea580c;">9/25<br>中秋休</span>
+                  <span class="gantt-tick" style="left:51.5%; color:#ea580c;">10/1~7<br>国庆休</span>
+                  <span class="gantt-tick" style="left:72.7%">10/8<br>复工</span>
+                  <span class="gantt-tick tick-end" style="left:100%">10/16<br>联调完成</span>
+                </div>
+              </div>
+              <div class="gantt-track">
+                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar milestone bar-compact" style="left:0%; width:6.5%;" title="9/14：接口计划核对及对齐会议（产出：接口计划表）"><span class="bar-text-long">9/14 对齐会议</span><span class="bar-text-short">会议</span></div>
+              </div>
+              <div class="gantt-track">
+                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar doing bar-compact" style="left:3.03%; width:12.12%;" title="9/15~9/18：接口清单逻辑核对与字段完善（产出：接口清单）"><span class="bar-text-long">9/15~18 清单确认</span><span class="bar-text-short">清单</span></div>
+              </div>
+              <div class="gantt-track">
+                <div style="position:absolute; top:0; bottom:0; left:33.3%; width:9.1%; background:rgba(226,232,240,0.55); pointer-events:none;" title="中秋假期 9/25~9/27"></div>
+                <div style="position:absolute; top:0; bottom:0; left:51.5%; width:21.2%; background:rgba(226,232,240,0.55); pointer-events:none;" title="国庆假期 10/1~10/7"></div>
+                <div class="gantt-bar todo" style="left:21.21%; width:78.79%;" title="9/21~10/16：接口双方开发及测试联调（产出：接口 API 文档）">9/21~10/16 开发联调（含节假日）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="margin:10px 0 0; font-size:12px;">右侧时间轴区域可左右滑动查看；鼠标悬停任务条可查看完整说明。</p>
+    </div>
+  </div>`;
+}
+
 function renderPlan() {
-  pageTitle.textContent = '五、后续计划安排';
+  pageTitle.textContent = '三、后续计划安排';
   content.innerHTML = `
   <div class="card" style="margin-bottom: 20px;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
       <h3 style="margin:0;">整体推进里程碑（跨系统接口对接）</h3>
-      <span class="status-pill doing" style="font-size:12px; padding:4px 12px;">推进中 · 接口专项</span>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" onclick="navigate('interfacePlan')" style="background:#0284c7; color:#fff; border:none; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer;">查看甘特图 📊</button>
+        <span class="status-pill doing" style="font-size:12px; padding:4px 12px;">推进中 · 接口专项</span>
+      </div>
     </div>
     <div style="background:rgba(56, 189, 248, 0.08); border-left:4px solid #0284c7; padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:13px; color:#334155;">
       💡 <strong>排期说明</strong>：具体日期参考 9~10 月实施日历。<span style="color:#e11d48; font-weight:600;">※ 备注：任务如有变动，后续事项自动顺延。</span>
@@ -2321,34 +2541,34 @@ function renderPlan() {
     <table>
       <thead>
         <tr>
-          <th style="width:180px">阶段</th>
+          <th style="width:200px">阶段</th>
           <th>工作内容</th>
           <th style="width:160px">责任主体</th>
           <th style="width:170px">计划周期</th>
-          <th style="width:220px">关键产出</th>
+          <th style="width:180px">关键产出</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong style="color:var(--text)">0、接口计划核对及对齐会议</strong></td>
+          <td><strong style="color:var(--text)">接口计划核对及对齐会议</strong></td>
           <td>组织多方对齐会，明确责任边界、接口方案、技术协议及排期计划</td>
           <td>双方项目经理、技术负责人</td>
           <td><strong>2026.09.14</strong><br><span class="muted" style="font-size:12px">（周一）</span></td>
-          <td>《接口责任矩阵与排期》<br>《环境网络确认单》</td>
+          <td>接口计划表</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--text)">1、接口清单逻辑核对与字段完善</strong></td>
+          <td><strong style="color:var(--text)">接口清单逻辑核对与字段完善</strong></td>
           <td>逐项梳理业务触发时机、流向逻辑，补充完善字段映射、转换规则与校验约束</td>
           <td>双方业务顾问、接口架构师</td>
           <td><strong>2026.09.15 ～ 09.18</strong><br><span class="muted" style="font-size:12px">（周二至周五）</span></td>
-          <td>《接口规范说明书 (API契约)》<br>《字段映射对照表》</td>
+          <td>接口清单</td>
         </tr>
         <tr>
-          <td><strong style="color:var(--text)">2、接口双方开发及测试联调</strong></td>
+          <td><strong style="color:var(--text)">接口双方开发及测试联调</strong></td>
           <td>双方背靠背独立开发、单接口联调、全业务端到端场景闭环测试与验收</td>
           <td>双方开发团队、测试团队</td>
           <td><strong>2026.09.21 ～ 10.16</strong><br><span class="muted" style="font-size:12px">（含中秋国庆休假）</span></td>
-          <td>《接口测试用例与记录》<br>《接口联调验收报告》</td>
+          <td>接口API文档</td>
         </tr>
       </tbody>
     </table>
@@ -2572,6 +2792,7 @@ async function navigate(page) {
   closeFullscreen();
   if (resolved === 'cover') return renderMeeting();
   if (resolved === 'proto') return renderProtoProgress();
+  if (resolved === 'interfacePlan') return renderInterfacePlan();
   if (resolved === 'interfaces') return renderInterfaces();
   if (resolved === 'overview') return renderOverview();
   if (resolved === 'plan') return renderPlan();
