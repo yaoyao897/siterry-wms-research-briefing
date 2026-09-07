@@ -86,6 +86,24 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 @media (max-width:960px){
   .demo-announce__upd{grid-template-columns:1fr;gap:2px}
 }
+.demo-announce__kpi{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.demo-announce__kpi-item{flex:1;min-width:88px;padding:8px 10px;border:1px solid var(--color-border);border-radius:6px;background:#FAFAFA}
+.demo-announce__kpi-num{font-size:16px;font-weight:700;color:#1A4099;line-height:1.2}
+.demo-announce__kpi-num.ready{color:#16a34a}
+.demo-announce__kpi-lab{font-size:11px;color:#8C8C8C;margin-top:2px}
+.demo-announce__hint{font-size:12px;color:#595959;line-height:1.5;margin:0 0 10px;padding:8px 10px;border-radius:6px;background:#F0F7FF;border:1px solid #C5D4EB}
+.demo-announce__prog{display:grid;grid-template-columns:52px 40px minmax(72px,.8fr) minmax(72px,.8fr) minmax(90px,1fr) minmax(88px,.9fr) minmax(88px,.9fr);gap:6px 8px;padding:7px 0;border-bottom:1px dashed #F0F0F0;font-size:12px;align-items:start}
+.demo-announce__prog:last-child{border-bottom:0}
+.demo-announce__prog-hd{font-weight:600;color:#8C8C8C;border-bottom:1px solid var(--color-border);padding-bottom:6px;margin-bottom:2px}
+.demo-announce__prog-id{color:#8C8C8C}
+.demo-announce__prog-m3{font-weight:600;color:#262626}
+.demo-announce__dev-ready{color:#16a34a;font-weight:600}
+.demo-announce__dev-wait{color:#8C8C8C}
+@media (max-width:960px){
+  .demo-announce__prog{grid-template-columns:1fr;gap:2px}
+  .demo-announce__prog-hd{display:none}
+}
+
 .app-aside{width:240px;flex-shrink:0;height:100%;min-height:0;background:#fff;border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow:hidden}
 .app-aside__logo{padding:16px 20px;font-size:15px;font-weight:600;color:var(--color-text-main);border-bottom:1px solid var(--color-border);flex-shrink:0}
 .app-aside__scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
@@ -593,6 +611,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
     <div class="demo-announce__tabs">
       <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='notes' }" @click="announceTab='notes'">使用说明</button>
       <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='updates' }" @click="announceTab='updates'">更新记录</button>
+      <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='progress' }" @click="announceTab='progress'">原型进度</button>
     </div>
     <div class="demo-announce__tools" v-if="announceTab==='updates'">
       <input v-model.trim="announceKw" type="search" placeholder="搜索版本 / 模块 / 摘要…" />
@@ -602,6 +621,19 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         <option value="APP">APP</option>
       </select>
     </div>
+    <div class="demo-announce__tools" v-if="announceTab==='progress'">
+      <input v-model.trim="announceProgressKw" type="search" placeholder="搜索模块 / 页面 / 开发状态…" />
+      <select v-model="announceProgressSide">
+        <option value="全部">全部终端</option>
+        <option value="PC">PC</option>
+        <option value="APP">APP</option>
+      </select>
+      <select v-model="announceProgressDev">
+        <option value="全部">全部开发状态</option>
+        <option value="可开发">可开发</option>
+        <option value="待排期">待排期</option>
+      </select>
+    </div>
     <div class="demo-announce__body">
       <template v-if="announceTab==='notes'">
         <div v-for="n in announceNotes" :key="n.id" class="demo-announce__note" :class="n.level">
@@ -609,7 +641,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <div class="demo-announce__note-body">{{ n.body }}</div>
         </div>
       </template>
-      <template v-else>
+      <template v-else-if="announceTab==='updates'">
         <div v-if="!filteredAnnounceUpdates.length" class="demo-announce__empty">无匹配的更新记录</div>
         <div v-for="u in filteredAnnounceUpdates" :key="u.version + u.module + u.summary" class="demo-announce__upd">
           <div class="demo-announce__upd-ver">{{ u.version }}</div>
@@ -617,6 +649,29 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <div class="demo-announce__upd-term">{{ u.terminal }}</div>
           <div class="demo-announce__upd-mod"><span class="demo-announce__type">{{ u.type }}</span>{{ u.module }}</div>
           <div class="demo-announce__upd-sum">{{ u.summary }}</div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="demo-announce__kpi">
+          <div class="demo-announce__kpi-item"><div class="demo-announce__kpi-num">{{ announceProgressSummary.total || 0 }}</div><div class="demo-announce__kpi-lab">总功能点</div></div>
+          <div class="demo-announce__kpi-item"><div class="demo-announce__kpi-num">{{ announceProgressSummary.pc || 0 }}</div><div class="demo-announce__kpi-lab">PC</div></div>
+          <div class="demo-announce__kpi-item"><div class="demo-announce__kpi-num">{{ announceProgressSummary.app || 0 }}</div><div class="demo-announce__kpi-lab">APP</div></div>
+          <div class="demo-announce__kpi-item"><div class="demo-announce__kpi-num ready">{{ announceProgressSummary.ready || 0 }}</div><div class="demo-announce__kpi-lab">可开发</div></div>
+          <div class="demo-announce__kpi-item"><div class="demo-announce__kpi-num">{{ announceProgressSummary.pending || 0 }}</div><div class="demo-announce__kpi-lab">待排期</div></div>
+        </div>
+        <div class="demo-announce__hint" v-if="announceProgressSummary.note">{{ announceProgressSummary.note }}</div>
+        <div class="demo-announce__prog demo-announce__prog-hd">
+          <div>序号</div><div>端</div><div>一级</div><div>二级</div><div>三级</div><div>开发状态</div><div>确认</div>
+        </div>
+        <div v-if="!filteredAnnounceProgress.length" class="demo-announce__empty">无匹配的进度项</div>
+        <div v-for="r in filteredAnnounceProgress" :key="r.id + '-' + r.m3" class="demo-announce__prog">
+          <div class="demo-announce__prog-id">{{ r.id }}</div>
+          <div>{{ r.side }}</div>
+          <div>{{ r.m1 }}</div>
+          <div>{{ r.m2 }}</div>
+          <div class="demo-announce__prog-m3">{{ r.m3 }}</div>
+          <div :class="(r.devStatus||'').indexOf('可开发')>=0 ? 'demo-announce__dev-ready' : 'demo-announce__dev-wait'">{{ r.devStatus }}</div>
+          <div>{{ r.cStatus }}</div>
         </div>
       </template>
     </div>
@@ -2263,9 +2318,9 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.270"></script>
-<script src="./js/page-configs.js?v=1.3.270"></script>
-<script src="./js/mock-rows.js?v=1.3.270"></script>
+<script src="./js/demo-announcements.js?v=1.3.271"></script>
+<script src="./js/page-configs.js?v=1.3.271"></script>
+<script src="./js/mock-rows.js?v=1.3.271"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/page-prd-notes.js"></script>
 <script src="./js/remarks-markdown.js"></script>
@@ -2433,7 +2488,7 @@ const app = createApp({
     const remarksActiveTab = ref('');
     const remarksBodyRef = ref(null);
     const remarksTocActive = ref('');
-    const ANNOUNCE = window.DEMO_ANNOUNCEMENTS || { notes:[], updates:[], latestVersion:'', updatedAt:'' };
+    const ANNOUNCE = window.DEMO_ANNOUNCEMENTS || { notes:[], updates:[], progress:{summary:{},rows:[]}, latestVersion:'', updatedAt:'' };
     const ANNOUNCE_DISMISS_KEY = 'siterry-demo-announce-dismissed';
     const announceLatest = ANNOUNCE.latestVersion || '';
     const announceUnread = ref((()=>{
@@ -2443,7 +2498,11 @@ const app = createApp({
     const announceTab = ref('notes');
     const announceKw = ref('');
     const announceTerminal = ref('全部');
+    const announceProgressKw = ref('');
+    const announceProgressSide = ref('全部');
+    const announceProgressDev = ref('全部');
     const announceNotes = ANNOUNCE.notes || [];
+    const announceProgressSummary = (ANNOUNCE.progress && ANNOUNCE.progress.summary) || {};
     const announceUpdateCount = (ANNOUNCE.updates || []).length;
     const announceHeadline = (()=>{
       const u = (ANNOUNCE.updates || [])[0];
@@ -2458,6 +2517,19 @@ const app = createApp({
         if(term === 'APP' && !String(u.terminal||'').includes('APP')) return false;
         if(!kw) return true;
         const hay = `${u.version} ${u.date} ${u.terminal} ${u.module} ${u.type} ${u.summary}`.toLowerCase();
+        return hay.includes(kw);
+      });
+    });
+    const filteredAnnounceProgress = computed(()=>{
+      const kw = announceProgressKw.value.toLowerCase();
+      const side = announceProgressSide.value;
+      const dev = announceProgressDev.value;
+      const list = (ANNOUNCE.progress && ANNOUNCE.progress.rows) || [];
+      return list.filter(r=>{
+        if(side !== '全部' && r.side !== side) return false;
+        if(dev !== '全部' && String(r.devStatus||'').indexOf(dev) < 0) return false;
+        if(!kw) return true;
+        const hay = `${r.id} ${r.side} ${r.m1} ${r.m2} ${r.m3} ${r.desc} ${r.dStatus} ${r.cStatus} ${r.devStatus} ${r.role}`.toLowerCase();
         return hay.includes(kw);
       });
     });
@@ -14661,7 +14733,7 @@ const app = createApp({
 
     return {
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
-      announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceNotes, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, dismissAnnounce,
+      announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       remarksOpen, remarksNote, remarksTitle, remarksTabDefs, remarksActiveTab, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTabClick, onRemarksTocClick, toggleRemarks, closeRemarks,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseShip, canCloseDispatch, canCloseWaybill, canCloseInspPlan, canSettleWaybill, canDeleteKpiPlan,
       formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineRows,
