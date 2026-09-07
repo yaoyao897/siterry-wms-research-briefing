@@ -1818,7 +1818,7 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "可编辑文本"
         },
         {
-          "name": "现场联系人",
+          "name": "联系人",
           "type": "input",
           "required": false,
           "ctrl": "可编辑文本"
@@ -3934,15 +3934,15 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "columns": [
             {
-              "field": "采购订单号",
-              "title": "采购订单号",
-              "width": 180
-            },
-            {
               "field": "订单状态",
               "title": "订单状态",
               "width": 100,
               "slot": "tag"
+            },
+            {
+              "field": "采购订单号",
+              "title": "采购订单号",
+              "width": 180
             },
             {
               "field": "采购类型",
@@ -4072,9 +4072,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "备注",
-          "type": "input",
+          "type": "textarea",
           "required": false,
-          "ctrl": "手动输入（文本）"
+          "ctrl": "手动输入（多行文本）"
         }
       ],
       "detailFields": [
@@ -4131,6 +4131,12 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入（只读，取物料采购单位）"
         },
         {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入（正整数，不必填）"
+        },
+        {
           "name": "计划数量",
           "type": "input",
           "required": true,
@@ -4155,10 +4161,16 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行状态"
+        },
+        {
           "name": "物料信息"
         },
         {
           "name": "采购单位"
+        },
+        {
+          "name": "计划件数"
         },
         {
           "name": "计划数量"
@@ -4168,9 +4180,6 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未入库数量"
-        },
-        {
-          "name": "行状态"
         },
         {
           "name": "备注"
@@ -4290,15 +4299,15 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "columns": [
             {
-              "field": "销售订单号",
-              "title": "销售订单号",
-              "width": 180
-            },
-            {
               "field": "订单状态",
               "title": "订单状态",
               "width": 100,
               "slot": "tag"
+            },
+            {
+              "field": "销售订单号",
+              "title": "销售订单号",
+              "width": 180
             },
             {
               "field": "销售类型",
@@ -4487,6 +4496,12 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "自动带入（只读，取物料销售单位）"
         },
         {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入（正整数，不必填）"
+        },
+        {
           "name": "计划数量",
           "type": "input",
           "required": true,
@@ -4511,10 +4526,16 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行状态"
+        },
+        {
           "name": "物料信息"
         },
         {
           "name": "销售单位"
+        },
+        {
+          "name": "计划件数"
         },
         {
           "name": "计划数量"
@@ -4524,9 +4545,6 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未出库数量"
-        },
-        {
-          "name": "行状态"
         },
         {
           "name": "备注"
@@ -4596,7 +4614,7 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
-              "name": "加工负责人",
+              "name": "采购员",
               "type": "select",
               "options": [
                 "张三",
@@ -4618,7 +4636,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "供应商编码",
             "采购部门",
-            "加工负责人",
+            "采购员",
             "订单日期"
           ],
           "toolbar": [
@@ -4640,15 +4658,15 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "columns": [
             {
-              "field": "委外订单号",
-              "title": "委外订单号",
-              "width": 160
-            },
-            {
               "field": "订单状态",
               "title": "订单状态",
               "width": 100,
               "slot": "tag"
+            },
+            {
+              "field": "委外订单号",
+              "title": "委外订单号",
+              "width": 160
             },
             {
               "field": "委外类型",
@@ -4661,8 +4679,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
-              "field": "加工厂名称",
-              "title": "加工厂名称",
+              "field": "供应商名称",
+              "title": "供应商名称",
               "width": 180
             },
             {
@@ -4676,8 +4694,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 110
             },
             {
-              "field": "加工负责人",
-              "title": "加工负责人",
+              "field": "采购员",
+              "title": "采购员",
               "width": 100
             },
             {
@@ -4743,10 +4761,10 @@ window.WMS_PAGE_CONFIGS = {
           "name": "供应商编码",
           "type": "picker",
           "required": true,
-          "ctrl": "弹窗选择启用中的委外加工商，带出加工厂名称"
+          "ctrl": "弹窗选择启用中的委外加工商，带出供应商名称"
         },
         {
-          "name": "加工厂名称",
+          "name": "供应商名称",
           "type": "readonly",
           "required": true,
           "ctrl": "选择供应商后自动带入（只读）"
@@ -4769,7 +4787,7 @@ window.WMS_PAGE_CONFIGS = {
           ]
         },
         {
-          "name": "加工负责人",
+          "name": "采购员",
           "type": "select",
           "required": true,
           "ctrl": "下拉选择，默认当前登录人",
@@ -4813,7 +4831,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "供应商编码"
         },
         {
-          "name": "加工厂名称"
+          "name": "供应商名称"
         },
         {
           "name": "合同号"
@@ -4822,7 +4840,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "采购部门"
         },
         {
-          "name": "加工负责人"
+          "name": "采购员"
         },
         {
           "name": "订单日期"
@@ -4857,20 +4875,16 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "选择物料后拼接编码/名称/规格/种类"
         },
         {
-          "name": "发料/产出类型",
-          "type": "select",
-          "required": true,
-          "ctrl": "委外原料（我方发料）/ 委外成品（厂方产出）",
-          "options": [
-            "委外原料",
-            "委外成品"
-          ]
-        },
-        {
           "name": "采购单位",
           "type": "readonly",
           "required": false,
           "ctrl": "物料主单位"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入（正整数，不必填）"
         },
         {
           "name": "计划数量",
@@ -4897,13 +4911,16 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行状态"
+        },
+        {
           "name": "物料信息"
         },
         {
-          "name": "发料/产出类型"
+          "name": "单位"
         },
         {
-          "name": "单位"
+          "name": "计划件数"
         },
         {
           "name": "计划数量"
@@ -4913,9 +4930,6 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未出/入库数量"
-        },
-        {
-          "name": "行状态"
         },
         {
           "name": "备注"
@@ -4961,7 +4975,17 @@ window.WMS_PAGE_CONFIGS = {
               "type": "select",
               "options": [
                 "初始化",
-                "仓库"
+                "仓库",
+                "厂外"
+              ]
+            },
+            {
+              "name": "检验状态",
+              "type": "select",
+              "options": [
+                "待检验",
+                "合格",
+                "不合格"
               ]
             },
             {
@@ -4999,6 +5023,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryDefault": [
             "使用状态",
             "库存状态",
+            "检验状态",
             "条码号",
             "物料编码",
             "包装规格"
@@ -5050,6 +5075,12 @@ window.WMS_PAGE_CONFIGS = {
               "field": "库存状态",
               "title": "库存状态",
               "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "检验状态",
+              "title": "检验状态",
+              "width": 110,
               "slot": "tag"
             },
             {
@@ -5458,10 +5489,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "库存状态",
               "type": "select",
               "options": [
-                "初始化",
-                "仓库",
-                "线边仓",
-                "厂外"
+                "库内"
               ]
             }
           ],
@@ -5488,7 +5516,7 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "批量删除",
               "type": "danger",
-              "desc": "仅库存状态=初始化可删；被引用不可删"
+              "desc": "仅空罐（无物料明细）可删；被引用不可删"
             },
             {
               "name": "导出",
@@ -5579,7 +5607,7 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "编辑",
-              "desc": "使用状态=在用且库存状态=初始化时可编辑"
+              "desc": "使用状态=在用且无物料明细（空罐）时可编辑"
             }
           ]
         }
@@ -5641,12 +5669,6 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": false,
           "ctrl": "手动输入（文本）"
-        },
-        {
-          "name": "启用状态",
-          "type": "switch",
-          "required": true,
-          "ctrl": "Switch 开关"
         }
       ],
       "detailFields": [],
@@ -5657,7 +5679,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "title": "状态信息",
-          "fields": ["使用状态", "库存状态", "库存位置", "启用状态"]
+          "fields": ["使用状态", "库存状态", "库存位置"]
         },
         {
           "title": "业务进度信息",
@@ -6065,13 +6087,7 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "适用物料",
-              "type": "select",
-              "options": [
-                "钢瓶",
-                "阀门",
-                "储罐"
-              ],
-              "multiple": true
+              "type": "input"
             },
             {
               "name": "启用状态",
@@ -6211,14 +6227,15 @@ window.WMS_PAGE_CONFIGS = {
           "type": "select",
           "required": false,
           "multiple": true,
-          "ctrl": "下拉选择，多选"
-        },
-        {
-          "name": "适用物料",
-          "type": "select",
-          "required": false,
-          "multiple": true,
-          "ctrl": "下拉选择，多选（物料）"
+          "ctrl": "随适用业务单据联动过滤，下拉多选",
+          "options": [
+            "收料通知单",
+            "入库单",
+            "发料通知单",
+            "出库单",
+            "退料通知单",
+            "退货通知单"
+          ]
         },
         {
           "name": "备注",
@@ -6238,8 +6255,25 @@ window.WMS_PAGE_CONFIGS = {
       "hasDetail": true,
       "stub": false,
       "formFlat": true,
-      "formLineFields": [],
-      "formLineActions": [],
+      "formLineTabLabel": "物料",
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "弹窗多选物料档案后带入（编码 / 名称 / 规格 / 种类）"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger"
+        }
+      ],
       "craftProcs": [
         "来料检验",
         "外观检查",
@@ -6553,75 +6587,19 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailFields": [
-        {
-          "name": "条码号"
-        },
-        {
-          "name": "外包材类型"
-        },
-        {
-          "name": "外包材材质"
-        },
-        {
-          "name": "包材编号"
-        },
-        {
-          "name": "容积"
-        },
-        {
-          "name": "生产厂家"
-        },
-        {
-          "name": "充装介质"
-        },
-        {
-          "name": "备注"
-        },
-        {
-          "name": "使用状态"
-        },
-        {
-          "name": "绑定状态"
-        },
-        {
-          "name": "库存状态"
-        },
-        {
-          "name": "库存位置"
-        },
-        {
-          "name": "生产日期"
-        },
-        {
-          "name": "有效期"
-        },
-        {
-          "name": "失效日期"
-        },
-        {
-          "name": "物料信息"
-        },
-        {
-          "name": "批号"
-        },
-        {
-          "name": "批号类型"
-        },
-        {
-          "name": "当前绑定包材"
-        },
-        {
-          "name": "绑定时间"
-        },
-        {
-          "name": "当前数量"
-        },
-        {
-          "name": "库存单位"
-        },
-        {
-          "name": "供应商信息"
-        }
+        { "name": "条码号" },
+        { "name": "外包材类型" },
+        { "name": "外包材材质" },
+        { "name": "生产厂家" },
+        { "name": "备注" },
+        { "name": "使用状态" },
+        { "name": "绑定状态" },
+        { "name": "库存状态" },
+        { "name": "库存位置" },
+        { "name": "物料信息" },
+        { "name": "批号" },
+        { "name": "当前绑定包材" },
+        { "name": "绑定时间" }
       ],
       "hasEdit": true,
       "hasDetail": true,
@@ -6680,11 +6658,6 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "生产厂家",
           "type": "select",
-          "required": false
-        },
-        {
-          "name": "容积",
-          "type": "input",
           "required": false
         },
         {
@@ -22765,8 +22738,13 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "告警状态",
               "title": "告警状态",
-              "width": 100,
+              "width": 110,
               "slot": "tag"
+            },
+            {
+              "field": "在库时长",
+              "title": "在库时长",
+              "width": 100
             },
             {
               "field": "使用状态",
@@ -22839,6 +22817,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "失效日期",
               "title": "失效日期",
               "width": 120
+            },
+            {
+              "field": "入库日期",
+              "title": "入库日期",
+              "width": 120
             }
           ],
           "rowOps": []
@@ -22847,6 +22830,14 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab5",
           "label": "计数库存明细",
           "queryFields": [
+            {
+              "name": "告警状态",
+              "type": "select",
+              "options": [
+                "正常",
+                "库龄超限"
+              ]
+            },
             {
               "name": "物料编码",
               "type": "input"
@@ -22869,12 +22860,13 @@ window.WMS_PAGE_CONFIGS = {
             }
           ],
           "queryDefault": [
+            "告警状态",
             "物料编码",
-            "物料名称",
             "批号",
             "仓库编码"
           ],
           "queryMore": [
+            "物料名称",
             "库位编码"
           ],
           "toolbar": [
@@ -22885,6 +22877,17 @@ window.WMS_PAGE_CONFIGS = {
             }
           ],
           "columns": [
+            {
+              "field": "告警状态",
+              "title": "告警状态",
+              "width": 110,
+              "slot": "tag"
+            },
+            {
+              "field": "在库时长",
+              "title": "在库时长",
+              "width": 100
+            },
             {
               "field": "物料编码",
               "title": "物料编码",
@@ -22928,6 +22931,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "库位编码",
               "title": "库位编码",
+              "width": 120
+            },
+            {
+              "field": "入库日期",
+              "title": "入库日期",
               "width": 120
             }
           ],

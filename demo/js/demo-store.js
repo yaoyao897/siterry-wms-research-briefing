@@ -2373,6 +2373,13 @@ window.WMS_DEMO_STORE = (function () {
     } catch (e) {
       console.warn('[WMS_DEMO_STORE] MOCK localStorage 写入失败', e);
     }
+    const payload = { type: 'sync', reason: 'mock-save', at: nowStr() };
+    try {
+      channel && channel.postMessage(payload);
+    } catch (e) { /* ignore */ }
+    try {
+      window.dispatchEvent(new CustomEvent('wms-demo-sync', { detail: payload }));
+    } catch (e) { /* ignore */ }
   }
 
   function loadMock() {
@@ -2411,6 +2418,12 @@ window.WMS_DEMO_STORE = (function () {
       }
       if ((!Array.isArray(r._pickLines) || !r._pickLines.length) && Array.isArray(base._pickLines) && base._pickLines.length) {
         next._pickLines = JSON.parse(JSON.stringify(base._pickLines));
+      }
+      // 新字段回补：缓存行缺「检验状态」时用源码 Mock 值（或待检验）
+      const qc = String(next['检验状态'] == null ? '' : next['检验状态']).trim();
+      if (!qc || qc === '—' || qc === '-') {
+        const fromBase = String((base && base['检验状态']) || '').trim();
+        next['检验状态'] = (fromBase && fromBase !== '—' && fromBase !== '-') ? fromBase : '待检验';
       }
       return next;
     });
@@ -2464,7 +2477,9 @@ window.WMS_DEMO_STORE = (function () {
     if (typeof handler !== 'function') return function () {};
     const onMsg = (ev) => handler(ev && ev.data ? ev.data : ev);
     const onStorage = (ev) => {
-      if (ev && ev.key === STORAGE_KEY) handler({ type: 'sync', reason: 'storage' });
+      if (ev && (ev.key === STORAGE_KEY || ev.key === MOCK_KEY)) {
+        handler({ type: 'sync', reason: ev.key === MOCK_KEY ? 'mock-storage' : 'storage' });
+      }
     };
     const onCustom = (ev) => handler(ev.detail || { type: 'sync' });
     if (channel) channel.addEventListener('message', onMsg);

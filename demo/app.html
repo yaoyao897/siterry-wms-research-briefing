@@ -18,29 +18,34 @@
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color:var(--color-text-normal);background:var(--color-bg-page)}
 #app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .app-shell{display:flex;flex:1;min-height:0;height:auto}
-/* Demo 顶部公告栏 */
-.demo-announce{flex-shrink:0;background:linear-gradient(90deg,#EEF2F8 0%,#F7F9FC 55%,#FFF8E1 100%);border-bottom:1px solid #C5D4EB;z-index:10060;position:relative}
-.demo-announce__bar{display:flex;align-items:center;gap:10px;padding:0 16px;height:36px;cursor:pointer;user-select:none}
-.demo-announce__badge{flex-shrink:0;height:20px;padding:0 8px;border-radius:3px;background:#1A4099;color:#fff;font-size:11px;font-weight:600;line-height:20px}
-.demo-announce__ver{flex-shrink:0;font-size:12px;font-weight:600;color:#1A4099}
-.demo-announce__headline{flex:1;min-width:0;font-size:12px;color:#434343;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.demo-announce__meta{flex-shrink:0;font-size:11px;color:#8C8C8C}
-.demo-announce__btn{flex-shrink:0;height:24px;padding:0 10px;border:1px solid #C5D4EB;border-radius:4px;background:#fff;color:#1A4099;font-size:12px;cursor:pointer}
-.demo-announce__btn:hover{border-color:#1A4099;background:#EEF2F8}
-.demo-announce__btn--ghost{color:#8C8C8C;border-color:#E8E8E8}
-.demo-announce__panel{max-height:min(42vh,420px);overflow:hidden;display:flex;flex-direction:column;border-top:1px solid #C5D4EB;background:#fff}
-.demo-announce__tabs{display:flex;gap:0;padding:0 12px;border-bottom:1px solid var(--color-border);background:#FAFAFA;flex-shrink:0}
-.demo-announce__tab{height:34px;padding:0 14px;border:0;background:transparent;font-size:13px;color:#8C8C8C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+/* 公告：右上角铃铛 + 弹窗（相对共享链接版本增量说明） */
+.announce-bell{
+  position:fixed;top:10px;right:100px;z-index:10050;
+  width:32px;height:32px;padding:0;border:1px solid var(--color-border);border-radius:4px;
+  background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.1);
+  color:#1A4099;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.announce-bell:hover{border-color:#1A4099;background:#EEF2F8}
+.announce-bell svg{width:16px;height:16px;display:block}
+.announce-bell__dot{
+  position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;
+  background:#F5222D;border:1px solid #fff;pointer-events:none;
+}
+.announce-bell{position:fixed}
+body.remarks-open .announce-bell{right:calc(var(--remarks-panel-w) + 100px)}
+.demo-announce__tabs{display:flex;gap:0;padding:0 4px;border-bottom:1px solid var(--color-border);background:#FAFAFA;flex-shrink:0;margin:-4px -4px 0}
+.demo-announce__tab{height:36px;padding:0 14px;border:0;background:transparent;font-size:13px;color:#8C8C8C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
 .demo-announce__tab.on{color:#1A4099;font-weight:600;border-bottom-color:#1A4099}
-.demo-announce__tools{display:flex;align-items:center;gap:8px;padding:8px 12px;flex-shrink:0;border-bottom:1px solid var(--color-border)}
+.demo-announce__tools{display:flex;align-items:center;gap:8px;padding:10px 0 8px;flex-shrink:0}
 .demo-announce__tools input,.demo-announce__tools select{height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 8px;font-size:12px;color:#595959;background:#fff}
 .demo-announce__tools input{flex:1;min-width:120px}
 .demo-announce__tools select{width:96px}
-.demo-announce__body{flex:1;min-height:0;overflow:auto;padding:10px 14px 14px}
+.demo-announce__body{max-height:min(52vh,480px);overflow:auto;padding:4px 2px 8px}
 .demo-announce__note{padding:10px 12px;margin-bottom:8px;border:1px solid var(--color-border);border-radius:6px;background:#FAFAFA}
 .demo-announce__note.warn{border-color:#FFD591;background:#FFF7E6}
 .demo-announce__note-title{font-size:13px;font-weight:600;color:#262626;margin-bottom:4px}
-.demo-announce__note-body{font-size:12px;line-height:1.55;color:#595959}
+.demo-announce__note-body{font-size:12px;line-height:1.55;color:#595959;white-space:pre-wrap}
 .demo-announce__upd{display:grid;grid-template-columns:88px 86px 52px minmax(120px,1.1fr) minmax(180px,2fr);gap:8px 10px;padding:8px 0;border-bottom:1px dashed #F0F0F0;font-size:12px;align-items:start}
 .demo-announce__upd:last-child{border-bottom:0}
 .demo-announce__upd-ver{font-weight:600;color:#1A4099}
@@ -51,7 +56,6 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .demo-announce__empty{padding:24px;text-align:center;color:#8C8C8C;font-size:13px}
 @media (max-width:960px){
   .demo-announce__upd{grid-template-columns:1fr;gap:2px}
-  .demo-announce__meta{display:none}
 }
 .app-aside{width:240px;flex-shrink:0;height:100%;min-height:0;background:#fff;border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow:hidden}
 .app-aside__logo{padding:16px 20px;font-size:15px;font-weight:600;color:var(--color-text-main);border-bottom:1px solid var(--color-border);flex-shrink:0}
@@ -344,48 +348,47 @@ body.remarks-open .demo-scope-tip{display:none}
 </head>
 <body>
 <div id="app" v-cloak>
-  <div class="demo-announce" v-if="announceBarVisible">
-    <div class="demo-announce__bar" @click="announceOpen = !announceOpen">
-      <span class="demo-announce__badge">公告</span>
-      <span class="demo-announce__ver">{{ announceLatest }}</span>
-      <span class="demo-announce__headline">{{ announceHeadline }}</span>
-      <span class="demo-announce__meta">共 {{ announceUpdateCount }} 条更新</span>
-      <button type="button" class="demo-announce__btn" @click.stop="announceOpen = !announceOpen">{{ announceOpen ? '收起' : '展开' }}</button>
-      <button type="button" class="demo-announce__btn demo-announce__btn--ghost" @click.stop="dismissAnnounce" title="关闭后新版本发布会再次显示">关闭</button>
+  <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span v-if="announceUnread" class="announce-bell__dot"></span>
+  </button>
+
+  <el-dialog v-model="announceOpen" :title="'版本公告 · ' + announceLatest" width="760px" append-to-body destroy-on-close class="announce-dialog" @closed="onAnnounceClosed">
+    <div class="demo-announce__tabs">
+      <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='notes' }" @click="announceTab='notes'">使用说明</button>
+      <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='updates' }" @click="announceTab='updates'">更新记录</button>
     </div>
-    <div class="demo-announce__panel" v-show="announceOpen">
-      <div class="demo-announce__tabs">
-        <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='notes' }" @click="announceTab='notes'">使用说明</button>
-        <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='updates' }" @click="announceTab='updates'">更新记录</button>
-      </div>
-      <div class="demo-announce__tools" v-if="announceTab==='updates'">
-        <input v-model.trim="announceKw" type="search" placeholder="搜索版本 / 模块 / 摘要…" />
-        <select v-model="announceTerminal">
-          <option value="全部">全部终端</option>
-          <option value="PC">PC</option>
-          <option value="APP">APP</option>
-        </select>
-      </div>
-      <div class="demo-announce__body">
-        <template v-if="announceTab==='notes'">
-          <div v-for="n in announceNotes" :key="n.id" class="demo-announce__note" :class="n.level">
-            <div class="demo-announce__note-title">{{ n.title }}</div>
-            <div class="demo-announce__note-body">{{ n.body }}</div>
-          </div>
-        </template>
-        <template v-else>
-          <div v-if="!filteredAnnounceUpdates.length" class="demo-announce__empty">无匹配的更新记录</div>
-          <div v-for="u in filteredAnnounceUpdates" :key="u.version + u.module + u.summary" class="demo-announce__upd">
-            <div class="demo-announce__upd-ver">{{ u.version }}</div>
-            <div class="demo-announce__upd-date">{{ u.date }}</div>
-            <div class="demo-announce__upd-term">{{ u.terminal }}</div>
-            <div class="demo-announce__upd-mod"><span class="demo-announce__type">{{ u.type }}</span>{{ u.module }}</div>
-            <div class="demo-announce__upd-sum">{{ u.summary }}</div>
-          </div>
-        </template>
-      </div>
+    <div class="demo-announce__tools" v-if="announceTab==='updates'">
+      <input v-model.trim="announceKw" type="search" placeholder="搜索版本 / 模块 / 摘要…" />
+      <select v-model="announceTerminal">
+        <option value="全部">全部终端</option>
+        <option value="PC">PC</option>
+        <option value="APP">APP</option>
+      </select>
     </div>
-  </div>
+    <div class="demo-announce__body">
+      <template v-if="announceTab==='notes'">
+        <div v-for="n in announceNotes" :key="n.id" class="demo-announce__note" :class="n.level">
+          <div class="demo-announce__note-title">{{ n.title }}</div>
+          <div class="demo-announce__note-body">{{ n.body }}</div>
+        </div>
+      </template>
+      <template v-else>
+        <div v-if="!filteredAnnounceUpdates.length" class="demo-announce__empty">无匹配的更新记录</div>
+        <div v-for="u in filteredAnnounceUpdates" :key="u.version + u.module + u.summary" class="demo-announce__upd">
+          <div class="demo-announce__upd-ver">{{ u.version }}</div>
+          <div class="demo-announce__upd-date">{{ u.date }}</div>
+          <div class="demo-announce__upd-term">{{ u.terminal }}</div>
+          <div class="demo-announce__upd-mod"><span class="demo-announce__type">{{ u.type }}</span>{{ u.module }}</div>
+          <div class="demo-announce__upd-sum">{{ u.summary }}</div>
+        </div>
+      </template>
+    </div>
+    <template #footer>
+      <el-button @click="announceOpen=false">关闭</el-button>
+      <el-button type="primary" @click="dismissAnnounce">知道了</el-button>
+    </template>
+  </el-dialog>
 
   <button type="button" class="remarks-toggle" :class="{ on: remarksOpen }" @click="toggleRemarks" title="查看本页页面说明">
     {{ remarksOpen ? '收起备注' : '备注' }}
@@ -441,10 +444,10 @@ body.remarks-open .demo-scope-tip{display:none}
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
+          <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
-            <a href="././pc.html">PC</a>
-            <a href="././app.html" class="on">APP</a>
+            <a href="./pc.html">PC</a>
+            <a href="./app.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
         </div>
@@ -2169,14 +2172,8 @@ body.remarks-open .demo-scope-tip{display:none}
               </div>
               <div class="m-footer" v-if="isOsRecvTank"><button type="button" class="btn-primary" @click="submitExec">提交 (收料入库)</button></div>
               <div class="m-footer" v-else-if="isProdRetTank"><button type="button" class="btn-primary" @click="submitExec">提交 (退料入库)</button></div>
-              <div class="m-footer" v-else-if="isTrustRecvTank" style="display:flex;gap:10px">
-                <button type="button" class="btn-ghost" style="flex:1" @click="saveTrustRecvTankExec">保存 (暂存)</button>
-                <button type="button" class="btn-primary" style="flex:1" @click="submitExec">提交 (收料打罐)</button>
-              </div>
-              <div class="m-footer" v-else-if="isPoInTank" style="display:flex;gap:10px">
-                <button type="button" class="btn-ghost" style="flex:1" @click="savePoInTankExec">保存 (暂存)</button>
-                <button type="button" class="btn-primary" style="flex:1" @click="submitExec">提交 (入库)</button>
-              </div>
+              <div class="m-footer" v-else-if="isTrustRecvTank"><button type="button" class="btn-primary" @click="submitExec">提交 (收料打罐)</button></div>
+              <div class="m-footer" v-else-if="isPoInTank"><button type="button" class="btn-primary" @click="submitExec">提交 (入库)</button></div>
               <div class="m-footer" v-else><button class="btn-primary" @click="submitExec">提交</button></div>
 
               <div v-if="lotDetailVisible" style="position:absolute;inset:0;z-index:21;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;border-radius:20px">
@@ -3513,7 +3510,7 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.248"></script>
+<script src="./js/demo-announcements.js?v=1.3.269"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/demo-store.js"></script>
 <script src="./js/app-configs.js"></script>
@@ -3568,6 +3565,7 @@ createApp({
     const storeTick = ref(0);
     function bumpStore() { storeTick.value += 1; }
     function hydrateAllDocs() {
+      hydrateSerialArchFromPcMock();
       if (!STORE || !CFG.docsMap) return;
       Object.keys(CFG.docsMap).forEach((k) => STORE.hydrateAppDocs(CFG.docsMap[k] || []));
       if (currentNotice.value && currentNotice.value.id) {
@@ -3804,7 +3802,7 @@ createApp({
     const ANNOUNCE = window.DEMO_ANNOUNCEMENTS || { notes:[], updates:[], latestVersion:'', updatedAt:'' };
     const ANNOUNCE_DISMISS_KEY = 'siterry-demo-announce-dismissed';
     const announceLatest = ANNOUNCE.latestVersion || '';
-    const announceBarVisible = ref((()=>{
+    const announceUnread = ref((()=>{
       try{ return localStorage.getItem(ANNOUNCE_DISMISS_KEY) !== announceLatest; }catch(e){ return true; }
     })());
     const announceOpen = ref(false);
@@ -3829,8 +3827,15 @@ createApp({
         return hay.includes(kw);
       });
     });
+    function openAnnounce(){
+      announceOpen.value = true;
+      announceTab.value = 'notes';
+    }
+    function onAnnounceClosed(){
+      /* keep unread until 知道了 */
+    }
     function dismissAnnounce(){
-      announceBarVisible.value = false;
+      announceUnread.value = false;
       announceOpen.value = false;
       try{ localStorage.setItem(ANNOUNCE_DISMISS_KEY, announceLatest); }catch(e){}
     }
@@ -4091,8 +4096,9 @@ createApp({
       const kw = String(recommendKw.value || '').trim();
       let list = (CFG.recommendBarcodes || []).slice();
       list = list.filter((r) => {
+        const arch = findSerialArch(r.barcode);
+        if (archInspectStatus(arch || r) !== '合格') return false;
         if (line && line.code) {
-          const arch = (CFG.serialArchRows || []).find(a => a.barcode === r.barcode);
           const mat = arch ? String(arch.material || '').split('/')[0].trim() : '';
           if (mat && mat !== line.code) return false;
         }
@@ -5120,6 +5126,7 @@ createApp({
         ElementPlus.ElMessage.error('请输入必填的包材编号');
         return;
       }
+      hydrateSerialArchFromPcMock();
       const rows = CFG.serialArchRows || [];
       const hit = rows.find(r =>
         r.pkgNo === pkgSearch.pkgNo.trim() &&
@@ -5156,7 +5163,7 @@ createApp({
         ElementPlus.ElMessage.error('请输入条码号');
         return;
       }
-      const hit = (CFG.serialArchRows || []).find(r => r.barcode === code);
+      const hit = findSerialArch(code);
       if (!hit) {
         pkgDetail.value = null;
         toast('未找到该条码信息');
@@ -5565,28 +5572,13 @@ createApp({
         return;
       }
       if (isPoInTank.value && !opts.skipSaveToast) {
+        savePoInTankExec({ silent: false, fromBack: true });
         view.value = 'materials';
         return;
       }
       if (isPoInCount.value && !opts.skipSaveToast) {
-        const defaultQty = Number((currentLine.value && currentLine.value.remainQty) || 0) || null;
-        const qtyChanged = form.inQty != null && Number(form.inQty) !== Number(defaultQty);
-        const lotChanged = !!(form.lotIn && form.lotIn !== ((currentLine.value && currentLine.value.lot) || ''));
-        const hasProgress = !!(form.loc || form.remark || qtyChanged || lotChanged || (countDoneProcs.value && countDoneProcs.value.length));
-        if (!hasProgress) {
-          view.value = 'materials';
-          return;
-        }
-        ElementPlus.ElMessageBox.confirm('当前内容尚未提交，是否暂存进度并离开？', '离开确认', {
-          confirmButtonText: '暂存离开',
-          cancelButtonText: '放弃返回',
-          distinguishCancelAndClose: true,
-        }).then(() => {
-          savePoInCountDraft();
-          view.value = 'materials';
-        }).catch((action) => {
-          if (action === 'cancel') view.value = 'materials';
-        });
+        savePoInCountDraft({ silent: false, fromBack: true });
+        view.value = 'materials';
         return;
       }
       if (isLineSidePick.value && !opts.skipSaveToast) {
@@ -5644,6 +5636,45 @@ createApp({
       }
       return true;
     }
+
+    /** 扫码成功后静默暂存（统一口径：扫码即为保存；无独立保存按钮） */
+    function autosaveAfterScan() {
+      try {
+        if (isPoInTank.value) return savePoInTankExec({ silent: true });
+        if (isTrustRecvTank.value) return saveTrustRecvTankExec({ silent: true, fromBack: true });
+        if (isOsRecvTank.value) return autoSaveOsRecvTankExec();
+        if (isProdRetTank.value) return autoSaveProdRetTankExec();
+        if (isPoInCount.value) return savePoInCountDraft({ silent: true, fromBack: true });
+        if (isOutCountDoc.value) {
+          if (isSoShipCount.value) return autoSaveSoShipCountExec();
+          if (isSoPreoutCount.value) return autoSaveSoPreoutCountExec();
+          if (isOsIssueCount.value) return autoSaveOsIssueCountExec();
+          if (isOsRmaCount.value) return autoSaveOsRmaCountExec();
+          if (isTrustRetCount.value) return autoSaveTrustRetCountExec();
+          return autoSavePoRetCountExec();
+        }
+        if (isOutSerialDoc.value) {
+          if (isSoShipSerial.value) return autoSaveSoShipExec();
+          if (isSoPreoutSerial.value) return autoSaveSoPreoutExec();
+          if (isOsIssueSerial.value) return autoSaveOsIssueExec();
+          if (isOsRmaSerial.value) return autoSaveOsRmaExec();
+          if (isTrustRetSerial.value) return autoSaveTrustRetExec();
+          return autoSavePoRetExec();
+        }
+        if (isInSerialDoc.value) {
+          if (isSoRmaSerial.value) return autoSaveSoRmaExec();
+          if (isOsRetSerial.value) return autoSaveOsRetExec();
+          if (isOsRecvSerial.value) return autoSaveOsRecvExec();
+          if (isProdRetSerial.value) return autoSaveProdRetExec();
+          if (isProdInSerial.value) return false;
+          if (isTrustRecvSerial.value || isPoInSerial.value) return autoSavePoInExec();
+          return autoSavePoInExec();
+        }
+        if (isLineSidePick.value) return autoSaveProdPickExec();
+      } catch (e) { /* ignore demo autosave errors */ }
+      return false;
+    }
+
     function addSerialScan() {
       const code = form.barcode.trim();
       if (!code) return;
@@ -5659,13 +5690,14 @@ createApp({
           addOuterBindScan(code);
           return;
         }
-        const arch = (CFG.serialArchRows || []).find(r => r.barcode === code);
+        const arch = findSerialArch(code);
         const err = validatePoRetBarcode(arch, code, { allowBound: false });
         if (err) { ElementPlus.ElMessage.error(err); return; }
         pushPoRetScanRow(arch, code, '—');
         form.barcode = '';
         form.retQty = null;
         ElementPlus.ElMessage.success(`条码[${code}]已加入明细`);
+        autosaveAfterScan();
         return;
       }
       if (isInSerialDoc.value) {
@@ -5676,12 +5708,13 @@ createApp({
           addOuterBindScan(code);
           return;
         }
-        const arch = (CFG.serialArchRows || []).find(r => r.barcode === code);
+        const arch = findSerialArch(code);
         const err = inSerialValidate(arch, code, { allowBound: false });
         if (err) { ElementPlus.ElMessage.error(err); return; }
         pushPoInScanRow(arch, code, '—');
         form.barcode = '';
         ElementPlus.ElMessage.success((isOsRetSerial.value || isProdRetSerial.value) ? '扫码成功，已添加明细' : (isOsRecvSerial.value ? '扫码成功，已添加明细' : `条码[${code}]已加入明细`));
+        autosaveAfterScan();
         return;
       }
       scanRows.value.push({
@@ -5694,9 +5727,180 @@ createApp({
       });
       form.barcode = '';
       toast('已录入扫码明细');
+      autosaveAfterScan();
     }
+
+    /** PC 流水码档案(localStorage Mock) → APP 扫码同源：批量建档后 APP 可识别 */
+    function parseSerialValidPeriod(v) {
+      const s = String(v == null ? '' : v).trim();
+      const m = s.match(/(\d+)/);
+      return m ? m[1] : '';
+    }
+    function mapPcSerialArchToApp(pc) {
+      if (!pc) return null;
+      const barcode = String(pc['条码号'] || '').trim();
+      if (!barcode) return null;
+      const stepRaw = String(pc['当前步骤'] == null ? '' : pc['当前步骤']).trim();
+      const qcRaw = String(pc['检验状态'] == null ? '' : pc['检验状态']).trim();
+      return {
+        barcode: barcode,
+        pkgNo: (String(pc['包材编号'] || '').trim() === '—' ? '' : String(pc['包材编号'] || '').trim()),
+        packType: String(pc['包材类型'] || '流水码').trim() || '流水码',
+        packSpec: pc['包装规格'] || '',
+        material: pc['物料信息'] || '',
+        lot: pc['物料批号'] || '',
+        unit: pc['库存单位'] || '',
+        archiveQty: pc['建档数量'] || '',
+        qty: pc['当前数量'] || '',
+        maker: pc['生产厂家'] || '',
+        supplier: pc['供应商信息'] || '',
+        prodDate: pc['生产日期'] || '',
+        validPeriod: parseSerialValidPeriod(pc['有效期']),
+        validUnit: /年/.test(String(pc['有效期'] || '')) ? '年' : '月',
+        expireDate: pc['失效日期'] || '',
+        useStatus: pc['使用状态'] || '',
+        inspectStatus: (!qcRaw || qcRaw === '—' || qcRaw === '待检') ? '待检验' : qcRaw,
+        stockStatus: pc['库存状态'] || '',
+        loc: pc['存储位置'] || '',
+        bindStatus: pc['绑定状态'] || '未绑定',
+        bindOuter: pc['当前绑定外包材'] || '—',
+        step: (!stepRaw || stepRaw === '—') ? '' : stepRaw,
+        docNo: (String(pc['当前单据号'] || '').trim() === '—' ? '' : String(pc['当前单据号'] || '').trim()),
+        sourceNo: pc['来源单号'] || '',
+        sourceBarcode: pc['来源条码号'] || '',
+        custLot: pc['客户批号'] || '',
+        stage: (String(pc['所属阶段'] || '').trim() === '—' ? '' : (pc['所属阶段'] || '')),
+        remark: pc['备注'] || '',
+        fromPc: true,
+      };
+    }
+    function hydrateSerialArchFromPcMock() {
+      if (!STORE || !STORE.loadMock) return;
+      let mock;
+      try { mock = STORE.loadMock(); } catch (e) { return; }
+      if (!mock) return;
+      const pcList = ((mock['serial-arch'] || {}).main) || [];
+      if (!Array.isArray(pcList) || !pcList.length) return;
+      if (!CFG.serialArchRows) CFG.serialArchRows = [];
+      const rows = CFG.serialArchRows;
+      const byCode = new Map();
+      rows.forEach((r) => {
+        const c = String((r && r.barcode) || '').trim();
+        if (c) byCode.set(c, r);
+      });
+      pcList.forEach((pc) => {
+        const mapped = mapPcSerialArchToApp(pc);
+        if (!mapped) return;
+        const hit = byCode.get(mapped.barcode);
+        if (hit) {
+          hit.material = mapped.material || hit.material;
+          hit.lot = mapped.lot || hit.lot;
+          hit.unit = mapped.unit || hit.unit;
+          hit.archiveQty = mapped.archiveQty || hit.archiveQty;
+          hit.qty = mapped.qty || hit.qty;
+          hit.maker = mapped.maker || hit.maker;
+          hit.supplier = mapped.supplier || hit.supplier;
+          hit.prodDate = mapped.prodDate || hit.prodDate;
+          hit.validPeriod = mapped.validPeriod || hit.validPeriod;
+          hit.expireDate = mapped.expireDate || hit.expireDate;
+          hit.useStatus = mapped.useStatus || hit.useStatus;
+          hit.inspectStatus = mapped.inspectStatus || hit.inspectStatus;
+          hit.stockStatus = mapped.stockStatus || hit.stockStatus;
+          hit.loc = mapped.loc || hit.loc;
+          hit.bindStatus = mapped.bindStatus || hit.bindStatus;
+          hit.bindOuter = mapped.bindOuter || hit.bindOuter;
+          hit.step = mapped.step;
+          hit.docNo = mapped.docNo;
+          hit.packSpec = mapped.packSpec || hit.packSpec;
+          hit.packType = mapped.packType || hit.packType || '流水码';
+          hit.sourceNo = mapped.sourceNo || hit.sourceNo;
+          hit.sourceBarcode = mapped.sourceBarcode || hit.sourceBarcode;
+          hit.custLot = mapped.custLot || hit.custLot;
+          hit.stage = mapped.stage || hit.stage;
+          hit.fromPc = true;
+        } else {
+          rows.push(mapped);
+          byCode.set(mapped.barcode, mapped);
+        }
+      });
+    }
+    function findSerialArch(code) {
+      hydrateSerialArchFromPcMock();
+      const c = String(code || '').trim();
+      if (!c) return null;
+      return (CFG.serialArchRows || []).find((r) => r && (r.barcode === c || r.pkgNo === c)) || null;
+    }
+    function flushSerialArchToPcMock() {
+      if (!STORE || !STORE.loadMock || !STORE.saveMock) return;
+      let mock;
+      try { mock = STORE.loadMock() || {}; } catch (e) { return; }
+      if (!mock['serial-arch']) mock['serial-arch'] = { main: [] };
+      const list = mock['serial-arch'].main || (mock['serial-arch'].main = []);
+      const byCode = new Map();
+      list.forEach((r) => {
+        const c = String((r && r['条码号']) || '').trim();
+        if (c) byCode.set(c, r);
+      });
+      (CFG.serialArchRows || []).forEach((arch) => {
+        const code = String((arch && arch.barcode) || '').trim();
+        if (!code) return;
+        let pc = byCode.get(code);
+        if (!pc) {
+          if (!arch.fromPc && arch.stockStatus !== '仓库' && arch.stockStatus !== '厂外') return;
+          pc = {
+            id: 'app-' + code,
+            条码号: code,
+            使用状态: arch.useStatus || '在用',
+            检验状态: arch.inspectStatus || '待检验',
+            物料信息: arch.material || '—',
+            物料批号: arch.lot || '—',
+            包装规格: arch.packSpec || '—',
+            建档数量: arch.archiveQty || arch.qty || '—',
+            库存单位: arch.unit || '—',
+            供应商信息: arch.supplier || '—',
+            生产厂家: arch.maker || '—',
+            生产日期: arch.prodDate || '—',
+            有效期: arch.validPeriod ? (String(arch.validPeriod) + ' ' + (arch.validUnit || '月')) : '—',
+            失效日期: arch.expireDate || '—',
+            绑定状态: arch.bindStatus || '未绑定',
+            当前绑定外包材: arch.bindOuter || '—',
+            来源单号: arch.sourceNo || '—',
+            来源条码号: arch.sourceBarcode || '—',
+            客户批号: arch.custLot || '—',
+            创建时间: (STORE.nowStr && STORE.nowStr()) || '',
+          };
+          list.unshift(pc);
+          byCode.set(code, pc);
+        }
+        pc['当前数量'] = String(arch.qty != null ? arch.qty : (pc['当前数量'] || ''));
+        pc['库存状态'] = arch.stockStatus || pc['库存状态'] || '初始化';
+        pc['存储位置'] = arch.loc || pc['存储位置'] || '—';
+        pc['当前步骤'] = arch.step ? arch.step : '—';
+        pc['当前单据号'] = arch.docNo ? arch.docNo : '—';
+        pc['绑定状态'] = arch.bindStatus || pc['绑定状态'] || '未绑定';
+        pc['当前绑定外包材'] = arch.bindOuter || pc['当前绑定外包材'] || '—';
+        if (arch.sourceNo) pc['来源单号'] = arch.sourceNo;
+        if (arch.stage) pc['所属阶段'] = arch.stage;
+        if (arch.useStatus) pc['使用状态'] = arch.useStatus;
+        if (arch.inspectStatus) pc['检验状态'] = arch.inspectStatus;
+        if (arch.material) pc['物料信息'] = arch.material;
+        if (arch.lot) pc['物料批号'] = arch.lot;
+      });
+      STORE.saveMock(mock);
+    }
+
     function archMaterialCode(arch) {
       return String((arch && arch.material) || '').split('/')[0].trim();
+    }
+    function archInspectStatus(arch) {
+      const v = String((arch && (arch.inspectStatus || arch.qcStatus || arch['检验状态'])) || '').trim();
+      if (!v || v === '—' || v === '待检') return '待检验';
+      return v;
+    }
+    function requireInspectPass(arch, code, act) {
+      const qc = archInspectStatus(arch);
+      if (qc !== '合格') return `条码[${code}]检验状态非合格（当前：${qc}），禁止${act}`;
+      return '';
     }
     function poInDraftKey() {
       const n = currentNotice.value;
@@ -5858,11 +6062,18 @@ createApp({
       if (!tabs.length) return true;
       return tabs.every(t => countProcDone(t));
     }
-    function savePoInCountDraft() {
+    function savePoInCountDraft(opts) {
+      opts = opts || {};
       const n = currentNotice.value;
       const line = currentLine.value;
-      if (n && (form.loc || form.inQty)) n.status = '执行中';
-      if (line && (form.loc || form.inQty)) line.status = '执行中';
+      const hasProgress = !!(form.loc || form.inQty || form.remark || form.lotIn || (countDoneProcs.value && countDoneProcs.value.length));
+      if (!hasProgress && !opts.fromBack) {
+        if (!opts.silent) ElementPlus.ElMessage.warning('暂无可保存的作业内容');
+        return false;
+      }
+      if (!hasProgress) return false;
+      if (n) n.status = '执行中';
+      if (line) line.status = '执行中';
       if (STORE && STORE.upsertWhPoInFromApp) {
         STORE.upsertWhPoInFromApp({
           action: 'po-in-draft',
@@ -5880,7 +6091,7 @@ createApp({
           },
         });
       }
-      ElementPlus.ElMessage.success('作业进度已保存');
+      if (!opts.silent) ElementPlus.ElMessage.success(opts.fromBack ? '作业进度已暂存' : '作业进度已保存');
       return true;
     }
     function savePoRetCountDraft() {
@@ -6169,6 +6380,10 @@ createApp({
       if (arch.useStatus !== '在用') return `条码[${code}]使用状态非在用（当前：${arch.useStatus || '—'}），禁止入库`;
       if (arch.stockStatus === '仓库') return `条码[${code}]库存状态为「仓库」（已在库），禁止入库`;
       if (arch.stockStatus !== '初始化') return `条码[${code}]库存状态非初始化（当前：${arch.stockStatus || '—'}），禁止入库`;
+      if (isProdInSerial.value) {
+        const qcErr = requireInspectPass(arch, code, '生产入库');
+        if (qcErr) return qcErr;
+      }
       const mat = archMaterialCode(arch);
       if (currentLine.value && mat && mat !== currentLine.value.code) {
         return `条码[${code}]物料（${mat}）与当前明细物料不相符`;
@@ -6245,8 +6460,8 @@ createApp({
       opts = opts || {};
       if (!arch) return `条码[${code}]档案不存在，禁止退货入库`;
       if (arch.useStatus !== '在用') return `条码[${code}]使用状态非在用（当前：${arch.useStatus || '—'}），禁止退货入库`;
-      if (arch.stockStatus !== '已出库' && arch.stockStatus !== '初始化') {
-        return `条码[${code}]库存状态须为已出库或初始化（当前：${arch.stockStatus || '—'}），禁止退货入库`;
+      if (arch.stockStatus !== '厂外' && arch.stockStatus !== '已出库' && arch.stockStatus !== '初始化') {
+        return `条码[${code}]库存状态须为厂外或初始化（当前：${arch.stockStatus || '—'}），禁止退货入库`;
       }
       const mat = archMaterialCode(arch);
       if (currentLine.value && mat && mat !== currentLine.value.code) {
@@ -6304,6 +6519,10 @@ createApp({
       if (!arch) return `条码[${code}]档案不存在，禁止${act}`;
       if (arch.useStatus !== '在用') return `条码[${code}]使用状态非在用（当前：${arch.useStatus || '—'}），禁止${act}`;
       if (arch.stockStatus !== '仓库') return `条码[${code}]库存状态非仓库（当前：${arch.stockStatus || '—'}），禁止${act}`;
+      if (isSoPreoutSerial.value || isSoShipSerial.value) {
+        const qcErr = requireInspectPass(arch, code, act);
+        if (qcErr) return qcErr;
+      }
       if (isOsRmaSerial.value) {
         const step = String(arch.step || '').trim();
         if (step && step !== '—' && step !== '无值') {
@@ -6452,6 +6671,7 @@ createApp({
         ElementPlus.ElMessage.error(`外包材[${outer}]下无绑定子包材`);
         return;
       }
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const validateFn = isOutSerialDoc.value ? validatePoRetBarcode : inSerialValidate;
       for (const code of kids) {
@@ -6471,11 +6691,14 @@ createApp({
       form.outerNo = '';
       form.retQty = null;
       ElementPlus.ElMessage.success(`外包材[${outer}]验证通过，已批量扫入 ${kids.length} 袋物料`);
+      autosaveAfterScan();
     }
     function validateProdPickBarcode(arch, code) {
       if (!arch) return `条码[${code}]档案不存在，禁止领料`;
       if (arch.useStatus !== '在用') return `条码[${code}]使用状态非在用（当前：${arch.useStatus || '—'}），禁止领料`;
       if (arch.stockStatus !== '仓库') return `条码[${code}]库存状态非仓库（当前：${arch.stockStatus || '—'}），禁止领料`;
+      const qcErr = requireInspectPass(arch, code, '领料');
+      if (qcErr) return qcErr;
       const mat = archMaterialCode(arch);
       if (currentLine.value && mat && mat !== currentLine.value.code) {
         return `条码[${code}]物料（${mat}）与当前明细物料不相符`;
@@ -6552,13 +6775,14 @@ createApp({
     function addPickScan() {
       const code = String(form.barcode || '').trim();
       if (!code) return;
-      const arch = (CFG.serialArchRows || []).find(r => r.barcode === code);
+      const arch = findSerialArch(code);
       const err = validateProdPickBarcode(arch, code);
       if (err) { ElementPlus.ElMessage.error(err); return; }
       pushProdPickScanRow(arch, code);
       form.barcode = '';
       form.pkgNo = '';
       ElementPlus.ElMessage.success(`条码[${code}]已加入明细`);
+      autosaveAfterScan();
     }
     function openRecommend() {
       if (isLineSidePick.value) {
@@ -6613,7 +6837,7 @@ createApp({
       let ok = 0;
       selected.forEach((r) => {
         if (scanRows.value.some(x => x.barcode === r.barcode)) return;
-        const arch = (CFG.serialArchRows || []).find(a => a.barcode === r.barcode);
+        const arch = findSerialArch(r.barcode);
         const err = validateProdPickBarcode(arch || {
           barcode: r.barcode, useStatus: '在用', stockStatus: '仓库', material: (currentLine.value && currentLine.value.code) || '',
           lot: r.lot, qty: r.qty, loc: r.loc, pkgNo: r.pkgNo, bindStatus: '未绑定', bindOuter: '—',
@@ -6628,7 +6852,10 @@ createApp({
       });
       recommendSelected.value = {};
       view.value = 'exec';
-      if (ok) ElementPlus.ElMessage.success(`已带回 ${ok} 条推荐条码`);
+      if (ok) {
+        ElementPlus.ElMessage.success(`已带回 ${ok} 条推荐条码`);
+        autosaveAfterScan();
+      }
     }
     function focusRecommendScan() { /* demo: search box already focused by enter */ }
     function addTankRow() {
@@ -6674,6 +6901,7 @@ createApp({
         form.tankBarcode = '';
         form.pkgQty = null;
         toast('已添加储罐领料明细');
+        autosaveAfterScan();
         return;
       }
       const before = tankExec.value === 'out' ? 20 : 10;
@@ -6725,6 +6953,13 @@ createApp({
       form.maker = arch.maker || form.maker;
       form.qty = Number(arch.qty || form.qty || 0);
       ElementPlus.ElMessage.success('已关联槽车流水码，原料信息已自动填充');
+      // 过程占用：当前步骤=业务短名，当前单据号=通知单号
+      const n = currentNotice.value;
+      const step = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : '采购入库');
+      arch.step = step;
+      arch.docNo = (n && n.id) || '';
+      flushSerialArchToPcMock();
+      autosaveAfterScan();
     }
     function onPoInTankNoChange() {
       const hit = (CFG.tankArchRows || []).find(t => t.tankNo === form.tankNo);
@@ -6799,19 +7034,24 @@ createApp({
       form.tankBarcode = '';
       form.tankNo = '';
       ElementPlus.ElMessage.success('已添加储罐明细');
+      autosaveAfterScan();
     }
-    function savePoInTankExec() {
+    function savePoInTankExec(opts) {
+      opts = opts || {};
       if (!isPoInTank.value) return false;
-      if (!tankRows.value.length && !form.lotIn && !form.barcode) {
-        ElementPlus.ElMessage.warning('暂无可保存的作业内容');
+      const hasProgress = !!(tankRows.value.length || form.lotIn || form.barcode || form.remark);
+      if (!hasProgress && !opts.fromBack) {
+        if (!opts.silent) ElementPlus.ElMessage.warning('暂无可保存的作业内容');
         return false;
       }
+      if (!hasProgress) return false;
       const n = currentNotice.value;
       const line = currentLine.value;
       if (n) n.status = '执行中';
       if (line) line.status = '执行中';
+      applyPoInTankArchive(false);
       syncPoInPcDocs('执行中', 'po-in-save', { keepDraft: true });
-      ElementPlus.ElMessage.success('作业进度已保存');
+      if (!opts.silent) ElementPlus.ElMessage.success(opts.fromBack ? '作业进度已暂存' : '作业进度已保存');
       return true;
     }
     function saveTrustRecvTankExec(opts) {
@@ -6842,6 +7082,7 @@ createApp({
         };
       }
       if (STORE && n) STORE.setDocStatus(n.id, n.status, { source: 'APP', action: 'trust-recv-tank-save' });
+      applyPoInTankArchive(false);
       if (!opts.silent) ElementPlus.ElMessage.success(opts.fromBack ? '作业进度已暂存' : '作业进度已保存');
       return true;
     }
@@ -6853,6 +7094,7 @@ createApp({
       const line = currentLine.value;
       if (n) n.status = '执行中';
       if (line) line.status = '执行中';
+      applyPoInTankArchive(false);
       if (tankRows.value.length) {
         syncOsRecvPcDocs('执行中', 'os-recv-save', { keepDraft: true });
       } else if (STORE && STORE.upsertWhOsRecvFromApp) {
@@ -6884,7 +7126,7 @@ createApp({
       const code = String(form.barcode || '').trim();
       if (!code) return;
       const line = currentLine.value;
-      const arch = (CFG.serialArchRows || []).find(r => r.barcode === code || r.pkgNo === code);
+      const arch = findSerialArch(code);
       if (!arch) {
         ElementPlus.ElMessage.error('未找到车间条码档案');
         return;
@@ -6913,6 +7155,7 @@ createApp({
       form.validMonths = Number(arch.validPeriod || form.validMonths || 12);
       form.barcode = '';
       ElementPlus.ElMessage.success('已自动带入条码物料批号与生产信息');
+      autosaveAfterScan();
     }
     function addProdRetTankRow() {
       if (!isProdRetTank.value) return;
@@ -6974,6 +7217,7 @@ createApp({
         form.tankBarcode = '';
         form.tankNo = '';
         ElementPlus.ElMessage.success(sameLot ? '同批号已叠加退料数量' : '已新增储罐批号明细');
+        autosaveAfterScan();
         return;
       }
       const lots = Array.isArray(arch.lots) ? arch.lots.slice() : [];
@@ -7015,6 +7259,7 @@ createApp({
       form.tankBarcode = '';
       form.tankNo = '';
       ElementPlus.ElMessage.success('已添加储罐明细');
+      autosaveAfterScan();
     }
     function autoSaveProdRetTankExec() {
       if (!isProdRetTank.value) return false;
@@ -7024,6 +7269,7 @@ createApp({
       const line = currentLine.value;
       if (n) n.status = '执行中';
       if (line) line.status = '执行中';
+      applyProdRetTankArchive(false);
       if (tankRows.value.length) {
         syncProdRetPcDocs('执行中', 'prod-ret-save', { keepDraft: true });
       } else if (STORE && STORE.upsertWhProdRetFromApp) {
@@ -7051,10 +7297,17 @@ createApp({
     }
     function applyProdRetTankArchive(final) {
       const line = currentLine.value;
-      if (!line || !final) return;
+      if (!line) return;
+      const n = currentNotice.value;
+      const noticeId = (n && n.id) || '';
       tankRows.value.forEach((r) => {
         const arch = (CFG.tankArchRows || []).find(t => t.barcode === r.barcode || t.tankNo === r.tankNo);
         if (!arch) return;
+        if (!final) {
+          arch.step = '生产退料';
+          arch.docNo = noticeId;
+          return;
+        }
         const addQty = Number(r.qty || 0);
         arch.qty = Number(arch.qty || 0) + addQty;
         arch.material = line.code;
@@ -7067,13 +7320,34 @@ createApp({
           if (hit) hit.qty = Number(hit.qty || 0) + add;
           else arch.lots.push({ lot: d.lot, qty: add, inDate: d.inDate || todayYmd() });
         });
-        arch.stockStatus = '仓库';
-        // 储罐位置保持不变；WMS 不减来源线边仓库存
+        // 储罐库存状态固定「库内」；位置不变
+        arch.stage = '生产退料';
+        arch.step = '';
+        arch.docNo = '';
       });
+      if (form.barcode) {
+        const serial = findSerialArch(form.barcode);
+        if (serial) {
+          if (final) {
+            serial.stockStatus = '仓库';
+            serial.loc = (tankRows.value[0] && tankRows.value[0].loc) || serial.loc;
+            serial.stage = '生产退料';
+            serial.step = '';
+            serial.docNo = '';
+          } else {
+            serial.step = '生产退料';
+            serial.docNo = noticeId;
+          }
+        }
+      }
+      flushSerialArchToPcMock();
     }
     function applyPoInTankArchive(final) {
       const line = currentLine.value;
       if (!line) return;
+      const n = currentNotice.value;
+      const step = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : '采购入库');
+      const noticeId = (n && n.id) || '';
       tankRows.value.forEach((r) => {
         const arch = (CFG.tankArchRows || []).find(t => t.barcode === r.barcode || t.tankNo === r.tankNo);
         if (!arch) return;
@@ -7088,20 +7362,32 @@ createApp({
             qty: addQty,
             inDate: todayYmd(),
           });
-          arch.stockStatus = '仓库';
-          arch.qualityStatus = '待检';
-          arch.stage = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : '采购入库');
+          // 储罐库存状态固定「库内」，不随业务改写
+          arch.stage = step;
+          arch.step = '';
+          arch.docNo = '';
+        } else {
+          arch.step = step;
+          arch.docNo = noticeId;
         }
       });
-      if (final && form.barcode) {
-        const tanker = (CFG.tankerSerialRows || []).find(t => t.barcode === form.barcode);
+      if (form.barcode) {
+        const tanker = (CFG.tankerSerialRows || CFG.serialArchRows || []).find(t => t.barcode === form.barcode);
         if (tanker) {
-          tanker.stockStatus = '仓库';
-          tanker.step = '';
-          tanker.loc = (tankRows.value[0] && tankRows.value[0].loc) || tanker.loc;
-          tanker.stage = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : (tanker.stage || '采购入库'));
+          if (final) {
+            tanker.stockStatus = '仓库';
+            tanker.step = '';
+            tanker.docNo = '';
+            tanker.loc = (tankRows.value[0] && tankRows.value[0].loc) || tanker.loc;
+            tanker.stage = step;
+            if (form.qty != null && form.qty !== '') tanker.qty = String(form.qty);
+          } else {
+            tanker.step = step;
+            tanker.docNo = noticeId;
+          }
         }
       }
+      flushSerialArchToPcMock();
     }
     function addTankPkgScan() {
       const code = form.barcode.trim();
@@ -7382,7 +7668,38 @@ createApp({
         ElementPlus.ElMessage.error('该包材已被其他外包材绑定，不可重复添加');
         return;
       }
-      outerRows.value.push({ barcode: code || ('TMP' + Date.now()), pkgNo: pkg || '—', medium: 'NO' });
+      if (code === 'DIFFMAT' || code === 'DIFF') {
+        ElementPlus.ElMessage.error('外包材仅允许绑定相同物料的流水码');
+        return;
+      }
+      if (code === 'DIFFLOC') {
+        ElementPlus.ElMessage.error('所选包材库存位置不一致，不可绑定到同一外包材');
+        return;
+      }
+      const arch = findSerialArch(code || pkg);
+      if (arch && outerRows.value.length) {
+        const firstCode = outerRows.value[0].barcode;
+        const first = findSerialArch(firstCode) || outerRows.value[0];
+        const matA = arch.code || arch.matCode || '';
+        const matB = first.code || first.matCode || '';
+        const locA = arch.loc || '';
+        const locB = first.loc || '';
+        if (matA && matB && matA !== matB) {
+          ElementPlus.ElMessage.error('外包材仅允许绑定相同物料的流水码');
+          return;
+        }
+        if (locA && locB && locA !== locB) {
+          ElementPlus.ElMessage.error('所选包材库存位置不一致，不可绑定到同一外包材');
+          return;
+        }
+      }
+      outerRows.value.push({
+        barcode: code || ('TMP' + Date.now()),
+        pkgNo: pkg || '—',
+        medium: 'NO',
+        code: arch ? (arch.code || '') : '',
+        loc: arch ? (arch.loc || '') : '',
+      });
       form.barcode = '';
       form.pkgNo = '';
       toast('包材扫码添加成功，扫码件数已更新');
@@ -8981,7 +9298,10 @@ createApp({
           流水状态: status,
           当前工序: r.done ? '已完成' : (processTab.value || '—'),
           检查结果: '合格',
-          档案类型: '储罐',
+          档案类型: (()=>{
+            const outer = String(form.barcode || '').trim();
+            return (outer && outer !== '—') ? '流水码' : '—';
+          })(),
           条码号: form.barcode || '—',
           外包材编号: '—',
           物料信息: matInfo,
@@ -9750,6 +10070,7 @@ createApp({
       return soPrepSource('avail').length;
     });
     function soPrepBarcodePool() {
+      hydrateSerialArchFromPcMock();
       if (isSoShipSerial.value) return CFG.soShipPrepBarcodes || CFG.serialArchRows || [];
       return CFG.soPreoutPrepBarcodes || CFG.serialArchRows || [];
     }
@@ -9760,6 +10081,7 @@ createApp({
       const lotLocked = !!(lineLot && lineLot !== '—');
       return src.filter((r) => {
         if (!r || r.useStatus !== '在用' || r.stockStatus !== '仓库') return false;
+        if (archInspectStatus(r) !== '合格') return false;
         if (line && line.code) {
           const mat = String(r.material || '').split('/')[0].trim();
           if (mat && mat !== line.code) return false;
@@ -10529,13 +10851,14 @@ createApp({
      * 仓库在库码 → 当前数量在原在库数量上累加本次退料数量。
      */
     function applyOsRetBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode);
         if (!arch) return;
         if (!final) {
-          arch.step = '委外退料-执行中';
+          arch.step = '委外退料';
           return;
         }
         const retQty = Number(r.qty || 0);
@@ -10547,11 +10870,13 @@ createApp({
         arch.sourceNo = noticeId || arch.sourceNo;
         arch.stage = '委外退料';
         arch.step = '';
+          arch.docNo = '';
         if (r.outer && r.outer !== '—') {
           arch.bindStatus = '已绑定';
           arch.bindOuter = r.outer;
         }
       });
+      flushSerialArchToPcMock();
     }
     function autoSaveOsRetExec() {
       if (form.loc && !findEnabledLoc(form.loc)) form.loc = '';
@@ -10670,7 +10995,10 @@ createApp({
           流水状态: status,
           当前工序: r.done ? '已完成' : (r.process || '—'),
           检查结果: '合格',
-          档案类型: '储罐',
+          档案类型: (()=>{
+            const outer = String(form.barcode || '').trim();
+            return (outer && outer !== '—') ? '流水码' : '—';
+          })(),
           条码号: form.barcode || '—',
           外包材编号: '—',
           物料信息: matInfo,
@@ -10782,13 +11110,14 @@ createApp({
      * 仓库在库 → 数量累加；不改来源线边仓库存。
      */
     function applyProdRetBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode);
         if (!arch) return;
         if (!final) {
-          arch.step = '生产退料-执行中';
+          arch.step = '生产退料';
           return;
         }
         const retQty = Number(r.qty || 0);
@@ -10801,11 +11130,13 @@ createApp({
         arch.sourceNo = noticeId || arch.sourceNo;
         arch.stage = '生产退料';
         arch.step = '';
+          arch.docNo = '';
         if (r.outer && r.outer !== '—') {
           arch.bindStatus = '已绑定';
           arch.bindOuter = r.outer;
         }
       });
+      flushSerialArchToPcMock();
     }
     function autoSaveProdRetExec() {
       if (form.loc && !findEnabledLoc(form.loc)) form.loc = '';
@@ -10976,7 +11307,10 @@ createApp({
           流水状态: status,
           当前工序: r.done ? '已完成' : (processTab.value || '—'),
           检查结果: '合格',
-          档案类型: '储罐',
+          档案类型: (()=>{
+            const outer = String(form.barcode || '').trim();
+            return (outer && outer !== '—') ? '流水码' : '—';
+          })(),
           条码号: form.barcode || '—',
           外包材编号: '—',
           物料信息: matInfo,
@@ -11097,13 +11431,15 @@ createApp({
     }
     /** 委外收货：初始化码 → 仓库，数量赋值为本次收货数量 */
     function applyOsRecvBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode);
         if (!arch) return;
         if (!final) {
-          arch.step = '委外收货-执行中';
+          arch.step = '委外收货';
+          arch.docNo = noticeId || arch.docNo || '';
           return;
         }
         arch.qty = String(Number(r.qty || 0));
@@ -11112,12 +11448,9 @@ createApp({
         arch.sourceNo = noticeId || arch.sourceNo;
         arch.stage = '委外收货';
         arch.step = '';
-        arch.qualityStatus = '待检';
-        if (r.outer && r.outer !== '—') {
-          arch.bindStatus = '已绑定';
-          arch.bindOuter = r.outer;
-        }
+        arch.docNo = '';
       });
+      flushSerialArchToPcMock();
     }
     function autoSaveOsRecvExec() {
       if (form.loc && !findEnabledLoc(form.loc)) form.loc = '';
@@ -11161,6 +11494,7 @@ createApp({
       const matInfo = line
         ? [line.code, line.name, line.spec, line.kind].filter(Boolean).join(' / ')
         : ((notice && notice.materialSummary) || '');
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const rows = scans.map((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode) || {};
@@ -11199,6 +11533,7 @@ createApp({
       return rows.length;
     }
     function applyPoInBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       scanRows.value.forEach((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode);
@@ -11206,18 +11541,19 @@ createApp({
         if (final) {
           arch.stockStatus = '仓库';
           arch.loc = r.loc || form.loc || arch.loc;
+          if (r.qty != null && r.qty !== '') arch.qty = String(r.qty);
           arch.step = '';
-          arch.qualityStatus = '待检';
-          if (r.outer && r.outer !== '—') {
-            arch.bindStatus = '已绑定';
-            arch.bindOuter = r.outer;
-          }
+          arch.docNo = '';
         } else {
-          arch.step = '采购入库-执行中';
+          arch.step = '采购入库';
+          const n = currentNotice.value;
+          arch.docNo = (n && n.id) || arch.docNo || '';
         }
       });
+      flushSerialArchToPcMock();
     }
     function applySoRmaBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
@@ -11227,6 +11563,7 @@ createApp({
           arch.stockStatus = '仓库';
           arch.loc = r.loc || form.loc || arch.loc;
           arch.step = '';
+          arch.docNo = '';
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = '销售退货';
           arch.remark = '销售退货入库';
@@ -11235,11 +11572,13 @@ createApp({
             arch.bindOuter = r.outer;
           }
         } else {
-          arch.step = '销售退货-执行中';
+          arch.step = '销售退货';
         }
       });
+      flushSerialArchToPcMock();
     }
     function applyPoRetBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       const stage = isSoShipSerial.value ? '销售发货' : (isSoPreoutSerial.value ? '销售预出货' : (isTrustRetSerial.value ? '受托退料' : '采购退料'));
@@ -11248,20 +11587,36 @@ createApp({
         const arch = archRows.find(a => a.barcode === r.barcode);
         if (!arch) return;
         const retQty = Number(r.qty || 0);
-        const remain = Math.max(0, Number(arch.qty || arch.archiveQty || 0) - retQty);
+        const srcQty = Number(r.srcQty || r.srcArchiveQty || arch.qty || arch.archiveQty || 0);
+        const remain = Math.max(0, srcQty - retQty);
+        const fullOut = !(retQty + 1e-9 < srcQty); // 出库量≥扫入时当前数量 → 整件出厂
+        const customerLoc = String(
+          r.custLoc || custLoc || (currentNotice.value && (currentNotice.value.custLoc || currentNotice.value.partner || currentNotice.value.supplier)) || ''
+        ).trim() || '厂外';
         if (final) {
-          arch.qty = String(remain);
-          arch.archiveQty = String(remain);
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = stage;
           arch.step = '';
+          arch.docNo = '';
           if (isSoShipSerial.value) {
-            arch.stockStatus = '已出库';
-            arch.loc = '';
+            // 整件按本身数量出库：不扣减数量，状态厂外，位置=对应客户
+            if (fullOut) {
+              arch.stockStatus = '厂外';
+              arch.loc = customerLoc;
+            } else {
+              arch.qty = String(remain);
+              arch.archiveQty = String(remain);
+              if (remain === 0) {
+                arch.stockStatus = '厂外';
+                arch.loc = customerLoc;
+              }
+            }
             arch.bindStatus = '未绑定';
             arch.bindOuter = '—';
             arch.remark = '销售发货出库';
           } else if (isSoPreoutSerial.value) {
+            arch.qty = String(remain);
+            arch.archiveQty = String(remain);
             const toLoc = String(r.custLoc || custLoc || '').trim();
             if (toLoc) arch.loc = toLoc;
             arch.stockStatus = '仓库';
@@ -11270,16 +11625,21 @@ createApp({
               arch.bindStatus = '未绑定';
               arch.bindOuter = '—';
             }
-          } else if (remain === 0) {
-            arch.stockStatus = '厂外';
-            arch.loc = '';
-            arch.bindStatus = '未绑定';
-            arch.bindOuter = '—';
+          } else {
+            arch.qty = String(remain);
+            arch.archiveQty = String(remain);
+            if (remain === 0) {
+              arch.stockStatus = '厂外';
+              arch.loc = '';
+              arch.bindStatus = '未绑定';
+              arch.bindOuter = '—';
+            }
           }
         } else {
-          arch.step = stage + '-执行中';
+          arch.step = stage;
         }
       });
+      flushSerialArchToPcMock();
     }
     function autoSaveTrustRetExec() {
       if (!isTrustRetSerial.value) return false;
@@ -11307,6 +11667,7 @@ createApp({
       return true;
     }
     function applyOsIssueBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
@@ -11320,6 +11681,7 @@ createApp({
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = '委外发料';
           arch.step = '';
+          arch.docNo = '';
           if (remain === 0) {
             arch.stockStatus = '厂外';
             arch.loc = '厂外';
@@ -11327,11 +11689,13 @@ createApp({
             arch.bindOuter = '—';
           }
         } else {
-          arch.step = '委外发料-执行中';
+          arch.step = '委外发料';
         }
       });
+      flushSerialArchToPcMock();
     }
     function applyOsRmaBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       const partner = (currentNotice.value && (currentNotice.value.partner || currentNotice.value.supplier)) || '厂外';
@@ -11346,6 +11710,7 @@ createApp({
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = '委外退货';
           arch.step = '';
+          arch.docNo = '';
           if (remain === 0) {
             arch.stockStatus = '厂外';
             arch.loc = partner;
@@ -11353,9 +11718,10 @@ createApp({
             arch.bindOuter = '—';
           }
         } else {
-          arch.step = '委外退货-执行中';
+          arch.step = '委外退货';
         }
       });
+      flushSerialArchToPcMock();
     }
     function syncProdPickPcDocs(status, action, opts) {
       opts = opts || {};
@@ -11474,6 +11840,7 @@ createApp({
       bumpStore();
     }
     function applyProdPickBarcodeArchive(final) {
+      hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
       scanRows.value.forEach((r) => {
@@ -11487,11 +11854,13 @@ createApp({
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = '生产领料';
           arch.step = '';
+          arch.docNo = '';
           // 扣量后库存位置不变；线边仓不计 WMS 库存
         } else {
-          arch.step = '生产领料-执行中';
+          arch.step = '生产领料';
         }
       });
+      flushSerialArchToPcMock();
     }
     function autoSaveProdPickExec() {
       const hasProgress = !!(form.remark || (scanRows.value && scanRows.value.length));
@@ -13462,7 +13831,7 @@ createApp({
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute,
       flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
-      announceBarVisible, announceOpen, announceTab, announceKw, announceTerminal, announceNotes, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, dismissAnnounce,
+      announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceNotes, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
       statusTag, gatepassStatusTag, gatepassDisplayLines, maskPhoneApp, gatepassPlateText, gatepassLotQtyText, gatepassLineInfo, gatepassLinePcs, gatepassLineQty, gatepassMatStats, openGatepassDetail, scanGatepass, toast, goHome, openStub, openModule, onMenuSelect, maskIdCardApp,
       poOptions, poInSelectablePos, tankArchOptions, poInFormMode, poInForm, poInWaybillOpts, poInShipOpts, noticeDocTypeOptions, pickTypeOptions, isSparePickType,
