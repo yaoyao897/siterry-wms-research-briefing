@@ -1558,7 +1558,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>*领料数量(可改)</th><th>剩余数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th>外包材编号</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>*领料数量(可改)</th><th>剩余数量</th><th>批号</th><th>原位置</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'pick-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                             <td>
@@ -1567,13 +1567,13 @@ body.remarks-open .demo-scope-tip{display:none}
                             </td>
                             <td><input v-model.number="r.qty" type="number" min="0.01" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onPickQtyChange(r)" /></td>
                             <td>{{ r.remainQty }}</td>
-                            <td>{{ r.fromLoc }}</td>
                             <td>{{ r.lot }}</td>
+                            <td>{{ r.fromLoc || '—' }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
                           </tr>
                         </tbody>
@@ -1599,17 +1599,17 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>外包材</th><th>数量</th><th>批号</th><th>库位</th><th>工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>数量(可改)</th><th>批号</th><th>库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-rma-'+i">
                             <td>
                               <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
                             <td><input v-model.number="r.qty" type="number" min="0.01" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
                             <td>{{ r.lot }}</td>
                             <td>{{ r.loc || form.loc || '—' }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
@@ -1635,17 +1635,17 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>外包材</th><th>数量</th><th>批号</th><th>源储位</th><th>工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>原位置</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-ship-'+i">
                             <td>
                               <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
-                            <td><input v-model.number="r.qty" type="number" min="0.01" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onPoRetQtyChange(r)" /></td>
+                            <td>{{ r.qty }}</td>
                             <td>{{ r.lot }}</td>
-                            <td>{{ r.fromLoc || '—' }}</td>
+                            <td>{{ r.fromLoc || r.loc || '—' }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
@@ -1678,18 +1678,18 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>外包材</th><th>数量</th><th>批号</th><th>源储位</th><th>客户库位</th><th>工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>原位置</th><th>目标客户库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-preout-'+i">
                             <td>
                               <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
                             <td>{{ r.qty }}</td>
                             <td>{{ r.lot }}</td>
                             <td>{{ r.fromLoc || '—' }}</td>
                             <td>{{ r.custLoc || form.custLoc || '—' }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
@@ -1720,18 +1720,18 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>外包材编号</th><th>{{ outQtyLabel }}(可改)</th><th>剩余数量</th><th>批号</th><th>原位置</th><th>工序状态</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>{{ outQtyLabel }}(可改)</th><th>剩余数量</th><th>批号</th><th>原位置</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-ret-'+i">
                             <td>
                               <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
                             <td><input v-model.number="r.qty" type="number" min="0.01" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onPoRetQtyChange(r)" /></td>
                             <td>{{ r.remainQty }}</td>
                             <td>{{ r.lot }}</td>
                             <td>{{ r.fromLoc || '—' }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
@@ -1765,18 +1765,18 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table" v-if="isInSerialDoc">
-                        <thead><tr><th>条码号</th><th>{{ (isOsRetSerial || isOsRecvSerial || isProdRetSerial) ? '外包材编号' : '外包材' }}</th><th>{{ (isOsRetSerial || isProdRetSerial) ? '退料数量(可改)' : (isOsRecvSerial ? '数量(可改)' : '数量') }}</th><th v-if="isProdRetSerial">剩余数量</th><th>批号</th><th>{{ (isOsRetSerial || isOsRecvSerial || isProdRetSerial) ? '入库库位' : '库位' }}</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>{{ (isOsRetSerial || isProdRetSerial) ? '退料数量(可改)' : (isOsRecvSerial ? '数量(可改)' : '数量') }}</th><th v-if="isProdRetSerial">剩余数量</th><th>批号</th><th>{{ (isOsRetSerial || isOsRecvSerial || isProdRetSerial) ? '入库库位' : '库位' }}</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-po-'+i">
                             <td>
                               <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
                               <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
                             </td>
-                            <td>{{ r.outer || '—' }}</td>
                             <td><input v-model.number="r.qty" type="number" :min="(isOsRetSerial || isOsRecvSerial || isProdRetSerial) ? 0.01 : 0" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onInSerialQtyChange(r)" /></td>
                             <td v-if="isProdRetSerial">{{ r.remainQty != null ? r.remainQty : '—' }}</td>
                             <td>{{ r.lot }}</td>
                             <td>{{ r.loc }}</td>
+                            <td>{{ r.outer || '—' }}</td>
                             <td>
                               <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
                               <span v-else>{{ r.process || '—' }}</span>
@@ -1786,7 +1786,7 @@ body.remarks-open .demo-scope-tip{display:none}
                         </tbody>
                       </table>
                       <table class="scan-table" v-else>
-                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>库位</th><th>工序</th><th>外包材</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'serial-'+i">
                             <td>
@@ -1796,8 +1796,8 @@ body.remarks-open .demo-scope-tip{display:none}
                             <td>{{ r.qty }}</td>
                             <td>{{ r.lot }}</td>
                             <td>{{ r.loc }}</td>
-                            <td>{{ r.process }}</td>
-                            <td>{{ r.outer }}</td>
+                            <td>{{ r.outer || '—' }}</td>
+                            <td>{{ r.process || '—' }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
                           </tr>
                         </tbody>
@@ -3561,7 +3561,7 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.271"></script>
+<script src="./js/demo-announcements.js?v=1.3.272"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/demo-store.js"></script>
 <script src="./js/app-configs.js"></script>

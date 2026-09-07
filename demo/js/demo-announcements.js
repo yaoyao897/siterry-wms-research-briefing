@@ -2,7 +2,7 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-07",
-    latestVersion: "v1.3.271",
+    latestVersion: "v1.3.272",
     notes: [
   {
     "id": "since-shared",
@@ -1674,6 +1674,14 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.3.272",
+    "date": "2026-09-07",
+    "terminal": "APP/PRD",
+    "module": "全流水码模块 · 扫码明细列表口径统一",
+    "type": "[Refactor]",
+    "summary": "统一 APP 仓储 16 个流水码执行页扫码明细列序：外包材编号后置；前段固定条码/数量/剩余量/批号；原位置/库位/当前工序命名收敛；同步 PRD 说明"
+  },
   {
     "version": "v1.3.271",
     "date": "2026-09-07",
