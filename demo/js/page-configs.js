@@ -8446,7 +8446,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "关联采购订单",
               "type": "picker",
               "required": true,
-              "ctrl": "弹窗选择采购订单"
+              "ctrl": "弹窗选择采购订单（订单状态仅待执行/执行中，排除已完成/已关闭）"
             },
             {
               "name": "供应商名称",
@@ -9350,7 +9350,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "关联采购订单",
               "type": "picker",
               "required": true,
-              "ctrl": "弹窗选择采购订单"
+              "ctrl": "弹窗选择采购订单（订单状态仅执行中/已完成/已关闭，排除待执行）"
             },
             {
               "name": "供应商名称",
@@ -25262,6 +25262,18 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "columns": [
             {
+              "field": "审核状态",
+              "title": "审核状态",
+              "width": 110,
+              "slot": "tag"
+            },
+            {
+              "field": "状态",
+              "title": "状态",
+              "width": 110,
+              "slot": "tag"
+            },
+            {
               "field": "编号",
               "title": "编号",
               "width": 140
@@ -25392,18 +25404,6 @@ window.WMS_PAGE_CONFIGS = {
               "title": "关联运单",
               "width": 160,
               "slot": "link"
-            },
-            {
-              "field": "审核状态",
-              "title": "审核状态",
-              "width": 110,
-              "slot": "tag"
-            },
-            {
-              "field": "状态",
-              "title": "状态",
-              "width": 110,
-              "slot": "tag"
             },
             {
               "field": "_actions",

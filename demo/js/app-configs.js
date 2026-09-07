@@ -486,6 +486,9 @@ window.APP_CFG = (function () {
       locLabel: '目标库位',
       doneHint: '所有物料已入库完成',
       hasProcess: false,
+      addMatTitle: '添加入库信息',
+      serialScanTitle: '添加入库扫码',
+      qtyLabel: '入库数量',
     }),
     'prod-in-count': flow('生产入库-计数', 'count', {
       hasProcess: false,

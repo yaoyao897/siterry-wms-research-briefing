@@ -47,8 +47,43 @@
 /* 布局 §8 */
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color:var(--color-text-normal);background:var(--color-bg-page)}
-#app{height:100vh}
-.app-shell{display:flex;height:100vh}
+#app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.app-shell{display:flex;flex:1;min-height:0;height:auto}
+/* Demo 顶部公告栏 */
+.demo-announce{flex-shrink:0;background:linear-gradient(90deg,#EEF2F8 0%,#F7F9FC 55%,#FFF8E1 100%);border-bottom:1px solid #C5D4EB;z-index:10060;position:relative}
+.demo-announce__bar{display:flex;align-items:center;gap:10px;padding:0 16px;height:36px;cursor:pointer;user-select:none}
+.demo-announce__badge{flex-shrink:0;height:20px;padding:0 8px;border-radius:3px;background:#1A4099;color:#fff;font-size:11px;font-weight:600;line-height:20px}
+.demo-announce__ver{flex-shrink:0;font-size:12px;font-weight:600;color:#1A4099}
+.demo-announce__headline{flex:1;min-width:0;font-size:12px;color:#434343;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.demo-announce__meta{flex-shrink:0;font-size:11px;color:#8C8C8C}
+.demo-announce__btn{flex-shrink:0;height:24px;padding:0 10px;border:1px solid #C5D4EB;border-radius:4px;background:#fff;color:#1A4099;font-size:12px;cursor:pointer}
+.demo-announce__btn:hover{border-color:#1A4099;background:#EEF2F8}
+.demo-announce__btn--ghost{color:#8C8C8C;border-color:#E8E8E8}
+.demo-announce__panel{max-height:min(42vh,420px);overflow:hidden;display:flex;flex-direction:column;border-top:1px solid #C5D4EB;background:#fff}
+.demo-announce__tabs{display:flex;gap:0;padding:0 12px;border-bottom:1px solid var(--color-border);background:#FAFAFA;flex-shrink:0}
+.demo-announce__tab{height:34px;padding:0 14px;border:0;background:transparent;font-size:13px;color:#8C8C8C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.demo-announce__tab.on{color:#1A4099;font-weight:600;border-bottom-color:#1A4099}
+.demo-announce__tools{display:flex;align-items:center;gap:8px;padding:8px 12px;flex-shrink:0;border-bottom:1px solid var(--color-border)}
+.demo-announce__tools input,.demo-announce__tools select{height:28px;border:1px solid var(--color-border-input);border-radius:4px;padding:0 8px;font-size:12px;color:#595959;background:#fff}
+.demo-announce__tools input{flex:1;min-width:120px}
+.demo-announce__tools select{width:96px}
+.demo-announce__body{flex:1;min-height:0;overflow:auto;padding:10px 14px 14px}
+.demo-announce__note{padding:10px 12px;margin-bottom:8px;border:1px solid var(--color-border);border-radius:6px;background:#FAFAFA}
+.demo-announce__note.warn{border-color:#FFD591;background:#FFF7E6}
+.demo-announce__note-title{font-size:13px;font-weight:600;color:#262626;margin-bottom:4px}
+.demo-announce__note-body{font-size:12px;line-height:1.55;color:#595959}
+.demo-announce__upd{display:grid;grid-template-columns:88px 86px 52px minmax(120px,1.1fr) minmax(180px,2fr);gap:8px 10px;padding:8px 0;border-bottom:1px dashed #F0F0F0;font-size:12px;align-items:start}
+.demo-announce__upd:last-child{border-bottom:0}
+.demo-announce__upd-ver{font-weight:600;color:#1A4099}
+.demo-announce__upd-date,.demo-announce__upd-term{color:#8C8C8C}
+.demo-announce__upd-mod{color:#262626}
+.demo-announce__upd-sum{color:#595959;line-height:1.45}
+.demo-announce__type{display:inline-block;padding:0 6px;border-radius:3px;font-size:11px;line-height:18px;background:#EEF2F8;color:#1A4099;margin-right:4px}
+.demo-announce__empty{padding:24px;text-align:center;color:#8C8C8C;font-size:13px}
+@media (max-width:960px){
+  .demo-announce__upd{grid-template-columns:1fr;gap:2px}
+  .demo-announce__meta{display:none}
+}
 .app-aside{width:240px;flex-shrink:0;height:100%;min-height:0;background:#fff;border-right:1px solid var(--color-border);display:flex;flex-direction:column;overflow:hidden}
 .app-aside__logo{padding:16px 20px;font-size:15px;font-weight:600;color:var(--color-text-main);border-bottom:1px solid var(--color-border);flex-shrink:0}
 .app-aside__scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
@@ -552,6 +587,49 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 </head>
 <body>
 <div id="app" v-cloak>
+  <div class="demo-announce" v-if="announceBarVisible">
+    <div class="demo-announce__bar" @click="announceOpen = !announceOpen">
+      <span class="demo-announce__badge">公告</span>
+      <span class="demo-announce__ver">{{ announceLatest }}</span>
+      <span class="demo-announce__headline">{{ announceHeadline }}</span>
+      <span class="demo-announce__meta">共 {{ announceUpdateCount }} 条更新</span>
+      <button type="button" class="demo-announce__btn" @click.stop="announceOpen = !announceOpen">{{ announceOpen ? '收起' : '展开' }}</button>
+      <button type="button" class="demo-announce__btn demo-announce__btn--ghost" @click.stop="dismissAnnounce" title="关闭后新版本发布会再次显示">关闭</button>
+    </div>
+    <div class="demo-announce__panel" v-show="announceOpen">
+      <div class="demo-announce__tabs">
+        <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='notes' }" @click="announceTab='notes'">使用说明</button>
+        <button type="button" class="demo-announce__tab" :class="{ on: announceTab==='updates' }" @click="announceTab='updates'">更新记录</button>
+      </div>
+      <div class="demo-announce__tools" v-if="announceTab==='updates'">
+        <input v-model.trim="announceKw" type="search" placeholder="搜索版本 / 模块 / 摘要…" />
+        <select v-model="announceTerminal">
+          <option value="全部">全部终端</option>
+          <option value="PC">PC</option>
+          <option value="APP">APP</option>
+        </select>
+      </div>
+      <div class="demo-announce__body">
+        <template v-if="announceTab==='notes'">
+          <div v-for="n in announceNotes" :key="n.id" class="demo-announce__note" :class="n.level">
+            <div class="demo-announce__note-title">{{ n.title }}</div>
+            <div class="demo-announce__note-body">{{ n.body }}</div>
+          </div>
+        </template>
+        <template v-else>
+          <div v-if="!filteredAnnounceUpdates.length" class="demo-announce__empty">无匹配的更新记录</div>
+          <div v-for="u in filteredAnnounceUpdates" :key="u.version + u.module + u.summary" class="demo-announce__upd">
+            <div class="demo-announce__upd-ver">{{ u.version }}</div>
+            <div class="demo-announce__upd-date">{{ u.date }}</div>
+            <div class="demo-announce__upd-term">{{ u.terminal }}</div>
+            <div class="demo-announce__upd-mod"><span class="demo-announce__type">{{ u.type }}</span>{{ u.module }}</div>
+            <div class="demo-announce__upd-sum">{{ u.summary }}</div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
   <!-- 页面 PRD 备注：置顶常驻，弹窗打开时仍可点 -->
   <button type="button" class="remarks-toggle" :class="{ on: remarksOpen }" @click="toggleRemarks" title="查看本页页面说明">
     {{ remarksOpen ? '收起备注' : '备注' }}
@@ -648,10 +726,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         </el-breadcrumb>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html" class="on">PC</a>
-            <a href="./app.html">APP</a>
+            <a href="././pc.html" class="on">PC</a>
+            <a href="././app.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
         </div>
@@ -2185,6 +2263,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
+<script src="./js/demo-announcements.js?v=1.3.248"></script>
 <script src="./js/page-configs.js?v=1.3.245"></script>
 <script src="./js/mock-rows.js?v=1.3.245"></script>
 <script src="./js/dict-catalog.js"></script>
@@ -2309,6 +2388,39 @@ const app = createApp({
     const remarksActiveTab = ref('');
     const remarksBodyRef = ref(null);
     const remarksTocActive = ref('');
+    const ANNOUNCE = window.DEMO_ANNOUNCEMENTS || { notes:[], updates:[], latestVersion:'', updatedAt:'' };
+    const ANNOUNCE_DISMISS_KEY = 'siterry-demo-announce-dismissed';
+    const announceLatest = ANNOUNCE.latestVersion || '';
+    const announceBarVisible = ref((()=>{
+      try{ return localStorage.getItem(ANNOUNCE_DISMISS_KEY) !== announceLatest; }catch(e){ return true; }
+    })());
+    const announceOpen = ref(false);
+    const announceTab = ref('notes');
+    const announceKw = ref('');
+    const announceTerminal = ref('全部');
+    const announceNotes = ANNOUNCE.notes || [];
+    const announceUpdateCount = (ANNOUNCE.updates || []).length;
+    const announceHeadline = (()=>{
+      const u = (ANNOUNCE.updates || [])[0];
+      if(!u) return '暂无更新记录';
+      return `${u.date} · ${u.module} · ${u.summary}`;
+    })();
+    const filteredAnnounceUpdates = computed(()=>{
+      const kw = announceKw.value.toLowerCase();
+      const term = announceTerminal.value;
+      return (ANNOUNCE.updates || []).filter(u=>{
+        if(term === 'PC' && !String(u.terminal||'').includes('PC')) return false;
+        if(term === 'APP' && !String(u.terminal||'').includes('APP')) return false;
+        if(!kw) return true;
+        const hay = `${u.version} ${u.date} ${u.terminal} ${u.module} ${u.type} ${u.summary}`.toLowerCase();
+        return hay.includes(kw);
+      });
+    });
+    function dismissAnnounce(){
+      announceBarVisible.value = false;
+      announceOpen.value = false;
+      try{ localStorage.setItem(ANNOUNCE_DISMISS_KEY, announceLatest); }catch(e){}
+    }
     const PAGE_PRD_NOTES = window.WMS_PAGE_PRD_NOTES || {};
     const remarksNote = computed(()=> PAGE_PRD_NOTES[pageId.value] || null);
     const remarksTitle = computed(()=> (remarksNote.value && remarksNote.value.title) || ((page.value && page.value.title) ? (page.value.title + ' · 页面说明') : '页面说明'));
@@ -6403,7 +6515,13 @@ const app = createApp({
         if(t.includes('委外') || isOsPoPage()){
           all = wrapPickerModuleRows('wwpo', ((MOCK.wwpo||{}).main||[]).filter(r=> r['订单状态']!=='已关闭'), '委外订单号', '加工厂名称');
         } else {
-          all = wrapPickerModuleRows('po', ((MOCK.po||{}).main||[]).filter(r=> r['订单状态']!=='已关闭'), '采购订单号', '供应商名称');
+          // 采购入库：可选待执行/执行中；采购退料：可选执行中/已完成/已关闭
+          const poStatusOk = pageId.value==='wh-po-ret'
+            ? (st)=> ['执行中','已完成','已关闭'].includes(st)
+            : (pageId.value==='wh-po-in'
+              ? (st)=> ['待执行','执行中'].includes(st)
+              : (st)=> st!=='已关闭');
+          all = wrapPickerModuleRows('po', ((MOCK.po||{}).main||[]).filter(r=> poStatusOk(r['订单状态'])), '采购订单号', '供应商名称');
         }
       } else if(t.includes('客户')){
         all = wrapPickerModuleRows('customer', ((MOCK.customer||{}).main||[]).filter(c=> c['启用状态']==='启用'), '客户编码', '客户名称');
@@ -14097,6 +14215,7 @@ const app = createApp({
 
     return {
       ElMessage, menu, activeMenu, defaultOpeneds, page, pageId, activeTab, tabView, currentTabLabel, breadcrumb,
+      announceBarVisible, announceOpen, announceTab, announceKw, announceTerminal, announceNotes, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, dismissAnnounce,
       remarksOpen, remarksNote, remarksTitle, remarksTabDefs, remarksActiveTab, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTabClick, onRemarksTocClick, toggleRemarks, closeRemarks,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseShip, canCloseDispatch, canCloseWaybill, canCloseInspPlan, canSettleWaybill, canDeleteKpiPlan,
       formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineRows,
