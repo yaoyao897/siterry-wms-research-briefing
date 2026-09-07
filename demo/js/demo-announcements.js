@@ -2,7 +2,7 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-07",
-    latestVersion: "v1.3.269",
+    latestVersion: "v1.3.270",
     notes: [
   {
     "id": "since-shared",
@@ -36,6 +36,14 @@
   }
 ],
     updates: [
+  {
+    "version": "v1.3.270",
+    "date": "2026-09-07",
+    "terminal": "PC/APP",
+    "module": "全局 · 公告铃铛布局",
+    "type": "[Fix]",
+    "summary": "铃铛改为顶栏流式按钮，避免与重置/备注叠压"
+  },
   {
     "version": "v1.3.269",
     "date": "2026-09-07",
