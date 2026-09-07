@@ -565,7 +565,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     <span class="doc-card__no">{{ n.id }}</span>
                     <span class="tag" :class="flowMode==='gatepass' ? gatepassStatusTag(n.status) : statusTag(n.status)">{{ n.status }}</span>
                   </div>
-                  <div class="doc-card__bd" @click="isLoadFlow ? openDocAction(n) : ((flowMode==='gatepass' || flowMode==='insp' || flowMode==='waybill' || isPoNoticeDoc || isProdPickDoc || isProdRetDoc) && toggleExpand('doc', n.id))">
+                  <div class="doc-card__bd" @click="isLoadFlow ? openDocAction(n) : ((flowMode==='gatepass' || flowMode==='insp' || flowMode==='waybill' || isPoNoticeDoc || isProdPickDoc || isProdRetDoc || isXferSerialDoc || isXferCountDoc) && toggleExpand('doc', n.id))">
                     <div class="doc-grid" v-if="flowMode==='waybill' && isWaybillDispatchView(n)">
                       <div class="full"><span class="doc-label">关联发货单</span>{{ n.shipNos || '—' }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary || '—' }}</div>
@@ -660,6 +660,16 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div class="full"><span class="doc-label">车牌/车挂</span>{{ (n.plate || '—') + ' / ' + (n.trailer || '—') }}</div>
                       <div class="full"><span class="doc-label">司机姓名</span>{{ (n.driver || '—') + (n.phone ? (' (' + n.phone + ')') : '') }}</div>
                       <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
+                      <template v-if="isExpanded('doc', n.id)">
+                        <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      </template>
+                    </div>
+                    <div class="doc-grid" v-else-if="isXferSerialDoc || isXferCountDoc">
+                      <div><span class="doc-label">调出仓库</span>{{ n.fromWh || '—' }}</div>
+                      <div><span class="doc-label">调入仓库</span>{{ n.toWh || '—' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
@@ -790,6 +800,9 @@ body.remarks-open .demo-scope-tip{display:none}
                     </template>
                     <template v-else-if="isSoRmaDoc || isSoShipDoc || isSoPreoutDoc">
                       <button v-if="n.status==='待执行'" class="btn-sm" @click.stop="toast('Demo：待执行可核对单据头')">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
+                    <template v-else-if="isXferSerialDoc || isXferCountDoc">
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <template v-else-if="isPoNoticeDoc">
@@ -1410,6 +1423,15 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
                       <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
                     </div>
+                    <div class="doc-grid" v-else-if="isXferSerialDoc || isXferCountDoc">
+                      <div><span class="doc-label">调拨申请单号</span>{{ currentNotice.id }}</div>
+                      <div><span class="doc-label">单据状态</span>{{ currentNotice.status }}</div>
+                      <div><span class="doc-label">调出仓库</span>{{ currentNotice.fromWh || '—' }}</div>
+                      <div><span class="doc-label">调入仓库</span>{{ currentNotice.toWh || '—' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
+                    </div>
                     <div class="doc-grid" v-else-if="isProdPickDoc">
                       <div><span class="doc-label">关联生产订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
                       <div><span class="doc-label">领料类型</span>{{ currentNotice.pickType || '生产领料' }}</div>
@@ -1456,8 +1478,8 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="line-stats">
                     <div v-if="isLoadFlow && line.manageMode==='条码管理'"><span class="k">计划件数</span><span class="v">{{ line.planPcs ?? '—' }}</span></div>
                     <div v-else-if="isLoadFlow"><span class="k">计划件数</span><span class="v">—</span></div>
-                    <div v-else-if="!(isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank || isProdRetCount || isProdRetTank || isProdPickCount || isSoRmaCount || (isOutCountDoc && !line.planPcs))"><span class="k">计划件数</span><span class="v">{{ line.planPcs }}</span></div>
-                    <div v-else-if="isTrustRetCount || isTrustRecvCount || isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isSoRmaCount || (isOutCountDoc && !line.planPcs)"><span class="k">计划件数</span><span class="v">—</span></div>
+                    <div v-else-if="!(isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank || isProdRetCount || isProdRetTank || isProdPickCount || isSoRmaCount || isXferCountDoc || (isOutCountDoc && !line.planPcs))"><span class="k">计划件数</span><span class="v">{{ line.planPcs }}</span></div>
+                    <div v-else-if="isTrustRetCount || isTrustRecvCount || isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isSoRmaCount || isXferCountDoc || (isOutCountDoc && !line.planPcs)"><span class="k">计划件数</span><span class="v">—</span></div>
                     <div><span class="k">计划数量</span><span class="v">{{ line.planQty }}</span></div>
                     <div><span class="k">{{ isLoadFlow ? '已完成数量' : '已完成' }}</span><span class="v">{{ line.doneQty }}</span></div>
                     <div><span class="k">{{ isLoadFlow ? '未完成数量' : '未完成' }}</span><span class="v" :class="{ zero: line.remainQty===0 }">{{ line.remainQty }}</span></div>
@@ -1538,6 +1560,54 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
                   </div>
                 </template>
+                <!-- 直接调拨-流水码：调出/调入仓库 + 扫码 + 目标库位绑定 -->
+                <template v-else-if="isXferSerialPick">
+                  <div class="sec">
+                    <div class="sec__title" style="display:flex;justify-content:space-between;align-items:center">
+                      <span>调拨仓库信息</span>
+                      <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openRecommend">查看推荐条码</button>
+                    </div>
+                    <div class="field"><label>调出仓库</label><input :value="currentNotice && currentNotice.fromWh" readonly /></div>
+                    <div class="field"><label>调入仓库</label><input :value="currentNotice && currentNotice.toWh" readonly /></div>
+                  </div>
+                  <div class="sec">
+                    <div class="sec__title">扫码录入</div>
+                    <div class="field"><label><span class="req">*</span>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addXferScan" /></div>
+                  </div>
+                  <div class="stat-bar"><span>扫码件数：{{ scanRows.length }}</span><span>扫码数量：{{ scanQtySum }}{{ currentLine && currentLine.unit ? (' ' + currentLine.unit) : '' }}</span></div>
+                  <div class="sec" style="padding:0;overflow:hidden">
+                    <div class="table-scroll">
+                      <table class="scan-table">
+                        <thead><tr><th>条码号</th><th>*数量</th><th>批号</th><th>原位置</th><th>*目标库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                        <tbody>
+                          <tr v-for="(r,i) in scanRows" :key="'xfer-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
+                            <td>
+                              <a v-if="poInHasCraft" class="scan-link" :class="{ done: r.done }" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a>
+                              <span v-else :style="{ color: r.done ? '#52C41A' : '' }">{{ r.barcode }}</span>
+                            </td>
+                            <td><input v-model.number="r.qty" type="number" min="0.01" step="0.01" style="width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onXferQtyChange(r)" /></td>
+                            <td>{{ r.lot }}</td>
+                            <td>{{ r.fromLoc || '—' }}</td>
+                            <td>
+                              <select v-model="r.toLoc" style="max-width:120px;height:28px;border:1px solid #D9D9D9;border-radius:4px;font-size:12px" @change="onXferToLocChange(r)">
+                                <option value="">请选择</option>
+                                <option v-for="loc in xferToLocOptions" :key="'xfer-loc-'+loc.code" :value="loc.code">{{ loc.code }}</option>
+                              </select>
+                            </td>
+                            <td>{{ r.outer || '—' }}</td>
+                            <td>
+                              <span v-if="r.done" style="color:#52C41A;font-weight:600">已完成</span>
+                              <span v-else>{{ r.process || '—' }}</span>
+                            </td>
+                            <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
+                          </tr>
+                          <tr v-if="!scanRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无扫码明细</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </template>
+
                 <!-- 生产领料-流水码：按执行页 PRD（线边仓 + 库内包材） -->
                 <template v-else-if="isLineSidePick">
                   <div class="sec">
@@ -1806,22 +1876,22 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </template>
 
-                <div class="sec" v-if="(isPoNoticeSerial || isLineSidePick) ? poInHasCraft : (flowMeta.hasProcess && flowMode!=='stocktake')">
-                  <div class="sec__title">工序（可批量执行）<span v-if="(isPoNoticeSerial || isLineSidePick) && poInCraftGraph" style="font-weight:400;color:#8C8C8C;margin-left:6px">{{ poInCraftGraph.name }}</span></div>
-                  <div class="process-tabs" v-if="((isPoNoticeSerial || isLineSidePick) ? poInCraftTabs : flowMeta.processTabs) && ((isPoNoticeSerial || isLineSidePick) ? poInCraftTabs : flowMeta.processTabs).length">
+                <div class="sec" v-if="(isPoNoticeSerial || isLineSidePick || isXferSerialPick) ? poInHasCraft : (flowMeta.hasProcess && flowMode!=='stocktake')">
+                  <div class="sec__title">工序（可批量执行）<span v-if="(isPoNoticeSerial || isLineSidePick || isXferSerialPick) && poInCraftGraph" style="font-weight:400;color:#8C8C8C;margin-left:6px">{{ poInCraftGraph.name }}</span></div>
+                  <div class="process-tabs" v-if="((isPoNoticeSerial || isLineSidePick || isXferSerialPick) ? poInCraftTabs : flowMeta.processTabs) && ((isPoNoticeSerial || isLineSidePick || isXferSerialPick) ? poInCraftTabs : flowMeta.processTabs).length">
                     <button
-                      v-for="t in ((isPoNoticeSerial || isLineSidePick) ? poInCraftTabs : flowMeta.processTabs)"
+                      v-for="t in ((isPoNoticeSerial || isLineSidePick || isXferSerialPick) ? poInCraftTabs : flowMeta.processTabs)"
                       :key="t"
                       type="button"
-                      :class="{ on: processTab===t, done: (isPoNoticeSerial || isLineSidePick) && poInTabAllDone(t), locked: (isPoNoticeSerial || isLineSidePick) && !poInTabUnlocked(t) }"
+                      :class="{ on: processTab===t, done: (isPoNoticeSerial || isLineSidePick || isXferSerialPick) && poInTabAllDone(t), locked: (isPoNoticeSerial || isLineSidePick || isXferSerialPick) && !poInTabUnlocked(t) }"
                       @click="goProcessBatch(t)"
                     >{{ t }}</button>
                   </div>
-                  <div class="process-tabs" v-else-if="!(isPoNoticeSerial || isLineSidePick)">
+                  <div class="process-tabs" v-else-if="!(isPoNoticeSerial || isLineSidePick || isXferSerialPick)">
                     <button :class="{ on: processTab==='包装检查' }" @click="goProcessBatch('包装检查')">包装检查</button>
                     <button :class="{ on: processTab==='物料检查' }" @click="goProcessBatch('物料检查')">物料检查</button>
                   </div>
-                  <p v-if="(isPoNoticeSerial || isLineSidePick) && poInHasCraft" class="hint" style="margin-top:8px">串联须完成上游；并行须全部完成后进入下游。条码全部工序完成变绿后方可提交。</p>
+                  <p v-if="(isPoNoticeSerial || isLineSidePick || isXferSerialPick) && poInHasCraft" class="hint" style="margin-top:8px">串联须完成上游；并行须全部完成后进入下游。条码全部工序完成变绿后方可提交。</p>
                 </div>
                 <div class="sec" v-if="flowMode!=='stocktake'">
                   <div class="field"><label>备注</label><input v-model="form.remark" placeholder="选填" maxlength="200" /></div>
@@ -1834,11 +1904,14 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-footer" v-else-if="isOutSerialDoc">
                 <button class="btn-primary" @click="submitExec">提交 ({{ outActionWord }})</button>
               </div>
+              <div class="m-footer" v-else-if="isXferSerialPick">
+                <button class="btn-primary" @click="submitExec">提交 (调拨入库)</button>
+              </div>
               <div class="m-footer" v-else><button class="btn-primary" @click="submitExec">提交</button></div>
             </template>
 
             <!-- 推荐条码弹窗（非生产领料简易） -->
-            <div v-if="recommendVisible && !isLineSidePick" style="position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;border-radius:20px;overflow:hidden">
+            <div v-if="recommendVisible && !isLineSidePick && !isXferSerialPick" style="position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;border-radius:20px;overflow:hidden">
               <div style="width:100%;max-height:70%;background:#fff;border-radius:16px 16px 0 0;display:flex;flex-direction:column">
                 <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center">
                   <span>推荐条码</span>
@@ -2339,8 +2412,49 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </template>
                 <template v-else>
+                  <!-- 直接调拨-计数：调出/调入仓库 + 来源库位/批号/数量/目标库位 -->
+                  <template v-if="isXferCountExec">
+                    <div class="sec">
+                      <div class="sec__title">调拨仓库信息</div>
+                      <div class="field"><label>调出仓库</label><input :value="currentNotice && currentNotice.fromWh" readonly /></div>
+                      <div class="field"><label>调入仓库</label><input :value="currentNotice && currentNotice.toWh" readonly /></div>
+                    </div>
+                    <div class="sec">
+                      <div class="sec__title">{{ flowMeta.addLocTitle || '添加调出位置信息' }}</div>
+                      <div class="field">
+                        <label><span class="req">*</span>来源库位</label>
+                        <input v-model="form.loc" list="xfer-from-loc-list" placeholder="扫码 / 输入来源库位编码，回车" @keyup.enter="confirmXferFromLoc" @change="onXferCountLocChange" />
+                        <datalist id="xfer-from-loc-list">
+                          <option v-for="loc in xferFromLocOptions" :key="'xfer-fl-'+loc.code" :value="loc.code">{{ loc.name }}</option>
+                        </datalist>
+                      </div>
+                    </div>
+                    <div class="sec">
+                      <div class="sec__title">{{ flowMeta.addMatTitle || '添加调拨物料' }}</div>
+                      <div class="field">
+                        <label><span class="req">*</span>批号</label>
+                        <input v-if="xferCountLotLocked" v-model="form.lotIn" readonly placeholder="申请单已指定批号，不可修改" />
+                        <select v-else v-model="form.lotIn" :disabled="!form.loc" @change="onXferCountLotChange">
+                          <option value="">{{ form.loc ? '请选择批号' : '请先选择来源库位' }}</option>
+                          <option v-for="opt in xferCountLotOptions" :key="'xfer-lot-'+opt.lot" :value="opt.lot">{{ opt.lot }}（可用 {{ opt.qty }} {{ currentLine && currentLine.unit || '' }}）</option>
+                        </select>
+                      </div>
+                      <div class="field"><label><span class="req">*</span>{{ flowMeta.qtyLabel || '调拨数量' }}</label><input v-model.number="form.inQty" type="number" min="0.01" step="0.01" :placeholder="'不超过未完成 ' + (currentLine.remainQty||0)" /></div>
+                      <p class="hint" v-if="form.loc && form.lotIn && xferCountAvailQty > 0">所选库位批次可用库存：{{ xferCountAvailQty }} {{ currentLine && currentLine.unit || '' }}</p>
+                    </div>
+                    <div class="sec">
+                      <div class="sec__title">添加入库位置信息</div>
+                      <div class="field">
+                        <label><span class="req">*</span>目标库位</label>
+                        <input v-model="form.toLoc" list="xfer-to-loc-list" placeholder="扫码 / 输入目标库位编码，回车" @keyup.enter="confirmXferToLoc" />
+                        <datalist id="xfer-to-loc-list">
+                          <option v-for="loc in xferToLocOptions" :key="'xfer-tl-'+loc.code" :value="loc.code">{{ loc.name }}</option>
+                        </datalist>
+                      </div>
+                    </div>
+                  </template>
                   <!-- 入库类计数（采购入库-计数 / 委外退料-计数 / 委外收货-计数，对齐 PRD：目标库位） -->
-                  <template v-if="isInCountDoc">
+                  <template v-else-if="isInCountDoc">
                     <div class="sec" v-if="isProdRetCount">
                       <div class="sec__title">基本信息</div>
                       <div class="field"><label>来源线边仓</label><input :value="(currentNotice && currentNotice.lineSideLoc) || '—'" readonly /></div>
@@ -2468,7 +2582,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
                 </div>
               </div>
-              <div class="m-footer"><button class="btn-primary" @click="submitExec">{{ isLoadFlow ? '提交' : (isSoRmaCount ? '提交 (退货入库)' : (isTrustRecvCount ? '提交 (收料上架)' : (isProdRetCount ? '提交 (退料入库)' : (isOsRecvCount ? '提交 (收料入库)' : (isOsRetCount ? '提交 (退料入库)' : (isPoInCount ? '提交 (入库)' : (isOutCountDoc ? ('提交 (' + outActionWord + ')') : '提交'))))))) }}</button></div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">{{ isLoadFlow ? '提交' : (isXferCountExec ? '提交 (调拨入库)' : (isSoRmaCount ? '提交 (退货入库)' : (isTrustRecvCount ? '提交 (收料上架)' : (isProdRetCount ? '提交 (退料入库)' : (isOsRecvCount ? '提交 (收料入库)' : (isOsRetCount ? '提交 (退料入库)' : (isPoInCount ? '提交 (入库)' : (isOutCountDoc ? ('提交 (' + outActionWord + ')') : '提交')))))))) }}</button></div>
             </template>
 
             <!-- ===== 执行页 · 库内移库/转序 ===== -->
@@ -3561,7 +3675,7 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.272"></script>
+<script src="./js/demo-announcements.js?v=1.3.274"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/demo-store.js"></script>
 <script src="./js/app-configs.js"></script>
@@ -3805,7 +3919,7 @@ createApp({
     const tankRows = ref([...CFG.tankRows]);
     const innerRows = ref([...CFG.innerScanRows]);
     const form = reactive({
-      loc: '', custLoc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '丁A',
+      loc: '', custLoc: '', toLoc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '丁A',
       prodDate: '2025-08-01', validDate: '2026-08-01', validMonths: 12, maker: '天齐锂业股份有限公司', qty: 25,
       lotIn: '', inQty: null, inPcs: null, remark: '', lineSideWh: '', pkgQty: null, outDir: '',
       splitCount: 5, splitScalar: 10, mergeBarcode: '', outerBarcode: '', outerNo: '', retQty: null,
@@ -4105,6 +4219,12 @@ createApp({
     const isSoRmaSerial = computed(() => flowId.value === 'so-rma-serial');
     const isSoRmaCount = computed(() => flowId.value === 'so-rma-count');
     const isSoRmaDoc = computed(() => isSoRmaSerial.value || isSoRmaCount.value);
+    const isXferSerial = computed(() => flowId.value === 'xfer-serial');
+    const isXferCount = computed(() => flowId.value === 'xfer-count');
+    const isXferSerialDoc = computed(() => isXferSerial.value);
+    const isXferCountDoc = computed(() => isXferCount.value);
+    const isXferSerialPick = computed(() => flowMeta.value.execVariant === 'xfer-serial');
+    const isXferCountExec = computed(() => flowMeta.value.execVariant === 'xfer-count');
     /** 出库类流水码（退料出库 / 委外发料 / 委外退货 / 受托退料 / 销售预出货 / 销售发货）共用扫码执行逻辑；退货另需源库位 */
     const isOutSerialDoc = computed(() => isPoRetSerial.value || isOsIssueSerial.value || isOsRmaSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value);
     const isInSerialDoc = computed(() => isPoInSerial.value || isOsRetSerial.value || isOsRecvSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || flowId.value === 'prod-in-serial' || isSoRmaSerial.value);
@@ -4132,7 +4252,7 @@ createApp({
     const isRestAppDoc = computed(() => {
       const id = String(flowId.value || '');
       // 受托收/退、销售预出货/发货/退货等已并入通知单路径，不再走 gen-doc-form
-      if (id === 'trust-recv-serial' || id === 'trust-recv-count' || id === 'trust-recv-tank' || id === 'trust-ret-serial' || id === 'trust-ret-count' || id === 'so-preout-serial' || id === 'so-preout-count' || id === 'so-ship-serial' || id === 'so-ship-count' || id === 'so-rma-serial' || id === 'so-rma-count') return false;
+      if (id === 'trust-recv-serial' || id === 'trust-recv-count' || id === 'trust-recv-tank' || id === 'trust-ret-serial' || id === 'trust-ret-count' || id === 'so-preout-serial' || id === 'so-preout-count' || id === 'so-ship-serial' || id === 'so-ship-count' || id === 'so-rma-serial' || id === 'so-rma-count' || id === 'xfer-serial') return false;
       return /^(trust-|so-ship-|so-rma-|oth-|stock-take$|wh-load$|pkg-scrap$|pkg-freeze$|pkg-unfreeze$)/.test(id);
     });
     const isPoNoticeSerial = computed(() => isPoInSerial.value || isPoRetSerial.value || isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value || isSoRmaSerial.value);
@@ -4147,7 +4267,7 @@ createApp({
     const inCountQtyLabel = computed(() => flowMeta.value.qtyLabel || ((isOsRetCount.value || flowId.value === 'prod-ret-count' || isSoRmaCount.value) ? '退货数量' : '入库数量'));
     const poInCraftTabs = ref([]);
     const poInCraftGraph = ref(null); // { code, name, nodes, edges }
-    const poInHasCraft = computed(() => (isPoNoticeSerial.value || isInCountDoc.value || isOutCountDoc.value || isLineSidePick.value) && (poInCraftTabs.value || []).length > 0);
+    const poInHasCraft = computed(() => (isPoNoticeSerial.value || isInCountDoc.value || isOutCountDoc.value || isLineSidePick.value || isXferSerialPick.value) && (poInCraftTabs.value || []).length > 0);
     const poInBatchKey = ref('');
     const countDoneProcs = ref([]);
     const isProdPickSerial = computed(() => flowId.value === 'prod-pick-serial');
@@ -4159,10 +4279,93 @@ createApp({
     const isProdRetTank = computed(() => flowId.value === 'prod-ret-tank');
     const isProdRetDoc = computed(() => isProdRetSerial.value || isProdRetCount.value || isProdRetTank.value);
     const isLineSidePick = computed(() => flowMeta.value.execVariant === 'line-side-pick');
+    function parseXferWhName(field) {
+      const s = String(field || '').trim();
+      const m = s.match(/-\s*(.+)$/);
+      return m ? m[1].trim() : s;
+    }
+    function locBelongsToWh(locCode, whName) {
+      const code = String(locCode || '').trim();
+      const wh = String(whName || '').trim();
+      if (!code || !wh) return false;
+      const hit = (CFG.locRows || []).find(l => l.code === code);
+      if (hit) return hit.warehouse === wh;
+      if (wh === '原料仓') return /^(WH-RAW|A-)/.test(code);
+      if (wh === '成品仓') return /^WH-FG/.test(code);
+      if (wh === '包材仓') return /^WH-PM/.test(code);
+      return false;
+    }
+    const xferFromWhName = computed(() => parseXferWhName(currentNotice.value && currentNotice.value.fromWh));
+    const xferToWhName = computed(() => parseXferWhName(currentNotice.value && currentNotice.value.toWh));
+    const xferToLocOptions = computed(() => {
+      const wh = xferToWhName.value;
+      return (CFG.locRows || []).filter(l => l.status === '启用' && l.warehouse === wh);
+    });
+    function parseCountInvLoc(locField) {
+      const s = String(locField || '').trim();
+      return s.split(/\s*\/\s*/)[0].trim();
+    }
+    function listXferCountInv(code, locCode, lot) {
+      const fromWh = xferFromWhName.value;
+      const c = String(code || '');
+      const lc = String(locCode || '').trim();
+      const l = String(lot || '').trim();
+      return (CFG.countInvRows || []).filter(r => {
+        if (r.code !== c) return false;
+        const rowLoc = parseCountInvLoc(r.loc);
+        if (lc && rowLoc !== lc) return false;
+        if (l && String(r.lot || '') !== l) return false;
+        if (fromWh && !locBelongsToWh(rowLoc, fromWh)) return false;
+        return Number(r.qty) > 0;
+      });
+    }
+    const xferFromLocOptions = computed(() => {
+      const line = currentLine.value;
+      if (!line || !line.code) return [];
+      const fromWh = xferFromWhName.value;
+      const locSet = new Map();
+      (CFG.countInvRows || []).forEach(r => {
+        if (r.code !== line.code) return;
+        const locCode = parseCountInvLoc(r.loc);
+        if (!locBelongsToWh(locCode, fromWh)) return;
+        if (!(Number(r.qty) > 0)) return;
+        const hit = (CFG.locRows || []).find(l => l.code === locCode && l.status === '启用');
+        if (hit) locSet.set(locCode, hit);
+      });
+      return Array.from(locSet.values());
+    });
+    const xferCountLotOptions = computed(() => {
+      const line = currentLine.value;
+      const loc = String(form.loc || '').trim();
+      if (!line || !loc) return [];
+      const lotMap = new Map();
+      listXferCountInv(line.code, loc, '').forEach(r => {
+        const lot = String(r.lot || '');
+        if (!lot) return;
+        lotMap.set(lot, (lotMap.get(lot) || 0) + Number(r.qty || 0));
+      });
+      return Array.from(lotMap.entries()).map(([lot, qty]) => ({ lot, qty }));
+    });
+    const xferCountLotLocked = computed(() => {
+      if (!isXferCountExec.value || !currentLine.value) return false;
+      const lot = String(currentLine.value.lot || '').trim();
+      return !!(lot && lot !== '—');
+    });
+    const xferCountAvailQty = computed(() => {
+      if (!isXferCountExec.value || !currentLine.value) return 0;
+      const loc = String(form.loc || '').trim();
+      const lot = String(form.lotIn || '').trim();
+      if (!loc || !lot) return 0;
+      return listXferCountInv(currentLine.value.code, loc, lot).reduce((s, r) => s + Number(r.qty || 0), 0);
+    });
     const filteredRecommendBarcodes = computed(() => {
       const line = currentLine.value;
       const kw = String(recommendKw.value || '').trim();
-      let list = (CFG.recommendBarcodes || []).slice();
+      let list = (isXferSerialPick.value ? (CFG.xferRecommendBarcodes || []) : (CFG.recommendBarcodes || [])).slice();
+      if (isXferSerialPick.value) {
+        const fromWh = xferFromWhName.value;
+        list = list.filter(r => locBelongsToWh(r.loc, fromWh));
+      }
       list = list.filter((r) => {
         const arch = findSerialArch(r.barcode);
         if (archInspectStatus(arch || r) !== '合格') return false;
@@ -4224,13 +4427,13 @@ createApp({
     const tankArchOptions = computed(() => (CFG.tankArchRows || []).filter(t => t.useStatus === '在用'));
     const displayedLines = computed(() => {
       const lines = (currentNotice.value && currentNotice.value.lines) || [];
-      if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value) {
+      if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value || isXferCount.value) {
         return lines.filter(ln => !ln.manageMode || ln.manageMode === '计数管理');
       }
       if (isTrustRecvTank.value || isPoInTank.value || isOsRecvTank.value || isProdPickTank.value || isProdRetTank.value) {
         return lines.filter(ln => !ln.manageMode || ln.manageMode === '罐区管理' || ln.manageMode === '计数管理' || !!ln.medium);
       }
-      if (isOutSerialDoc.value || isOsRetSerial.value || isOsRecvSerial.value || isProdPickSerial.value || isProdRetSerial.value || isTrustRecvSerial.value || isSoRmaSerial.value) {
+      if (isOutSerialDoc.value || isOsRetSerial.value || isOsRecvSerial.value || isProdPickSerial.value || isProdRetSerial.value || isTrustRecvSerial.value || isSoRmaSerial.value || isXferSerial.value) {
         return lines.filter(ln => !ln.manageMode || ln.manageMode === '条码管理');
       }
       return lines;
@@ -4441,7 +4644,7 @@ createApp({
     const filteredNotices = computed(() => {
       const kw = docKw.value.trim();
       let list = currentDocs.value || [];
-      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isLoadFlow.value || flowMode.value === 'insp') {
+      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isLoadFlow.value || flowMode.value === 'insp') {
         list = list.filter(n => n.status === '待执行' || n.status === '执行中');
         list = list.slice().sort((a, b) => String(a.planDate || '').localeCompare(String(b.planDate || '')) || String(a.id || '').localeCompare(String(b.id || '')));
       }
@@ -4478,7 +4681,7 @@ createApp({
         }
         const pts = [...(n.loads || []), ...(n.unloads || [])].map(p => [p.unit, p.place, p.shipNo, p.contact].join(' ')).join(' ');
         const lineBlob = (n.lines || []).map(ln => [ln.code, ln.name, ln.spec, ln.lot].join(' ')).join(' ');
-        return [n.id, n.partner, n.supplier, n.refNo, n.whBiz, n.poNo, n.issueCkNo, n.outCkNo, n.stockNo, n.preoutNo, n.prepNoticeNo, n.custWh, n.custLoc, n.materialSummary, n.lineSideLoc, n.pickType, n.logisticsNo, n.dispatchNo, n.waybillNo, n.docType, n.driver, n.plate, n.trailer, n.driverId, n.route, n.shipMode, n.transportType, n.shipNos, n.carrier, n.loadArea, n.remark, n.creator, n.takeMode, n.phone, n.sourceType, n.outNo, n.shipFrom, n.shipTo, n.materialName, n.spec, n.erpNo, pts, lineBlob].join(' ');
+        return [n.id, n.partner, n.supplier, n.refNo, n.whBiz, n.poNo, n.fromWh, n.toWh, n.issueCkNo, n.outCkNo, n.stockNo, n.preoutNo, n.prepNoticeNo, n.custWh, n.custLoc, n.materialSummary, n.lineSideLoc, n.pickType, n.logisticsNo, n.dispatchNo, n.waybillNo, n.docType, n.driver, n.plate, n.trailer, n.driverId, n.route, n.shipMode, n.transportType, n.shipNos, n.carrier, n.loadArea, n.remark, n.creator, n.takeMode, n.phone, n.sourceType, n.outNo, n.shipFrom, n.shipTo, n.materialName, n.spec, n.erpNo, pts, lineBlob].join(' ');
       };
       return list.filter(n => blob(n).includes(kw));
     });
@@ -5242,6 +5445,8 @@ createApp({
     function openMaterials(n) { openDocAction(n); }
     function resetExecForm() {
       form.loc = '';
+      form.toLoc = '';
+      form.custLoc = '';
       form.barcode = '';
       form.pkgNo = '';
       form.outerNo = '';
@@ -5252,7 +5457,7 @@ createApp({
         const rp = currentLine.value?.remainPcs ?? currentLine.value?.planPcs;
         form.inPcs = (currentLine.value?.manageMode === '条码管理' && rp != null) ? Number(rp) || null : null;
       } else {
-        form.inQty = (isInCountDoc.value || isOutCountDoc.value) ? (Number(currentLine.value?.remainQty || 0) || null) : null;
+        form.inQty = (isInCountDoc.value || isOutCountDoc.value || isXferCountExec.value) ? (Number(currentLine.value?.remainQty || 0) || null) : null;
         form.inPcs = null;
       }
       form.remark = '';
@@ -5300,6 +5505,8 @@ createApp({
       if (line.status === '已完成') {
         let doneMsg = '该物料明细已完成入库，无需重复作业';
         if (isLineSidePick.value) doneMsg = '该物料明细已领料完成，无需重复作业';
+        else if (isXferSerialPick.value) doneMsg = '该物料明细已调拨完成，无需重复作业';
+        else if (isXferCountExec.value) doneMsg = '该物料明细已调拨完成，无需重复作业';
         else if (isSoRmaDoc.value) doneMsg = '该物料明细已退货入库完成，无需重复作业';
         else if (isProdRetDoc.value) doneMsg = '该物料明细已退料完成，无需重复作业';
         else if (isOsIssueDoc.value) doneMsg = '该物料明细已发料完成，无需重复作业';
@@ -5348,6 +5555,50 @@ createApp({
           poInCraftTabs.value = [];
           poInCraftGraph.value = null;
           poInBatchKey.value = '';
+          form.remark = '';
+        }
+      } else if (isXferSerialPick.value) {
+        const draft = line._xferDraft;
+        if (draft && Array.isArray(draft.scanRows) && draft.scanRows.length) {
+          form.remark = draft.remark || '';
+          scanRows.value = JSON.parse(JSON.stringify(draft.scanRows));
+          poInCraftTabs.value = (draft.craftTabs || []).slice();
+          poInCraftGraph.value = draft.craftGraph ? JSON.parse(JSON.stringify(draft.craftGraph)) : null;
+          if (!poInCraftGraph.value && poInCraftTabs.value.length) {
+            poInCraftGraph.value = {
+              code: draft.craftCode || '',
+              name: draft.craftName || '已匹配工艺',
+              nodes: poInCraftTabs.value.map((name, i) => ({ id: 'n' + (i + 1), name })),
+              edges: poInCraftTabs.value.slice(0, -1).map((_, i) => ['n' + (i + 1), 'n' + (i + 2)]),
+            };
+          }
+          poInBatchKey.value = draft.batchKey || '';
+          processTab.value = (poInCraftTabs.value[0]) || processTab.value;
+          ElementPlus.ElMessage.success('已恢复上次保存的作业进度');
+        } else {
+          scanRows.value = [];
+          poInCraftTabs.value = [];
+          poInCraftGraph.value = null;
+          poInBatchKey.value = '';
+          form.remark = '';
+        }
+      } else if (isXferCountExec.value) {
+        const draft = line._xferCountDraft;
+        const lockedLot = String(line.lot || '').trim();
+        const hasLockedLot = !!(lockedLot && lockedLot !== '—');
+        const hasDraft = draft && (draft.loc || draft.toLoc || draft.lotIn || draft.inQty || draft.remark);
+        if (hasDraft) {
+          form.loc = draft.loc || '';
+          form.toLoc = draft.toLoc || '';
+          form.lotIn = draft.lotIn || (hasLockedLot ? line.lot : '');
+          form.inQty = draft.inQty != null ? draft.inQty : form.inQty;
+          form.remark = draft.remark || '';
+          ElementPlus.ElMessage.success('已恢复上次保存的作业进度');
+        } else {
+          form.inQty = Number(line.remainQty || 0) || null;
+          form.lotIn = hasLockedLot ? line.lot : '';
+          form.loc = '';
+          form.toLoc = '';
           form.remark = '';
         }
       } else if (isOutSerialDoc.value) {
@@ -5654,6 +5905,16 @@ createApp({
         view.value = 'materials';
         return;
       }
+      if (isXferSerialPick.value && !opts.skipSaveToast) {
+        autoSaveXferExec();
+        view.value = 'materials';
+        return;
+      }
+      if (isXferCountExec.value && !opts.skipSaveToast) {
+        autoSaveXferCountExec();
+        view.value = 'materials';
+        return;
+      }
       if (isLoadFlow.value && !opts.skipSaveToast) toast('当前作业进度已保存');
       if (flowMode.value === 'stocktake' && !opts.skipSaveToast) toast('当前盘点数据已自动保存');
       if (flowMode.value === 'inner' || flowMode.value === 'stocktake') view.value = 'docs';
@@ -5739,6 +6000,8 @@ createApp({
           return autoSavePoInExec();
         }
         if (isLineSidePick.value) return autoSaveProdPickExec();
+        if (isXferSerialPick.value) return autoSaveXferExec();
+        if (isXferCountExec.value) return autoSaveXferCountExec();
       } catch (e) { /* ignore demo autosave errors */ }
       return false;
     }
@@ -6852,8 +7115,225 @@ createApp({
       ElementPlus.ElMessage.success(`条码[${code}]已加入明细`);
       autosaveAfterScan();
     }
+    function validateXferBarcode(arch, code) {
+      if (!arch) return '当前条码不满足调拨条件（非在用/非在库/不合格）';
+      if (arch.useStatus !== '在用') return '当前条码不满足调拨条件（非在用/非在库/不合格）';
+      if (arch.stockStatus !== '仓库') return '当前条码不满足调拨条件（非在用/非在库/不合格）';
+      const qcErr = requireInspectPass(arch, code, '调拨');
+      if (qcErr) return qcErr;
+      const fromWh = xferFromWhName.value;
+      if (!locBelongsToWh(arch.loc, fromWh)) return '该条码不在调出仓库内，禁止扫入';
+      const mat = archMaterialCode(arch);
+      if (currentLine.value && mat && mat !== currentLine.value.code) return '条码物料与调拨申请单物料不一致，请核对';
+      const lineLot = String((currentLine.value && currentLine.value.lot) || '').trim();
+      if (lineLot && lineLot !== '—' && arch.lot && arch.lot !== lineLot) return '条码批号与申请单指定批号不一致，禁止录入';
+      if (String(arch.step || '').trim()) return `条码[${code}]当前步骤已被占用（${arch.step}），禁止扫入`;
+      if (scanRows.value.some(r => r.barcode === code)) return '当前条码已录入，不可重复扫码';
+      const archQty = Number(arch.qty || arch.archiveQty || 0);
+      if (!(archQty > 0)) return '数量必须填写大于 0 的正数';
+      return '';
+    }
+    function pushXferScanRow(arch, code) {
+      const archQty = Number((arch && (arch.qty || arch.archiveQty)) || 0);
+      if (!scanRows.value.length) {
+        const craft = matchPoInCraft(arch);
+        applyPoInCraft(craft);
+        if (!poInBatchKey.value) poInBatchKey.value = 'B' + Date.now();
+        if (craft) ElementPlus.ElMessage.success(`已匹配检查工艺「${craft.name}」`);
+        else toast('未匹配到检查工艺，绑定目标库位后可直接提交');
+      }
+      const row = {
+        barcode: code,
+        pkgNo: (arch && arch.pkgNo) || '—',
+        qty: archQty,
+        archQty,
+        lot: (arch && arch.lot) || currentLine.value?.lot || '—',
+        fromLoc: (arch && arch.loc) || '—',
+        toLoc: '',
+        process: (poInCraftTabs.value && poInCraftTabs.value[0]) || '—',
+        outer: (arch && arch.bindOuter) || '—',
+        packType: (arch && arch.packType) || '',
+        packSpec: (arch && arch.packSpec) || '',
+        doneProcs: [],
+        done: !(poInCraftTabs.value && poInCraftTabs.value.length),
+      };
+      refreshPoInRowDone(row);
+      scanRows.value.push(row);
+      occupyXferArch(code, false);
+    }
+    function occupyXferArch(barcode, final) {
+      hydrateSerialArchFromPcMock();
+      const noticeId = (currentNotice.value && currentNotice.value.id) || '';
+      const arch = (CFG.serialArchRows || []).find(a => a.barcode === barcode);
+      if (!arch) return;
+      if (final) {
+        const row = scanRows.value.find(r => r.barcode === barcode);
+        if (row && row.toLoc) {
+          arch.loc = row.toLoc;
+          arch.qty = String(row.qty);
+          arch.archiveQty = arch.qty;
+        }
+        arch.stage = '直接调拨';
+        arch.step = '';
+        arch.docNo = '';
+      } else {
+        arch.step = '直接调拨';
+        arch.docNo = noticeId;
+      }
+      flushSerialArchToPcMock();
+    }
+    function releaseXferArch(barcode) {
+      hydrateSerialArchFromPcMock();
+      const arch = (CFG.serialArchRows || []).find(a => a.barcode === barcode);
+      if (!arch) return;
+      arch.step = '';
+      arch.docNo = '';
+      flushSerialArchToPcMock();
+    }
+    function onXferQtyChange(row) {
+      const archQty = Number(row.archQty || 0);
+      let qty = Number(row.qty || 0);
+      if (!(qty > 0)) {
+        ElementPlus.ElMessage.error('数量必须填写大于 0 的正数');
+        row.qty = archQty || 0.01;
+        return;
+      }
+      if (archQty && qty > archQty) {
+        ElementPlus.ElMessage.error('调拨数量不可大于条码在库数量');
+        row.qty = archQty;
+      }
+    }
+    function onXferToLocChange(row) {
+      const code = String(row.toLoc || '').trim();
+      if (!code) return;
+      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      if (!hit || hit.warehouse !== xferToWhName.value) {
+        ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
+        row.toLoc = '';
+        return;
+      }
+      row.toLoc = hit.code;
+    }
+    function addXferScan() {
+      const code = String(form.barcode || '').trim();
+      if (!code) return;
+      const outerMap = CFG.outerBindMap || {};
+      if (outerMap[code] || /^TJ/i.test(code)) {
+        form.barcode = '';
+        ElementPlus.ElMessage.error('外包材整托扫入 Demo 暂未接入调拨页，请扫单品流水码');
+        return;
+      }
+      const arch = findSerialArch(code);
+      const err = validateXferBarcode(arch, code);
+      if (err) { ElementPlus.ElMessage.error(err); return; }
+      pushXferScanRow(arch, code);
+      form.barcode = '';
+      ElementPlus.ElMessage.success(`条码[${code}]已加入明细`);
+      autosaveAfterScan();
+    }
+    function applyXferBarcodeArchive(final) {
+      scanRows.value.forEach(r => occupyXferArch(r.barcode, final));
+    }
+    function autoSaveXferExec() {
+      const hasProgress = !!(form.remark || (scanRows.value && scanRows.value.length));
+      if (!hasProgress) return false;
+      const n = currentNotice.value;
+      const line = currentLine.value;
+      if (n && scanRows.value.length) n.status = '执行中';
+      if (line && scanRows.value.length) {
+        line.status = '执行中';
+        line._xferDraft = {
+          remark: form.remark,
+          scanRows: JSON.parse(JSON.stringify(scanRows.value || [])),
+          craftTabs: (poInCraftTabs.value || []).slice(),
+          craftGraph: poInCraftGraph.value ? JSON.parse(JSON.stringify(poInCraftGraph.value)) : null,
+          craftCode: poInCraftGraph.value && poInCraftGraph.value.code,
+          craftName: poInCraftGraph.value && poInCraftGraph.value.name,
+          batchKey: poInBatchKey.value,
+        };
+        applyXferBarcodeArchive(false);
+      }
+      ElementPlus.ElMessage.success('直接调拨作业数据已暂存');
+      bumpStore();
+      return true;
+    }
+    function confirmXferFromLoc() {
+      const code = String(form.loc || '').trim();
+      if (!code) {
+        ElementPlus.ElMessage.error('请选择来源库位');
+        return false;
+      }
+      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      if (!hit || hit.warehouse !== xferFromWhName.value) {
+        ElementPlus.ElMessage.error('来源库位须为调出仓库内的启用库位');
+        form.loc = '';
+        return false;
+      }
+      form.loc = hit.code;
+      if (!xferCountLotLocked.value) form.lotIn = '';
+      ElementPlus.ElMessage.success('来源库位已确认：' + hit.code);
+      autosaveAfterScan();
+      return true;
+    }
+    function confirmXferToLoc() {
+      const code = String(form.toLoc || '').trim();
+      if (!code) {
+        ElementPlus.ElMessage.error('请选择调入侧目标库位');
+        return false;
+      }
+      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      if (!hit || hit.warehouse !== xferToWhName.value) {
+        ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
+        form.toLoc = '';
+        return false;
+      }
+      form.toLoc = hit.code;
+      ElementPlus.ElMessage.success('目标库位已确认：' + hit.code);
+      autosaveAfterScan();
+      return true;
+    }
+    function onXferCountLocChange() {
+      if (!xferCountLotLocked.value) form.lotIn = '';
+    }
+    function onXferCountLotChange() {
+      autosaveAfterScan();
+    }
+    function deductXferCountInv(code, locCode, lot, qty) {
+      let left = Number(qty);
+      if (!(left > 0)) return;
+      (CFG.countInvRows || []).forEach(r => {
+        if (left <= 0) return;
+        if (r.code !== code) return;
+        if (parseCountInvLoc(r.loc) !== locCode) return;
+        if (String(r.lot || '') !== String(lot || '')) return;
+        const before = Number(r.qty || 0);
+        const deduct = Math.min(before, left);
+        r.qty = before - deduct;
+        left -= deduct;
+      });
+    }
+    function autoSaveXferCountExec() {
+      const hasProgress = !!(form.loc || form.toLoc || form.lotIn || form.inQty || form.remark);
+      if (!hasProgress) return false;
+      const n = currentNotice.value;
+      const line = currentLine.value;
+      if (n && (form.loc || form.inQty)) n.status = '执行中';
+      if (line && (form.loc || form.inQty)) {
+        line.status = '执行中';
+        line._xferCountDraft = {
+          loc: form.loc,
+          toLoc: form.toLoc,
+          lotIn: form.lotIn,
+          inQty: form.inQty,
+          remark: form.remark,
+        };
+      }
+      ElementPlus.ElMessage.success('直接调拨作业数据已暂存');
+      bumpStore();
+      return true;
+    }
     function openRecommend() {
-      if (isLineSidePick.value) {
+      if (isLineSidePick.value || isXferSerialPick.value) {
         recommendKw.value = '';
         recommendSelected.value = {};
         view.value = 'recommend';
@@ -6906,13 +7386,17 @@ createApp({
       selected.forEach((r) => {
         if (scanRows.value.some(x => x.barcode === r.barcode)) return;
         const arch = findSerialArch(r.barcode);
-        const err = validateProdPickBarcode(arch || {
+        const err = (isXferSerialPick.value ? validateXferBarcode : validateProdPickBarcode)(arch || {
           barcode: r.barcode, useStatus: '在用', stockStatus: '仓库', material: (currentLine.value && currentLine.value.code) || '',
           lot: r.lot, qty: r.qty, loc: r.loc, pkgNo: r.pkgNo, bindStatus: '未绑定', bindOuter: '—',
           packType: '流水码', packSpec: '吨袋+托架',
         }, r.barcode);
         if (err) { ElementPlus.ElMessage.error(err); return; }
-        pushProdPickScanRow(arch || {
+        if (isXferSerialPick.value) pushXferScanRow(arch || {
+          barcode: r.barcode, pkgNo: r.pkgNo, qty: r.qty, loc: r.loc, lot: r.lot,
+          packType: '流水码', packSpec: '吨袋+托架', bindOuter: r.outer || '—',
+        }, r.barcode);
+        else pushProdPickScanRow(arch || {
           barcode: r.barcode, pkgNo: r.pkgNo, qty: r.qty, loc: r.loc, lot: r.lot,
           packType: '流水码', packSpec: '吨袋+托架', bindOuter: r.outer || '—',
         }, r.barcode);
@@ -7515,7 +7999,7 @@ createApp({
       toast('已添加移库/转序明细');
     }
     function openProcess(row) {
-      if (isPoNoticeSerial.value || isLineSidePick.value) {
+      if (isPoNoticeSerial.value || isLineSidePick.value || isXferSerialPick.value) {
         if (!poInHasCraft.value) return;
         const name = processTab.value || (poInCraftTabs.value && poInCraftTabs.value[0]);
         if (name && !poInRowProcUnlocked(row, name)) {
@@ -7544,12 +8028,14 @@ createApp({
       }).then(() => {
         const map = { scan: scanRows, tank: tankRows, inner: innerRows, pkg: pkgRows, stock: stockRows };
         const list = map[kind];
+        const removed = (map[kind] && map[kind].value) ? map[kind].value[index] : null;
         if (list && list.value) list.value.splice(index, 1);
-        if ((isInSerialDoc.value || isOutSerialDoc.value || isLineSidePick.value) && kind === 'scan' && !scanRows.value.length) {
+        if (isXferSerialPick.value && kind === 'scan' && removed && removed.barcode) releaseXferArch(removed.barcode);
+        if ((isInSerialDoc.value || isOutSerialDoc.value || isLineSidePick.value || isXferSerialPick.value) && kind === 'scan' && !scanRows.value.length) {
           applyPoInCraft(null);
           poInBatchKey.value = '';
         }
-        ElementPlus.ElMessage.success(isInTankDoc.value ? '明细记录已删除' : ((isInSerialDoc.value || isOutSerialDoc.value) ? '扫码明细已删除' : '明细数据删除完成'));
+        ElementPlus.ElMessage.success(isXferSerialPick.value ? '条码明细已删除' : (isInTankDoc.value ? '明细记录已删除' : ((isInSerialDoc.value || isOutSerialDoc.value) ? '扫码明细已删除' : '明细数据删除完成')));
       }).catch(() => {});
     }
     function openLoadProc(p, idx) {
@@ -7565,7 +8051,7 @@ createApp({
       view.value = 'process';
     }
     function goProcessBatch(name) {
-      if (isPoNoticeSerial.value || isLineSidePick.value) {
+      if (isPoNoticeSerial.value || isLineSidePick.value || isXferSerialPick.value) {
         if (!poInHasCraft.value) return;
         if (!scanRows.value.length) {
           ElementPlus.ElMessage.error('请先扫码录入明细后再执行工序');
@@ -12581,6 +13067,119 @@ createApp({
         }).catch(() => {});
         return;
       }
+      if (isXferSerialPick.value) {
+        if (!scanRows.value.length) { ElementPlus.ElMessage.error('请先扫码录入明细后再提交'); return; }
+        const missingLoc = scanRows.value.find(r => !String(r.toLoc || '').trim());
+        if (missingLoc) { ElementPlus.ElMessage.error('请为所有条码绑定调入侧目标库位'); return; }
+        if (scanRows.value.some(r => !(Number(r.qty) > 0))) {
+          ElementPlus.ElMessage.error('数量必须填写大于 0 的正数');
+          return;
+        }
+        if (poInHasCraft.value) {
+          const undone = scanRows.value.find(r => !r.done);
+          if (undone) {
+            ElementPlus.ElMessage.error('仍存在未执行工序，请完成所有工序后再提交');
+            return;
+          }
+        }
+        const qty = Number(scanQtySum.value || 0);
+        const overRemain = qty > Number((currentLine.value && currentLine.value.remainQty) || 0);
+        const confirmText = overRemain
+          ? '当前调拨数量超出未完成数量，是否确认继续提交？'
+          : '确认提交本次直接调拨作业？提交后将更新双仓库存并过账。';
+        ElementPlus.ElMessageBox.confirm(confirmText, '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回检查', type: 'warning',
+        }).then(() => {
+          const n = currentNotice.value;
+          const line = currentLine.value;
+          const pcs = scanRows.value.length;
+          if (line) {
+            line.doneQty = Number(line.doneQty || 0) + qty;
+            line.remainQty = Math.max(0, Number(line.remainQty || 0) - qty);
+            line.remainPcs = Math.max(0, Number(line.remainPcs || 0) - pcs);
+            if (line.remainQty === 0 || line.remainPcs === 0) {
+              line.remainQty = 0;
+              line.remainPcs = 0;
+              line.status = '已完成';
+            } else {
+              line.status = '执行中';
+            }
+            delete line._xferDraft;
+          }
+          if (n) {
+            const allDone = (n.lines || []).every(ln => ln.status === '已完成' || ln.status === '已关闭');
+            n.status = allDone ? '已完成' : '执行中';
+          }
+          applyXferBarcodeArchive(true);
+          bumpStore();
+          ElementPlus.ElMessage.success('直接调拨入库提交成功');
+          scanRows.value = [];
+          poInCraftTabs.value = [];
+          poInCraftGraph.value = null;
+          poInBatchKey.value = '';
+          form.remark = '';
+          form.barcode = '';
+          if (n && n.status === '已完成') view.value = 'docs';
+          else backFromExec({ skipSaveToast: true });
+        }).catch(() => {});
+        return;
+      }
+      if (isXferCountExec.value) {
+        const fromCode = String(form.loc || '').trim();
+        const toCode = String(form.toLoc || '').trim();
+        const lot = String(form.lotIn || '').trim();
+        if (!fromCode) { ElementPlus.ElMessage.error('请选择来源库位'); return; }
+        const fromHit = (CFG.locRows || []).find(l => l.code === fromCode && l.status === '启用');
+        if (!fromHit || fromHit.warehouse !== xferFromWhName.value) {
+          ElementPlus.ElMessage.error('来源库位须为调出仓库内的启用库位');
+          return;
+        }
+        if (!lot) { ElementPlus.ElMessage.error('请选择调拨批号'); return; }
+        if (!toCode) { ElementPlus.ElMessage.error('请选择调入侧目标库位'); return; }
+        const toHit = (CFG.locRows || []).find(l => l.code === toCode && l.status === '启用');
+        if (!toHit || toHit.warehouse !== xferToWhName.value) {
+          ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
+          return;
+        }
+        const qty = Number(form.inQty);
+        if (!(qty > 0)) { ElementPlus.ElMessage.error('调拨数量必须填写大于 0 的正数'); return; }
+        const remain = Number((currentLine.value && currentLine.value.remainQty) || 0);
+        if (qty > remain) { ElementPlus.ElMessage.error('调拨数量不可大于申请单未完成数量'); return; }
+        const avail = xferCountAvailQty.value;
+        if (qty > avail) { ElementPlus.ElMessage.error('调拨数量不可大于所选库位当前批次的在库可用数量'); return; }
+        ElementPlus.ElMessageBox.confirm('确认提交本次直接调拨作业？提交后将更新双仓库存并过账。', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回检查', type: 'warning',
+        }).then(() => {
+          const n = currentNotice.value;
+          const line = currentLine.value;
+          if (line) {
+            line.doneQty = Number(line.doneQty || 0) + qty;
+            line.remainQty = Math.max(0, Number(line.remainQty || 0) - qty);
+            if (line.remainQty === 0) {
+              line.remainQty = 0;
+              line.status = '已完成';
+            } else {
+              line.status = '执行中';
+            }
+            delete line._xferCountDraft;
+          }
+          if (n) {
+            const allDone = (n.lines || []).every(ln => ln.status === '已完成' || ln.status === '已关闭');
+            n.status = allDone ? '已完成' : '执行中';
+          }
+          deductXferCountInv(line && line.code, fromCode, lot, qty);
+          bumpStore();
+          ElementPlus.ElMessage.success('直接调拨入库提交成功');
+          form.loc = '';
+          form.toLoc = '';
+          form.lotIn = '';
+          form.inQty = null;
+          form.remark = '';
+          if (n && n.status === '已完成') view.value = 'docs';
+          else backFromExec({ skipSaveToast: true });
+        }).catch(() => {});
+        return;
+      }
       if (isLoadFlow.value) {
         if (!(form.inQty > 0)) { ElementPlus.ElMessage.error('本次装卸数量必须大于 0'); return; }
         if (form.inQty > Number(currentLine.value.remainQty || 0)) {
@@ -13798,7 +14397,7 @@ createApp({
       ElementPlus.ElMessageBox.confirm('确认提交当前工序所有表单填报内容吗？', '提交确认', {
         confirmButtonText: '确认提交', cancelButtonText: '返回编辑',
       }).then(() => {
-        if ((isPoNoticeSerial.value || isLineSidePick.value) && poInHasCraft.value) {
+        if ((isPoNoticeSerial.value || isLineSidePick.value || isXferSerialPick.value) && poInHasCraft.value) {
           const name = processTab.value;
           const ref = processRef.value;
           const isBatch = String(ref).includes('批量');
@@ -13815,7 +14414,7 @@ createApp({
             ElementPlus.ElMessage.error('没有可完成该工序的条码，请确认前置工序已完成');
             return;
           }
-          ElementPlus.ElMessage.success(isBatch ? `工序「${name}」批量执行完成（${touched} 条）` : '工序表单提交成功');
+          ElementPlus.ElMessage.success(isBatch ? `工序「${name}」批量执行完成（${touched} 条）` : (isXferSerialPick.value ? '当前条码工序执行完成' : '工序表单提交成功'));
           view.value = 'exec';
           return;
         }
@@ -13897,7 +14496,7 @@ createApp({
       recommendVisible, lotDetailVisible, lotDetailRows, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute,
-      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
+      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
@@ -13918,7 +14517,7 @@ createApp({
       openPoInMatPicker, selectPoInMat, isPoInMatAlreadyAdded, addPoInFormLine, removePoInFormLine, savePoInNotice,
       autoSavePoInExec, autoSavePoRetExec, autoSaveTrustRetExec, autoSaveTrustRetCountExec, autoSavePoRetCountExec, autoSaveOsIssueCountExec, autoSaveOsRmaCountExec, autoSaveOsRetCountExec, autoSaveProdRetCountExec, autoSaveProdRetTankExec, autoSaveOsRecvCountExec, autoSaveOsRecvTankExec, autoSaveOsRetExec, autoSaveOsRecvExec, savePoInTankExec, saveTrustRecvTankExec, savePoInCountDraft, savePoRetCountDraft, saveOsIssueCountDraft, saveOsRmaCountDraft, saveOsRetCountDraft, saveOsRecvCountDraft, scanTankerBarcode, scanProdRetWorkshopBarcode, onPoInTankNoChange, addPoInTankRow, addProdRetTankRow, addOuterBindScan, confirmPoInLoc, onPoRetQtyChange, onInSerialQtyChange,
       openMaterials, openDocAction, openStockExec, openInspExec, openExec, backFromExec,
-      addSerialScan, addPickScan, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail,
+      addSerialScan, addPickScan, addXferScan, onXferQtyChange, onXferToLocChange, confirmXferFromLoc, confirmXferToLoc, onXferCountLocChange, onXferCountLotChange, autoSaveXferCountExec, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail,
       addStockScan, onStockQtyChange, scanInspWh, mockInspPhoto, mockInspSign, inspForm,
       openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,

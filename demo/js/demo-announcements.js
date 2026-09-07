@@ -2,7 +2,7 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-07",
-    latestVersion: "v1.3.272",
+    latestVersion: "v1.3.274",
     notes: [
   {
     "id": "since-shared",
@@ -1674,6 +1674,22 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.3.274",
+    "date": "2026-09-07",
+    "terminal": "APP",
+    "module": "调拨 · 直接调拨-计数",
+    "type": "[Feat]",
+    "summary": "补全 APP 直接调拨-计数 Demo：单据/物料明细/执行（调出调入仓库只读、来源库位、批号下拉、调拨数量、目标库位、暂存/提交）与 PRD 对齐"
+  },
+  {
+    "version": "v1.3.273",
+    "date": "2026-09-07",
+    "terminal": "APP",
+    "module": "调拨 · 直接调拨-流水码",
+    "type": "[Feat]",
+    "summary": "补全 APP 直接调拨-流水码 Demo：单据/物料明细/执行（调出调入仓库只读、扫码、目标库位绑定、推荐条码、工序、暂存/提交）与 PRD 对齐"
+  },
   {
     "version": "v1.3.272",
     "date": "2026-09-07",

@@ -93,6 +93,14 @@ window.APP_CFG = (function () {
           ],
         },
         {
+          index: 'wh-xfer',
+          title: '调拨',
+          children: [
+            leaf('xfer-serial', '直接调拨-流水码'),
+            leaf('xfer-count', '直接调拨-计数'),
+          ],
+        },
+        {
           index: 'wh-other',
           title: '其他',
           children: [
@@ -225,6 +233,13 @@ window.APP_CFG = (function () {
         homeItem('so-ship-count', '销售发货-计数', '🔢'),
         homeItem('so-rma-serial', '销售退货-流水码', '🔙'),
         homeItem('so-rma-count', '销售退货-计数', '🔢'),
+      ],
+    },
+    {
+      group: '仓储管理 · 调拨',
+      items: [
+        homeItem('xfer-serial', '直接调拨-流水码', '🔁'),
+        homeItem('xfer-count', '直接调拨-计数', '🔢'),
       ],
     },
     {
@@ -848,6 +863,46 @@ window.APP_CFG = (function () {
       addMatTitle: '添加退货物料',
       processTabs: ['退货外观检查', '品质判定'],
       doneHint: '所有物料已退货入库完成',
+    }),
+
+    // 调拨
+    'xfer-serial': flow('直接调拨-流水码', 'serial', {
+      isOut: true,
+      docKind: 'xfer',
+      partnerLabel: '调出仓库',
+      refLabel: '调入仓库',
+      execVariant: 'xfer-serial',
+      docsKey: 'xfer-serial',
+      showDocAdd: false,
+      showDocEdit: false,
+      hasSaveSubmit: false,
+      craftMatch: true,
+      searchHint: '搜索申请单号/调出仓库/调入仓库/物料/备注…',
+      emptyDocs: '暂无待执行的直接调拨申请单',
+      qtyLabel: '调拨数量',
+      serialScanTitle: '扫码录入',
+      processTabs: ['调出复核', '调入上架'],
+      doneHint: '所有物料已调拨完成',
+    }),
+    'xfer-count': flow('直接调拨-计数', 'count', {
+      isOut: true,
+      docKind: 'xfer',
+      partnerLabel: '调出仓库',
+      refLabel: '调入仓库',
+      execVariant: 'xfer-count',
+      docsKey: 'xfer-count',
+      showDocAdd: false,
+      showDocEdit: false,
+      hasSaveSubmit: false,
+      hasProcess: false,
+      craftMatch: false,
+      searchHint: '搜索申请单号/调出仓库/调入仓库/物料/备注…',
+      emptyDocs: '暂无待执行的直接调拨申请单',
+      qtyLabel: '调拨数量',
+      locLabel: '来源库位',
+      addLocTitle: '添加调出位置信息',
+      addMatTitle: '添加调拨物料',
+      doneHint: '所有物料已调拨完成',
     }),
 
     // 其他
@@ -5371,6 +5426,86 @@ window.APP_CFG = (function () {
     'RM-HCl': ['盐酸'],
   };
 
+  /** 直接调拨-流水码（APP）：与 PC wh-direct-xfer tab1 同源；纯执行无新增/编辑 */
+  const noticesXferSerial = [
+    {
+      id: 'ZJDBSQ202608010001',
+      status: '待执行',
+      fromWh: 'WH-RAW - 原料仓',
+      toWh: 'WH-FG - 成品仓',
+      planDate: '2026-08-01',
+      docType: '直接调拨申请单',
+      remark: '厂内短驳调拨',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
+      lines: [
+        {
+          lineNo: 1, status: '待执行', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'KG', lot: '20260801001',
+          remark: '—', manageMode: '条码管理',
+          planPcs: 2, planQty: 100, doneQty: 0, remainQty: 100, remainPcs: 2,
+        },
+      ],
+    },
+    {
+      id: 'ZJDBSQ202608020002',
+      status: '执行中',
+      fromWh: 'WH-RAW - 原料仓',
+      toWh: 'WH-PKG - 包材仓',
+      planDate: '2026-08-02',
+      docType: '直接调拨申请单',
+      remark: '—',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
+      lines: [
+        {
+          lineNo: 1, status: '执行中', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'KG', lot: '20260801001',
+          remark: '—', manageMode: '条码管理',
+          planPcs: 2, planQty: 100, doneQty: 40, remainQty: 60, remainPcs: 1,
+        },
+      ],
+    },
+  ];
+
+  /** 直接调拨-计数（APP）：纯执行；计数管理物料仓间调拨 */
+  const noticesXferCount = [
+    {
+      id: 'ZJDBSQ202608010003',
+      status: '待执行',
+      fromWh: 'WH-RAW - 原料仓',
+      toWh: 'WH-FG - 成品仓',
+      planDate: '2026-08-01',
+      docType: '直接调拨申请单',
+      remark: '备品备件仓间调拨',
+      materialSummary: 'SP-BRG-6205 / 轴承（6205） / P5级 / 备品备件',
+      lines: [
+        {
+          lineNo: 1, status: '待执行', code: 'SP-BRG-6205', name: '轴承（6205）',
+          spec: 'P5级', kind: '备品备件', unit: '个', lot: 'LOT20260806',
+          remark: '—', manageMode: '计数管理',
+          planPcs: 0, planQty: 50, doneQty: 0, remainQty: 50,
+        },
+      ],
+    },
+    {
+      id: 'ZJDBSQ202608020003',
+      status: '执行中',
+      fromWh: 'WH-RAW - 原料仓',
+      toWh: 'WH-PM - 包材仓',
+      planDate: '2026-08-02',
+      docType: '直接调拨申请单',
+      remark: '—',
+      materialSummary: 'SP-SEAL-NBR / 丁腈密封圈 / φ50 / 低值易耗',
+      lines: [
+        {
+          lineNo: 1, status: '执行中', code: 'SP-SEAL-NBR', name: '丁腈密封圈',
+          spec: 'φ50', kind: '低值易耗', unit: '个', lot: '—',
+          remark: '—', manageMode: '计数管理',
+          planPcs: 0, planQty: 100, doneQty: 30, remainQty: 70,
+        },
+      ],
+    },
+  ];
+
   const docsMap = {
     default: noticesDefault,
     'po-in-serial': noticesPoInSerial,
@@ -5403,6 +5538,8 @@ window.APP_CFG = (function () {
     'so-rma': noticesSoRma,
     'so-rma-serial': noticesSoRmaSerial,
     'so-rma-count': noticesSoRmaCount,
+    'xfer-serial': noticesXferSerial,
+    'xfer-count': noticesXferCount,
     'trust-recv': noticesTrustRecv,
     'trust-recv-count': noticesTrustRecvCount,
     'trust-recv-tank': noticesTrustRecvTank,
@@ -5575,6 +5712,13 @@ window.APP_CFG = (function () {
     { barcode: 'WM202608200002', pkgNo: 'PW202608200002', loc: 'WH-RAW-01', lot: '20260801001', qty: 2000, outer: '—', createTime: '2026-07-20 09:00:00' },
     { barcode: 'PL202608200001', pkgNo: 'PL-PKG-001', loc: 'WH-RAW-02', lot: '20260802001', qty: 500, outer: '—', createTime: '2026-08-02 08:00:00' },
     { barcode: 'PL202608200002', pkgNo: 'PL-PKG-002', loc: 'WH-RAW-02', lot: '20260802001', qty: 380, outer: '—', createTime: '2026-08-02 09:30:00' },
+  ];
+  /** 直接调拨推荐条码（调出仓 FIFO；与 serialArchRows 同源） */
+  const xferRecommendBarcodes = [
+    { barcode: 'WM202608200001', pkgNo: 'PW202608200001', loc: 'WH-RAW-01', lot: '20260801001', qty: 1000, outer: '—', createTime: '2026-07-15 08:00:00' },
+    { barcode: 'WM202608200002', pkgNo: 'PW202608200002', loc: 'WH-RAW-01', lot: '20260801001', qty: 2000, outer: '—', createTime: '2026-07-20 09:00:00' },
+    { barcode: 'PL202608200001', pkgNo: 'PL-PKG-001', loc: 'A-01-01', lot: '20260801001', qty: 500, outer: 'WB001', createTime: '2026-08-02 08:00:00' },
+    { barcode: 'PL202608200002', pkgNo: 'PL-PKG-002', loc: 'A-01-02-03', lot: '20260801001', qty: 380, outer: 'WB002', createTime: '2026-08-02 09:30:00' },
   ];
 
   const tankRows = [
@@ -5928,8 +6072,10 @@ window.APP_CFG = (function () {
   /** APP 执行页目标库位：对齐 PC 仓库列表 · 库位 Tab（仅启用可入库） */
   const locRows = [
     { code: 'WH-RAW-01', name: '原料仓库位01', warehouse: '原料仓', status: '启用' },
+    { code: 'WH-RAW-02', name: '原料仓库位02', warehouse: '原料仓', status: '启用' },
     { code: 'WH-CS-01', name: '受托原料仓位01', warehouse: '受托加工原料仓', status: '启用' },
     { code: 'WH-CS-02', name: '受托原料仓位02', warehouse: '受托加工原料仓', status: '启用' },
+    { code: 'WH-FG-01', name: '成品仓库位01', warehouse: '成品仓', status: '启用' },
     { code: 'WH-FG-02', name: '成品仓库位02', warehouse: '成品仓', status: '启用' },
     { code: 'WH-PM-01', name: '包材仓库位01', warehouse: '包材仓', status: '启用' },
     { code: 'WH-PM-02', name: '包材仓库位02', warehouse: '包材仓', status: '启用' },
@@ -5959,6 +6105,7 @@ window.APP_CFG = (function () {
     sclckTankOptions: sclckTankOptions,
     moOptions: moOptions,
     recommendBarcodes: recommendBarcodes,
+    xferRecommendBarcodes: xferRecommendBarcodes,
     tankRows: tankRows,
     tankRowsOut: tankRowsOut,
     scanRowsTankRet: scanRowsTankRet,
