@@ -1,580 +1,580 @@
 window.WMS_PAGE_CONFIGS = {
   "menu": [
-    {
-      "title": "基础数据",
-      "index": "g-基础数据",
-      "children": [
-        {
-          "title": "基础资料",
-          "index": "g-基础数据/基础资料",
-          "children": [
-            {
-              "title": "物料列表",
-              "index": "mat-list",
-              "pageId": "mat-list"
-            },
-            {
-              "title": "物料单位换算",
-              "index": "mat-uom",
-              "pageId": "mat-uom"
-            },
-            {
-              "title": "物料介质对照表",
-              "index": "mat-medium",
-              "pageId": "mat-medium"
-            },
-            {
-              "title": "客户列表",
-              "index": "customer",
-              "pageId": "customer"
-            },
-            {
-              "title": "供应商列表",
-              "index": "supplier",
-              "pageId": "supplier"
-            },
-            {
-              "title": "单位列表",
-              "index": "unit",
-              "pageId": "unit"
-            },
-            {
-              "title": "数据字典",
-              "index": "dict",
-              "pageId": "dict"
-            }
-          ]
-        },
-        {
-          "title": "仓储资料",
-          "index": "g-基础数据/仓储资料",
-          "children": [
-            {
-              "title": "仓库列表",
-              "index": "warehouse",
-              "pageId": "warehouse"
-            },
-            {
-              "title": "库存预警",
-              "index": "stock-warn",
-              "pageId": "stock-warn"
-            },
-            {
-              "title": "检查工序",
-              "index": "insp-proc",
-              "pageId": "insp-proc"
-            },
-            {
-              "title": "检查工艺",
-              "index": "insp-craft",
-              "pageId": "insp-craft"
-            }
-          ]
-        },
-        {
-          "title": "生产资料",
-          "index": "g-基础数据/生产资料",
-          "children": [
-            {
-              "title": "线边仓",
-              "index": "line-side",
-              "pageId": "line-side"
-            }
-          ]
-        },
-        {
-          "title": "订单资料",
-          "index": "g-基础数据/订单资料",
-          "children": [
-            {
-              "title": "采购订单",
-              "index": "po",
-              "pageId": "po"
-            },
-            {
-              "title": "销售订单",
-              "index": "so",
-              "pageId": "so"
-            },
-            {
-              "title": "委外加工订单",
-              "index": "wwpo",
-              "pageId": "wwpo"
-            }
-          ]
-        },
-        {
-          "title": "包材资料",
-          "index": "g-基础数据/包材资料",
-          "children": [
-            {
-              "title": "流水码档案",
-              "index": "serial-arch",
-              "pageId": "serial-arch"
-            },
-            {
-              "title": "固定包材档案",
-              "index": "g-基础数据/包材资料/固定包材档案",
-              "children": [
-                {
-                  "title": "储罐档案",
-                  "index": "tank-arch",
-                  "pageId": "tank-arch"
-                }
-              ]
-            },
-            {
-              "title": "APP信息查看配置",
-              "index": "app-view-cfg",
-              "pageId": "app-view-cfg"
-            },
-            {
-              "title": "包材工序",
-              "index": "pkg-proc",
-              "pageId": "pkg-proc"
-            },
-            {
-              "title": "包材工艺",
-              "index": "pkg-craft",
-              "pageId": "pkg-craft"
-            }
-          ]
-        },
-        {
-          "title": "外包材资料",
-          "index": "g-基础数据/外包材资料",
-          "children": [
-            {
-              "title": "流水外包材档案",
-              "index": "outer-serial",
-              "pageId": "outer-serial"
-            }
-          ]
-        },
-        {
-          "title": "标签配置",
-          "index": "g-基础数据/标签配置",
-          "children": [
-            {
-              "title": "标签数据源",
-              "index": "label-ds",
-              "pageId": "label-ds"
-            },
-            {
-              "title": "标签配置",
-              "index": "label-cfg",
-              "pageId": "label-cfg"
-            },
-            {
-              "title": "打印任务",
-              "index": "print-task",
-              "pageId": "print-task"
-            }
-          ]
-        },
-        {
-          "title": "表单配置",
-          "index": "g-基础数据/表单配置",
-          "children": [
-            {
-              "title": "表单数据源",
-              "index": "form-ds",
-              "pageId": "form-ds"
-            },
-            {
-              "title": "表单设计器",
-              "index": "form-designer",
-              "pageId": "form-designer"
-            }
-          ]
-        },
-        {
-          "title": "物流资料",
-          "index": "g-基础数据/物流资料",
-          "children": [
-            {
-              "title": "承运商列表",
-              "index": "carrier",
-              "pageId": "carrier"
-            },
-            {
-              "title": "车辆及司机列表",
-              "index": "vehicle",
-              "pageId": "vehicle"
-            },
-            {
-              "title": "运费参照表",
-              "index": "freight",
-              "pageId": "freight"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "仓储管理",
-      "index": "g-仓储管理",
-      "children": [
-        {
-          "title": "采购",
-          "index": "g-仓储管理/采购",
-          "children": [
-            {
-              "title": "采购入库",
-              "index": "wh-po-in",
-              "pageId": "wh-po-in"
-            },
-            {
-              "title": "采购退料",
-              "index": "wh-po-ret",
-              "pageId": "wh-po-ret"
-            }
-          ]
-        },
-        {
-          "title": "委外",
-          "index": "g-仓储管理/委外",
-          "children": [
-            {
-              "title": "委外发料",
-              "index": "wh-os-issue",
-              "pageId": "wh-os-issue"
-            },
-            {
-              "title": "委外退料",
-              "index": "wh-os-ret-mat",
-              "pageId": "wh-os-ret-mat"
-            },
-            {
-              "title": "委外收货",
-              "index": "wh-os-recv",
-              "pageId": "wh-os-recv"
-            },
-            {
-              "title": "委外退货",
-              "index": "wh-os-ret-goods",
-              "pageId": "wh-os-ret-goods"
-            }
-          ]
-        },
-        {
-          "title": "生产",
-          "index": "g-仓储管理/生产",
-          "children": [
-            {
-              "title": "生产领料",
-              "index": "wh-prod-issue",
-              "pageId": "wh-prod-issue"
-            },
-            {
-              "title": "生产退料",
-              "index": "wh-prod-ret",
-              "pageId": "wh-prod-ret"
-            },
-            {
-              "title": "生产入库",
-              "index": "wh-prod-in",
-              "pageId": "wh-prod-in"
-            }
-          ]
-        },
-        {
-          "title": "受托",
-          "index": "g-仓储管理/受托",
-          "children": [
-            {
-              "title": "受托收料",
-              "index": "wh-cs-recv",
-              "pageId": "wh-cs-recv"
-            },
-            {
-              "title": "受托退料",
-              "index": "wh-cs-ret",
-              "pageId": "wh-cs-ret"
-            }
-          ]
-        },
-        {
-          "title": "销售",
-          "index": "g-仓储管理/销售",
-          "children": [
-            {
-              "title": "备货通知",
-              "index": "wh-so-prep",
-              "pageId": "wh-so-prep"
-            },
-            {
-              "title": "销售预出货",
-              "index": "wh-so-preout",
-              "pageId": "wh-so-preout"
-            },
-            {
-              "title": "销售发货",
-              "index": "wh-so-ship",
-              "pageId": "wh-so-ship"
-            },
-            {
-              "title": "销售退货",
-              "index": "wh-so-ret",
-              "pageId": "wh-so-ret"
-            }
-          ]
-        },
-        {
-          "title": "调拨",
-          "index": "g-仓储管理/调拨",
-          "children": [
-            {
-              "title": "直接调拨",
-              "index": "wh-direct-xfer",
-              "pageId": "wh-direct-xfer"
-            }
-          ]
-        },
-        {
-          "title": "其他",
-          "index": "g-仓储管理/其他",
-          "children": [
-            {
-              "title": "其他入库",
-              "index": "wh-other-in",
-              "pageId": "wh-other-in"
-            },
-            {
-              "title": "其他出库",
-              "index": "wh-other-out",
-              "pageId": "wh-other-out"
-            }
-          ]
-        },
-        {
-          "title": "装卸",
-          "index": "g-仓储管理/装卸",
-          "children": [
-            {
-              "title": "装卸货",
-              "index": "wh-load",
-              "pageId": "wh-load"
-            }
-          ]
-        },
-        {
-          "title": "库内",
-          "index": "g-仓储管理/库内",
-          "children": [
-            {
-              "title": "库内转移",
-              "index": "wh-transfer",
-              "pageId": "wh-transfer"
-            },
-            {
-              "title": "库内转序",
-              "index": "wh-seq",
-              "pageId": "wh-seq"
-            }
-          ]
-        },
-        {
-          "title": "盘点",
-          "index": "g-仓储管理/盘点",
-          "children": [
-            {
-              "title": "库存全盘",
-              "index": "wh-stocktake",
-              "pageId": "wh-stocktake"
-            }
-          ]
-        },
-        {
-          "title": "仓库巡检",
-          "index": "g-仓储管理/仓库巡检",
-          "children": [
-            {
-              "title": "巡检方案",
-              "index": "wh-insp-scheme",
-              "pageId": "wh-insp-scheme"
-            },
-            {
-              "title": "巡检计划",
-              "index": "wh-insp-plan",
-              "pageId": "wh-insp-plan"
-            }
-          ]
-        },
-        {
-          "title": "报表统计",
-          "index": "g-仓储管理/报表统计",
-          "children": [
-            {
-              "title": "仓库库存",
-              "index": "wh-inv-rpt",
-              "pageId": "wh-inv-rpt"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "物流管理",
-      "index": "g-物流管理",
-      "children": [
-        {
-          "title": "派车申请单",
-          "index": "lg-dispatch",
-          "pageId": "lg-dispatch"
-        },
-        {
-          "title": "发货单",
-          "index": "lg-ship",
-          "pageId": "lg-ship"
-        },
-        {
-          "title": "运单",
-          "index": "lg-waybill",
-          "pageId": "lg-waybill"
-        },
-        {
-          "title": "运单-承运商派车",
-          "index": "lg-waybill-carrier",
-          "pageId": "lg-waybill-carrier"
-        },
-        {
-          "title": "提货单",
-          "index": "lg-pickup",
-          "pageId": "lg-pickup"
-        },
-        {
-          "title": "签收单",
-          "index": "lg-sign",
-          "pageId": "lg-sign"
-        },
-        {
-          "title": "承运商管理",
-          "index": "g-物流管理/承运商管理",
-          "children": [
-            {
-              "title": "承运商事件",
-              "index": "lg-carrier-evt",
-              "pageId": "lg-carrier-evt"
-            },
-            {
-              "title": "承运商考核",
-              "index": "g-物流管理/承运商管理/承运商考核",
-              "children": [
-                {
-                  "title": "考核方案",
-                  "index": "lg-kpi-scheme",
-                  "pageId": "lg-kpi-scheme"
-                },
-                {
-                  "title": "考核计划",
-                  "index": "lg-kpi-plan",
-                  "pageId": "lg-kpi-plan"
-                },
-                {
-                  "title": "考核记录",
-                  "index": "lg-kpi-record",
-                  "pageId": "lg-kpi-record"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "质量管理",
-      "index": "g-质量管理",
-      "children": [
-        {
-          "title": "检验数据台账",
-          "index": "qc-ledger",
-          "pageId": "qc-ledger"
-        }
-      ]
-    },
-    {
-      "title": "条码管理",
-      "index": "g-条码管理",
-      "children": [
-        {
-          "title": "流水码拆组",
-          "index": "g-条码管理/流水码拆组",
-          "children": [
-            {
-              "title": "流水码拆分",
-              "index": "bc-serial-split",
-              "pageId": "bc-serial-split"
-            },
-            {
-              "title": "流水码合并",
-              "index": "bc-serial-merge",
-              "pageId": "bc-serial-merge"
-            }
-          ]
-        },
-        {
-          "title": "外包材拆组",
-          "index": "g-条码管理/外包材拆组",
-          "children": [
-            {
-              "title": "外包材拆组",
-              "index": "bc-outer-split",
-              "pageId": "bc-outer-split"
-            }
-          ]
-        },
-        {
-          "title": "报废处理",
-          "index": "g-条码管理/报废处理",
-          "children": [
-            {
-              "title": "待报废清单",
-              "index": "bc-scrap-list",
-              "pageId": "bc-scrap-list"
-            },
-            {
-              "title": "报废处理",
-              "index": "bc-scrap-proc",
-              "pageId": "bc-scrap-proc"
-            }
-          ]
-        },
-        {
-          "title": "异常冻结",
-          "index": "g-条码管理/异常冻结",
-          "children": [
-            {
-              "title": "冻结中清单",
-              "index": "bc-freeze-list",
-              "pageId": "bc-freeze-list"
-            },
-            {
-              "title": "异常冻结",
-              "index": "bc-freeze",
-              "pageId": "bc-freeze"
-            },
-            {
-              "title": "冻结解除",
-              "index": "bc-unfreeze",
-              "pageId": "bc-unfreeze"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "门卫管理",
-      "index": "g-门卫管理",
-      "children": [
-        {
-          "title": "出门条",
-          "index": "lg-gatepass",
-          "pageId": "lg-gatepass"
-        }
-      ]
-    }
-  ],
+  {
+    "title": "基础数据",
+    "index": "g-基础数据",
+    "children": [
+      {
+        "title": "基础资料",
+        "index": "g-基础数据/基础资料",
+        "children": [
+          {
+            "title": "物料列表",
+            "index": "mat-list",
+            "pageId": "mat-list"
+          },
+          {
+            "title": "物料单位换算",
+            "index": "mat-uom",
+            "pageId": "mat-uom"
+          },
+          {
+            "title": "物料介质对照表",
+            "index": "mat-medium",
+            "pageId": "mat-medium"
+          },
+          {
+            "title": "客户列表",
+            "index": "customer",
+            "pageId": "customer"
+          },
+          {
+            "title": "供应商列表",
+            "index": "supplier",
+            "pageId": "supplier"
+          },
+          {
+            "title": "单位列表",
+            "index": "unit",
+            "pageId": "unit"
+          },
+          {
+            "title": "数据字典",
+            "index": "dict",
+            "pageId": "dict"
+          }
+        ]
+      },
+      {
+        "title": "物流资料",
+        "index": "g-基础数据/物流资料",
+        "children": [
+          {
+            "title": "承运商列表",
+            "index": "carrier",
+            "pageId": "carrier"
+          },
+          {
+            "title": "车辆及司机列表",
+            "index": "vehicle",
+            "pageId": "vehicle"
+          },
+          {
+            "title": "运费参照表",
+            "index": "freight",
+            "pageId": "freight"
+          }
+        ]
+      },
+      {
+        "title": "仓储资料",
+        "index": "g-基础数据/仓储资料",
+        "children": [
+          {
+            "title": "仓库列表",
+            "index": "warehouse",
+            "pageId": "warehouse"
+          },
+          {
+            "title": "库存预警",
+            "index": "stock-warn",
+            "pageId": "stock-warn"
+          },
+          {
+            "title": "检查工序",
+            "index": "insp-proc",
+            "pageId": "insp-proc"
+          },
+          {
+            "title": "检查工艺",
+            "index": "insp-craft",
+            "pageId": "insp-craft"
+          }
+        ]
+      },
+      {
+        "title": "生产资料",
+        "index": "g-基础数据/生产资料",
+        "children": [
+          {
+            "title": "线边仓",
+            "index": "line-side",
+            "pageId": "line-side"
+          }
+        ]
+      },
+      {
+        "title": "订单资料",
+        "index": "g-基础数据/订单资料",
+        "children": [
+          {
+            "title": "采购订单",
+            "index": "po",
+            "pageId": "po"
+          },
+          {
+            "title": "销售订单",
+            "index": "so",
+            "pageId": "so"
+          },
+          {
+            "title": "委外加工订单",
+            "index": "wwpo",
+            "pageId": "wwpo"
+          }
+        ]
+      },
+      {
+        "title": "包材资料",
+        "index": "g-基础数据/包材资料",
+        "children": [
+          {
+            "title": "流水码档案",
+            "index": "serial-arch",
+            "pageId": "serial-arch"
+          },
+          {
+            "title": "固定包材档案",
+            "index": "g-基础数据/包材资料/固定包材档案",
+            "children": [
+              {
+                "title": "储罐档案",
+                "index": "tank-arch",
+                "pageId": "tank-arch"
+              }
+            ]
+          },
+          {
+            "title": "APP信息查看配置",
+            "index": "app-view-cfg",
+            "pageId": "app-view-cfg"
+          },
+          {
+            "title": "包材工序",
+            "index": "pkg-proc",
+            "pageId": "pkg-proc"
+          },
+          {
+            "title": "包材工艺",
+            "index": "pkg-craft",
+            "pageId": "pkg-craft"
+          }
+        ]
+      },
+      {
+        "title": "外包材资料",
+        "index": "g-基础数据/外包材资料",
+        "children": [
+          {
+            "title": "流水外包材档案",
+            "index": "outer-serial",
+            "pageId": "outer-serial"
+          }
+        ]
+      },
+      {
+        "title": "标签配置",
+        "index": "g-基础数据/标签配置",
+        "children": [
+          {
+            "title": "标签数据源",
+            "index": "label-ds",
+            "pageId": "label-ds"
+          },
+          {
+            "title": "标签配置",
+            "index": "label-cfg",
+            "pageId": "label-cfg"
+          },
+          {
+            "title": "打印任务",
+            "index": "print-task",
+            "pageId": "print-task"
+          }
+        ]
+      },
+      {
+        "title": "表单配置",
+        "index": "g-基础数据/表单配置",
+        "children": [
+          {
+            "title": "表单数据源",
+            "index": "form-ds",
+            "pageId": "form-ds"
+          },
+          {
+            "title": "表单设计器",
+            "index": "form-designer",
+            "pageId": "form-designer"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "物流管理",
+    "index": "g-物流管理",
+    "children": [
+      {
+        "title": "派车申请单",
+        "index": "lg-dispatch",
+        "pageId": "lg-dispatch"
+      },
+      {
+        "title": "发货单",
+        "index": "lg-ship",
+        "pageId": "lg-ship"
+      },
+      {
+        "title": "运单",
+        "index": "lg-waybill",
+        "pageId": "lg-waybill"
+      },
+      {
+        "title": "运单-承运商派车",
+        "index": "lg-waybill-carrier",
+        "pageId": "lg-waybill-carrier"
+      },
+      {
+        "title": "提货单",
+        "index": "lg-pickup",
+        "pageId": "lg-pickup"
+      },
+      {
+        "title": "签收单",
+        "index": "lg-sign",
+        "pageId": "lg-sign"
+      },
+      {
+        "title": "承运商管理",
+        "index": "g-物流管理/承运商管理",
+        "children": [
+          {
+            "title": "承运商事件",
+            "index": "lg-carrier-evt",
+            "pageId": "lg-carrier-evt"
+          },
+          {
+            "title": "承运商考核",
+            "index": "g-物流管理/承运商管理/承运商考核",
+            "children": [
+              {
+                "title": "考核方案",
+                "index": "lg-kpi-scheme",
+                "pageId": "lg-kpi-scheme"
+              },
+              {
+                "title": "考核计划",
+                "index": "lg-kpi-plan",
+                "pageId": "lg-kpi-plan"
+              },
+              {
+                "title": "考核记录",
+                "index": "lg-kpi-record",
+                "pageId": "lg-kpi-record"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "仓储管理",
+    "index": "g-仓储管理",
+    "children": [
+      {
+        "title": "采购",
+        "index": "g-仓储管理/采购",
+        "children": [
+          {
+            "title": "采购入库",
+            "index": "wh-po-in",
+            "pageId": "wh-po-in"
+          },
+          {
+            "title": "采购退料",
+            "index": "wh-po-ret",
+            "pageId": "wh-po-ret"
+          }
+        ]
+      },
+      {
+        "title": "委外",
+        "index": "g-仓储管理/委外",
+        "children": [
+          {
+            "title": "委外发料",
+            "index": "wh-os-issue",
+            "pageId": "wh-os-issue"
+          },
+          {
+            "title": "委外退料",
+            "index": "wh-os-ret-mat",
+            "pageId": "wh-os-ret-mat"
+          },
+          {
+            "title": "委外收货",
+            "index": "wh-os-recv",
+            "pageId": "wh-os-recv"
+          },
+          {
+            "title": "委外退货",
+            "index": "wh-os-ret-goods",
+            "pageId": "wh-os-ret-goods"
+          }
+        ]
+      },
+      {
+        "title": "生产",
+        "index": "g-仓储管理/生产",
+        "children": [
+          {
+            "title": "生产领料",
+            "index": "wh-prod-issue",
+            "pageId": "wh-prod-issue"
+          },
+          {
+            "title": "生产退料",
+            "index": "wh-prod-ret",
+            "pageId": "wh-prod-ret"
+          },
+          {
+            "title": "生产入库",
+            "index": "wh-prod-in",
+            "pageId": "wh-prod-in"
+          }
+        ]
+      },
+      {
+        "title": "受托",
+        "index": "g-仓储管理/受托",
+        "children": [
+          {
+            "title": "受托收料",
+            "index": "wh-cs-recv",
+            "pageId": "wh-cs-recv"
+          },
+          {
+            "title": "受托退料",
+            "index": "wh-cs-ret",
+            "pageId": "wh-cs-ret"
+          }
+        ]
+      },
+      {
+        "title": "销售",
+        "index": "g-仓储管理/销售",
+        "children": [
+          {
+            "title": "备货通知",
+            "index": "wh-so-prep",
+            "pageId": "wh-so-prep"
+          },
+          {
+            "title": "销售预出货",
+            "index": "wh-so-preout",
+            "pageId": "wh-so-preout"
+          },
+          {
+            "title": "销售发货",
+            "index": "wh-so-ship",
+            "pageId": "wh-so-ship"
+          },
+          {
+            "title": "销售退货",
+            "index": "wh-so-ret",
+            "pageId": "wh-so-ret"
+          }
+        ]
+      },
+      {
+        "title": "调拨",
+        "index": "g-仓储管理/调拨",
+        "children": [
+          {
+            "title": "直接调拨",
+            "index": "wh-direct-xfer",
+            "pageId": "wh-direct-xfer"
+          }
+        ]
+      },
+      {
+        "title": "其他",
+        "index": "g-仓储管理/其他",
+        "children": [
+          {
+            "title": "其他入库",
+            "index": "wh-other-in",
+            "pageId": "wh-other-in"
+          },
+          {
+            "title": "其他出库",
+            "index": "wh-other-out",
+            "pageId": "wh-other-out"
+          }
+        ]
+      },
+      {
+        "title": "装卸",
+        "index": "g-仓储管理/装卸",
+        "children": [
+          {
+            "title": "装卸货",
+            "index": "wh-load",
+            "pageId": "wh-load"
+          }
+        ]
+      },
+      {
+        "title": "库内",
+        "index": "g-仓储管理/库内",
+        "children": [
+          {
+            "title": "库内转移",
+            "index": "wh-transfer",
+            "pageId": "wh-transfer"
+          },
+          {
+            "title": "库内转序",
+            "index": "wh-seq",
+            "pageId": "wh-seq"
+          }
+        ]
+      },
+      {
+        "title": "盘点",
+        "index": "g-仓储管理/盘点",
+        "children": [
+          {
+            "title": "库存全盘",
+            "index": "wh-stocktake",
+            "pageId": "wh-stocktake"
+          }
+        ]
+      },
+      {
+        "title": "仓库巡检",
+        "index": "g-仓储管理/仓库巡检",
+        "children": [
+          {
+            "title": "巡检方案",
+            "index": "wh-insp-scheme",
+            "pageId": "wh-insp-scheme"
+          },
+          {
+            "title": "巡检计划",
+            "index": "wh-insp-plan",
+            "pageId": "wh-insp-plan"
+          }
+        ]
+      },
+      {
+        "title": "报表统计",
+        "index": "g-仓储管理/报表统计",
+        "children": [
+          {
+            "title": "仓库库存",
+            "index": "wh-inv-rpt",
+            "pageId": "wh-inv-rpt"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "质量管理",
+    "index": "g-质量管理",
+    "children": [
+      {
+        "title": "检验数据台账",
+        "index": "qc-ledger",
+        "pageId": "qc-ledger"
+      }
+    ]
+  },
+  {
+    "title": "门卫管理",
+    "index": "g-门卫管理",
+    "children": [
+      {
+        "title": "出门条",
+        "index": "lg-gatepass",
+        "pageId": "lg-gatepass"
+      }
+    ]
+  },
+  {
+    "title": "条码管理",
+    "index": "g-条码管理",
+    "children": [
+      {
+        "title": "流水码拆组",
+        "index": "g-条码管理/流水码拆组",
+        "children": [
+          {
+            "title": "流水码拆分",
+            "index": "bc-serial-split",
+            "pageId": "bc-serial-split"
+          },
+          {
+            "title": "流水码合并",
+            "index": "bc-serial-merge",
+            "pageId": "bc-serial-merge"
+          }
+        ]
+      },
+      {
+        "title": "外包材拆组",
+        "index": "g-条码管理/外包材拆组",
+        "children": [
+          {
+            "title": "外包材拆组",
+            "index": "bc-outer-split",
+            "pageId": "bc-outer-split"
+          }
+        ]
+      },
+      {
+        "title": "报废处理",
+        "index": "g-条码管理/报废处理",
+        "children": [
+          {
+            "title": "待报废清单",
+            "index": "bc-scrap-list",
+            "pageId": "bc-scrap-list"
+          },
+          {
+            "title": "报废处理",
+            "index": "bc-scrap-proc",
+            "pageId": "bc-scrap-proc"
+          }
+        ]
+      },
+      {
+        "title": "异常冻结",
+        "index": "g-条码管理/异常冻结",
+        "children": [
+          {
+            "title": "冻结中清单",
+            "index": "bc-freeze-list",
+            "pageId": "bc-freeze-list"
+          },
+          {
+            "title": "异常冻结",
+            "index": "bc-freeze",
+            "pageId": "bc-freeze"
+          },
+          {
+            "title": "冻结解除",
+            "index": "bc-unfreeze",
+            "pageId": "bc-unfreeze"
+          }
+        ]
+      }
+    ]
+  }
+],
   "pages": {
     "mat-list": {
       "id": "mat-list",

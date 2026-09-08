@@ -26,6 +26,13 @@ window.APP_CFG = (function () {
       ],
     },
     {
+      index: 'lg',
+      title: '物流管理',
+      children: [
+        leaf('lg-waybill', '运单'),
+      ],
+    },
+    {
       index: 'wh',
       title: '仓储管理',
       children: [
@@ -138,6 +145,13 @@ window.APP_CFG = (function () {
       ],
     },
     {
+      index: 'gate',
+      title: '门卫管理',
+      children: [
+        leaf('lg-gatepass', '出门条'),
+      ],
+    },
+    {
       index: 'pkg-mgmt',
       title: '包材管理',
       children: [
@@ -147,20 +161,6 @@ window.APP_CFG = (function () {
         leaf('pkg-scrap', '报废处理'),
         leaf('pkg-unfreeze', '解除冻结'),
         leaf('pkg-freeze', '异常冻结'),
-      ],
-    },
-    {
-      index: 'lg',
-      title: '物流管理',
-      children: [
-        leaf('lg-waybill', '运单'),
-      ],
-    },
-    {
-      index: 'gate',
-      title: '门卫管理',
-      children: [
-        leaf('lg-gatepass', '出门条'),
       ],
     },
   ];
@@ -175,6 +175,12 @@ window.APP_CFG = (function () {
       items: [
         homeItem('app-pkg-create', '包材建档', '📦'),
         homeItem('app-pkg-query', '信息查询', '🔍'),
+      ],
+    },
+    {
+      group: '物流管理',
+      items: [
+        homeItem('lg-waybill', '运单', '🚚'),
       ],
     },
     {
@@ -259,6 +265,12 @@ window.APP_CFG = (function () {
       ],
     },
     {
+      group: '门卫管理',
+      items: [
+        homeItem('lg-gatepass', '出门条', '🛂'),
+      ],
+    },
+    {
       group: '包材管理',
       items: [
         homeItem('pkg-split', '流水码拆分', '✂️'),
@@ -267,18 +279,6 @@ window.APP_CFG = (function () {
         homeItem('pkg-scrap', '报废处理', '🗑️'),
         homeItem('pkg-unfreeze', '解除冻结', '🔓'),
         homeItem('pkg-freeze', '异常冻结', '❄️'),
-      ],
-    },
-    {
-      group: '物流管理',
-      items: [
-        homeItem('lg-waybill', '运单', '🚚'),
-      ],
-    },
-    {
-      group: '门卫管理',
-      items: [
-        homeItem('lg-gatepass', '出门条', '🛂'),
       ],
     },
   ];

@@ -784,8 +784,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
           <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="././pc.html" class="on">PC</a>
-            <a href="./思特瑞./app.html">APP</a>
+            <a href="./思特瑞WMS_Demo.html" class="on">PC</a>
+            <a href="./思特瑞WMS_APP_Demo.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -3782,30 +3782,30 @@ const app = createApp({
       const c = codeOf(poCode);
       if(!c) return false;
       const pages = ['wh-po-in','wh-po-ret'];
-      return walkMockInUse(['po'], r=>{
-        if(!r || typeof r!=='object') return false;
-        const v = r['关联采购订单'];
-        return v && codeOf(v)===c;
-      }) || pages.some(pid=>{
-        const data = MOCK[pid];
-        if(!data) return false;
-        return ['main','tab1','tab2'].some(k=>{
-          const arr = data[k];
-          return Array.isArray(arr) && arr.some(r=> codeOf(r['关联采购订单'])===c);
-        });
+      return pages.some(pid=>{
+        const arr = (MOCK[pid]||{}).tab1;
+        return Array.isArray(arr) && arr.some(r=> codeOf(r['关联采购订单'])===c);
       });
     }
     function soDownstreamInUse(soCode){
       const c = codeOf(soCode);
       if(!c) return false;
-      return walkMockInUse(['so'], r=>{
-        if(!r || typeof r!=='object') return false;
-        const keys = ['关联销售订单','销售订单','订单号'];
-        return keys.some(k=>{
-          const v = r[k];
-          return v && codeOf(v)===c;
-        });
+      const pages = [
+        ['wh-so-prep', 'main'],
+        ['wh-so-preout', 'tab1'],
+        ['wh-so-ship', 'tab1'],
+        ['wh-so-ret', 'tab1']
+      ];
+      return pages.some(([pid, key])=>{
+        const arr = (MOCK[pid]||{})[key];
+        return Array.isArray(arr) && arr.some(r=> codeOf(r['关联销售订单'])===c);
       });
+    }
+    function canEditPo(row){
+      return (row?.['订单状态'] || '')==='待执行';
+    }
+    function canEditSo(row){
+      return (row?.['订单状态'] || '')==='待执行';
     }
     function normPoFormLine(r,i){
       return {
@@ -4022,9 +4022,8 @@ const app = createApp({
       }
       if(pageId.value==='wwpo'){
         const st = row?.['订单状态'] || '';
-        const no = row?.['委外订单号'] || '';
         return ops.filter(op=>{
-          if(op.name==='编辑') return st==='待执行' && !wwpoDownstreamInUse(no);
+          if(op.name==='编辑') return st==='待执行';
           return true;
         });
       }
@@ -4072,17 +4071,15 @@ const app = createApp({
       }
       if(pageId.value==='po'){
         const st = row?.['订单状态'] || '';
-        const no = row?.['采购订单号'] || '';
         return ops.filter(op=>{
-          if(op.name==='编辑') return st==='待执行' && !poDownstreamInUse(no);
+          if(op.name==='编辑') return st==='待执行';
           return true;
         });
       }
       if(pageId.value==='so'){
         const st = row?.['订单状态'] || '';
-        const no = row?.['销售订单号'] || '';
         return ops.filter(op=>{
-          if(op.name==='编辑') return st==='待执行' && !soDownstreamInUse(no);
+          if(op.name==='编辑') return st==='待执行';
           return true;
         });
       }
@@ -4326,13 +4323,12 @@ const app = createApp({
       if(!c) return false;
       const pages = ['wh-os-issue','wh-os-recv','wh-os-ret-mat','wh-os-ret-goods'];
       return pages.some(pid=>{
-        const data = MOCK[pid];
-        if(!data) return false;
-        return ['main','tab1','tab2'].some(k=>{
-          const arr = data[k];
-          return Array.isArray(arr) && arr.some(r=> codeOf(r['关联委外加工单'])===c);
-        });
+        const arr = (MOCK[pid]||{}).tab1;
+        return Array.isArray(arr) && arr.some(r=> codeOf(r['关联委外加工单'])===c);
       });
+    }
+    function canEditWwpo(row){
+      return (row?.['订单状态'] || '')==='待执行';
     }
     function wwpoLinesOf(row){
       if(row && Array.isArray(row._lines) && row._lines.length) return row._lines.map((r,i)=>normWwpoFormLine(r,i));
@@ -5390,7 +5386,10 @@ const app = createApp({
         const blob = [w['采购订单'], w['关联订单号'], w['订单号'], w['ERP采购订单号'], w['委外加工单'], w['关联委外加工单'], w['合同号']].map(v=>String(v||'')).join(' ');
         return blob.includes(code);
       });
-      if(wantType) list = list.filter(w=> String(w['仓库业务类型']||'')===wantType);
+      if(wantType){
+        const byBiz = list.filter(w=> String(w['仓库业务类型']||'')===wantType);
+        list = byBiz.length ? byBiz : list;
+      }
       return list;
     }
     function waybillsLinkedToPo(poNo){ return waybillsLinkedToOrder(poNo); }
@@ -8876,18 +8875,18 @@ const app = createApp({
         }
       }
       if(op.name==='编辑' && pageId.value==='po'){
-        if(row['订单状态']!=='待执行' || poDownstreamInUse(row['采购订单号'])){
-          ElMessage.warning('仅待执行且无下游收料单据时可编辑'); return;
+        if(!canEditPo(row)){
+          ElMessage.warning('仅「待执行」状态的采购订单可编辑'); return;
         }
       }
       if(op.name==='编辑' && pageId.value==='so'){
-        if(row['订单状态']!=='待执行' || soDownstreamInUse(row['销售订单号'])){
-          ElMessage.warning('仅待执行且无下游单据时可编辑'); return;
+        if(!canEditSo(row)){
+          ElMessage.warning('仅「待执行」状态的销售订单可编辑'); return;
         }
       }
       if(op.name==='编辑' && pageId.value==='wwpo'){
-        if(row['订单状态']!=='待执行' || wwpoDownstreamInUse(row['委外订单号'])){
-          ElMessage.warning('仅待执行且无下游委外发料/收料单据时可编辑'); return;
+        if(!canEditWwpo(row)){
+          ElMessage.warning('仅「待执行」状态的委外加工订单可编辑'); return;
         }
       }
       if(op.name==='编辑' && isWhNoticePage()){
@@ -10819,8 +10818,8 @@ const app = createApp({
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑采购订单'); return; }
-          if(cur['订单状态']!=='待执行' || poDownstreamInUse(cur['采购订单号'])){
-            ElMessage.warning('仅待执行且无下游收料单据时可编辑'); return;
+          if(!canEditPo(cur)){
+            ElMessage.warning('仅「待执行」状态的采购订单可编辑'); return;
           }
           Object.assign(cur, payload, { id: cur.id, 采购订单号: cur['采购订单号'] });
         }
@@ -10893,8 +10892,8 @@ const app = createApp({
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑销售订单'); return; }
-          if(cur['订单状态']!=='待执行' || soDownstreamInUse(cur['销售订单号'])){
-            ElMessage.warning('仅待执行且无下游单据时可编辑'); return;
+          if(!canEditSo(cur)){
+            ElMessage.warning('仅「待执行」状态的销售订单可编辑'); return;
           }
           Object.assign(cur, payload, { id: cur.id, 销售订单号: cur['销售订单号'] });
         }
@@ -11693,8 +11692,8 @@ const app = createApp({
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑委外加工订单'); return; }
-          if(cur['订单状态']!=='待执行' || wwpoDownstreamInUse(cur['委外订单号'])){
-            ElMessage.warning('仅待执行且无下游委外发料/收料单据时可编辑'); return;
+          if(!canEditWwpo(cur)){
+            ElMessage.warning('仅「待执行」状态的委外加工订单可编辑'); return;
           }
           Object.assign(cur, payload, { id: cur.id, 委外订单号: cur['委外订单号'] });
         }
