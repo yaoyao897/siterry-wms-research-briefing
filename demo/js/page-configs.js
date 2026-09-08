@@ -1014,7 +1014,8 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "换算比例",
               "title": "换算比例",
-              "width": 100
+              "width": 120,
+              "slot": "uom_ratio"
             },
             {
               "field": "备注",
@@ -1106,9 +1107,11 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "换算比例",
-          "type": "input",
+          "type": "ratio",
           "required": true,
-          "ctrl": "手动输入（数字）"
+          "leftName": "换算比例左",
+          "rightName": "换算比例右",
+          "ctrl": "双数字输入（冒号分隔，基本单位数量:换算单位数量）"
         },
         {
           "name": "备注",
@@ -3550,9 +3553,10 @@ window.WMS_PAGE_CONFIGS = {
               "name": "适用包材类型",
               "type": "select",
               "multiple": true,
-              "ctrl": "下拉选择（字典表，多选）",
+              "ctrl": "下拉多选（固定枚举：流水码 / 储罐）",
               "options": [
-                "流水码"
+                "流水码",
+                "储罐"
               ]
             },
             {
@@ -3711,9 +3715,10 @@ window.WMS_PAGE_CONFIGS = {
           "type": "select",
           "required": false,
           "multiple": true,
-          "ctrl": "下拉选择（字典表，多选）",
+          "ctrl": "下拉多选（固定枚举：流水码 / 储罐）",
           "options": [
-            "流水码"
+            "流水码",
+            "储罐"
           ]
         },
         {

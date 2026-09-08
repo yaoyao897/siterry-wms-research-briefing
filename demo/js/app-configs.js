@@ -308,6 +308,7 @@ window.APP_CFG = (function () {
       showDocAdd: opts.showDocAdd,
       showDocEdit: opts.showDocEdit,
       hasSaveSubmit: !!opts.hasSaveSubmit,
+      autosaveToast: opts.autosaveToast || '',
       locLabel: opts.locLabel || '',
       processTabs: opts.processTabs || null,
     };
@@ -1102,6 +1103,56 @@ window.APP_CFG = (function () {
 
   };
 
+  /** 03-仓储管理各 flow 返回暂存 Toast（与页面PRD「反馈文案」对齐） */
+  (function applyWhAutosaveToasts() {
+    const SAVED = '作业进度已保存';
+    const STAGED = '作业进度已暂存';
+    const SHORT = '进度已保存';
+    const AUTO = '当前作业数据已自动保存';
+    const explicit = {
+      'po-in-serial': SAVED,
+      'po-in-tank': SAVED,
+      'po-in-count': SAVED,
+      'po-ret-serial': AUTO,
+      'po-ret-count': AUTO,
+      'trust-recv-serial': SAVED,
+      'trust-recv-tank': SAVED,
+      'trust-recv-count': SAVED,
+      'trust-ret-serial': STAGED,
+      'trust-ret-count': STAGED,
+      'so-rma-serial': SAVED,
+      'so-preout-serial': SAVED,
+      'so-ship-count': SHORT,
+      'so-rma-count': SHORT,
+      'so-preout-count': SHORT,
+      'oth-in-serial': SAVED,
+      'oth-in-tank': SAVED,
+      'oth-in-count': SHORT,
+      'oth-out-count': SHORT,
+      'prod-pick-serial': STAGED,
+      'prod-pick-count': STAGED,
+      'prod-pick-tank': STAGED,
+      'prod-ret-serial': STAGED,
+      'prod-ret-count': STAGED,
+      'prod-ret-tank': STAGED,
+      'prod-in-serial': STAGED,
+      'prod-in-count': STAGED,
+      'xfer-serial': STAGED,
+      'xfer-count': STAGED,
+      'inner-xfer': STAGED,
+      'inner-move': STAGED,
+      'wh-load': '当前作业进度已保存',
+      'wh-insp': '巡检进度已暂存',
+      'stock-take': '当前盘点数据已自动保存',
+    };
+    Object.keys(flowMeta).forEach((id) => {
+      if (explicit[id]) flowMeta[id].autosaveToast = explicit[id];
+      else if (/^os-/.test(id)) flowMeta[id].autosaveToast = STAGED;
+      else if (/^oth-out-/.test(id)) flowMeta[id].autosaveToast = STAGED;
+      else if (/^so-ship-/.test(id)) flowMeta[id].autosaveToast = STAGED;
+    });
+  })();
+
   const lineTpl = [
     {
       lineNo: 1,
@@ -1564,7 +1615,7 @@ window.APP_CFG = (function () {
     },
   ];
 
-  /** 生产退料-罐区（APP）：仅罐区管理液体行；关联 SCLCK + 来源线边仓；不与流水码共用 notices */
+  /** 生产退料-罐区（APP）：液体行（medium）；关联 SCLCK + 来源线边仓；不与流水码共用 notices */
   const noticesProdRetTank = [
     {
       id: 'SCTSQ202608260001',
@@ -1582,7 +1633,7 @@ window.APP_CFG = (function () {
         {
           lineNo: 1, status: '待执行', code: 'RM-H2SO4', name: '工业浓硫酸',
           spec: '98%', kind: '危化原料', unit: 'Kg', lot: 'LOT2026082601',
-          remark: '—', manageMode: '罐区管理', medium: '浓硫酸',
+          remark: '—', manageMode: '条码管理', medium: '浓硫酸',
           planPcs: 0, planQty: 2000, doneQty: 0, remainQty: 2000, remainPcs: 0,
         },
       ],
@@ -1603,7 +1654,7 @@ window.APP_CFG = (function () {
         {
           lineNo: 1, status: '执行中', code: 'RM-NaOH', name: '液碱',
           spec: '32%', kind: '危化原料', unit: 'Kg', lot: '20260809001',
-          remark: '—', manageMode: '罐区管理', medium: '液碱',
+          remark: '—', manageMode: '条码管理', medium: '液碱',
           planPcs: 0, planQty: 3000, doneQty: 800, remainQty: 2200, remainPcs: 0,
         },
       ],
@@ -2488,14 +2539,14 @@ window.APP_CFG = (function () {
         {
           lineNo: 1, status: '待执行', code: 'MAT-L001', name: '受托工业硫酸',
           spec: '液体槽车', kind: '原料', unit: 'Kg', lot: '20260825001',
-          remark: '客户委托打罐', manageMode: '罐区管理', medium: '浓硫酸',
+          remark: '客户委托打罐', manageMode: '条码管理', medium: '浓硫酸',
           planPcs: 0, planQty: 15000, doneQty: 0, remainQty: 15000, remainPcs: 0,
           prodDate: '2026-08-25', validMonths: 12, maker: '宁德时代新能源科技股份有限公司',
         },
         {
           lineNo: 2, status: '待执行', code: 'MAT-L002', name: '受托液碱',
           spec: '液体槽车', kind: '辅料', unit: 'Kg', lot: '20260825002',
-          remark: '—', manageMode: '罐区管理', medium: '液碱',
+          remark: '—', manageMode: '条码管理', medium: '液碱',
           planPcs: 0, planQty: 10000, doneQty: 0, remainQty: 10000, remainPcs: 0,
           prodDate: '2026-08-25', validMonths: 12, maker: '宁德时代新能源科技股份有限公司',
         },
@@ -2524,7 +2575,7 @@ window.APP_CFG = (function () {
         {
           lineNo: 1, status: '执行中', code: 'MAT-L002', name: '受托液碱',
           spec: '液体槽车', kind: '辅料', unit: 'Kg', lot: '20260825002',
-          remark: '—', manageMode: '罐区管理', medium: '液碱',
+          remark: '—', manageMode: '条码管理', medium: '液碱',
           planPcs: 0, planQty: 10000, doneQty: 4000, remainQty: 6000, remainPcs: 0,
           prodDate: '2026-08-25', validMonths: 12, maker: '中创新航科技股份有限公司',
         },
@@ -3193,6 +3244,58 @@ window.APP_CFG = (function () {
       sourceNo: 'CGST202608020002',
       remark: '执行中通知单可扫2',
     },
+    {
+      barcode: 'TM202608250003',
+      pkgNo: 'BB-TB-003',
+      packType: '流水码',
+      packSpec: '1000Kg/袋',
+      material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
+      lot: '20260801001',
+      unit: 'KG',
+      archiveQty: '1000',
+      qty: '1000',
+      maker: '天齐锂业股份',
+      supplier: '天齐锂业股份',
+      prodDate: '2026-08-01',
+      validPeriod: '12',
+      validUnit: '月',
+      expireDate: '2027-08-01',
+      useStatus: '在用',
+      inspectStatus: '合格',
+      stockStatus: '初始化',
+      loc: '—',
+      bindStatus: '未绑定',
+      bindOuter: '—',
+      step: '',
+      sourceNo: 'CGST202608010001',
+      remark: '可扫码入库示例3',
+    },
+    {
+      barcode: 'TM202608250013',
+      pkgNo: 'BB-TB-013',
+      packType: '流水码',
+      packSpec: '吨袋+托架',
+      material: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
+      lot: '20260802001',
+      unit: 'KG',
+      archiveQty: '1000',
+      qty: '1000',
+      maker: '雅化集团',
+      supplier: '雅化集团',
+      prodDate: '2026-08-02',
+      validPeriod: '12',
+      validUnit: '月',
+      expireDate: '2027-08-02',
+      useStatus: '在用',
+      inspectStatus: '合格',
+      stockStatus: '初始化',
+      loc: '—',
+      bindStatus: '未绑定',
+      bindOuter: '—',
+      step: '',
+      sourceNo: 'CGST202608020002',
+      remark: '可扫码入库示例3',
+    },
 
     {
       barcode: 'TM202608040001',
@@ -3789,6 +3892,74 @@ window.APP_CFG = (function () {
       edges: [['n1', 'n2']],
     },
     {
+      code: 'CFG-PO-IN-TANK',
+      name: '采购入库罐区打罐工艺',
+      bizList: ['采购入库'],
+      packTypes: ['储罐'],
+      packSpecs: [],
+      enabled: true,
+      nodes: [
+        { id: 'n1', name: '管道检查' },
+        { id: 'n2', name: '储罐外观检查' },
+        { id: 'n3', name: '打罐入库' },
+      ],
+      edges: [['n1', 'n2'], ['n2', 'n3']],
+    },
+    {
+      code: 'CFG-TRUST-RECV-TANK',
+      name: '受托收料罐区打罐工艺',
+      bizList: ['受托收料'],
+      packTypes: ['储罐'],
+      packSpecs: [],
+      enabled: true,
+      nodes: [
+        { id: 'n1', name: '管道检查' },
+        { id: 'n2', name: '储罐外观检查' },
+        { id: 'n3', name: '打罐入库' },
+      ],
+      edges: [['n1', 'n2'], ['n2', 'n3']],
+    },
+    {
+      code: 'CFG-PROD-PICK-TANK',
+      name: '生产领料罐区出库工艺',
+      bizList: ['生产领料'],
+      packTypes: ['储罐'],
+      packSpecs: [],
+      enabled: true,
+      nodes: [
+        { id: 'n1', name: '管道检查' },
+        { id: 'n2', name: '储罐外观检查' },
+        { id: 'n3', name: '领料复核' },
+      ],
+      edges: [['n1', 'n2'], ['n2', 'n3']],
+    },
+    {
+      code: 'CFG-OTH-IN-TANK',
+      name: '其他入库罐区工艺',
+      bizList: ['其他入库'],
+      packTypes: ['储罐'],
+      packSpecs: [],
+      enabled: true,
+      nodes: [
+        { id: 'n1', name: '管道检查' },
+        { id: 'n2', name: '储罐外观检查' },
+      ],
+      edges: [['n1', 'n2']],
+    },
+    {
+      code: 'CFG-OTH-OUT-TANK',
+      name: '其他出库罐区工艺',
+      bizList: ['其他出库'],
+      packTypes: ['储罐'],
+      packSpecs: [],
+      enabled: true,
+      nodes: [
+        { id: 'n1', name: '管道检查' },
+        { id: 'n2', name: '储罐外观检查' },
+      ],
+      edges: [['n1', 'n2']],
+    },
+    {
       code: 'CFG-PROD-RET-TANK',
       name: '生产退料罐区入库工艺',
       bizList: ['生产退料'],
@@ -3872,8 +4043,8 @@ window.APP_CFG = (function () {
       code: 'CFG-OS-RECV-TANK',
       name: '罐区液体委外收货入库工艺',
       bizList: ['委外收货'],
-      packTypes: ['流水码'],
-      packSpecs: ['槽车散装', '槽车散装/储罐'],
+      packTypes: ['储罐'],
+      packSpecs: [],
       enabled: true,
       nodes: [
         { id: 'n1', name: '包装检查' },
@@ -5627,7 +5798,7 @@ window.APP_CFG = (function () {
       lines: [
         {
           code: 'RM-H2SO4', name: '工业浓硫酸', spec: '98%', kind: '危化原料',
-          unit: 'Kg', lot: 'LOT2026082601', planPcs: 0, planQty: 2000, manageMode: '罐区管理', medium: '浓硫酸',
+          unit: 'Kg', lot: 'LOT2026082601', planPcs: 0, planQty: 2000, manageMode: '条码管理', medium: '浓硫酸',
         },
       ],
     },
@@ -5639,7 +5810,7 @@ window.APP_CFG = (function () {
       lines: [
         {
           code: 'RM-NaOH', name: '液碱', spec: '32%', kind: '危化原料',
-          unit: 'Kg', lot: '20260809001', planPcs: 0, planQty: 3000, manageMode: '罐区管理', medium: '液碱',
+          unit: 'Kg', lot: '20260809001', planPcs: 0, planQty: 3000, manageMode: '条码管理', medium: '液碱',
         },
       ],
     },
@@ -5651,7 +5822,7 @@ window.APP_CFG = (function () {
       lines: [
         {
           code: 'RM-HCl', name: '盐酸', spec: '31%', kind: '危化原料',
-          unit: 'Kg', lot: '', planPcs: 0, planQty: 1500, manageMode: '罐区管理', medium: '盐酸',
+          unit: 'Kg', lot: '', planPcs: 0, planQty: 1500, manageMode: '条码管理', medium: '盐酸',
         },
       ],
     },
@@ -5713,14 +5884,6 @@ window.APP_CFG = (function () {
     { barcode: 'PL202608200001', pkgNo: 'PL-PKG-001', loc: 'WH-RAW-02', lot: '20260802001', qty: 500, outer: '—', createTime: '2026-08-02 08:00:00' },
     { barcode: 'PL202608200002', pkgNo: 'PL-PKG-002', loc: 'WH-RAW-02', lot: '20260802001', qty: 380, outer: '—', createTime: '2026-08-02 09:30:00' },
   ];
-  /** 直接调拨推荐条码（调出仓 FIFO；与 serialArchRows 同源） */
-  const xferRecommendBarcodes = [
-    { barcode: 'WM202608200001', pkgNo: 'PW202608200001', loc: 'WH-RAW-01', lot: '20260801001', qty: 1000, outer: '—', createTime: '2026-07-15 08:00:00' },
-    { barcode: 'WM202608200002', pkgNo: 'PW202608200002', loc: 'WH-RAW-01', lot: '20260801001', qty: 2000, outer: '—', createTime: '2026-07-20 09:00:00' },
-    { barcode: 'PL202608200001', pkgNo: 'PL-PKG-001', loc: 'A-01-01', lot: '20260801001', qty: 500, outer: 'WB001', createTime: '2026-08-02 08:00:00' },
-    { barcode: 'PL202608200002', pkgNo: 'PL-PKG-002', loc: 'A-01-02-03', lot: '20260801001', qty: 380, outer: 'WB002', createTime: '2026-08-02 09:30:00' },
-  ];
-
   const tankRows = [
     {
       barcode: 'TK001',
@@ -5746,9 +5909,38 @@ window.APP_CFG = (function () {
   ];
   const scanRowsTankRet = scanRowsPick.map((r) => ({ ...r, inLoc: 'A01-01' }));
 
+  /** 执行页 mock 预填：在库可扫条码（step/docNo 为空，供出库/领料/调拨 seed） */
+  const execScanSeedArchExtra = [
+    {
+      barcode: 'SEED-LIOH-001', pkgNo: 'PW-SEED-001', packType: '流水码', packSpec: '吨袋+托架',
+      material: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
+      lot: '20260802001', unit: 'KG', archiveQty: '800', qty: '800',
+      maker: '雅化集团', supplier: '雅化集团', prodDate: '2026-08-02', validPeriod: '12', validUnit: '月',
+      expireDate: '2027-08-02', useStatus: '在用', inspectStatus: '合格', stockStatus: '仓库', loc: 'WH-RAW-01',
+      bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SEED-DEMO', remark: '执行页预填mock-1',
+    },
+    {
+      barcode: 'SEED-LIOH-002', pkgNo: 'PW-SEED-002', packType: '流水码', packSpec: '吨袋+托架',
+      material: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
+      lot: '20260802001', unit: 'KG', archiveQty: '600', qty: '600',
+      maker: '雅化集团', supplier: '雅化集团', prodDate: '2026-08-02', validPeriod: '12', validUnit: '月',
+      expireDate: '2027-08-02', useStatus: '在用', inspectStatus: '合格', stockStatus: '仓库', loc: 'WH-RAW-02',
+      bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SEED-DEMO', remark: '执行页预填mock-2',
+    },
+    {
+      barcode: 'SEED-LIOH-003', pkgNo: 'PW-SEED-003', packType: '流水码', packSpec: '吨袋+托架',
+      material: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
+      lot: '20260802001', unit: 'KG', archiveQty: '500', qty: '500',
+      maker: '雅化集团', supplier: '雅化集团', prodDate: '2026-08-02', validPeriod: '12', validUnit: '月',
+      expireDate: '2027-08-02', useStatus: '在用', inspectStatus: '合格', stockStatus: '仓库', loc: 'A-01-02-03',
+      bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SEED-DEMO', remark: '执行页预填mock-3',
+    },
+  ];
+
   const innerScanRows = [
     { barcode: 'SC101', pkgNo: 'BK-001', code: 'RM-Li2CO3-BG', loc: 'A-01-01', qty: 20 },
     { barcode: 'SC102', pkgNo: 'BK-002', code: 'RM-Li2CO3-BG', loc: 'A-01-01', qty: 15 },
+    { barcode: 'SC103', pkgNo: 'BK-003', code: 'RM-Li2CO3-BG', loc: 'A-01-02-03', qty: 10 },
   ];
 
   const outerBindMap = {
@@ -6105,14 +6297,13 @@ window.APP_CFG = (function () {
     sclckTankOptions: sclckTankOptions,
     moOptions: moOptions,
     recommendBarcodes: recommendBarcodes,
-    xferRecommendBarcodes: xferRecommendBarcodes,
     tankRows: tankRows,
     tankRowsOut: tankRowsOut,
     scanRowsTankRet: scanRowsTankRet,
     innerScanRows: innerScanRows,
     pkgScanRows: pkgScanRows,
     outerScanRows: outerScanRows,
-    serialArchRows: serialArchRows.concat(trustRetSerialArchExtra, soPreoutSerialArchExtra, soShipSerialArchExtra, soRmaSerialArchExtra),
+    serialArchRows: serialArchRows.concat(trustRetSerialArchExtra, soPreoutSerialArchExtra, soShipSerialArchExtra, soRmaSerialArchExtra, execScanSeedArchExtra),
     soPreoutPrepBarcodes: soPreoutSerialArchExtra,
     soShipPrepBarcodes: soShipSerialArchExtra,
     craftRoutes: craftRoutes,

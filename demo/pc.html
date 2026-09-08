@@ -527,6 +527,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 .demo-valid-period>.el-select{flex:0 0 88px;width:88px!important;min-width:88px!important;max-width:88px!important}
 .demo-valid-period__unit .el-select__wrapper,
 .demo-valid-period>.el-select .el-select__wrapper{width:100%!important;border-top-left-radius:0;border-bottom-left-radius:0;margin-left:-1px}
+/* 换算比例：双数字 + 冒号 */
+.demo-uom-ratio{display:flex;width:100%;min-width:0;align-items:center;gap:8px}
+.demo-uom-ratio>.el-input{flex:1 1 0;min-width:0}
+.demo-uom-ratio__sep{flex:0 0 auto;color:var(--color-text-secondary);font-size:14px;line-height:1;padding:0 2px}
 .demo-valid-period__suffix{flex:0 0 auto;display:flex;align-items:center;padding:0 12px;background:#fafafa;border:1px solid var(--color-border-input);border-left:none;border-radius:0 4px 4px 0;font-size:13px;color:var(--color-text-secondary);white-space:nowrap}
 .demo-valid-period-popper{z-index:4000!important}
 .demo-readonly{color:var(--color-text-secondary)}
@@ -780,7 +784,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
           <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html" class="on">PC</a>
+            <a href="./思特瑞WMS_Demo.html" class="on">PC</a>
             <a href="./app.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
@@ -875,6 +879,9 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
                 <template #tag="{ row, column }">
                   <span class="tag" :class="tagClass(displayTagValue(row, column.field))">{{ displayTagValue(row, column.field) }}</span>
                 </template>
+                <template #uom_ratio="{ row, column }">
+                  <span>{{ formatMatUomRatioDisplay(row[column.field]) }}</span>
+                </template>
                 <template #addr_info="{ row }">
                   <el-popover v-if="(row._addrs||[]).length" placement="top" :width="480" :trigger="['hover','click']">
                     <el-table class="demo-data-table demo-data-table--striped" :data="row._addrs" border stripe>
@@ -943,6 +950,11 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
                   <el-option v-for="u in (f.options||['天','月','年'])" :key="u" :label="u" :value="u"></el-option>
                 </el-select>
               </div>
+              <div v-else-if="f.type==='ratio'" class="demo-uom-ratio">
+                <el-input v-model="formModel[ratioFieldKey(f,'left')]" placeholder="输入，数字"></el-input>
+                <span class="demo-uom-ratio__sep">：</span>
+                <el-input v-model="formModel[ratioFieldKey(f,'right')]" placeholder="输入，数字"></el-input>
+              </div>
               <el-date-picker v-else-if="f.type==='date' || f.type==='datetime'" v-model="formModel[f.name]" :type="isDateTimeField(f)?'datetime':'date'" :value-format="isDateTimeField(f)?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="isDateTimeField(f)?'选择日期时间':'选择日期'" style="width:100%"></el-date-picker>
               <div v-else-if="f.type==='radio'">
                 <el-radio-group v-model="formModel[f.name]" @change="onFormSelectChange(f)">
@@ -977,6 +989,11 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
               <el-select v-model="formModel[f.unitName || (f.name+'单位')]" :placeholder="f.defaultUnit||'天'" style="width:96px" @change="pageId==='serial-arch' && refreshSerialExpire(formModel)">
                 <el-option v-for="u in (f.options||['天','月','年'])" :key="u" :label="u" :value="u"></el-option>
               </el-select>
+            </div>
+            <div v-else-if="f.type==='ratio'" class="demo-uom-ratio">
+              <el-input v-model="formModel[ratioFieldKey(f,'left')]" placeholder="输入，数字"></el-input>
+              <span class="demo-uom-ratio__sep">：</span>
+              <el-input v-model="formModel[ratioFieldKey(f,'right')]" placeholder="输入，数字"></el-input>
             </div>
               <el-date-picker v-else-if="f.type==='date' || f.type==='datetime'" v-model="formModel[f.name]" :type="isDateTimeField(f)?'datetime':'date'" :value-format="isDateTimeField(f)?'YYYY-MM-DD HH:mm':'YYYY-MM-DD'" :placeholder="isDateTimeField(f)?'选择日期时间':'选择日期'" style="width:100%" @change="pageId==='serial-arch' && f.name==='生产日期' && refreshSerialExpire(formModel)"></el-date-picker>
               <div v-else-if="f.type==='radio'">
@@ -2318,7 +2335,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.275"></script>
+<script src="./js/demo-announcements.js?v=1.3.280"></script>
 <script src="./js/page-configs.js?v=1.3.245"></script>
 <script src="./js/mock-rows.js?v=1.3.245"></script>
 <script src="./js/dict-catalog.js"></script>
@@ -2326,7 +2343,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
-<script src="./js/demo-store.js"></script>
+<script src="./js/demo-store.js?v=1.3.277"></script>
 <script>
 const { createApp, ref, computed, reactive, watch, onMounted, onBeforeUnmount, nextTick } = Vue;
 const { ElMessage } = ElementPlus;
@@ -3249,6 +3266,46 @@ const app = createApp({
       formModel['物料规格'] = m['物料规格'] || '';
       formModel['物料种类'] = m['物料种类'] || '';
       formModel['基本单位'] = m['基本单位'] || formModel['基本单位'] || 'KG';
+    }
+    function ratioFieldKey(f, side) {
+      if (!f) return side === 'left' ? '换算比例左' : '换算比例右';
+      return side === 'left' ? (f.leftName || (f.name + '左')) : (f.rightName || (f.name + '右'));
+    }
+    function trimRatioNum(n) {
+      if (!Number.isFinite(n)) return '';
+      if (Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
+      return String(parseFloat(n.toFixed(6)));
+    }
+    function matUomRatioPair(ratioVal) {
+      const raw = String(ratioVal == null ? '' : ratioVal).trim();
+      if (!raw || raw === '—' || raw === '-') return { left: '', right: '' };
+      if (raw.includes(':') || raw.includes('：')) {
+        const parts = raw.replace(/：/g, ':').split(':');
+        if (parts.length === 2) return { left: parts[0].trim(), right: parts[1].trim() };
+      }
+      const r = Number(raw);
+      if (!(r > 0)) return { left: '', right: '' };
+      if (r >= 1) return { left: trimRatioNum(r), right: '1' };
+      return { left: '1', right: trimRatioNum(1 / r) };
+    }
+    function formatMatUomRatioDisplay(ratioVal) {
+      const pair = matUomRatioPair(ratioVal);
+      if (!pair.left || !pair.right) return '—';
+      return `${pair.left}：${pair.right}`;
+    }
+    function fillMatUomRatioFromStored(ratioVal) {
+      const pair = matUomRatioPair(ratioVal);
+      formModel['换算比例左'] = pair.left;
+      formModel['换算比例右'] = pair.right;
+    }
+    function parseMatUomRatioFromForm() {
+      const leftStr = String(formModel['换算比例左'] || '').trim();
+      const rightStr = String(formModel['换算比例右'] || '').trim();
+      if (!leftStr || !rightStr) return { ok: false, msg: '请填写换算比例' };
+      const left = Number(leftStr);
+      const right = Number(rightStr);
+      if (!(left > 0) || !(right > 0)) return { ok: false, msg: '换算比例必须为大于 0 的数字' };
+      return { ok: true, ratio: left / right };
     }
     /** 1 换算单位 = ratio 基本单位；未配置按 1:1。基本单位作中间单位。 */
     function convertMatQty(code, qty, fromU, toU){
@@ -7555,6 +7612,9 @@ const app = createApp({
         } else if(c.slot==='tag'){
           const fitW = fitColWidth(c.field, c.title, sampleRows);
           cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), fixed:c.fixed||null, slots:{ default:'tag' } });
+        } else if(c.slot==='uom_ratio'){
+          const fitW = fitColWidth(c.field, c.title, sampleRows.map(r => Object.assign({}, r, { [c.field]: formatMatUomRatioDisplay(r[c.field]) })));
+          cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), slots:{ default:'uom_ratio' } });
         } else if(c.slot==='link'){
           const fitW = fitColWidth(c.field, c.title, sampleRows);
           cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), slots:{ default:'link' } });
@@ -8877,6 +8937,10 @@ const app = createApp({
         formSwitch['启用状态'] = row['启用状态']!=='禁用';
         (activeFormFields.value||[]).forEach(f=>{
           if(!f || !f.name || f.type==='switch') return;
+          if(f.type==='ratio'){
+            fillMatUomRatioFromStored(row[f.name]);
+            return;
+          }
           const v = row[f.name];
           if(f.multiple){
             formModel[f.name] = splitDun(v);
@@ -11126,10 +11190,9 @@ const app = createApp({
         if(!formModel['基本单位']){ ElMessage.warning('请选择基本单位'); return; }
         if(!formModel['换算单位']){ ElMessage.warning('请选择换算单位'); return; }
         if(formModel['基本单位']===formModel['换算单位']){ ElMessage.warning('基本单位与换算单位不能相同'); return; }
-        const ratioStr = String(formModel['换算比例']||'').trim();
-        if(!ratioStr){ ElMessage.warning('请填写换算比例'); return; }
-        const ratio = Number(ratioStr);
-        if(!(ratio>0)){ ElMessage.warning('换算比例必须为大于 0 的数字'); return; }
+        const parsed = parseMatUomRatioFromForm();
+        if(!parsed.ok){ ElMessage.warning(parsed.msg); return; }
+        const ratio = parsed.ratio;
         const list = ((MOCK['mat-uom'] = MOCK['mat-uom'] || {}).main = (MOCK['mat-uom'].main || []));
         const isAdd = formMode.value==='add' || formMode.value==='copy';
         if(list.some(r=> r['物料编码']===code && r['基本单位']===formModel['基本单位'] && r['换算单位']===formModel['换算单位'] && (isAdd || r.id!==formModel._editId))){
@@ -14753,7 +14816,7 @@ const app = createApp({
       jobLogiMode, jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows, formBarcodeSelected,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeCollapsed, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,
       visibleTypeFormFields, dictTypeOptions,
-      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, addrPopoverField,
       resetDemoStore, storeTick,
       openPicker, onPickerOk, onGenerateBatch, onBatchDeleteLines, onBatchOk, refreshSerialExpire,

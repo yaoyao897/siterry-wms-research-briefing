@@ -2396,6 +2396,55 @@ window.WMS_DEMO_STORE = (function () {
     return String(r.id || r['单号'] || r['入库单号'] || r['运单号'] || r['发货单号'] || r['事件编号'] || r['采购订单号'] || r['物料编码'] || '');
   }
 
+  /** 物料主数据无「罐区管理」；历史缓存/旧 Mock 统一纠正为条码管理 */
+  function fixInvalidManageModeRow(row, base) {
+    if (!row || typeof row !== 'object') return false;
+    let changed = false;
+    if (row['管理方式'] === '罐区管理') {
+      row['管理方式'] = (base && base['管理方式'] && base['管理方式'] !== '罐区管理')
+        ? base['管理方式']
+        : '条码管理';
+      changed = true;
+    }
+    if (row.manageMode === '罐区管理') {
+      row.manageMode = (base && base.manageMode && base.manageMode !== '罐区管理')
+        ? base.manageMode
+        : '条码管理';
+      changed = true;
+    }
+    ['_lines', '_pickLines'].forEach(function (key) {
+      if (!Array.isArray(row[key])) return;
+      row[key].forEach(function (ln) {
+        if (ln && ln['管理方式'] === '罐区管理') {
+          ln['管理方式'] = '条码管理';
+          changed = true;
+        }
+        if (ln && ln.manageMode === '罐区管理') {
+          ln.manageMode = '条码管理';
+          changed = true;
+        }
+      });
+    });
+    return changed;
+  }
+
+  function migrateInvalidManageMode(target) {
+    if (!target || typeof target !== 'object') return false;
+    let changed = false;
+    function walk(node) {
+      if (!node) return;
+      if (Array.isArray(node)) {
+        node.forEach(function (r) { if (fixInvalidManageModeRow(r)) changed = true; });
+        return;
+      }
+      if (typeof node === 'object') {
+        Object.keys(node).forEach(function (k) { walk(node[k]); });
+      }
+    }
+    walk(target);
+    return changed;
+  }
+
   /** 持久化行优先，但源码 Mock 上有而缓存缺失的 `_lines` 等子表予以回补，避免详情操作列丢失 */
   function mergeMockRows(saved, fresh) {
     if (!Array.isArray(saved)) return Array.isArray(fresh) ? fresh : saved;
@@ -2425,6 +2474,7 @@ window.WMS_DEMO_STORE = (function () {
         const fromBase = String((base && base['检验状态']) || '').trim();
         next['检验状态'] = (fromBase && fromBase !== '—' && fromBase !== '-') ? fromBase : '待检验';
       }
+      fixInvalidManageModeRow(next, base);
       return next;
     });
   }
@@ -2463,6 +2513,7 @@ window.WMS_DEMO_STORE = (function () {
         }
       }
     });
+    if (migrateInvalidManageMode(target)) saveMock(target);
   }
 
   function resetMock() {

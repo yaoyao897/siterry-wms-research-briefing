@@ -1,9 +1,15 @@
 /** Demo 公告（铃铛弹窗）：使用说明 + 更新记录 + 原型进度；字段增量对比上次共享链接版本 */
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
-    updatedAt: "2026-09-07",
-    latestVersion: "v1.3.275",
+    updatedAt: "2026-09-08",
+    latestVersion: "v1.3.280",
     notes: [
+  {
+    "id": "dev-ready-base",
+    "title": "v1.3.280 · 基础数据全面开放开发",
+    "level": "warn",
+    "body": "原型进度更新（2026-09-08）：PC「基础数据」下全部 28 项功能点已标为 🟢 可开发，涵盖基础资料、仓储资料、物流资料、订单资料、包材资料、外包材档案、标签配置、表单配置，可进入研发排期。详见公告「原型进度」Tab 与项目总览「二、原型进度跟踪」。\n\n本版同步：检查工艺适用包材类型（流水码/储罐）、APP 执行页 Mock 扫码预填、扫码明细数量列必填标识等 v1.3.277～279 变更。"
+  },
   {
     "id": "since-shared",
     "title": "相对共享链接（v1.3.248）字段增量",
@@ -36,14 +42,14 @@
   }
 ],
     progress: {
-      "baseline": "正式开发版本说明 v1.0 · Demo v1.3.270",
+      "baseline": "正式开发版本说明 v1.0 · Demo v1.3.280",
       "summary": {
         "total": 125,
         "pc": 70,
         "app": 55,
-        "ready": 6,
-        "pending": 119,
-        "note": "首批可开发：PC · 基础资料（物料/单位换算/客户/供应商/单位/数据字典）。其余待排期。"
+        "ready": 28,
+        "pending": 97,
+        "note": "PC · 基础数据全部 28 项已标为可开发（含基础资料/仓储资料/物流资料/订单资料/包材资料/外包材档案/标签配置/表单配置）。其余待排期。"
       },
       "rows": [
         {
@@ -133,7 +139,7 @@
           "desc": "仓库列表功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -146,7 +152,7 @@
           "desc": "库存预警功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -159,7 +165,7 @@
           "desc": "检查工序功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "质检员",
           "time": "2026-08-07"
         },
@@ -172,7 +178,7 @@
           "desc": "检查工艺功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "质检员",
           "time": "2026-08-07"
         },
@@ -185,7 +191,7 @@
           "desc": "承运商列表功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -198,7 +204,7 @@
           "desc": "车辆及司机列表功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -211,7 +217,7 @@
           "desc": "运费参照表功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -224,7 +230,7 @@
           "desc": "采购订单功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -237,7 +243,7 @@
           "desc": "销售订单功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -250,7 +256,7 @@
           "desc": "委外加工订单功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -263,7 +269,7 @@
           "desc": "流水码档案功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -276,7 +282,7 @@
           "desc": "固定包材档案功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -289,7 +295,7 @@
           "desc": "APP 信息查看配置功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -302,7 +308,7 @@
           "desc": "包材工序功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "质检员",
           "time": "2026-08-07"
         },
@@ -315,7 +321,7 @@
           "desc": "包材工艺功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -328,7 +334,7 @@
           "desc": "流水外包材档案功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -341,7 +347,7 @@
           "desc": "固定外包材档案功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "仓库管理员",
           "time": "2026-08-07"
         },
@@ -354,7 +360,7 @@
           "desc": "标签数据源功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "系统管理员",
           "time": "2026-08-07"
         },
@@ -367,7 +373,7 @@
           "desc": "标签模板管理功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "系统管理员",
           "time": "2026-08-07"
         },
@@ -380,7 +386,7 @@
           "desc": "打印任务日志功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "系统管理员",
           "time": "2026-08-07"
         },
@@ -393,7 +399,7 @@
           "desc": "表单数据源功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "系统管理员",
           "time": "2026-08-07"
         },
@@ -406,7 +412,7 @@
           "desc": "表单模板管理功能操作与管理",
           "dStatus": "✅ 已完成",
           "cStatus": "✅ 已确认",
-          "devStatus": "⬜ 待排期",
+          "devStatus": "🟢 可开发",
           "role": "系统管理员",
           "time": "2026-08-07"
         },
@@ -1674,6 +1680,46 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.3.280",
+    "date": "2026-09-08",
+    "terminal": "PC/APP/交付",
+    "module": "原型进度 · 基础数据全面开放开发",
+    "type": "[Feat]",
+    "summary": "PC 基础数据 28 项全部标为可开发；同步项目总览/公告原型进度 Tab；推送共享 Pages v1.3.280"
+  },
+  {
+    "version": "v1.3.279",
+    "date": "2026-09-08",
+    "terminal": "PC/APP/PRD",
+    "module": "检查工艺 · 储罐包材类型",
+    "type": "[Feat]",
+    "summary": "适用包材类型固定枚举流水码/储罐；选储罐不展示包装规格；APP 罐区执行按储罐匹配检查工艺"
+  },
+  {
+    "version": "v1.3.278",
+    "date": "2026-09-08",
+    "terminal": "APP/PRD",
+    "module": "仓储执行页 · 扫码明细数量列",
+    "type": "[Opt]",
+    "summary": "可编辑数量列统一加 * 必填标识，去掉列头「(可改)」"
+  },
+  {
+    "version": "v1.3.277",
+    "date": "2026-09-08",
+    "terminal": "APP",
+    "module": "仓储执行页 · Mock 扫码预填",
+    "type": "[Feat]",
+    "summary": "带扫码明细的执行页无草稿时自动预填 3 条 mock 明细"
+  },
+  {
+    "version": "v1.3.276",
+    "date": "2026-09-08",
+    "terminal": "APP/PRD",
+    "module": "仓储管理 46 模块 · 页面 PRD 备注同步",
+    "type": "[Refactor]",
+    "summary": "全量 sync 03-仓储管理 46 份页面PRD 至 Demo 备注；装卸 app-wh-load alias；各 flow autosaveToast 与 PRD 反馈文案对齐；备注 TOC 锚点增强"
+  },
   {
     "version": "v1.3.275",
     "date": "2026-09-08",
