@@ -4166,6 +4166,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "行状态"
         },
         {
@@ -4530,6 +4533,9 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -4915,6 +4921,9 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -5612,7 +5621,7 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "编辑",
-              "desc": "使用状态=在用且无物料明细（空罐）时可编辑"
+              "desc": "使用状态=在用且行物料无值（空罐）时可编辑"
             }
           ]
         }
@@ -8303,6 +8312,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "行状态"
         },
         {
@@ -9216,6 +9228,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "行状态"
         },
         {
@@ -10033,7 +10048,12 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
             "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -10827,7 +10847,12 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
             "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -11650,7 +11675,12 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
             "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -12448,7 +12478,12 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
             "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -13234,6 +13269,9 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineTitle": "物料明细",
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "行状态"
         },
         {
@@ -13930,6 +13968,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineTitle": "物料明细",
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -14650,6 +14691,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineTitle": "物料明细",
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -15462,6 +15506,9 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -16358,9 +16405,12 @@ window.WMS_PAGE_CONFIGS = {
       }
     ],
     "detailLineFields": [
-      {
-        "name": "行状态"
-      },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
       {
         "name": "物料信息"
       },
@@ -17611,9 +17661,12 @@ window.WMS_PAGE_CONFIGS = {
       }
     ],
     "detailLineFields": [
-      {
-        "name": "行状态"
-      },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
       {
         "name": "物料信息"
       },
@@ -18440,6 +18493,9 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "行状态"
         },
         {
@@ -19188,7 +19244,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "批号",
           "type": "picker",
           "required": false,
-          "ctrl": "选填；物料+批号唯一"
+          "ctrl": "选填；关联销售出库单后，条码管理行从该出库单 tab3 流水匹配厂外流水码档案选批号；未关联时可手选/录入"
         },
         {
           "name": "库存单位",
@@ -19234,6 +19290,9 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailLineFields": [
+        {
+          "name": "行号"
+        },
         {
           "name": "行状态"
         },
@@ -19510,7 +19569,12 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineSelectable": true,
       "detailLineTitle": "物料明细",
       "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -19753,7 +19817,12 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineSelectable": true,
       "detailLineTitle": "物料明细",
       "detailLineFields": [
-        { "name": "行状态" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
         { "name": "物料信息" },
         { "name": "库存单位" },
         { "name": "管理方式" },
@@ -20615,9 +20684,12 @@ window.WMS_PAGE_CONFIGS = {
     }
   ],
   "detailLineFields": [
-    {
-      "name": "行状态"
-    },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        },
     {
       "name": "物料信息"
     },
@@ -20974,7 +21046,12 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineActions": ["关闭"],
       "detailLineTitle": "物料明细",
       "detailLineFields": [
-        { "name": "行状态" }, { "name": "物料信息" }, { "name": "批号" },
+        {
+          "name": "行号"
+        },
+        {
+          "name": "行状态"
+        }, { "name": "物料信息" }, { "name": "批号" },
         { "name": "库存单位" }, { "name": "管理方式" }, { "name": "计划件数" },
         { "name": "计划数量" }, { "name": "已完成数量" }, { "name": "未完成数量" }, { "name": "备注" }
       ],
@@ -25538,11 +25615,11 @@ window.WMS_PAGE_CONFIGS = {
               "required": false,
               "ctrl": "运输与防护注意事项"
             },
-            {
-              "name": "配送类型",
-              "type": "radio",
-              "required": true,
-              "ctrl": "单选，默认正常业务",
+        {
+          "name": "配送类型",
+          "type": "radio",
+          "required": false,
+          "ctrl": "仅关联仓储业务=销售发货时显示；单选，默认正常业务",
               "options": [
                 "正常业务",
                 "直发业务（贸易）"
@@ -25590,10 +25667,22 @@ window.WMS_PAGE_CONFIGS = {
               "ctrl": "条件必填：矩阵要求关联订单时必填；随订单类型过滤；选中后带入合同号及物料行"
             },
             {
+              "name": "关联销售备货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "关联仓储业务=销售发货或销售预出货时显示；弹窗选择备货通知单（选填）。销售发货：候选执行中/已完成；销售预出货：候选待执行/执行中/已完成/已关闭；选中后写入派车单并在生成销售预出货/发货通知单时带入「关联备货通知单」"
+            },
+            {
+              "name": "关联销售预出货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "仅关联仓储业务=销售发货时显示；弹窗选择已完成的销售预出货出库单 CKYC（选填），与销售发货通知单口径一致"
+            },
+            {
               "name": "前置关联单据",
               "type": "picker",
               "required": false,
-              "ctrl": "销售发货：可选预出货单（选填）；销售退货：销售出库单（必填）；其他业务隐藏"
+              "ctrl": "仅关联仓储业务=销售退货时显示；可选已完成的 L2 销售出库单（CKFH/CKYC 等 tab2 执行单，选填）；选中后带入原出库物料，未选可手录物料；销售发货已拆分为备货单/预出货单两字段"
             },
             {
               "name": "采购订单",
@@ -25692,6 +25781,12 @@ window.WMS_PAGE_CONFIGS = {
           "name": "订单号"
         },
         {
+          "name": "关联销售备货单"
+        },
+        {
+          "name": "关联销售预出货单"
+        },
+        {
           "name": "前置关联单据"
         },
         {
@@ -25740,10 +25835,16 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineTitle": "物料",
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "物料信息"
         },
         {
           "name": "需求数量"
+        },
+        {
+          "name": "计划件数"
         },
         {
           "name": "已拆数量"
@@ -25783,6 +25884,12 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": true,
           "ctrl": "数字输入"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "正整数，选填"
         },
         {
           "name": "体积(长*宽*高)",
@@ -26322,6 +26429,9 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineTitle": "物料",
       "detailLineFields": [
         {
+          "name": "行号"
+        },
+        {
           "name": "物料信息"
         },
         {
@@ -26329,6 +26439,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "发货数量"
+        },
+        {
+          "name": "计划件数"
         },
         {
           "name": "已签收数量"
@@ -26821,7 +26934,19 @@ window.WMS_PAGE_CONFIGS = {
               "name": "装货点"
             },
             {
+              "name": "装货联系人"
+            },
+            {
+              "name": "装货联系电话"
+            },
+            {
               "name": "卸货点"
+            },
+            {
+              "name": "卸货联系人"
+            },
+            {
+              "name": "卸货联系电话"
             },
             {
               "name": "车型要求"

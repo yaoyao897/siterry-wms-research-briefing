@@ -491,10 +491,10 @@ body.remarks-open .demo-scope-tip{display:none}
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html">PC</a>
-            <a href="./app.html" class="on">APP</a>
+            <a href="././pc.html">PC</a>
+            <a href="././app.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -2059,7 +2059,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <template v-if="isInTankDoc">
                     <div class="sec">
                       <div class="sec__title">添加厂外物料</div>
-                      <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫槽车流水码 / 包材编号，回车" @keyup.enter="scanTankerBarcode" /></div>
+                      <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫流水码 / 包材编号，回车" @keyup.enter="scanTankerBarcode" /></div>
                     </div>
                     <div class="sec">
                       <div class="sec__title">添加原料信息</div>
@@ -2076,7 +2076,7 @@ body.remarks-open .demo-scope-tip{display:none}
                         <label><span class="req">*</span>储罐编号</label>
                         <select v-model="form.tankNo" @change="onPoInTankNoChange">
                           <option value="">请选择储罐</option>
-                          <option v-for="t in tankArchOptions" :key="t.tankNo" :value="t.tankNo">{{ t.tankNo }} · {{ t.medium }}（余量 {{ Math.max(0, Number(t.maxQty||0)-Number(t.qty||0)) }}）</option>
+                          <option v-for="t in tankArchOptions" :key="t.tankNo" :value="t.tankNo">{{ t.tankNo }} · {{ t.medium || '—' }}（余量 {{ Math.max(0, Number(t.maxQty||0)-Number(t.qty||0)) }}）</option>
                         </select>
                       </div>
                       <button type="button" class="btn-sm" style="margin:4px 0 8px" @click="addPoInTankRow">加入储罐明细</button>
@@ -2207,7 +2207,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <label><span class="req">*</span>储罐编号</label>
                       <select v-model="form.tankNo" @change="onPoInTankNoChange">
                         <option value="">请选择储罐</option>
-                        <option v-for="t in tankArchOptions" :key="t.tankNo" :value="t.tankNo">{{ t.tankNo }} · {{ t.medium }}（余量 {{ Math.max(0, Number(t.maxQty||0)-Number(t.qty||0)) }}）</option>
+                        <option v-for="t in tankArchOptions" :key="t.tankNo" :value="t.tankNo">{{ t.tankNo }} · {{ t.medium || '—' }}（余量 {{ Math.max(0, Number(t.maxQty||0)-Number(t.qty||0)) }}）</option>
                       </select>
                     </div>
                     <button type="button" class="btn-sm" style="margin:4px 0 8px" @click="addProdRetTankRow">添加确认</button>
@@ -3120,7 +3120,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     <button class="btn-sm btn-sign" :class="{ 'is-off': p.status==='已确认', 'is-dim': p.status!=='已确认' && !canSignPoint(p) }" @click="openSign(p)">{{ p.status==='已确认' ? '已签收' : '签收' }}</button>
                 </div>
               </div>
-                <div v-if="currentNotice.status==='运输中' && recentEnroute.length" style="margin-top:8px">
+                <div v-if="canWaybillEnroute && recentEnroute.length" style="margin-top:8px">
                   <div class="m-group__title">最近打卡</div>
                   <div class="enroute-mini" v-for="(h,i) in recentEnroute" :key="'er'+i" @click="openEnroute">
                     <div>{{ h.time }}　{{ h.place }}</div>
@@ -3128,7 +3128,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </div>
               </div>
-              <div class="m-footer" v-if="currentNotice.status==='运输中'">
+              <div class="m-footer" v-if="canWaybillEnroute">
                 <button class="btn-primary" @click="openEnroute">更新在途信息</button>
               </div>
             </template>
@@ -3244,7 +3244,7 @@ body.remarks-open .demo-scope-tip{display:none}
                 </div>
                 <div class="sec">
                   <div class="sec__title">预计送达时间</div>
-                  <div class="field"><label>预计送达时间</label><input v-model="enrouteForm.eta" placeholder="yyyy-MM-dd HH:mm" /></div>
+                  <div class="field"><label>预计送达时间</label><input type="datetime-local" :value="toDatetimeLocal(enrouteForm.eta)" @input="enrouteForm.eta = fromDatetimeLocal($event.target.value)" /></div>
                 </div>
                 <div class="sec">
                   <div class="sec__title">当前在途打卡</div>
@@ -3681,11 +3681,12 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.280"></script>
+<script src="./js/demo-announcements.js?v=1.3.309"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/demo-store.js"></script>
-<script src="./js/app-configs.js"></script>
-<script src="./js/page-prd-notes.js?v=1.3.276"></script>
+<script src="./js/mock-rows.js?v=1.3.309"></script>
+<script src="./js/demo-store.js?v=1.3.302"></script>
+<script src="./js/app-configs.js?v=1.3.298"></script>
+<script src="./js/page-prd-notes.js?v=1.3.301"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
@@ -3736,7 +3737,11 @@ createApp({
     const storeTick = ref(0);
     function bumpStore() { storeTick.value += 1; }
     function hydrateAllDocs() {
+      hydrateLocRowsFromPcMock();
+      hydrateTankArchFromPcMock();
       hydrateSerialArchFromPcMock();
+      hydrateWaybillsFromPcMock();
+      hydrateWhNoticesFromPcMock();
       if (!STORE || !CFG.docsMap) return;
       Object.keys(CFG.docsMap).forEach((k) => STORE.hydrateAppDocs(CFG.docsMap[k] || []));
       if (currentNotice.value && currentNotice.value.id) {
@@ -3920,12 +3925,11 @@ createApp({
       maker: '', supplier: '', prodDate: '', validPeriod: '', validUnit: '天', expireDate: '', remark: '',
     });
     const operator = CFG.operator;
-    const tanks = CFG.tanks;
     const scanRows = ref([...CFG.scanRowsSerial]);
     const tankRows = ref([...CFG.tankRows]);
     const innerRows = ref([...CFG.innerScanRows]);
     const form = reactive({
-      loc: '', custLoc: '', toLoc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '丁A',
+      loc: '', custLoc: '', toLoc: '', barcode: '', pkgNo: '', tankBarcode: '', tankNo: '',
       prodDate: '2025-08-01', validDate: '2026-08-01', validMonths: 12, maker: '天齐锂业股份有限公司', qty: 25,
       lotIn: '', inQty: null, inPcs: null, remark: '', lineSideWh: '', pkgQty: null, outDir: '',
       splitCount: 5, splitScalar: 10, mergeBarcode: '', outerBarcode: '', outerNo: '', retQty: null,
@@ -4296,9 +4300,10 @@ createApp({
       const code = String(locCode || '').trim();
       const wh = String(whName || '').trim();
       if (!code || !wh) return false;
+      hydrateLocRowsFromPcMock();
       const hit = (CFG.locRows || []).find(l => l.code === code);
       if (hit) return hit.warehouse === wh;
-      if (wh === '原料仓') return /^(WH-RAW|A-)/.test(code);
+      if (wh === '原料仓') return /^WH-RAW/.test(code);
       if (wh === '成品仓') return /^WH-FG/.test(code);
       if (wh === '包材仓') return /^WH-PM/.test(code);
       return false;
@@ -4306,8 +4311,9 @@ createApp({
     const xferFromWhName = computed(() => parseXferWhName(currentNotice.value && currentNotice.value.fromWh));
     const xferToWhName = computed(() => parseXferWhName(currentNotice.value && currentNotice.value.toWh));
     const xferToLocOptions = computed(() => {
+      storeTick.value;
       const wh = xferToWhName.value;
-      return (CFG.locRows || []).filter(l => l.status === '启用' && l.warehouse === wh);
+      return enabledLocRows().filter(l => l.warehouse === wh);
     });
     function parseCountInvLoc(locField) {
       const s = String(locField || '').trim();
@@ -4328,6 +4334,8 @@ createApp({
       });
     }
     const xferFromLocOptions = computed(() => {
+      storeTick.value;
+      hydrateLocRowsFromPcMock();
       const line = currentLine.value;
       if (!line || !line.code) return [];
       const fromWh = xferFromWhName.value;
@@ -4337,7 +4345,7 @@ createApp({
         const locCode = parseCountInvLoc(r.loc);
         if (!locBelongsToWh(locCode, fromWh)) return;
         if (!(Number(r.qty) > 0)) return;
-        const hit = (CFG.locRows || []).find(l => l.code === locCode && l.status === '启用');
+        const hit = findEnabledLoc(locCode);
         if (hit) locSet.set(locCode, hit);
       });
       return Array.from(locSet.values());
@@ -4407,47 +4415,78 @@ createApp({
       if (!ln) return false;
       return !!(ln.medium || liquidMatCodes.value.has(ln.code));
     }
+    /** 管理方式分流：计数 vs 条码（流水码/罐区共用条码，入口决定执行页） */
+    function whEntryManageBucket(docsKey, execMode) {
+      const k = String(docsKey || '');
+      if (k.includes('count') || execMode === 'count') return 'count';
+      return 'barcode';
+    }
+    function isCountManageLine(ln) {
+      if (!ln) return false;
+      const mode = String(ln.manageMode || '').trim();
+      if (mode) return mode.includes('计数');
+      return countMatCodes.value.has(ln.code);
+    }
+    function isBarcodeManageLine(ln) {
+      if (!ln) return false;
+      const mode = String(ln.manageMode || '').trim();
+      if (mode) return mode.includes('条码');
+      return !isCountManageLine(ln);
+    }
+    function filterNoticeLinesForEntry(lines, docsKey, execMode) {
+      const bucket = whEntryManageBucket(docsKey, execMode);
+      const src = lines || [];
+      if (bucket === 'count') return src.filter(isCountManageLine);
+      return src.filter(isBarcodeManageLine);
+    }
+    function noticeHasLinesForEntry(notice, docsKey, execMode) {
+      return filterNoticeLinesForEntry(notice && notice.lines, docsKey, execMode).length > 0;
+    }
     function isNoPlanPcsLine(ln, tankFlow) {
       const mode = (ln && ln.manageMode) || (countMatCodes.value.has(ln && ln.code) ? '计数管理' : '条码管理');
       return mode === '计数管理' || !!tankFlow || isLiquidMatLine(ln);
     }
     const poInSelectablePos = computed(() => {
-      const codes = countMatCodes.value;
+      const poBarcode = (p) => (p.lines || []).some((l) => isBarcodeManageLine({ code: l.code, manageMode: l.manageMode }));
+      const poCount = (p) => (p.lines || []).some((l) => isCountManageLine({ code: l.code, manageMode: l.manageMode }));
       if (isTrustRecvCount.value || isTrustRetCount.value) {
-        return soOptions.filter(p => (p.lines || []).some(l => codes.has(l.code) || !(Number(l.planPcs) > 0)));
+        return soOptions.filter(poCount);
       }
-      if (isTrustRecvTank.value) {
-        return soOptions.filter(p => (p.lines || []).some(l => l.medium || ['MAT-L001', 'MAT-L002', 'RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code)));
+      if (isTrustRecvSerial.value || isTrustRecvTank.value || isTrustRetSerial.value) {
+        return soOptions.filter(poBarcode);
       }
-      if (isTrustPartyDoc.value) return soOptions.slice();
       if (isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value) {
-        return wwpoOptions.filter(p => (p.lines || []).some(l => codes.has(l.code)));
+        return wwpoOptions.filter(poCount);
       }
-      if (isOsRecvTank.value) {
-        return wwpoOptions.filter(p => (p.lines || []).some(l => l.medium || ['RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code)));
+      if (isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value || isOsRecvTank.value) {
+        return wwpoOptions.filter(poBarcode);
       }
-      if (isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value) {
-        return wwpoOptions.filter(p => (p.lines || []).some(l => !codes.has(l.code) && !l.medium && !['RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code)));
-      }
-      if (isPoInTank.value) {
-        return poOptions.filter(p => (p.lines || []).some(l => l.medium || ['RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code)));
+      if (isPoInSerial.value || isPoInTank.value || isPoRetSerial.value) {
+        return poOptions.filter(poBarcode);
       }
       if (isPoInCount.value || isPoRetCount.value) {
-        return poOptions.filter(p => (p.lines || []).some(l => codes.has(l.code)));
+        return poOptions.filter(poCount);
       }
       return poOptions;
     });
-    const tankArchOptions = computed(() => (CFG.tankArchRows || []).filter(t => t.useStatus === '在用'));
+    const tankArchOptions = computed(() => {
+      storeTick.value;
+      hydrateTankArchFromPcMock();
+      return (CFG.tankArchRows || []).filter(t => t.useStatus === '在用');
+    });
+    const tanks = computed(() => tankArchOptions.value.map((t) => t.tankNo));
     const displayedLines = computed(() => {
       const lines = (currentNotice.value && currentNotice.value.lines) || [];
-      if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value || isXferCount.value) {
-        return lines.filter(ln => !ln.manageMode || ln.manageMode === '计数管理');
+      const execMode = flowMeta.value.mode;
+      const docsKey = flowMeta.value.docsKey || flowId.value;
+      if (execMode === 'count' || execMode === 'serial' || execMode === 'tank') {
+        return filterNoticeLinesForEntry(lines, docsKey, execMode);
       }
-      if (isTrustRecvTank.value || isPoInTank.value || isOsRecvTank.value || isProdPickTank.value || isProdRetTank.value) {
-        return lines.filter(ln => isLiquidMatLine(ln) || !ln.manageMode || ln.manageMode === '条码管理');
+      if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value || isXferCount.value) {
+        return filterNoticeLinesForEntry(lines, 'count', 'count');
       }
       if (isOutSerialDoc.value || isOsRetSerial.value || isOsRecvSerial.value || isProdPickSerial.value || isProdRetSerial.value || isTrustRecvSerial.value || isSoRmaSerial.value || isXferSerial.value) {
-        return lines.filter(ln => !ln.manageMode || ln.manageMode === '条码管理');
+        return filterNoticeLinesForEntry(lines, docsKey, 'serial');
       }
       return lines;
     });
@@ -4650,6 +4689,13 @@ createApp({
         const want = flowMeta.value.innerType === 'xfer' ? '物料转序' : '货物移库';
         list = list.filter(n => n.docType === want);
       }
+      if (flowMode.value === 'waybill') hydrateWaybillsFromPcMock();
+      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isLoadFlow.value) {
+        const mergeKeys = whMergeKeysForDocsKey(key);
+        mergeKeys.forEach((k) => hydrateWhNoticesFromPcMock(k));
+        if (mergeKeys.length > 1) list = mergeWhNoticesById(mergeKeys);
+        else list = (CFG.docsMap && CFG.docsMap[key]) || [];
+      }
       if (STORE) STORE.hydrateAppDocs(list);
       return list;
     });
@@ -4659,7 +4705,12 @@ createApp({
       let list = currentDocs.value || [];
       if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isLoadFlow.value || flowMode.value === 'insp') {
         list = list.filter(n => n.status === '待执行' || n.status === '执行中');
-        list = list.slice().sort((a, b) => String(a.planDate || '').localeCompare(String(b.planDate || '')) || String(a.id || '').localeCompare(String(b.id || '')));
+        list = sortDocsByCreateDesc(list);
+      }
+      const entryExecMode = flowMeta.value.mode;
+      if (entryExecMode === 'count' || entryExecMode === 'serial' || entryExecMode === 'tank') {
+        const docsKey = flowMeta.value.docsKey || 'default';
+        list = list.filter(n => noticeHasLinesForEntry(n, docsKey, entryExecMode));
       }
       if (flowMode.value === 'waybill') {
         const carrier = appUser.carrier || flowMeta.value.carrierName || (CFG.carrierDemo && CFG.carrierDemo.name) || '顺丰物流';
@@ -4677,11 +4728,11 @@ createApp({
         } else {
           list = list.filter(n => n.status !== '已关闭');
         }
-        list = list.slice().sort((a, b) => String(a.planLoad || '').localeCompare(String(b.planLoad || '')) || String(a.id || '').localeCompare(String(b.id || '')));
+        list = sortDocsByCreateDesc(list);
       }
       if (flowMode.value === 'gatepass') {
         list = list.filter(n => n.status === '待放行');
-        list = list.slice().sort((a, b) => String(b.createTime || '').localeCompare(String(a.createTime || '')) || String(b.id || '').localeCompare(String(a.id || '')));
+        list = sortDocsByCreateDesc(list);
       }
       if (!kw) return list;
       const blob = (n) => {
@@ -4718,6 +4769,14 @@ createApp({
       return list.length;
     }
     const recentEnroute = computed(() => (enrouteHistory.value || []).slice(0, 3));
+    /** 提货完成后即可在途更新（状态应为运输中；若装货点已确认但状态未推进，仍允许入口） */
+    const canWaybillEnroute = computed(() => {
+      const n = currentNotice.value;
+      if (!n) return false;
+      if (['已签收', '已完成', '已关闭'].includes(n.status)) return false;
+      if (n.status === '运输中' || n.status === '发运中') return true;
+      return (n.loads || []).some((p) => p && p.status === '已确认');
+    });
     const wayProcFields = computed(() => {
       const name = processTab.value || '';
       const map = {
@@ -4799,6 +4858,7 @@ createApp({
       ElementPlus.ElMessage.success(msg);
     }
     function goHome() {
+      if (view.value === 'exec') flushExecProgress({ silent: true });
       view.value = 'home';
       menuActive.value = 'app-home';
       stockExecOverride.value = '';
@@ -4846,6 +4906,7 @@ createApp({
       }).catch(() => {});
     }
     function openFlow(id) {
+      if (view.value === 'exec') flushExecProgress({ silent: true });
       const rawMeta = CFG.flowMeta[id];
       if (!rawMeta) {
         openStub(findMenuTitle(menu, id) || id);
@@ -4945,6 +5006,10 @@ createApp({
       if (flowMode.value === 'waybill') {
         currentNotice.value = JSON.parse(JSON.stringify(n));
         if (STORE) STORE.overlayAppDoc(currentNotice.value);
+        syncWaybillStatusFromPoints(currentNotice.value);
+        if (STORE && currentNotice.value && currentNotice.value.id) {
+          STORE.setDocStatus(currentNotice.value.id, currentNotice.value.status, { source: 'APP', action: 'sync-status' });
+        }
         syncEnrouteHistory(currentNotice.value.id);
         view.value = 'waybill-exec';
         return;
@@ -5346,6 +5411,7 @@ createApp({
         const row = {
           id,
           status: isEdit ? ((list.find(x => x.id === id) || {}).status || '待执行') : '待执行',
+          createTime: isEdit ? ((list.find(x => x.id === id) || {}).createTime || appNowStr()) : appNowStr(),
           docType: genDocForm.docType,
           whBiz: genDocForm.whBiz,
           refNo: genDocForm.refNo,
@@ -5391,6 +5457,7 @@ createApp({
       const row = {
         id,
         status: '待执行',
+        createTime: appNowStr(),
         partner: genDocForm.partner,
         supplier: genDocForm.partner,
         refNo: genDocForm.refNo || '—',
@@ -5488,7 +5555,7 @@ createApp({
       form.prodDate = currentLine.value?.prodDate || todayYmd();
       form.validMonths = Number(currentLine.value?.validMonths || 12);
       form.qty = Number(currentLine.value?.remainQty || 0) || null;
-      form.tankNo = isInTankDoc.value ? '' : (form.tankNo || '丁A');
+      form.tankNo = form.tankNo || '';
       const tabs = flowMeta.value.processTabs;
       processTab.value = (tabs && tabs[0]) || '包装检查';
     }
@@ -5584,10 +5651,10 @@ createApp({
     }
     function applyExecScanSeedFormDefaults(kind, notice, form) {
       if (kind === 'in-serial') {
-        if (!String(form.loc || '').trim()) form.loc = 'A-01-01';
+        if (!String(form.loc || '').trim()) form.loc = 'WH-RAW-01';
       }
       if (kind === 'xfer-serial') {
-        if (!String(form.toLoc || '').trim()) form.toLoc = 'WH-FG-01';
+        if (!String(form.toLoc || '').trim()) form.toLoc = 'WH-FG-02';
       }
       if (kind === 'so-preout-serial') {
         const cl = (notice && notice.custLoc) || '';
@@ -5597,7 +5664,7 @@ createApp({
         }
       }
       if (kind === 'out-serial' && flowId.value === 'os-rma-serial') {
-        if (!String(form.loc || '').trim()) form.loc = 'A-01-01';
+        if (!String(form.loc || '').trim()) form.loc = 'WH-RAW-01';
       }
     }
     function buildScanSeedRow(arch, kind, form, notice) {
@@ -5622,7 +5689,7 @@ createApp({
           : Number((arch && (arch.qty || arch.archiveQty)) || 1000);
         return Object.assign(base, {
           qty,
-          loc: form.loc || 'A-01-01',
+          loc: form.loc || 'WH-RAW-01',
           srcStockStatus: (arch && arch.stockStatus) || '',
           srcQty: Number((arch && arch.qty) || 0),
           srcArchiveQty: Number((arch && arch.archiveQty) || 0),
@@ -5646,11 +5713,11 @@ createApp({
           qty: archQty,
           archQty,
           fromLoc: (arch && arch.loc) || '—',
-          toLoc: form.toLoc || 'WH-FG-01',
+          toLoc: form.toLoc || 'WH-FG-02',
         });
       }
       if (kind === 'tank-pick-scan') {
-        const tankNo = arch.tankNo || '丁A';
+        const tankNo = arch.tankNo || ((CFG.tankArchRows||[])[0]&&CFG.tankArchRows[0].tankNo) || '';
         const qty = Number(arch.qty) || 10;
         const maxQty = Number(arch.archQty) || 20;
         return {
@@ -5676,9 +5743,9 @@ createApp({
       applyExecScanSeedFormDefaults(kind, notice, form);
       if (kind === 'tank-pick-scan') {
         const presets = [
-          { barcode: 'TK-SEED-001', tankNo: '丁A', qty: 10, archQty: 20 },
-          { barcode: 'TK-SEED-002', tankNo: '丁B', qty: 8, archQty: 18 },
-          { barcode: 'TK-SEED-003', tankNo: '戊C', qty: 12, archQty: 25 },
+          { barcode: 'TM202608050001', tankNo: 'TK-STR-001', qty: 10, archQty: 20 },
+          { barcode: 'TM202608050002', tankNo: 'TK-STR-002', qty: 8, archQty: 18 },
+          { barcode: 'TM202608050004', tankNo: 'TK-STR-004', qty: 12, archQty: 25 },
         ];
         return presets.map((p) => buildScanSeedRow(p, kind, form, notice)).filter(Boolean);
       }
@@ -5860,12 +5927,17 @@ createApp({
           }
         }
       } else if (isInSerialDoc.value) {
-        const draftKey = poInDraftKey();
-        const draft = getInSerialDraft(draftKey);
-        if (draft && Array.isArray(draft.scanRows) && draft.scanRows.length) {
+        const draft = resolveInSerialDraft(currentNotice.value, line);
+        const hasDraft = draft && (
+          (Array.isArray(draft.scanRows) && draft.scanRows.length)
+          || draft.loc
+          || draft.remark
+          || (draft.craftTabs && draft.craftTabs.length)
+        );
+        if (hasDraft) {
           form.loc = draft.loc || '';
           form.remark = draft.remark || '';
-          scanRows.value = JSON.parse(JSON.stringify(draft.scanRows));
+          scanRows.value = JSON.parse(JSON.stringify(draft.scanRows || []));
           poInCraftTabs.value = (draft.craftTabs || []).slice();
           poInCraftGraph.value = draft.craftGraph ? JSON.parse(JSON.stringify(draft.craftGraph)) : null;
           if (!poInCraftGraph.value && poInCraftTabs.value.length) {
@@ -6033,127 +6105,149 @@ createApp({
       }
       view.value = 'exec';
     }
-    function backFromExec(opts) {
+    function flushExecProgress(opts) {
       opts = opts || {};
-      if (flowMode.value === 'insp' && !opts.skipSaveToast) {
+      if (opts.skipSave) return false;
+      if (flowMode.value === 'insp') {
         const hasProgress = !!(inspForm.temp || inspForm.humidity || inspForm.vent || inspForm.gasAlarm || inspForm.photoName || inspForm.abnDesc || inspForm.signed);
         if (hasProgress) saveInspDraft();
-        view.value = 'docs';
-        return;
+        return hasProgress;
       }
-      if (isOutCountDoc.value && !opts.skipSaveToast) {
-        if (isSoShipCount.value) autoSaveSoShipCountExec();
-        else if (isSoPreoutCount.value) autoSaveSoPreoutCountExec();
-        else if (isOsIssueCount.value) autoSaveOsIssueCountExec();
-        else if (isOsRmaCount.value) autoSaveOsRmaCountExec();
-        else if (isTrustRetCount.value) autoSaveTrustRetCountExec();
-        else autoSavePoRetCountExec();
-        view.value = 'materials';
-        return;
+      if (isOutCountDoc.value) {
+        if (isSoShipCount.value) return autoSaveSoShipCountExec();
+        if (isSoPreoutCount.value) return autoSaveSoPreoutCountExec();
+        if (isOsIssueCount.value) return autoSaveOsIssueCountExec();
+        if (isOsRmaCount.value) return autoSaveOsRmaCountExec();
+        if (isTrustRetCount.value) return autoSaveTrustRetCountExec();
+        return autoSavePoRetCountExec();
       }
-      if (isOsRecvTank.value && !opts.skipSaveToast) {
-        autoSaveOsRecvTankExec();
-        view.value = 'materials';
-        return;
+      if (isOsRecvTank.value) return autoSaveOsRecvTankExec();
+      if (isTrustRecvTank.value) return saveTrustRecvTankExec({ silent: !!opts.silent, fromBack: true });
+      if (isOsRecvCount.value) return autoSaveOsRecvCountExec();
+      if (isSoRmaCount.value) return autoSaveSoRmaCountExec();
+      if (isTrustRecvCount.value) return autoSaveTrustRecvCountExec();
+      if (isOsRetCount.value) return autoSaveOsRetCountExec();
+      if (isProdRetCount.value) return autoSaveProdRetCountExec();
+      if (isProdRetTank.value) return autoSaveProdRetTankExec();
+      if (isOutSerialDoc.value) {
+        if (isSoShipSerial.value) return autoSaveSoShipExec();
+        if (isSoPreoutSerial.value) return autoSaveSoPreoutExec();
+        if (isOsIssueSerial.value) return autoSaveOsIssueExec();
+        if (isOsRmaSerial.value) return autoSaveOsRmaExec();
+        if (isTrustRetSerial.value) return autoSaveTrustRetExec();
+        return autoSavePoRetExec();
       }
-      if (isTrustRecvTank.value && !opts.skipSaveToast) {
-        saveTrustRecvTankExec({ silent: false, fromBack: true });
-        view.value = 'materials';
-        return;
-      }
-      if (isOsRecvCount.value && !opts.skipSaveToast) {
-        autoSaveOsRecvCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isSoRmaCount.value && !opts.skipSaveToast) {
-        autoSaveSoRmaCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isTrustRecvCount.value && !opts.skipSaveToast) {
-        autoSaveTrustRecvCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isOsRetCount.value && !opts.skipSaveToast) {
-        autoSaveOsRetCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isProdRetCount.value && !opts.skipSaveToast) {
-        autoSaveProdRetCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isProdRetTank.value && !opts.skipSaveToast) {
-        autoSaveProdRetTankExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isOutSerialDoc.value && !opts.skipSaveToast) {
-        if (isSoShipSerial.value) autoSaveSoShipExec();
-        else if (isSoPreoutSerial.value) autoSaveSoPreoutExec();
-        else if (isOsIssueSerial.value) autoSaveOsIssueExec();
-        else if (isOsRmaSerial.value) autoSaveOsRmaExec();
-        else if (isTrustRetSerial.value) autoSaveTrustRetExec();
-        else autoSavePoRetExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isInSerialDoc.value && !opts.skipSaveToast) {
-        if (isSoRmaSerial.value) autoSaveSoRmaExec();
-        else if (isOsRetSerial.value) autoSaveOsRetExec();
-        else if (isOsRecvSerial.value) autoSaveOsRecvExec();
-        else if (isProdRetSerial.value) autoSaveProdRetExec();
-        else if (isProdInSerial.value) {
+      if (isInSerialDoc.value) {
+        if (isSoRmaSerial.value) return autoSaveSoRmaExec();
+        if (isOsRetSerial.value) return autoSaveOsRetExec();
+        if (isOsRecvSerial.value) return autoSaveOsRecvExec();
+        if (isProdRetSerial.value) return autoSaveProdRetExec();
+        if (isProdInSerial.value) {
           const hasProgress = !!(form.loc || form.remark || (scanRows.value && scanRows.value.length));
           if (hasProgress) {
             const n = currentNotice.value;
             const line = currentLine.value;
             if (n) n.status = '执行中';
             if (line) line.status = '执行中';
-            showFlowAutosaveToast(true);
+            if (!opts.silent) showFlowAutosaveToast(true);
           }
+          return hasProgress;
         }
-        else autoSavePoInExec();
+        return autoSavePoInExec({ silent: !!opts.silent });
+      }
+      if (isPoInTank.value) return savePoInTankExec({ silent: !!opts.silent, fromBack: true });
+      if (isPoInCount.value) return savePoInCountDraft({ silent: !!opts.silent, fromBack: true });
+      if (isLineSidePick.value) return autoSaveProdPickExec();
+      if (isXferSerialPick.value) return autoSaveXferExec();
+      if (isXferCountExec.value) return autoSaveXferCountExec();
+      if (isLoadFlow.value) { if (!opts.silent) showFlowAutosaveToast(true); return true; }
+      if (flowMode.value === 'stocktake') { if (!opts.silent) showFlowAutosaveToast(true); return true; }
+      return false;
+    }
+    function backFromExec(opts) {
+      opts = opts || {};
+      if (!opts.skipSaveToast) flushExecProgress(opts);
+      if (flowMode.value === 'insp') {
+        view.value = 'docs';
+        return;
+      }
+      if (isOutCountDoc.value || isOsRecvTank.value || isTrustRecvTank.value || isOsRecvCount.value
+        || isSoRmaCount.value || isTrustRecvCount.value || isOsRetCount.value || isProdRetCount.value
+        || isProdRetTank.value || isOutSerialDoc.value || isInSerialDoc.value || isPoInTank.value
+        || isPoInCount.value || isLineSidePick.value || isXferSerialPick.value || isXferCountExec.value) {
         view.value = 'materials';
         return;
       }
-      if (isPoInTank.value && !opts.skipSaveToast) {
-        savePoInTankExec({ silent: false, fromBack: true });
-        view.value = 'materials';
-        return;
-      }
-      if (isPoInCount.value && !opts.skipSaveToast) {
-        savePoInCountDraft({ silent: false, fromBack: true });
-        view.value = 'materials';
-        return;
-      }
-      if (isLineSidePick.value && !opts.skipSaveToast) {
-        autoSaveProdPickExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isXferSerialPick.value && !opts.skipSaveToast) {
-        autoSaveXferExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isXferCountExec.value && !opts.skipSaveToast) {
-        autoSaveXferCountExec();
-        view.value = 'materials';
-        return;
-      }
-      if (isLoadFlow.value && !opts.skipSaveToast) showFlowAutosaveToast(true);
-      if (flowMode.value === 'stocktake' && !opts.skipSaveToast) showFlowAutosaveToast(true);
       if (flowMode.value === 'inner' || flowMode.value === 'stocktake') view.value = 'docs';
       else view.value = 'materials';
     }
+    function hydrateLocRowsFromPcMock() {
+      if (STORE && STORE.syncAppLocRows) {
+        STORE.syncAppLocRows(CFG);
+        return;
+      }
+      // 无 Store 时回退：直接读源码 Mock 仓库库位
+      const seed = ((window.WMS_MOCK_ROWS || {}).warehouse || {}).tab2 || [];
+      if (!seed.length) return;
+      CFG.locRows = seed.map((r) => ({
+        code: String(r['库位编码'] || '').trim(),
+        name: String(r['库位名称'] || '').trim(),
+        warehouse: String(r['所属仓库'] || '').trim(),
+        status: String(r['启用状态'] || '').trim() || '启用',
+      })).filter((r) => r.code);
+    }
+    function hydrateTankArchFromPcMock() {
+      if (STORE && STORE.syncAppTankArchRows) {
+        STORE.syncAppTankArchRows(CFG);
+        if (STORE.syncAppMediumMap) STORE.syncAppMediumMap(CFG);
+        return;
+      }
+      const seed = ((window.WMS_MOCK_ROWS || {})['tank-arch'] || {}).main || [];
+      if (!Array.isArray(seed) || !seed.length) return;
+      CFG.tankArchRows = seed.map((pc) => {
+        const tankNo = String(pc['储罐编号'] || '').trim();
+        const barcode = String(pc['条码号'] || '').trim();
+        const mat = String(pc['物料信息'] || '').split('/').map((s) => s.trim());
+        const vol = String(pc['容积'] || '');
+        let maxQty = parseFloat(vol.replace(/[^\d.]/g, '')) || 0;
+        if (/m³|m3/i.test(vol)) maxQty = Math.round(maxQty * 1000);
+        return {
+          barcode: barcode || tankNo,
+          tankNo: tankNo || barcode,
+          loc: pc['库存位置'] || '—',
+          medium: pc['充装介质'] || '',
+          material: mat[0] && mat[0] !== '—' ? mat[0] : '',
+          materialName: mat[1] || '',
+          maxQty: maxQty,
+          qty: Number(pc['当前数量'] || 0) || 0,
+          useStatus: pc['使用状态'] || '在用',
+          stockStatus: pc['库存状态'] || '库内',
+          lots: [],
+          fromPc: true,
+        };
+      }).filter((t) => t.tankNo);
+      CFG.tanks = CFG.tankArchRows.filter((t) => t.useStatus === '在用').map((t) => t.tankNo);
+      const mm = ((window.WMS_MOCK_ROWS || {})['mat-medium'] || {}).main || [];
+      const map = {};
+      mm.forEach((r) => {
+        const code = String(r['物料编码'] || '').trim();
+        const medium = String(r['充装介质'] || '').trim();
+        if (!code || !medium) return;
+        if (!map[code]) map[code] = [];
+        if (!map[code].includes(medium)) map[code].push(medium);
+      });
+      CFG.mediumMap = map;
+    }
     function findEnabledLoc(code) {
+      if (STORE && STORE.findEnabledLoc) return STORE.findEnabledLoc(code);
+      hydrateLocRowsFromPcMock();
       const c = String(code || '').trim();
       if (!c) return null;
       return (CFG.locRows || []).find(l => l.code === c && l.status === '启用') || null;
+    }
+    function enabledLocRows() {
+      hydrateLocRowsFromPcMock();
+      return (CFG.locRows || []).filter(l => l && l.status === '启用');
     }
     function confirmPoInLoc() {
       const code = String(form.loc || '').trim();
@@ -6385,11 +6479,487 @@ createApp({
         }
       });
     }
+    function waybillDash(v) {
+      const s = String(v == null ? '' : v).trim();
+      return !s || s === '-' ? '—' : s;
+    }
+    function formatWayContact(name, phone) {
+      const n = waybillDash(name);
+      const p = waybillDash(phone);
+      if (n === '—' && p === '—') return '—';
+      if (p === '—') return n;
+      if (n === '—') return p;
+      return n + ' / ' + p;
+    }
+    function shipRowByNo(shipNo) {
+      const code = String(shipNo || '').trim();
+      if (!code) return null;
+      try {
+        const mock = STORE && STORE.loadMock ? STORE.loadMock() : null;
+        const list = mock && mock['lg-ship'] && mock['lg-ship'].main;
+        return Array.isArray(list) ? list.find((s) => s && s['发货单号'] === code) : null;
+      } catch (e) { return null; }
+    }
+    function waybillLoadContact(pc, ln) {
+      const ship = shipRowByNo(ln && ln['关联发货单号']);
+      if (ship) return formatWayContact(ship['装货联系人'], ship['装货联系电话']);
+      return formatWayContact(pc['装货联系人'], pc['装货联系电话']);
+    }
+    function waybillUnloadContact(pc, ln) {
+      const ship = shipRowByNo(ln && ln['关联发货单号']);
+      if (ship) return formatWayContact(ship['卸货联系人'], ship['卸货联系电话']);
+      return formatWayContact(pc['卸货联系人'], pc['卸货联系电话']);
+    }
+    function toDatetimeLocal(s) {
+      const t = String(s || '').trim();
+      if (!t) return '';
+      return t.replace(' ', 'T').slice(0, 16);
+    }
+    function fromDatetimeLocal(s) {
+      const t = String(s || '').trim();
+      if (!t) return '';
+      return t.replace('T', ' ').slice(0, 16);
+    }
+    function appNowStr() {
+      return (STORE && STORE.nowStr && STORE.nowStr()) || new Date().toISOString().slice(0, 19).replace('T', ' ');
+    }
+    /** 单据列表排序：优先 createTime，否则从单号 YYYYMMDD+流水 推导 */
+    function noticeSortKey(n) {
+      const doc = n || {};
+      const storeHit = (STORE && doc.id) ? STORE.getDoc(doc.id) : null;
+      const raw = String(doc.createTime || doc.createdAt || doc.scheduleAt || (storeHit && storeHit.updatedAt) || '').trim();
+      if (raw && raw !== '—') return raw.replace('T', ' ').slice(0, 19);
+      const id = String(doc.id || '');
+      const m = id.match(/(\d{4})(\d{2})(\d{2})(\d{4})$/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]} ${m[4].slice(0, 2)}:${m[4].slice(2, 4)}:${m[4].slice(4, 6)}`;
+      const pd = String(doc.planDate || doc.planLoad || '').trim();
+      if (pd) return pd.length <= 10 ? (pd + ' 00:00:00') : pd.slice(0, 19);
+      return id;
+    }
+    function sortDocsByCreateDesc(list) {
+      return (list || []).slice().sort((a, b) =>
+        noticeSortKey(b).localeCompare(noticeSortKey(a)) || String(b.id || '').localeCompare(String(a.id || ''))
+      );
+    }
+    function waybillMatParts(info) {
+      const p = String(info || '').split('/').map((s) => s.trim());
+      return { code: p[0] || '', name: p[1] || '', spec: p[2] || '', kind: p[3] || '' };
+    }
+    function waybillQtyNum(qtyStr) {
+      const n = parseFloat(String(qtyStr || '').replace(/[^\d.]/g, ''));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function waybillQtyUnit(qtyStr) {
+      const m = String(qtyStr || '').match(/[\d.]+\s*(.+)$/);
+      return m ? m[1].trim() : 'KG';
+    }
+    function syncWaybillStatusFromPoints(doc) {
+      if (!doc) return doc;
+      const loads = doc.loads || [];
+      const unloads = doc.unloads || [];
+      const anyLoadDone = loads.some((p) => p && p.status === '已确认');
+      const allLoadDone = loads.length > 0 && loads.every((p) => p && p.status === '已确认');
+      const allUnloadDone = unloads.length > 0 && unloads.every((p) => p && p.status === '已确认');
+      if (allLoadDone && allUnloadDone && !['已签收', '已完成', '已关闭'].includes(doc.status)) {
+        doc.status = '已签收';
+      } else if (anyLoadDone && ['待派车', '待运输', '待发运', '待运送'].includes(doc.status)) {
+        doc.status = '运输中';
+      }
+      return doc;
+    }
+    function mapPcWaybillStatus(pc) {
+      const raw = String((pc && pc['状态']) || '待派车').trim();
+      const map = (STORE && STORE.STATUS_TO_APP) || {};
+      return map[raw] || raw;
+    }
+    function buildWaybillLoadsFromPc(pc, status) {
+      const lines = Array.isArray(pc._lines) ? pc._lines : [];
+      const loadDone = ['运输中', '发运中', '已签收', '已完成'].includes(status);
+      const mk = (ln, i) => {
+        const mat = waybillMatParts(ln['物料信息'] || pc['物料信息']);
+        const qty = ln['发货数量'] || pc['总数量'] || '';
+        const n = waybillQtyNum(qty);
+        return {
+          id: waybillDash(ln['关联提货单']) !== '—' ? ln['关联提货单'] : ('THD-' + (ln['关联发货单号'] || i + 1)),
+          type: 'load',
+          status: loadDone ? '已确认' : '待确认',
+          shipNo: ln['关联发货单号'] || '',
+          unit: '—',
+          place: waybillDash(ln['装货点'] !== undefined ? ln['装货点'] : pc['装货点']),
+          contact: waybillLoadContact(pc, ln),
+          material: ln['物料信息'] || pc['物料信息'] || '',
+          qty: qty || '—',
+          remark: '—',
+          lines: [{ ...mat, planQty: n, unit: waybillQtyUnit(qty), actualQty: n, remark: '', confirmed: loadDone }],
+          procs: [
+            { name: '装货确认', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+            { name: '包装检查', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+            { name: '数量核对', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+          ],
+        };
+      };
+      if (lines.length) return lines.map(mk);
+      const qty = pc['总数量'] || '';
+      const n = waybillQtyNum(qty);
+      return [{
+        id: 'THD-' + String(pc['关联发货单'] || '001').split(/[、,，]/)[0],
+        type: 'load',
+        status: loadDone ? '已确认' : '待确认',
+        shipNo: String(pc['关联发货单'] || '').split(/[、,，]/)[0] || '',
+        unit: '—',
+        place: waybillDash(pc['装货点']),
+        contact: waybillLoadContact(pc, null),
+        material: pc['物料信息'] || '',
+        qty: qty || '—',
+        remark: '—',
+        lines: [{ ...waybillMatParts(pc['物料信息']), planQty: n, unit: waybillQtyUnit(qty), actualQty: n, remark: '', confirmed: loadDone }],
+        procs: [
+          { name: '装货确认', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+          { name: '包装检查', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+          { name: '数量核对', status: loadDone ? '已完成' : '待执行', user: '—', time: '—' },
+        ],
+      }];
+    }
+    function buildWaybillUnloadsFromPc(pc, status) {
+      const lines = Array.isArray(pc._lines) ? pc._lines : [];
+      const unloadDone = ['已签收', '已完成'].includes(status);
+      const mk = (ln, i) => {
+        const mat = waybillMatParts(ln['物料信息'] || pc['物料信息']);
+        const qty = ln['发货数量'] || pc['总数量'] || '';
+        const n = waybillQtyNum(qty);
+        return {
+          id: waybillDash(ln['关联签收单']) !== '—' ? ln['关联签收单'] : ('QSD-' + (ln['关联发货单号'] || i + 1)),
+          type: 'unload',
+          status: unloadDone ? '已确认' : '待确认',
+          shipNo: ln['关联发货单号'] || '',
+          unit: waybillDash(pc['客户名称']) !== '—' ? pc['客户名称'] : '—',
+          place: waybillDash(ln['卸货点'] !== undefined ? ln['卸货点'] : pc['卸货点']),
+          contact: waybillUnloadContact(pc, ln),
+          due: waybillDash(pc['要求送达时间']),
+          material: ln['物料信息'] || pc['物料信息'] || '',
+          qty: qty || '—',
+          remark: '—',
+          lines: [{ ...mat, planQty: n, unit: waybillQtyUnit(qty), actualQty: n, remark: '', confirmed: unloadDone }],
+          procs: [
+            { name: '卸货确认', status: unloadDone ? '已完成' : '待执行', user: '—', time: '—' },
+            { name: '数量核对', status: unloadDone ? '已完成' : '待执行', user: '—', time: '—' },
+            { name: '异常记录', status: '待执行', user: '—', time: '—' },
+          ],
+        };
+      };
+      if (lines.length) return lines.map(mk);
+      const qty = pc['总数量'] || '';
+      const n = waybillQtyNum(qty);
+      return [{
+        id: 'QSD-' + String(pc['关联发货单'] || '001').split(/[、,，]/)[0],
+        type: 'unload',
+        status: unloadDone ? '已确认' : '待确认',
+        shipNo: String(pc['关联发货单'] || '').split(/[、,，]/)[0] || '',
+        unit: waybillDash(pc['客户名称']) !== '—' ? pc['客户名称'] : '—',
+        place: waybillDash(pc['卸货点']),
+        contact: waybillUnloadContact(pc, null),
+        due: waybillDash(pc['要求送达时间']),
+        material: pc['物料信息'] || '',
+        qty: qty || '—',
+        remark: '—',
+        lines: [{ ...waybillMatParts(pc['物料信息']), planQty: n, unit: waybillQtyUnit(qty), actualQty: n, remark: '', confirmed: unloadDone }],
+        procs: [
+          { name: '卸货确认', status: unloadDone ? '已完成' : '待执行', user: '—', time: '—' },
+          { name: '数量核对', status: unloadDone ? '已完成' : '待执行', user: '—', time: '—' },
+          { name: '异常记录', status: '待执行', user: '—', time: '—' },
+        ],
+      }];
+    }
+    function mapPcWaybillToApp(pc) {
+      const id = String((pc && pc['运单号']) || '').trim();
+      if (!id) return null;
+      const status = mapPcWaybillStatus(pc);
+      const loadPoint = waybillDash(pc['装货点']);
+      const unloadPoint = waybillDash(pc['卸货点']);
+      const route = loadPoint !== '—' && unloadPoint !== '—' ? (loadPoint + ' → ' + unloadPoint) : (loadPoint !== '—' ? loadPoint : unloadPoint);
+      const carrier = waybillDash(pc['承运商名称']);
+      const dispatcher = carrier === '顺丰物流' ? '王调度' : '—';
+      return {
+        id: id,
+        status: status,
+        dispatchNo: '—',
+        shipMode: pc['用车类型'] === '提货' ? '提货' : '发货',
+        driver: waybillDash(pc['司机姓名']),
+        plate: waybillDash(pc['车牌号']),
+        trailer: waybillDash(pc['车挂号']),
+        phone: waybillDash(pc['司机电话']),
+        planLoad: waybillDash(pc['计划装货时间']),
+        scheduleAt: waybillDash(pc['创建时间']),
+        route: route,
+        shipNos: pc['关联发货单'] || '',
+        remark: waybillDash(pc['特殊要求']),
+        actualDepart: waybillDash(pc['实际装货时间']),
+        actualArrive: waybillDash(pc['实际到货时间']),
+        carrier: carrier,
+        dispatcher: dispatcher,
+        transportType: waybillDash(pc['运输类型']),
+        materialSummary: pc['物料信息'] || '',
+        applicantDept: pc['申请部门'] || '',
+        applicant: pc['申请人'] || '',
+        vehicleReq: pc['车型要求'] || '',
+        loads: buildWaybillLoadsFromPc(pc, status),
+        unloads: buildWaybillUnloadsFromPc(pc, status),
+        enroute: { location: '', remark: '', updatedAt: '' },
+        fromPc: true,
+      };
+    }
+    function hydrateWaybillsFromPcMock() {
+      if (!STORE || !STORE.loadMock || !CFG.docsMap) return;
+      let mock;
+      try { mock = STORE.loadMock(); } catch (e) { return; }
+      if (!mock) return;
+      const pcList = ((mock['lg-waybill'] || {}).main) || [];
+      if (!Array.isArray(pcList) || !pcList.length) return;
+      const list = CFG.docsMap.waybill || (CFG.docsMap.waybill = []);
+      const byId = new Map();
+      list.forEach((w) => { if (w && w.id) byId.set(w.id, w); });
+      pcList.forEach((pc) => {
+        const mapped = mapPcWaybillToApp(pc);
+        if (!mapped) return;
+        const hit = byId.get(mapped.id);
+        if (hit) {
+          const keepLoads = hit.loads && hit.loads.length && !hit.fromPc;
+          const keepUnloads = hit.unloads && hit.unloads.length && !hit.fromPc;
+          Object.assign(hit, mapped, {
+            loads: keepLoads ? hit.loads : mapped.loads,
+            unloads: keepUnloads ? hit.unloads : mapped.unloads,
+          });
+          hit.fromPc = true;
+          if (STORE) STORE.overlayAppDoc(hit);
+          syncWaybillStatusFromPoints(hit);
+        } else {
+          list.unshift(mapped);
+          byId.set(mapped.id, mapped);
+          if (STORE) STORE.overlayAppDoc(mapped);
+          syncWaybillStatusFromPoints(mapped);
+        }
+      });
+    }
+    function whNoticeCode(v) {
+      const s = String(v == null ? '' : v).trim();
+      if (!s || s === '—' || s === '-') return '';
+      return s.split(/\s*\/\s*/)[0].trim();
+    }
+    function whLineManageBucket(mode) {
+      const m = String(mode || '').trim();
+      if (m.includes('计数')) return 'count';
+      return 'barcode';
+    }
+    function whDocsKeyBucket(docsKey) {
+      return whEntryManageBucket(docsKey, String(docsKey || '').includes('count') ? 'count' : '');
+    }
+    function whMergeKeysForDocsKey(docsKey) {
+      const k = String(docsKey || '');
+      const route = (WH_PC_HYDRATE_ROUTES || []).find((r) => (r.docsKeys || []).includes(k));
+      return route ? route.docsKeys.slice() : [k];
+    }
+    function mergeWhNoticesById(keys) {
+      const byId = new Map();
+      (keys || []).forEach((docsKey) => {
+        ((CFG.docsMap && CFG.docsMap[docsKey]) || []).forEach((n) => {
+          if (!n || !n.id) return;
+          const prev = byId.get(n.id);
+          if (!prev) {
+            byId.set(n.id, Object.assign({}, n, { lines: (n.lines || []).map((l) => Object.assign({}, l)) }));
+            return;
+          }
+          const lineMap = new Map();
+          (prev.lines || []).forEach((l) => lineMap.set(String(l.lineNo) + '|' + l.code, l));
+          (n.lines || []).forEach((l) => {
+            const lk = String(l.lineNo) + '|' + l.code;
+            if (!lineMap.has(lk)) lineMap.set(lk, Object.assign({}, l));
+          });
+          prev.lines = Array.from(lineMap.values());
+          Object.assign(prev, n, { lines: prev.lines });
+        });
+      });
+      return Array.from(byId.values());
+    }
+    function mapPcWhLineToApp(ln, i, noticeId) {
+      const mat = waybillMatParts(ln['物料信息']);
+      const planQty = waybillQtyNum(ln['计划数量']);
+      const doneQty = waybillQtyNum(ln['已完成数量']);
+      let remainQty = waybillQtyNum(ln['未完成数量']);
+      if (!(remainQty > 0) && planQty > 0) remainQty = Math.max(0, planQty - doneQty);
+      const planPcsRaw = String(ln['计划件数'] ?? '').trim();
+      const planPcs = (planPcsRaw && planPcsRaw !== '—') ? (parseInt(planPcsRaw, 10) || 0) : 0;
+      let remainPcs = planPcs;
+      if (planPcs > 0 && planQty > 0 && doneQty > 0) {
+        remainPcs = Math.max(0, Math.round(planPcs * (remainQty / planQty)));
+      }
+      const rawId = String(ln.id || '').trim();
+      let lineNo = ln['行号'];
+      if (lineNo == null || lineNo === '' || lineNo === '—') {
+        const m = rawId.match(/-l(\d+)$/i);
+        lineNo = m ? (Number(m[1]) || (i + 1)) : (i + 1);
+      }
+      const lineId = rawId || (noticeId ? noticeId + '-l' + lineNo : '');
+      return {
+        id: lineId,
+        lineNo: lineNo,
+        status: ln['行状态'] || '待执行',
+        code: mat.code,
+        name: mat.name,
+        spec: mat.spec,
+        kind: mat.kind,
+        unit: ln['库存单位'] || ln['单位'] || 'KG',
+        lot: ln['批号'] || '—',
+        remark: (ln['备注'] && ln['备注'] !== '—') ? ln['备注'] : '—',
+        manageMode: ln['管理方式'] || '条码管理',
+        planPcs: planPcs,
+        planQty: planQty,
+        doneQty: doneQty,
+        remainQty: remainQty,
+        remainPcs: remainPcs,
+        prodDate: ln['生产日期'] || '',
+        validPeriod: ln['有效期'] || '',
+        maker: ln['生产厂家'] || '',
+      };
+    }
+    function mapPcWhNoticeToApp(pc, pageId, docsKey) {
+      const noKey = pageId === 'wh-transfer' ? '移库单号' : '单号';
+      const id = String((pc && pc[noKey]) || '').trim();
+      if (!id) return null;
+      const bucket = whDocsKeyBucket(docsKey);
+      const srcLines = Array.isArray(pc._lines) ? pc._lines : [];
+      const lines = srcLines
+        .map((ln, i) => ({ ln, app: mapPcWhLineToApp(ln, i, id) }))
+        .filter(({ ln }) => whLineManageBucket(ln['管理方式']) === bucket)
+        .map(({ app }) => app);
+      if (srcLines.length && !lines.length) return null;
+      const supplier = pc['供应商名称'] || pc['客户名称'] || pc['受益人'] || '';
+      const refRaw = pc['关联采购订单'] || pc['关联销售订单'] || pc['关联委外加工单'] || pc['关联订单号'] || '';
+      const refNo = whNoticeCode(refRaw) || whNoticeCode(pc['关联业务单号']) || refRaw;
+      return {
+        id: id,
+        status: pc['单据状态'] || '待执行',
+        partner: supplier || '—',
+        supplier: supplier || '—',
+        refNo: refNo || '—',
+        poNo: refNo || '—',
+        planDate: pc['计划执行日期'] || '',
+        docType: pc['单据类型'] || '',
+        waybillNo: waybillDash(pc['关联运单']),
+        logisticsNo: waybillDash(pc['关联发货单']),
+        plate: waybillDash(pc['车牌号']),
+        trailer: waybillDash(pc['车挂号']),
+        driver: waybillDash(pc['司机姓名']),
+        phone: waybillDash(pc['司机电话']),
+        driverId: waybillDash(pc['司机身份证号']),
+        erpNo: waybillDash(pc['ERP单据号']),
+        remark: waybillDash(pc['备注']),
+        materialSummary: pc['物料信息'] || '',
+        packSpec: waybillDash(pc['包装规格']),
+        createTime: pc['创建时间'] || (pc.fromPc !== false && id.match(/\d{8}/) ? noticeSortKey({ id }) : ''),
+        lines: lines.length ? lines : srcLines.map(mapPcWhLineToApp),
+        fromPc: true,
+      };
+    }
+    const WH_PC_HYDRATE_ROUTES = [
+      { pageId: 'wh-po-in', tab: 'tab1', docsKeys: ['po-in-serial', 'po-in-tank', 'po-in-count'] },
+      { pageId: 'wh-po-ret', tab: 'tab1', docsKeys: ['po-ret-serial', 'po-ret-count'] },
+      { pageId: 'wh-so-ship', tab: 'tab1', docsKeys: ['so-ship-serial', 'so-ship-count', 'soShip'] },
+      { pageId: 'wh-so-preout', tab: 'tab1', docsKeys: ['so-preout-serial', 'so-preout-count'] },
+      { pageId: 'wh-so-ret', tab: 'tab1', docsKeys: ['so-rma-serial', 'so-rma-count', 'so-rma'] },
+      { pageId: 'wh-os-issue', tab: 'tab1', docsKeys: ['os-issue-serial', 'os-issue-count'] },
+      { pageId: 'wh-os-recv', tab: 'tab1', docsKeys: ['os-recv-serial', 'os-recv-count', 'os-recv-tank'] },
+      { pageId: 'wh-os-ret-mat', tab: 'tab1', docsKeys: ['os-ret-serial', 'os-ret-count'] },
+      { pageId: 'wh-os-ret-goods', tab: 'tab1', docsKeys: ['os-rma-serial', 'os-rma-count'] },
+      { pageId: 'wh-cs-recv', tab: 'tab1', docsKeys: ['trust-recv-serial', 'trust-recv-count', 'trust-recv-tank', 'trust-recv'] },
+      { pageId: 'wh-cs-ret', tab: 'tab1', docsKeys: ['trust-ret-serial', 'trust-ret-count', 'trust-ret'] },
+      { pageId: 'wh-other-in', tab: 'tab1', docsKeys: ['oth-in'] },
+      { pageId: 'wh-other-out', tab: 'tab1', docsKeys: ['oth-out'] },
+      { pageId: 'wh-transfer', tab: 'tab1', docsKeys: ['xfer-serial', 'xfer-count'] },
+    ];
+    function mergeAppNoticeFromPc(list, mapped) {
+      if (!list || !mapped || !mapped.id) return;
+      const hit = list.find((n) => n && n.id === mapped.id);
+      if (hit) {
+        const keepLines = hit.lines && hit.lines.length && !hit.fromPc && !(mapped.lines && mapped.lines.length);
+        Object.assign(hit, mapped, { lines: keepLines ? hit.lines : (mapped.lines || hit.lines) });
+        hit.fromPc = true;
+      } else {
+        list.unshift(mapped);
+      }
+    }
+    function hydrateWhNoticesFromPcMock(docsKeyFilter) {
+      if (!STORE || !STORE.loadMock || !CFG.docsMap) return;
+      let mock;
+      try { mock = STORE.loadMock(); } catch (e) { return; }
+      if (!mock) return;
+      WH_PC_HYDRATE_ROUTES.forEach((route) => {
+        (route.docsKeys || []).forEach((docsKey) => {
+          if (docsKeyFilter && docsKey !== docsKeyFilter) return;
+          const pcList = ((mock[route.pageId] || {})[route.tab || 'tab1']) || [];
+          if (!Array.isArray(pcList) || !pcList.length) return;
+          const list = CFG.docsMap[docsKey] || (CFG.docsMap[docsKey] = []);
+          pcList.forEach((pc) => {
+            const mapped = mapPcWhNoticeToApp(pc, route.pageId, docsKey);
+            if (mapped) mergeAppNoticeFromPc(list, mapped);
+          });
+        });
+      });
+    }
     function findSerialArch(code) {
       hydrateSerialArchFromPcMock();
       const c = String(code || '').trim();
       if (!c) return null;
-      return (CFG.serialArchRows || []).find((r) => r && (r.barcode === c || r.pkgNo === c)) || null;
+      const hit = (CFG.serialArchRows || []).find((r) => r && (r.barcode === c || r.pkgNo === c));
+      if (hit) return hit;
+      // 兼容旧 Demo 槽车样例行：并入流水码池后写入，后续统一回写 PC
+      const legacy = (CFG.tankerSerialRows || []).find((r) => r && (r.barcode === c || r.pkgNo === c));
+      if (!legacy) return null;
+      if (!CFG.serialArchRows) CFG.serialArchRows = [];
+      CFG.serialArchRows.push(legacy);
+      return legacy;
+    }
+    /** 罐区「添加厂外物料」：任意符合条件的流水码均可扫入，不单独要求槽车标记 */
+    function scanTankerBarcode() {
+      if (!isInTankDoc.value) return;
+      const code = String(form.barcode || form.pkgNo || '').trim();
+      if (!code) return;
+      const arch = findSerialArch(code);
+      if (!arch) {
+        ElementPlus.ElMessage.error('未找到流水码档案');
+        return;
+      }
+      if (arch.stockStatus !== '初始化') {
+        ElementPlus.ElMessage.error('流水码库存状态必须为「初始化」');
+        return;
+      }
+      const matCode = archMaterialCode(arch);
+      if (matCode !== (currentLine.value && currentLine.value.code)) {
+        ElementPlus.ElMessage.error('流水码物料与当前单据行物料不一致');
+        return;
+      }
+      if (String(arch.step || '').trim()) {
+        ElementPlus.ElMessage.error('流水码当前步骤已被占用（非空），禁止扫入');
+        return;
+      }
+      const lineLot = String((currentLine.value && currentLine.value.lot) || '').trim();
+      if (lineLot && lineLot !== '—' && String(arch.lot || '') !== lineLot) {
+        ElementPlus.ElMessage.error('流水码批号与当前单据行物料批号不一致');
+        return;
+      }
+      form.barcode = arch.barcode;
+      form.pkgNo = arch.pkgNo || '';
+      form.lotIn = arch.lot || form.lotIn;
+      form.prodDate = arch.prodDate || form.prodDate;
+      form.validMonths = Number(arch.validPeriod || form.validMonths || 12);
+      form.maker = arch.maker || form.maker;
+      form.qty = Number(arch.qty || form.qty || 0);
+      ElementPlus.ElMessage.success('已关联流水码，原料信息已自动填充');
+      const n = currentNotice.value;
+      const step = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : '采购入库');
+      arch.step = step;
+      arch.docNo = (n && n.id) || '';
+      flushSerialArchToPcMock();
+      autosaveAfterScan();
     }
     function flushSerialArchToPcMock() {
       if (!STORE || !STORE.loadMock || !STORE.saveMock) return;
@@ -6463,11 +7033,39 @@ createApp({
       if (qc !== '合格') return `条码[${code}]检验状态非合格（当前：${qc}），禁止${act}`;
       return '';
     }
-    function poInDraftKey() {
-      const n = currentNotice.value;
-      const line = currentLine.value;
-      if (!n || !line) return '';
-      return n.id + '::L' + (line.lineNo || 1);
+    function poInDraftKeyCandidates(notice, line) {
+      const n = notice || currentNotice.value;
+      const ln = line || currentLine.value;
+      if (!n || !ln) return [];
+      const keys = [];
+      const push = (k) => { if (k && !keys.includes(k)) keys.push(k); };
+      if (ln.id) push(n.id + '::' + ln.id);
+      if (ln.code) push(n.id + '::C' + ln.code);
+      if (ln.lineNo != null && ln.lineNo !== '') push(n.id + '::L' + ln.lineNo);
+      const m = String(ln.id || '').match(/-l(\d+)$/i);
+      if (m) {
+        push(n.id + '::L' + m[1]);
+        const erpNo = Number(m[1]);
+        if (erpNo > 0 && erpNo < 100) push(n.id + '::L' + (erpNo * 10));
+      }
+      push(n.id + '::L1');
+      return keys;
+    }
+    function poInDraftKey(notice, line) {
+      const keys = poInDraftKeyCandidates(notice, line);
+      return keys[0] || '';
+    }
+    function resolveInSerialDraft(notice, line) {
+      const keys = poInDraftKeyCandidates(notice, line);
+      for (let i = 0; i < keys.length; i++) {
+        const draft = getInSerialDraft(keys[i]);
+        if (draft) return draft;
+      }
+      if (STORE && STORE.getWhPoInDraftForLine) {
+        const hit = STORE.getWhPoInDraftForLine((notice || currentNotice.value || {}).id, line || currentLine.value);
+        if (hit && hit.draft) return hit.draft;
+      }
+      return null;
     }
     function poInRkId(noticeId) {
       return 'CGRK' + String(noticeId || '').replace(/^CGST/, '');
@@ -7446,7 +8044,7 @@ createApp({
         ElementPlus.ElMessage.error('请先扫描或输入调入库位');
         return false;
       }
-      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      const hit = findEnabledLoc(code);
       if (!hit || hit.warehouse !== xferToWhName.value) {
         ElementPlus.ElMessage.error('调入库位须为调入仓库内的启用库位');
         return false;
@@ -7457,7 +8055,7 @@ createApp({
     function applyXferDefaultToLoc() {
       const code = String(form.toLoc || '').trim();
       if (!code) return;
-      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      const hit = findEnabledLoc(code);
       if (!hit || hit.warehouse !== xferToWhName.value) return;
       form.toLoc = hit.code;
       (scanRows.value || []).forEach(r => {
@@ -7467,7 +8065,7 @@ createApp({
     function onXferToLocChange(row) {
       const code = String(row.toLoc || '').trim();
       if (!code) return;
-      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      const hit = findEnabledLoc(code);
       if (!hit || hit.warehouse !== xferToWhName.value) {
         ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
         row.toLoc = '';
@@ -7526,7 +8124,7 @@ createApp({
         ElementPlus.ElMessage.error('请选择来源库位');
         return false;
       }
-      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      const hit = findEnabledLoc(code);
       if (!hit || hit.warehouse !== xferFromWhName.value) {
         ElementPlus.ElMessage.error('来源库位须为调出仓库内的启用库位');
         form.loc = '';
@@ -7544,7 +8142,7 @@ createApp({
         ElementPlus.ElMessage.error('请选择调入侧目标库位');
         return false;
       }
-      const hit = (CFG.locRows || []).find(l => l.code === code && l.status === '启用');
+      const hit = findEnabledLoc(code);
       if (!hit || hit.warehouse !== xferToWhName.value) {
         ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
         form.toLoc = '';
@@ -7731,48 +8329,6 @@ createApp({
       });
       form.tankBarcode = '';
       toast('已添加储罐明细');
-    }
-    function scanTankerBarcode() {
-      if (!isInTankDoc.value) return;
-      const code = String(form.barcode || form.pkgNo || '').trim();
-      if (!code) return;
-      const arch = (CFG.tankerSerialRows || []).find(r => r.barcode === code || r.pkgNo === code);
-      if (!arch) {
-        ElementPlus.ElMessage.error('未找到槽车流水码档案');
-        return;
-      }
-      if (arch.stockStatus !== '初始化') {
-        ElementPlus.ElMessage.error('槽车流水码库存状态必须为「初始化」');
-        return;
-      }
-      const matCode = archMaterialCode(arch);
-      if (matCode !== (currentLine.value && currentLine.value.code)) {
-        ElementPlus.ElMessage.error('槽车流水码物料与当前单据行物料不一致');
-        return;
-      }
-      if (String(arch.step || '').trim()) {
-        ElementPlus.ElMessage.error('槽车流水码当前步骤已被占用（非空），禁止扫入');
-        return;
-      }
-      if (String(arch.lot || '') !== String((currentLine.value && currentLine.value.lot) || '')) {
-        ElementPlus.ElMessage.error('槽车流水码批号与当前单据行物料批号不一致');
-        return;
-      }
-      form.barcode = arch.barcode;
-      form.pkgNo = arch.pkgNo || '';
-      form.lotIn = arch.lot || form.lotIn;
-      form.prodDate = arch.prodDate || form.prodDate;
-      form.validMonths = Number(arch.validPeriod || form.validMonths || 12);
-      form.maker = arch.maker || form.maker;
-      form.qty = Number(arch.qty || form.qty || 0);
-      ElementPlus.ElMessage.success('已关联槽车流水码，原料信息已自动填充');
-      // 过程占用：当前步骤=业务短名，当前单据号=通知单号
-      const n = currentNotice.value;
-      const step = isTrustRecvTank.value ? '受托收料' : (isOsRecvTank.value ? '委外收货' : '采购入库');
-      arch.step = step;
-      arch.docNo = (n && n.id) || '';
-      flushSerialArchToPcMock();
-      autosaveAfterScan();
     }
     function onPoInTankNoChange() {
       const hit = (CFG.tankArchRows || []).find(t => t.tankNo === form.tankNo);
@@ -8185,7 +8741,7 @@ createApp({
         }
       });
       if (form.barcode) {
-        const tanker = (CFG.tankerSerialRows || CFG.serialArchRows || []).find(t => t.barcode === form.barcode);
+        const tanker = findSerialArch(form.barcode);
         if (tanker) {
           if (final) {
             tanker.stockStatus = '仓库';
@@ -8873,7 +9429,7 @@ createApp({
         ElementPlus.ElMessage.success('生产领料申请单修改成功');
       } else {
         const id = 'SCLSQ' + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
-        const created = Object.assign({ id }, payload);
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
         list.unshift(created);
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
         syncProdPickNoticeToPc(created);
@@ -9443,7 +9999,7 @@ createApp({
         ElementPlus.ElMessage.success('生产退料申请单已更新');
       } else {
         const id = 'SCTSQ' + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
-        const created = Object.assign({ id }, payload);
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
         list.unshift(created);
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
         syncProdRetNoticeToPc(created);
@@ -9695,6 +10251,7 @@ createApp({
         packSpec: isInTankDoc.value ? '槽车散装/储罐' : (isCountFlow ? '计数/无包材' : '吨袋+托架'),
         lines: (poInForm.lines || []).map((ln, i) => ({
           lineNo: i + 1,
+          id: (poInForm.id ? poInForm.id + '-l' + (i + 1) : ''),
           status: ln.status || '待执行',
           code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit, lot: ln.lot,
           remark: ln.remark || '—', manageMode: isCountFlow ? '计数管理' : (ln.manageMode || manageModeDefault),
@@ -9728,7 +10285,8 @@ createApp({
         const prefix = isTrustRecvDoc.value ? 'STST'
           : (isOsIssueDoc.value ? 'WWFT' : (isOsRmaDoc.value ? 'WWTH' : (isOsRecvDoc.value ? 'WWST' : (isOsRetDoc.value ? 'WWTT' : (isPoRetDoc.value ? 'CGTT' : 'CGST')))));
         const id = prefix + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
-        const created = Object.assign({ id }, payload);
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
+        created.lines = (created.lines || []).map((ln) => Object.assign(ln, { id: id + '-l' + ln.lineNo }));
         list.unshift(created);
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
         if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
@@ -12805,7 +13363,8 @@ createApp({
       showFlowAutosaveToast(true);
       return true;
     }
-    function autoSavePoInExec() {
+    function autoSavePoInExec(opts) {
+      opts = opts || {};
       if (isProdInSerial.value) {
         const hasProgress = !!(form.loc || form.remark || (scanRows.value && scanRows.value.length));
         if (!hasProgress) return false;
@@ -12813,7 +13372,7 @@ createApp({
         const line = currentLine.value;
         if (n && (scanRows.value.length || form.loc)) n.status = '执行中';
         if (line && (scanRows.value.length || form.loc)) line.status = '执行中';
-        showFlowAutosaveToast(true);
+        if (!opts.silent) showFlowAutosaveToast(true);
         return true;
       }
       if (isInSerialDoc.value && form.loc && !findEnabledLoc(form.loc)) {
@@ -12826,11 +13385,11 @@ createApp({
       if (n && (scanRows.value.length || form.loc)) n.status = '执行中';
       if (line && (scanRows.value.length || form.loc)) line.status = '执行中';
       if (isTrustRecvSerial.value) {
-        showFlowAutosaveToast(true);
+        if (!opts.silent) showFlowAutosaveToast(true);
         return true;
       }
       if (isProdInSerial.value) {
-        showFlowAutosaveToast(true);
+        if (!opts.silent) showFlowAutosaveToast(true);
         return true;
       }
       if (form.loc && scanRows.value.length) {
@@ -12855,7 +13414,7 @@ createApp({
           },
         });
       }
-      showFlowAutosaveToast(true);
+      if (!opts.silent) showFlowAutosaveToast(true);
       return true;
     }
     function openWaybillAdd() {
@@ -13096,7 +13655,17 @@ createApp({
       view.value = 'waybill-sign';
     }
     function openEnroute() {
-      if (currentNotice.value.status !== '运输中') { ElementPlus.ElMessage.warning('仅运输中的运单可更新在途信息'); return; }
+      syncWaybillStatusFromPoints(currentNotice.value);
+      if (!canWaybillEnroute.value) {
+        ElementPlus.ElMessage.warning('请先完成提货确认后再更新在途信息');
+        return;
+      }
+      if (currentNotice.value && ['待运输', '待发运', '待运送'].includes(currentNotice.value.status)) {
+        currentNotice.value.status = '运输中';
+        if (STORE && currentNotice.value.id) {
+          STORE.setDocStatus(currentNotice.value.id, '运输中', { source: 'APP', action: 'enroute-open' });
+        }
+      }
       wayBackView.value = 'waybill-enroute';
       wayPhotos.value = [];
       const due = (currentNotice.value.unloads && currentNotice.value.unloads[0] && currentNotice.value.unloads[0].due) || currentNotice.value.eta || '';
@@ -13135,15 +13704,28 @@ createApp({
           lines.forEach(l => { l.confirmed = true; });
         wayPoint.value.status = '已确认';
           const wbId = currentNotice.value && currentNotice.value.id;
-          if (currentNotice.value.status === '待运输' || currentNotice.value.status === '待发运') {
+          // 任一装货点提货完成 → 运单进入运输中（可更新在途）
+          if (!['已签收', '已完成', '已关闭', '运输中'].includes(currentNotice.value.status)) {
             currentNotice.value.status = '运输中';
           }
+          syncWaybillStatusFromPoints(currentNotice.value);
           if (STORE && wbId) {
             STORE.setPointStatus(wbId, wayPoint.value.id, '已确认', { source: 'APP', action: 'pickup' });
             STORE.setDocStatus(wbId, currentNotice.value.status, { source: 'APP', action: 'pickup' });
             STORE.patchDoc(wbId, { 实际装货时间: nowStamp() });
             STORE.appendFlow({ docId: wbId, type: '提货确认', source: 'APP', summary: `装货点 ${wayPoint.value.id || ''} 已确认提货` });
           }
+          // 同步 PC 运单状态，避免下次 hydrate 冲回「待运输」
+          try {
+            const mock = STORE && STORE.loadMock ? STORE.loadMock() : null;
+            const pcList = mock && mock['lg-waybill'] && mock['lg-waybill'].main;
+            const pc = Array.isArray(pcList) ? pcList.find((r) => r && r['运单号'] === wbId) : null;
+            if (pc && STORE && STORE.saveMock) {
+              pc['状态'] = currentNotice.value.status === '运输中' ? '运输中' : (pc['状态'] || '运输中');
+              if (currentNotice.value.status === '运输中') pc['实际装货时间'] = nowStamp();
+              STORE.saveMock(mock);
+            }
+          } catch (e) { /* ignore */ }
           ElementPlus.ElMessage.success('提货确认已提交');
         view.value = 'waybill-exec';
         };
@@ -13393,13 +13975,13 @@ createApp({
         const toCode = String(form.toLoc || '').trim();
         const lot = String(form.lotIn || '').trim();
         if (!fromCode) { ElementPlus.ElMessage.error('请选择来源库位'); return; }
-        const fromHit = (CFG.locRows || []).find(l => l.code === fromCode && l.status === '启用');
+        const fromHit = findEnabledLoc(fromCode);
         if (!fromHit || fromHit.warehouse !== xferFromWhName.value) {
           ElementPlus.ElMessage.error('来源库位须为调出仓库内的启用库位');
           return;
         }
         if (!toCode) { ElementPlus.ElMessage.error('请选择调入侧目标库位'); return; }
-        const toHit = (CFG.locRows || []).find(l => l.code === toCode && l.status === '启用');
+        const toHit = findEnabledLoc(toCode);
         if (!toHit || toHit.warehouse !== xferToWhName.value) {
           ElementPlus.ElMessage.error('目标库位须为调入仓库内的启用库位');
           return;
@@ -14760,7 +15342,7 @@ createApp({
       operator, tanks, scanRows, tankRows, innerRows, form, procForm,
       recommendVisible, lotDetailVisible, lotDetailRows, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
-      signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute,
+      signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute, canWaybillEnroute, toDatetimeLocal, fromDatetimeLocal,
       flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,

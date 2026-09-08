@@ -782,10 +782,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         </el-breadcrumb>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html" class="on">PC</a>
-            <a href="./app.html">APP</a>
+            <a href="././pc.html" class="on">PC</a>
+            <a href="././app.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -1049,7 +1049,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
             <div v-else class="demo-table-scroll">
             <el-table class="demo-data-table demo-data-table--striped" :data="formLineRows" border stripe style="width:100%" max-height="280" @selection-change="rows => formLineSelected = rows">
               <el-table-column v-if="!isBcSerialPage()" type="selection" width="48"></el-table-column>
-              <el-table-column type="index" :label="['lg-dispatch','lg-ship','lg-waybill'].includes(pageId)?'行号':'序号'" width="72"></el-table-column>
+              <el-table-column v-if="usesErpLineNoCol()" prop="行号" label="行号" width="72"></el-table-column>
+              <el-table-column v-else type="index" :label="['lg-dispatch','lg-ship','lg-waybill'].includes(pageId)?'行号':'序号'" width="72"></el-table-column>
               <el-table-column v-for="f in activeFormLineFields" :key="f.name" :min-width="formLineColMinWidth(f)" show-overflow-tooltip>
                 <template #header>
                   <span v-if="f.required" class="line-col-req">*</span>{{ f.name }}
@@ -1068,7 +1069,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
                     </el-input>
                     <el-input v-else readonly placeholder="请选择合格流水码档案" @click="openPicker('批号', row)" :model-value="row[f.name]||''"></el-input>
                   </template>
-                  <el-input v-else-if="f.type==='picker' || (f.name==='物料信息' && !row[f.name])" readonly placeholder="请选择" @click="openPicker(f.name, row)"></el-input>
+                  <el-input v-else-if="f.type==='picker' || (f.name==='物料信息' && !row[f.name])" readonly :placeholder="(pageId==='wh-so-ret' && f.name==='批号' && formModel['关联销售出库单'] && formModel['关联销售出库单']!=='—') ? '请选择原出库流水码档案（厂外）' : '请选择'" @click="openPicker(f.name, row)"></el-input>
                   <el-select v-else-if="f.type==='select'" v-model="row[f.name]" placeholder="请选择" style="width:100%" filterable clearable>
                     <el-option v-for="opt in formLineSelectOptions(f, row)" :key="opt" :label="opt" :value="opt"></el-option>
                   </el-select>
@@ -1234,7 +1235,9 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           </div>
         </div>
         <el-table class="demo-data-table demo-data-table--striped" :data="detailLineRows" border stripe style="width:100%" max-height="280">
-          <el-table-column type="index" label="行号" width="72"></el-table-column>
+          <el-table-column prop="行号" label="行号" width="72">
+            <template #default="{ row, $index }">{{ row['行号'] || row._rowNo || String(($index+1)*10) }}</template>
+          </el-table-column>
           <el-table-column v-for="f in detailLineFields" :key="f.name" :label="f.name" :width="fitColWidth(f.name,f.name,detailLineRows)" :min-width="fitColWidth(f.name,f.name,detailLineRows)" show-overflow-tooltip>
             <template #default="{ row }">
               <el-button v-if="isBizLinkField(f.name) && row[f.name] && row[f.name]!=='—'" link type="primary" @click="onBizLink(f.name, row[f.name])">{{ row[f.name] }}</el-button>
@@ -1265,7 +1268,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         </div>
         <el-table class="demo-data-table demo-data-table--striped" :data="detailLineRows" border stripe style="width:100%" max-height="320" @selection-change="rows => detailLineSelected = rows">
           <el-table-column v-if="page.detailLineSelectable" type="selection" width="48"></el-table-column>
-          <el-table-column type="index" :label="['lg-dispatch','lg-ship','lg-pickup','lg-sign'].includes(pageId)?'行号':'序号'" width="72"></el-table-column>
+          <el-table-column v-if="usesErpLineNoCol()" prop="行号" label="行号" width="72"></el-table-column>
+          <el-table-column v-else type="index" :label="['lg-dispatch','lg-ship','lg-pickup','lg-sign'].includes(pageId)?'行号':'序号'" width="72"></el-table-column>
           <el-table-column v-for="f in detailLineFields" :key="f.name" :prop="f.name" :label="f.name" :width="fitColWidth(f.name,f.name,detailLineRows)" :min-width="fitColWidth(f.name,f.name,detailLineRows)" show-overflow-tooltip>
             <template #default="{ row }">
               <span v-if="f.name==='检查结果' || f.name==='行状态'" class="tag" :class="tagClass(row[f.name])">{{ row[f.name] || '—' }}</span>
@@ -1941,20 +1945,44 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         <h4 class="demo-form-section__title"><span>三、源头业务订单与前置单据关联</span></h4>
         <div class="demo-form-grid">
           <el-form-item v-if="splitNeedsOrder" label="订单类型" required>
-            <el-select v-model="splitForm.订单类型" placeholder="请选择" style="width:100%" @change="onSplitOrderTypeChange">
-              <el-option v-for="o in ['销售订单','采购订单','委外加工订单','无']" :key="o" :label="o" :value="o"></el-option>
-            </el-select>
+            <el-input :model-value="splitForm.订单类型||'—'" disabled placeholder="继承派车申请单，不可修改"></el-input>
           </el-form-item>
           <el-form-item v-if="splitNeedsOrder && splitForm.订单类型 && splitForm.订单类型!=='无'" label="订单号" required>
-            <el-input v-model="splitForm.订单号" readonly placeholder="弹窗选择订单">
-              <template #append><el-button @click="openSplitPicker('订单号')">选</el-button></template>
-            </el-input>
+            <el-input :model-value="splitForm.订单号||'—'" disabled placeholder="继承派车申请单，不可修改"></el-input>
           </el-form-item>
-          <el-form-item v-if="splitShowPreDoc" label="前置关联单据" :required="splitPreDocRequired">
-            <el-input v-model="splitForm.前置关联单据" readonly :placeholder="splitPreDocRequired ? '请选择销售出库单' : '可选预出货单'">
+          <template v-if="splitShowSoShipPreDocs">
+            <el-form-item label="关联销售备货单">
+              <el-input v-model="splitForm.关联销售备货单" readonly placeholder="请点击选择">
+                <template #append>
+                  <el-button @click="openSplitPicker('关联销售备货单')">选</el-button>
+                  <el-button v-if="splitForm.关联销售备货单" @click="splitForm.关联销售备货单=''">清</el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item label="关联销售预出货单">
+              <el-input v-model="splitForm.关联销售预出货单" readonly placeholder="请点击选择">
+                <template #append>
+                  <el-button @click="openSplitPicker('关联销售预出货单')">选</el-button>
+                  <el-button v-if="splitForm.关联销售预出货单" @click="splitForm.关联销售预出货单=''">清</el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+          </template>
+          <template v-else-if="splitShowSoPreoutPrepDoc">
+            <el-form-item label="关联销售备货单">
+              <el-input v-model="splitForm.关联销售备货单" readonly placeholder="请点击选择备货通知单（选填）">
+                <template #append>
+                  <el-button @click="openSplitPicker('关联销售备货单')">选</el-button>
+                  <el-button v-if="splitForm.关联销售备货单" @click="splitForm.关联销售备货单=''">清</el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+          </template>
+          <el-form-item v-else-if="splitShowPreDoc" label="前置关联单据">
+            <el-input v-model="splitForm.前置关联单据" readonly placeholder="请选择销售出库单（选填）">
               <template #append>
                 <el-button @click="openSplitPicker('前置关联单据')">选</el-button>
-                <el-button v-if="!splitPreDocRequired && splitForm.前置关联单据" @click="splitForm.前置关联单据=''">清</el-button>
+                <el-button v-if="splitForm.前置关联单据" @click="splitForm.前置关联单据=''">清</el-button>
               </template>
             </el-input>
           </el-form-item>
@@ -2001,6 +2029,11 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
                 </template>
               </el-table-column>
               <el-table-column prop="需求数量" label="需求数量" width="100"></el-table-column>
+              <el-table-column label="计划件数" width="100">
+                <template #default="{ row }">
+                  <el-input v-model="row['计划件数']" size="small" placeholder="选填"></el-input>
+                </template>
+              </el-table-column>
               <el-table-column prop="已拆数量" label="已拆数量" width="100"></el-table-column>
               <el-table-column prop="未拆数量" label="未拆数量" width="100"></el-table-column>
               <el-table-column label="本次发货数量" width="140">
@@ -2335,15 +2368,15 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.280"></script>
-<script src="./js/page-configs.js?v=1.3.245"></script>
-<script src="./js/mock-rows.js?v=1.3.245"></script>
+<script src="./js/demo-announcements.js?v=1.3.309"></script>
+<script src="./js/page-configs.js?v=1.3.308"></script>
+<script src="./js/mock-rows.js?v=1.3.309"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/page-prd-notes.js"></script>
+<script src="./js/page-prd-notes.js?v=1.3.301"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
-<script src="./js/demo-store.js?v=1.3.277"></script>
+<script src="./js/demo-store.js?v=1.3.298"></script>
 <script>
 const { createApp, ref, computed, reactive, watch, onMounted, onBeforeUnmount, nextTick } = Vue;
 const { ElMessage } = ElementPlus;
@@ -2487,7 +2520,7 @@ const app = createApp({
     const pageId = ref(firstId);
     const page = computed(()=> CFG.pages[pageId.value]);
     const storeTick = ref(0);
-    function bumpStore(){ storeTick.value += 1; if(STORE) STORE.saveMock(MOCK); }
+    function bumpStore(){ syncAllPoReceivedQty(); storeTick.value += 1; if(STORE) STORE.saveMock(MOCK); }
     function resetDemoStore(){
       if(!STORE) return;
       ElementPlus.ElMessageBox.confirm('确认清空 PC/APP 联动缓存？两侧状态将恢复为初始 Mock。','重置联动数据',{
@@ -2729,7 +2762,7 @@ const app = createApp({
     const splitRow = ref({});
     const splitLines = ref([]);
     const splitLineSelected = ref([]);
-    const splitForm = reactive({ 订单类型:'', 订单号:'', 前置关联单据:'', 采购订单:'', 合同号:'', 装货点:'', 装货联系人:'', 装货联系电话:'', 卸货点:'', 卸货联系人:'', 卸货联系电话:'', 计划装货时间:'', 要求送达时间:'', 备注:'' });
+    const splitForm = reactive({ 订单类型:'', 订单号:'', 关联销售备货单:'', 关联销售预出货单:'', 前置关联单据:'', 采购订单:'', 合同号:'', 装货点:'', 装货联系人:'', 装货联系电话:'', 卸货点:'', 卸货联系人:'', 卸货联系电话:'', 计划装货时间:'', 要求送达时间:'', 备注:'' });
     const splitPickerMode = ref(false);
     const dispatchAuditVisible = ref(false);
     const dispatchAuditRow = ref({});
@@ -3097,11 +3130,12 @@ const app = createApp({
     function isFormFieldVisible(f){
       if(!f) return false;
       if(pageId.value==='lg-dispatch'){
-        if(f.name==='采购订单') return formModel['配送类型']==='直发业务（贸易）';
-        if(f.name==='前置关联单据'){
-          const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
-          return biz==='销售发货' || biz==='销售退货';
-        }
+        const whBiz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        if(f.name==='配送类型') return whBiz==='销售发货';
+        if(f.name==='采购订单') return whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）';
+        if(f.name==='关联销售备货单') return whBiz==='销售发货' || whBiz==='销售预出货';
+        if(f.name==='关联销售预出货单') return whBiz==='销售发货';
+        if(f.name==='前置关联单据') return whBiz==='销售退货';
         if(f.name==='订单号'){
           const ot = formModel['订单类型'] || '';
           return !!ot && ot!=='无';
@@ -3137,12 +3171,15 @@ const app = createApp({
     }
     function isFormFieldRequired(f){
       if(!f) return false;
-      if(f.name==='采购订单' && formModel['配送类型']==='直发业务（贸易）') return true;
-      if(pageId.value==='lg-dispatch' && (f.name==='订单类型' || f.name==='订单号') && dispatchNeedsOrderNo()) return true;
-      if(pageId.value==='lg-dispatch' && f.name==='前置关联单据'){
+      if(f.name==='配送类型'){
         const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
-        return biz==='销售退货';
+        return biz==='销售发货';
       }
+      if(f.name==='采购订单'){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        return biz==='销售发货' && formModel['配送类型']==='直发业务（贸易）';
+      }
+      if(pageId.value==='lg-dispatch' && (f.name==='订单类型' || f.name==='订单号') && dispatchNeedsOrderNo()) return true;
       if(pageId.value==='wh-prod-issue' && f.name==='领至线边仓'){
         return formModel['领料类型'] !== '备品备件领料';
       }
@@ -3545,6 +3582,50 @@ const app = createApp({
       });
       return lots;
     }
+    function soOutFlowModule(outNo){
+      const no = codeOf(outNo);
+      if(!no) return '';
+      return no.startsWith('CKYC') ? 'wh-so-preout' : 'wh-so-ship';
+    }
+    function soOutFlowRows(outNo, matCode){
+      const no = codeOf(outNo);
+      if(!no) return [];
+      const pid = soOutFlowModule(no);
+      const mat = codeOf(matCode);
+      return (((MOCK[pid]||{}).tab3)||[]).filter(r=>{
+        if(codeOf(r['出库单号'])!==no) return false;
+        if(mat && codeOf(r['物料信息'])!==mat) return false;
+        const st = String(r['流水状态']||'');
+        return st==='已完成' || st==='执行中';
+      });
+    }
+    function soRetSerialArchRows(outNo, matCode){
+      const flows = soOutFlowRows(outNo, matCode);
+      const barcodes = new Set(flows.map(r=> String(r['条码号']||'').trim()).filter(Boolean));
+      if(!barcodes.size) return [];
+      const mat = codeOf(matCode);
+      let rows = (((MOCK['serial-arch']||{}).main)||[]).filter(r=>{
+        const bc = String(r['条码号']||'').trim();
+        if(!barcodes.has(bc)) return false;
+        if(r['使用状态']==='报废') return false;
+        if(mat && codeOf(r['物料信息'])!==mat) return false;
+        return true;
+      });
+      const factoryOut = rows.filter(r=> String(r['库存状态']||'')==='厂外');
+      if(factoryOut.length) return factoryOut;
+      const retOk = rows.filter(r=> ['厂外','初始化'].includes(String(r['库存状态']||'')));
+      if(retOk.length) return retOk;
+      return flows.map(f=>({
+        条码号: f['条码号'],
+        物料批号: f['批号'] || f['物料批号'] || '',
+        物料信息: f['物料信息'] || '',
+        库存单位: f['库存单位'] || 'KG',
+        库存状态: '厂外',
+        使用状态: '在用',
+        检验状态: '合格',
+        _flowOnly: true
+      }));
+    }
     function isDirectXferPage(){
       return pageId.value==='wh-direct-xfer';
     }
@@ -3804,12 +3885,80 @@ const app = createApp({
     function canEditPo(row){
       return (row?.['订单状态'] || '')==='待执行';
     }
+    function parseErpLineNo(v){
+      const m = String(v||'').match(/^(\d+)/);
+      return m ? Number(m[1]) : 0;
+    }
+    function erpLineNo(n){ return String(Math.max(1, Number(n)||1) * 10); }
+    function nextErpLineNo(lines){
+      const nums = (lines||[]).map(r=> parseErpLineNo(r['行号'] || r._orderLineNo)).filter(n=> n>0);
+      return String((nums.length ? Math.max(...nums) : 0) + 10);
+    }
+    /** 订单行号基底：取 10 / 20；若已是拆分串 10-1 则只取前缀 10 */
+    function orderLineNoBase(r, fallbackIdx){
+      const raw = String((r && (r._orderLineNo || r['行号'])) || '').trim();
+      if(raw && raw!=='—'){
+        const m = raw.match(/^(\d+)/);
+        if(m) return m[1];
+      }
+      return fallbackIdx != null ? erpLineNo(fallbackIdx) : '';
+    }
+    function ensureLineNos(lines){
+      return (lines||[]).map((r,i)=>{
+        const ln = String((r && (r['行号'] || r._orderLineNo)) || '').trim();
+        if(ln && ln!=='—'){
+          return Object.assign({}, r, {
+            行号: ln,
+            _orderLineNo: r._orderLineNo || orderLineNoBase(r, i+1)
+          });
+        }
+        const base = erpLineNo(i+1);
+        return Object.assign({}, r, { 行号: base, _orderLineNo: base });
+      });
+    }
+    function lineNoOf(r, fallbackIdx){
+      const base = orderLineNoBase(r, fallbackIdx);
+      if(base) return base;
+      return fallbackIdx != null ? erpLineNo(fallbackIdx) : '10';
+    }
+    function usesErpLineNoCol(){
+      return ['po','so','wwpo','lg-dispatch','lg-ship','lg-pickup','lg-sign'].includes(pageId.value) || isWhNoticePage();
+    }
+    /** 退货/退料类关联仓储业务：选来源订单允许已完成/已关闭 */
+    function isReturnOrRetWhBiz(biz){
+      const b = String(biz||'').trim();
+      return ['采购退料','销售退货','委外退货','委外退料','受托退料'].includes(b);
+    }
+    function dispatchOrderStatusOk(st, biz){
+      const s = String(st||'').trim();
+      if(isReturnOrRetWhBiz(biz)) return ['执行中','已完成','已关闭'].includes(s);
+      return ['待执行','执行中'].includes(s);
+    }
+    function dispatchBizForOrderPicker(){
+      if(splitPickerMode.value) return splitBizOf() || '';
+      return formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+    }
+    function waybillCarrierFields(wayNo){
+      const way = findWaybillSrc(wayNo);
+      if(!way) return {};
+      const plate = way['车牌号'] && way['车牌号']!=='—' ? String(way['车牌号']) : '—';
+      const veh = plate && plate!=='—' ? ((MOCK.vehicle||{}).main||[]).find(v=> v['车牌号']===plate) : null;
+      return {
+        车牌号: plate,
+        车挂号: (way['车挂号'] && way['车挂号']!=='—') ? String(way['车挂号']) : '—',
+        司机姓名: (way['司机姓名'] && way['司机姓名']!=='—') ? String(way['司机姓名']) : '—',
+        司机电话: (way['司机电话'] && way['司机电话']!=='—') ? String(way['司机电话']) : '—',
+        司机身份证号: (veh && veh['司机身份证号'] && veh['司机身份证号']!=='—') ? String(veh['司机身份证号']) : '—'
+      };
+    }
     function canEditSo(row){
       return (row?.['订单状态'] || '')==='待执行';
     }
     function normPoFormLine(r,i){
+      const idx = i != null ? i : 0;
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料编码: r['物料编码']||codeOf(r['物料信息']),
         物料信息: r['物料信息']||matInfoText(r['物料编码']||r['物料信息']),
         采购单位: r['采购单位']||matUnit(r['物料编码']||r['物料信息'],'po'),
@@ -3819,11 +3968,13 @@ const app = createApp({
       };
     }
     function normPoDetailLine(r,i){
+      const idx = i != null ? i : 0;
       const plan = Number(r['计划数量'])||0;
       const inQty = Number(r['已入库数量'] ?? r['已入库'])||0;
       const pcs = String(r['计划件数'] ?? '').trim();
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料编码: r['物料编码']||codeOf(r['物料信息']),
         物料信息: r['物料信息']||matInfoText(r['物料编码']||r['物料信息']),
         采购单位: r['采购单位']||matUnit(r['物料编码']||r['物料信息'],'po'),
@@ -3836,8 +3987,10 @@ const app = createApp({
       };
     }
     function normSoFormLine(r,i){
+      const idx = i != null ? i : 0;
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料编码: r['物料编码']||codeOf(r['物料信息']),
         物料信息: r['物料信息']||matInfoText(r['物料编码']||r['物料信息']),
         销售单位: r['销售单位']||matUnit(r['物料编码']||r['物料信息'],'so'),
@@ -3847,11 +4000,13 @@ const app = createApp({
       };
     }
     function normSoDetailLine(r,i){
+      const idx = i != null ? i : 0;
       const plan = Number(r['计划数量'])||0;
       const outQty = Number(r['已出库数量'])||0;
       const pcs = String(r['计划件数'] ?? '').trim();
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料编码: r['物料编码']||codeOf(r['物料信息']),
         物料信息: r['物料信息']||matInfoText(r['物料编码']||r['物料信息']),
         销售单位: r['销售单位']||matUnit(r['物料编码']||r['物料信息'],'so'),
@@ -3871,6 +4026,98 @@ const app = createApp({
       else if(sts.every(s=> s==='已关闭' || s==='已完成')) order['订单状态']='已关闭';
       else if(sts.some(s=> s==='执行中' || s==='已完成' || s==='已关闭')) order['订单状态']='执行中';
       else order['订单状态']='待执行';
+    }
+    /** 按订单行号汇总采购收料通知已完成数量，回写 PO「已入库数量」 */
+    function syncPoReceivedQtyFromNotices(poCode){
+      const c = codeOf(poCode);
+      if(!c) return;
+      const po = poOrderOf(c);
+      if(!po || !Array.isArray(po._lines)) return;
+      const qtyByLine = new Map();
+      ((MOCK['wh-po-in']||{}).tab1||[]).forEach(notice=>{
+        if(codeOf(notice['关联采购订单']) !== c) return;
+        (notice._lines||[]).forEach(ln=>{
+          const base = orderLineNoBase(ln);
+          if(!base) return;
+          const done = Number(String(ln['已完成数量']||'').replace(/[^\d.]/g,''))||0;
+          qtyByLine.set(base, (qtyByLine.get(base)||0) + done);
+        });
+      });
+      po._lines.forEach(ln=>{
+        const base = orderLineNoBase(ln);
+        const plan = Number(ln['计划数量'])||0;
+        const inQty = qtyByLine.get(base)||0;
+        ln['已入库数量'] = String(inQty);
+        ln['未入库数量'] = String(Math.max(0, plan - inQty));
+        if(plan > 0 && inQty >= plan) ln['行状态'] = '已完成';
+        else if(inQty > 0) ln['行状态'] = '执行中';
+        else if(!ln['行状态'] || ln['行状态']==='已完成') ln['行状态'] = '待执行';
+      });
+      syncPoStatusFromLines(po);
+    }
+    function syncAllPoReceivedQty(){
+      ((MOCK.po||{}).main||[]).forEach(o=> syncPoReceivedQtyFromNotices(o['采购订单号']));
+    }
+    /** 采购收料通知单：物料编码 + 批号在单内唯一 */
+    function assertPoInLineMatLotUnique(lines){
+      const seen = new Set();
+      for(const r of (lines||[])){
+        const lot = String(r['批号']||'').trim();
+        if(!lot || lot==='—'){ ElMessage.warning('请填写批号'); return false; }
+        const key = codeOf(r['物料信息']) + '|' + lot;
+        if(seen.has(key)){ ElMessage.warning('同一物料+批号不可重复添加'); return false; }
+        seen.add(key);
+      }
+      return true;
+    }
+    function nextQcInspectNo(){
+      const d = new Date();
+      const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+      const prefix = 'QC' + ymd;
+      const list = ((MOCK['qc-ledger']||{}).main||[]);
+      let max = 0;
+      list.forEach(r=>{
+        const s = String(r['检验单号']||'');
+        if(s.startsWith(prefix)){
+          const n = parseInt(s.slice(prefix.length), 10);
+          if(Number.isFinite(n) && n>max) max = n;
+        }
+      });
+      return prefix + String(max + 1).padStart(2,'0');
+    }
+    /** 采购收料通知单保存后：每行物料自动生成一条来料检验台账（物料与批号一一对应） */
+    function syncQcLedgerFromPoInNotice(noticeNo, lines){
+      const no = String(noticeNo||'').trim();
+      if(!no || !(lines||[]).length) return;
+      const bag = (MOCK['qc-ledger'] = MOCK['qc-ledger'] || {});
+      const list = (bag.main = bag.main || []);
+      const kept = list.filter(r=> !(r._autoFromPoIn && String(r['关联单号']||'')===no));
+      const d = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const newRows = (lines||[]).map((r, i)=>{
+        const lot = String(r['批号']||'').trim();
+        const mat = String(r['物料信息']||'').trim() || '—';
+        return {
+          id: 'qc-poin-' + no + '-' + (i+1) + '-' + Date.now(),
+          检验单号: nextQcInspectNo(),
+          关联单号: no,
+          检验类型: '来料检验',
+          物料信息: mat,
+          批次号: lot,
+          物料批次号: lot,
+          抽样数量: '0',
+          报检时间: now,
+          报检人: '张三',
+          检验日期: '',
+          质检员: '',
+          检验判定: '待判定',
+          备注: '—',
+          _autoFromPoIn: true,
+          _poInLineId: r.id || ('L' + (i+1))
+        };
+      });
+      bag.main = newRows.concat(kept);
     }
     function syncSoStatusFromLines(order){
       const lines = order._lines||[];
@@ -3899,15 +4146,15 @@ const app = createApp({
     }
     function soLinesAsForm(soCode){
       const hit = soOrderOf(soCode);
-      if(hit && hit._lines && hit._lines.length) return hit._lines.map(normSoFormLine);
+      if(hit && hit._lines && hit._lines.length) return ensureLineNos(hit._lines).map((r,i)=> normSoFormLine(r,i));
       const fallback = matInfoText('FG-Li2CO3-BG');
-      return [{ _i:1, 物料信息: fallback, 销售单位:'KG', 计划数量:'100', 备注:'' }];
+      return [{ _i:1, 行号:'10', 物料信息: fallback, 销售单位:'KG', 计划数量:'100', 备注:'' }];
     }
     function poLinesAsForm(poCode){
       const hit = poOrderOf(poCode);
-      if(hit && hit._lines && hit._lines.length) return hit._lines.map(normPoFormLine);
+      if(hit && hit._lines && hit._lines.length) return ensureLineNos(hit._lines).map((r,i)=> normPoFormLine(r,i));
       const fallback = matInfoText('RM-Li2CO3-BG');
-      return [{ _i:1, 物料信息: fallback, 采购单位:'KG', 计划数量:'100', 备注:'' }];
+      return [{ _i:1, 行号:'10', 物料信息: fallback, 采购单位:'KG', 计划数量:'100', 备注:'' }];
     }
     function stockSoMap(code){
       const hit = ((MOCK['wh-so-prep']||{}).main||[]).find(r=> r['备货通知单号']===code);
@@ -4174,8 +4421,21 @@ const app = createApp({
       const biz = (formModel && (formModel['关联仓储业务'] || formModel['仓库业务类型'])) || '';
       return !!dispatchOrderTypeForBiz(biz);
     }
+    function syncDispatchDeliveryTypeByBiz(){
+      const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+      if(biz === '销售发货'){
+        if(!formModel['配送类型']) formModel['配送类型'] = '正常业务';
+      } else {
+        formModel['配送类型'] = '';
+        formModel['采购订单'] = '';
+        if(biz !== '销售预出货') formModel['关联销售备货单'] = '';
+        formModel['关联销售预出货单'] = '';
+        formModel['前置关联单据'] = '';
+      }
+    }
     function syncDispatchOrderTypeByBiz(){
       const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+      syncDispatchDeliveryTypeByBiz();
       const need = dispatchOrderTypeForBiz(biz);
       const prev = formModel['订单类型'] || '';
       if(need){
@@ -4198,8 +4458,11 @@ const app = createApp({
       if(!code) return [];
       const toLine = (r, i)=>({
         _i: i+1,
+        行号: lineNoOf(r, i+1),
+        _orderLineNo: lineNoOf(r, i+1),
         物料信息: r['物料信息'] || matInfoText(r),
         需求数量: String(r['计划数量'] || r['需求数量'] || ''),
+        计划件数: r['计划件数'] != null && r['计划件数'] !== '' ? String(r['计划件数']) : '',
         单位: r['单位'] || r['销售单位'] || r['采购单位'] || matUnit(r, orderType==='销售订单' ? 'so' : 'po'),
         '体积(长*宽*高)': r['体积(长*宽*高)'] || '',
         行备注: r['行备注'] || r['备注'] || ''
@@ -4208,28 +4471,117 @@ const app = createApp({
       if(orderType==='采购订单') return poLinesAsForm(code).map(toLine);
       if(orderType==='委外加工单' || orderType==='委外加工订单'){
         const ww = ((MOCK.wwpo||{}).main||[]).find(r=> r['委外订单号']===code);
-        return wwpoLinesOf(ww || {}).map(toLine);
+        return ensureLineNos(wwpoLinesOf(ww || {})).map((r,i)=> toLine(r,i));
       }
       return [];
     }
     function dispatchPreDocKind(bizOverride){
       const biz = bizOverride || formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
-      if(biz==='销售发货') return 'so-ship-pre';
       if(biz==='销售退货') return 'so-ret-pre';
       return '';
+    }
+    function completedSoOutboundRows(soCode){
+      let outs = (((MOCK['wh-so-ship']||{}).tab2)||[]).concat(((MOCK['wh-so-preout']||{}).tab2)||[])
+        .filter(r=> r['单据状态']==='已完成');
+      const so = codeOf(soCode);
+      if(so) outs = outs.filter(r=> codeOf(r['关联销售订单'])===so);
+      return outs;
+    }
+    function wrapSoOutboundPickerRows(rows){
+      return (rows || []).map(r=>{
+        const pid = String(r['出库单号']||'').startsWith('CKYC') ? 'wh-so-preout' : 'wh-so-ship';
+        const tab = 'tab2';
+        const wrapped = wrapPickerModuleRows(pid, [r], '出库单号', '物料信息', tab)[0];
+        return {
+          ...wrapped,
+          名称: (wrapped.名称 || r['物料信息'] || '') + ' / 销售出库单',
+          规格: '销售出库单'
+        };
+      });
+    }
+    function normalizeDispatchSoShipPreDocs(row){
+      const src = row || {};
+      let stock = String(src['关联销售备货单'] || src['关联备货通知单'] || '').trim();
+      let preout = String(src['关联销售预出货单'] || '').trim();
+      const legacy = String(src['前置关联单据'] || '').trim();
+      if(!preout && legacy && /预出货|XSYCH|CKYC/i.test(legacy)) preout = codeOf(legacy);
+      if(!stock && legacy && /BHT|备货/i.test(legacy)) stock = codeOf(legacy);
+      return { 关联销售备货单: stock, 关联销售预出货单: preout };
+    }
+    function soNoticeLinesToDispatchLines(lines){
+      return (lines || []).map((r, i) => ({
+        _i: i + 1,
+        行号: lineNoOf(r, i + 1),
+        _orderLineNo: lineNoOf(r, i + 1),
+        物料信息: r['物料信息'] || matInfoText(r),
+        需求数量: String(r['计划数量'] || r['需求数量'] || r['备货数量'] || r['已完成数量'] || '0'),
+        单位: r['库存单位'] || r['销售单位'] || r['单位'] || matUnit(r, 'so'),
+        '体积(长*宽*高)': r['体积(长*宽*高)'] || '',
+        行备注: (r['备注'] && r['备注'] !== '—') ? r['备注'] : (r['行备注'] || ''),
+      }));
+    }
+    function applyPrepToDispatchForm(prep, no){
+      if(!prep) return false;
+      formModel['关联销售备货单'] = no;
+      const lines = [{
+        物料信息: prep['物料信息'] || matInfoText(prep),
+        计划数量: String(prep['备货数量'] || prep['已备数量'] || prep['计划数量'] || '0'),
+        库存单位: prep['单位'] || prep['库存单位'] || 'KG',
+        备注: prep['备注'] || '',
+      }];
+      formLineRows.value = soNoticeLinesToDispatchLines(lines);
+      return true;
+    }
+    function applyPreoutToDispatchForm(outRow){
+      if(!outRow) return false;
+      const outNo = outRow['出库单号'] || outRow.编码 || '';
+      formModel['关联销售预出货单'] = outNo;
+      const notice = findPreoutNoticeByOut(outRow);
+      if(notice && notice['关联备货通知单'] && notice['关联备货通知单'] !== '—'){
+        formModel['关联销售备货单'] = notice['关联备货通知单'];
+      }
+      let lines = preoutActualLinesOfOut(outNo);
+      if(!lines.length && notice && Array.isArray(notice._lines) && notice._lines.length){
+        const doneQty = String(outRow['已完成数量'] || '').trim();
+        const donePcs = String(outRow['已完成件数'] || '').trim();
+        lines = notice._lines.map(r => ({
+          物料信息: r['物料信息'] || outRow['物料信息'],
+          批号: (r['批号'] && r['批号'] !== '—') ? r['批号'] : '—',
+          库存单位: r['库存单位'] || outRow['库存单位'] || 'KG',
+          计划件数: donePcs || String(r['计划件数'] || '1'),
+          计划数量: doneQty || String(r['已完成数量'] || r['计划数量'] || '0'),
+          备注: r['备注'] || '',
+        }));
+      }
+      if(!lines.length && outRow['物料信息']){
+        lines = [{
+          物料信息: outRow['物料信息'],
+          库存单位: outRow['库存单位'] || 'KG',
+          计划件数: String(outRow['已完成件数'] || '1'),
+          计划数量: String(outRow['已完成数量'] || '0'),
+          备注: '',
+        }];
+      }
+      if(!lines.length) return false;
+      formLineRows.value = soNoticeLinesToDispatchLines(lines);
+      return true;
     }
     function splitBizOf(){
       return (splitRow.value && (splitRow.value['关联仓储业务'] || splitRow.value['仓库业务类型'] || resolveWhBizType(splitRow.value))) || '';
     }
     const splitNeedsOrder = computed(()=> !!dispatchOrderTypeForBiz(splitBizOf()));
-    const splitShowPreDoc = computed(()=> !!dispatchPreDocKind(splitBizOf()));
-    const splitPreDocRequired = computed(()=> splitBizOf()==='销售退货');
+    const splitShowPreDoc = computed(()=> splitBizOf()==='销售退货');
+    const splitShowSoShipPreDocs = computed(()=> splitBizOf()==='销售发货');
+    const splitShowSoPreoutPrepDoc = computed(()=> splitBizOf()==='销售预出货');
+    const splitPreDocRequired = computed(()=> false);
     const splitShowPo = computed(()=>{
       const dt = (splitRow.value && splitRow.value['配送类型']) || '';
       return dt==='直发业务（贸易）' || dt==='供应商直送';
     });
     function onSplitOrderTypeChange(){
       splitForm.订单号 = '';
+      splitForm.关联销售备货单 = '';
+      splitForm.关联销售预出货单 = '';
       splitForm.前置关联单据 = '';
       splitForm.合同号 = '';
     }
@@ -4237,8 +4589,14 @@ const app = createApp({
       if(title==='订单号' && (!splitForm.订单类型 || splitForm.订单类型==='无')){
         ElMessage.warning('请先选择订单类型'); return;
       }
-      if(title==='前置关联单据' && !dispatchPreDocKind(splitBizOf())){
+      if(title==='前置关联单据' && splitBizOf()!=='销售退货'){
         ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return;
+      }
+      if(title==='关联销售预出货单' && splitBizOf()!=='销售发货'){
+        ElMessage.warning('仅销售发货业务可选择预出货出库单'); return;
+      }
+      if(title==='关联销售备货单' && !['销售发货','销售预出货'].includes(splitBizOf())){
+        ElMessage.warning('仅销售发货/销售预出货业务可选择备货通知单'); return;
       }
       splitPickerMode.value = true;
       openPicker(title);
@@ -4249,6 +4607,8 @@ const app = createApp({
       if(!c) return [];
       const toLine = (r, i)=>({
         _i: i+1,
+        行号: lineNoOf(r, i+1),
+        _orderLineNo: lineNoOf(r, i+1),
         物料信息: r['物料信息'] || matInfoText(r),
         需求数量: String(r['计划数量'] || r['需求数量'] || r['备货数量'] || r['已完成数量'] || r['数量'] || ''),
         单位: r['单位'] || r['库存单位'] || r['销售单位'] || matUnit(r, 'so'),
@@ -4263,8 +4623,7 @@ const app = createApp({
         }
       }
       if(kind==='so-ret-pre'){
-        const outs = (((MOCK['wh-so-ship']||{}).tab2)||[]).concat(((MOCK['wh-so-preout']||{}).tab2)||[]);
-        const hit = outs.find(r=> codeOf(r['出库单号'])===c);
+        const hit = completedSoOutboundRows().find(r=> codeOf(r['出库单号'])===c);
         if(hit) return [toLine(hit, 0)];
       }
       return [];
@@ -4273,10 +4632,12 @@ const app = createApp({
       return { _i:i, 物料信息:'', 发货数量:'', 单位:'', '体积(长*宽*高)':'', 批号:'', 行备注:'' };
     }
     function normWwpoFormLine(r, i){
+      const idx = i != null ? i : 0;
       const unit = r['采购单位'] || r['单位'] || matUnit(r,'po');
       const info = matInfoText(r);
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料信息: info,
         物料编码: codeOf(info) || r['物料编码']||'',
         采购单位: unit,
@@ -4286,6 +4647,7 @@ const app = createApp({
       };
     }
     function normWwpoDetailLine(r, i){
+      const idx = i != null ? i : 0;
       const plan = Number(r['计划数量'])||0;
       const done = Number(r['已出/入库数量'] ?? r['已出/收数量'])||0;
       const pcs = String(r['计划件数'] ?? '').trim();
@@ -4296,7 +4658,8 @@ const app = createApp({
         else if(done>=plan && plan>0) lineSt='已完成';
       }
       return {
-        _i: i+1,
+        _i: idx+1,
+        行号: lineNoOf(r, idx+1),
         物料信息: matInfoText(r),
         物料编码: r['物料编码']||codeOf(r['物料信息']),
         单位: r['单位'] || r['采购单位'] || matUnit(r,'po'),
@@ -4331,7 +4694,7 @@ const app = createApp({
       return (row?.['订单状态'] || '')==='待执行';
     }
     function wwpoLinesOf(row){
-      if(row && Array.isArray(row._lines) && row._lines.length) return row._lines.map((r,i)=>normWwpoFormLine(r,i));
+      if(row && Array.isArray(row._lines) && row._lines.length) return ensureLineNos(row._lines).map((r,i)=>normWwpoFormLine(r,i));
       return ((MOCK.wwpo||{}).detailLines || []).map((r,i)=>normWwpoFormLine(r,i));
     }
     function osVendors(){
@@ -4395,10 +4758,16 @@ const app = createApp({
     }
     function shipLinesOf(row){
       const lines = (row && Array.isArray(row._lines) && row._lines.length) ? row._lines : ((MOCK['lg-ship']||{}).detailLines || []);
-      return lines.map(r=>{
+      return lines.map((r,i)=>{
         const qty = shipLineQty(r);
         const signed = shipLineSigned(r);
-        return Object.assign({}, r, { 未签收数量: String(Math.max(0, qty - signed)) });
+        const ln = String(r['行号'] || r._rowNo || '').trim();
+        const displayLn = (ln && ln!=='—') ? ln : erpLineNo(i+1);
+        return Object.assign({}, r, {
+          行号: displayLn,
+          _orderLineNo: r._orderLineNo || orderLineNoBase(r, i+1),
+          未签收数量: String(Math.max(0, qty - signed))
+        });
       });
     }
     function vehicleTypeKey(vt){
@@ -4453,6 +4822,49 @@ const app = createApp({
       if(!meta) return '—';
       return meta.prefix + ymd + String(n).padStart(4,'0');
     }
+    function buildNoticeLineFromShip(shipLine, ctx){
+      const { supplier, planDate, forRet, idx, noticeNo } = ctx;
+      const info = shipLine['物料信息'] || '';
+      const code = codeOf(info);
+      const mr = matListRow(code);
+      const mode = (mr && mr['管理方式']) || '条码管理';
+      const isCount = String(mode).includes('计数');
+      const qtyNum = Number(String(shipLine['发货数量']||'').replace(/[^\d.]/g,''))||0;
+      const planQty = qtyNum > 0 ? String(qtyNum) : String(shipLine['发货数量']||'');
+      let planPcs = String(shipLine['计划件数']||'').trim();
+      if(forRet && isCount) planPcs = '—';
+      else if(!planPcs || !(Number(planPcs)>0)){
+        const q = Number(planQty);
+        planPcs = String(Number.isFinite(q) && q>0 ? Math.max(1, Math.round(q >= 1000 ? q/1000 : q)) : 1);
+      }
+      const ymd = planDate || todayYmdLocal();
+      const ymdCompact = ymd.replace(/-/g,'');
+      let lot = String(shipLine['批号']||'').trim();
+      if(!forRet && (!lot || lot==='—')) lot = ymdCompact + String((idx||0)+1).padStart(3,'0');
+      const lineNo = shipLine['行号'] || shipLine._rowNo || lineNoOf(shipLine, (idx||0)+1);
+      const orderLn = shipLine._orderLineNo || orderLineNoBase(shipLine, (idx||0)+1);
+      const row = {
+        id: noticeNo ? (noticeNo+'-l'+lineNo) : '',
+        行号: lineNo,
+        _orderLineNo: orderLn,
+        行状态: '待执行',
+        物料信息: info,
+        库存单位: shipLine['单位'] || (mr && (mr['库存单位']||mr['基本单位'])) || 'KG',
+        管理方式: mode,
+        计划件数: planPcs,
+        计划数量: planQty,
+        已完成数量: '0',
+        未完成数量: planQty,
+        批号: forRet ? (lot && lot!=='—' ? lot : '') : lot,
+        备注: (shipLine['行备注'] && shipLine['行备注']!=='—') ? shipLine['行备注'] : (shipLine['备注'] && shipLine['备注']!=='—' ? shipLine['备注'] : '')
+      };
+      if(!forRet){
+        row.生产日期 = ymd;
+        row.有效期 = String((mr && (mr['有效期']||mr['保质期'])) || '12');
+        row.生产厂家 = supplier || '';
+      }
+      return row;
+    }
     function createWarehouseNoticeFromShip(ship, wayNo, noticeNo, whBiz){
       const meta = whBizNoticeMeta(whBiz);
       if(!meta || !noticeNo || noticeNo==='—' || !ship) return;
@@ -4467,22 +4879,15 @@ const app = createApp({
       const ordCode = codeOf(ship['订单号']||'');
       const poCode = codeOf(ship['采购订单']||ship['订单号']||'');
       const partyName = String(ship['订单号']||'').split(/\s*\/\s*/)[1]?.trim() || '—';
-      const lines = (ship._lines||[]).map((r,i)=>{
-        const qty = Number(String(r['发货数量']||'').replace(/[^\d.]/g,''))||0;
-        return {
-          id: noticeNo+'-l'+(i+1),
-          行状态: '待执行',
-          物料信息: r['物料信息']||'',
-          库存单位: r['单位']||'KG',
-          管理方式: '条码管理',
-          计划件数: String(qty||''),
-          计划数量: String(qty||''),
-          已完成数量: '0',
-          未完成数量: String(qty||''),
-          批号: r['批号']||'',
-          备注: r['行备注']||'—'
-        };
-      });
+      const forRet = meta.pageId==='wh-po-ret' || meta.pageId==='wh-so-ret' || meta.pageId.startsWith('wh-os-ret');
+      const lines = (ship._lines||[]).map((r,i)=> buildNoticeLineFromShip(r, {
+        supplier: partyName,
+        planDate,
+        forRet,
+        idx: i,
+        noticeNo
+      }));
+      const carrier = waybillCarrierFields(wayNo);
       const base = {
         id: String(list.length+1),
         单据状态: '待执行',
@@ -4496,50 +4901,30 @@ const app = createApp({
         _lines: lines
       };
       if(meta.pageId==='wh-po-in'){
-        Object.assign(base, { 关联采购订单: poCode||ordCode||'—', 供应商名称: partyName, 包装规格:'—' });
+        Object.assign(base, { 关联采购订单: poCode||ordCode||'—', 供应商名称: partyName, 包装规格:'—', ...carrier });
       } else if(meta.pageId==='wh-so-preout'){
-        const way = findWaybillSrc(wayNo);
-        const plate = way && way['车牌号'] && way['车牌号']!=='—' ? String(way['车牌号']) : '—';
-        const veh = plate && plate!=='—' ? ((MOCK.vehicle||{}).main||[]).find(v=> v['车牌号']===plate) : null;
+        const prepNo = ship['关联销售备货单'] || ship['关联备货通知单'] || '';
         Object.assign(base, {
           关联销售订单: ship['订单号']||'—',
           客户名称: partyName || '—',
-          关联备货通知单: '—',
-          车牌号: plate,
-          车挂号: (way && way['车挂号'] && way['车挂号']!=='—') ? String(way['车挂号']) : '—',
-          司机姓名: (way && way['司机姓名']) ? String(way['司机姓名']) : '—',
-          司机电话: (way && way['司机电话']) ? String(way['司机电话']) : '—',
-          司机身份证号: (veh && veh['司机身份证号']) ? String(veh['司机身份证号']) : '—'
+          关联备货通知单: (prepNo && prepNo!=='—') ? prepNo : '—',
+          ...carrier
         });
       } else if(meta.pageId==='wh-so-ship'){
-        const way = findWaybillSrc(wayNo);
-        const plate = way && way['车牌号'] && way['车牌号']!=='—' ? String(way['车牌号']) : '—';
-        const veh = plate && plate!=='—' ? ((MOCK.vehicle||{}).main||[]).find(v=> v['车牌号']===plate) : null;
         Object.assign(base, {
           关联销售订单: ship['订单号']||'—',
           客户名称: partyName || '—',
           关联销售备货单: '—',
           关联销售预出货单: '—',
-          车牌号: plate,
-          车挂号: (way && way['车挂号'] && way['车挂号']!=='—') ? String(way['车挂号']) : '—',
-          司机姓名: (way && way['司机姓名']) ? String(way['司机姓名']) : '—',
-          司机电话: (way && way['司机电话']) ? String(way['司机电话']) : '—',
-          司机身份证号: (veh && veh['司机身份证号']) ? String(veh['司机身份证号']) : '—'
+          ...carrier
         });
       } else if(meta.pageId==='wh-po-ret'){
-        const way = findWaybillSrc(wayNo);
-        const plate = way && way['车牌号'] && way['车牌号']!=='—' ? String(way['车牌号']) : '—';
-        const veh = plate && plate!=='—' ? ((MOCK.vehicle||{}).main||[]).find(v=> v['车牌号']===plate) : null;
         Object.assign(base, {
           关联采购订单: poCode||ordCode||'—', 供应商名称: partyName,
-          车牌号: plate,
-          车挂号: (way && way['车挂号'] && way['车挂号']!=='—') ? String(way['车挂号']) : '—',
-          司机姓名: (way && way['司机姓名']) ? String(way['司机姓名']) : '—',
-          司机电话: (way && way['司机电话']) ? String(way['司机电话']) : '—',
-          司机身份证号: (veh && veh['司机身份证号']) ? String(veh['司机身份证号']) : '—'
+          ...carrier
         });
       } else if(meta.pageId.startsWith('wh-os')){
-        Object.assign(base, { 关联委外加工单: ordCode||'—', 供应商名称: partyName });
+        Object.assign(base, { 关联委外加工单: ordCode||'—', 供应商名称: partyName, ...carrier });
       } else if(meta.pageId==='wh-so-ret'){
         const way = findWaybillSrc(wayNo);
         const plate = way && way['车牌号'] && way['车牌号']!=='—' ? String(way['车牌号']) : '—';
@@ -4608,6 +4993,7 @@ const app = createApp({
         Object.assign(base, { 移入仓库编码:'—', 移入库位编码:'—', 已完成件数:'0', 制单时间: planDate+' 08:00:00', 制单人: ship['申请人']||'张三', 包装规格:'—' });
       }
       list.unshift(base);
+      if(meta.pageId==='wh-po-in') syncQcLedgerFromPoInNotice(base[meta.noKey], base._lines);
     }
     function overlayShipByWaybill(row){
       if(!row) return row;
@@ -4668,19 +5054,19 @@ const app = createApp({
       src['关联发货单'] = ships.length ? ships.map(s=> s['发货单号']).filter(Boolean).join('、') : '—';
       const wayNos = [...new Set(ships.map(s=> s['关联运单']).filter(v=> v && v!=='—'))];
       src['关联运单'] = wayNos.length ? wayNos.join('、') : '—';
-      const addByMat = new Map();
-      const signedByMat = new Map();
+      const addByLine = new Map();
+      const signedByLine = new Map();
       ships.forEach(s=>{
         (s._lines || []).forEach(l=>{
-          const key = codeOf(l['物料信息']) || l['物料信息'];
-          addByMat.set(key, (addByMat.get(key) || 0) + shipLineQty(l));
-          signedByMat.set(key, (signedByMat.get(key) || 0) + shipLineSigned(l));
+          const key = orderLineNoBase(l) || codeOf(l['物料信息']) || l['物料信息'];
+          addByLine.set(key, (addByLine.get(key) || 0) + shipLineQty(l));
+          signedByLine.set(key, (signedByLine.get(key) || 0) + shipLineSigned(l));
         });
       });
       src._lines = (src._lines || []).map(r=>{
-        const key = codeOf(r['物料信息']) || r['物料信息'];
-        const splitQty = addByMat.get(key) || 0;
-        const signed = signedByMat.get(key) || 0;
+        const key = orderLineNoBase(r) || codeOf(r['物料信息']) || r['物料信息'];
+        const splitQty = addByLine.get(key) || 0;
+        const signed = signedByLine.get(key) || 0;
         const demand = Number(r['需求数量']) || 0;
         return Object.assign({}, r, {
           已拆数量: String(splitQty),
@@ -4889,9 +5275,67 @@ const app = createApp({
       const wayNo = (src||row)['运单号'];
       patchPickupsByWaybill(wayNo, fleetPatch);
       patchSignsByWaybill(wayNo, fleetPatch);
+      createNoticesForWaybillAfterAssign(wayNo);
       if(STORE && wayNo) STORE.setDocStatus(wayNo, '待运输', { source:'PC', action:'assign' });
       bumpStore();
-      ElMessage.success('派车成功，运单已更新为待运输状态');
+      ElMessage.success('派车成功，运单已更新为待运输状态；已生成仓储通知单');
+    }
+    function patchNoticeCarrierFields(noticeRow, carrier){
+      if(!noticeRow || !carrier) return;
+      Object.keys(carrier).forEach(k=>{
+        const v = carrier[k];
+        if(v && v!=='—') noticeRow[k] = v;
+        else if(!noticeRow[k] || noticeRow[k]==='—') noticeRow[k] = v || '—';
+      });
+    }
+    function fillNoticeLineDefaults(notice, ship, partyName){
+      if(!notice || !Array.isArray(notice._lines)) return;
+      const forRet = String(notice['单号']||'').startsWith('CGTT')
+        || String(notice['单号']||'').startsWith('XSTH')
+        || String(notice['单号']||'').startsWith('WWTH')
+        || String(notice['单号']||'').startsWith('WWTT')
+        || String(notice['单号']||'').startsWith('STTL');
+      const planDate = notice['计划执行日期'] || todayYmdLocal();
+      const shipLines = (ship && ship._lines) || [];
+      notice._lines = notice._lines.map((ln, i)=>{
+        const shipLine = shipLines[i] || shipLines.find(s=> (s['行号']||s._rowNo)===ln['行号']) || {};
+        const built = buildNoticeLineFromShip(Object.assign({}, shipLine, {
+          物料信息: ln['物料信息'] || shipLine['物料信息'],
+          发货数量: ln['计划数量'] || shipLine['发货数量'],
+          行号: ln['行号'] || shipLine['行号'] || shipLine._rowNo,
+          批号: (ln['批号'] && ln['批号']!=='—') ? ln['批号'] : shipLine['批号'],
+          单位: ln['库存单位'] || shipLine['单位'],
+          行备注: ln['备注'] || shipLine['行备注']
+        }), { supplier: partyName, planDate, forRet, idx: i, noticeNo: notice['单号']||notice['通知单号']||'' });
+        return Object.assign({}, ln, built, {
+          id: ln.id || built.id,
+          已完成数量: ln['已完成数量'] || built['已完成数量'],
+          未完成数量: ln['未完成数量'] || built['未完成数量']
+        });
+      });
+    }
+    function createNoticesForWaybillAfterAssign(wayNo){
+      if(!wayNo || wayNo==='—') return;
+      const ships = shipsOfWaybill(wayNo);
+      ships.forEach(s=>{
+        const noticeNo = s['关联仓储通知单'];
+        const whBiz = resolveWhBizType(s);
+        if(!noticeNo || noticeNo==='—' || !whBiz || whBiz==='无' || whBiz==='—') return;
+        const meta = whBizNoticeMeta(whBiz);
+        if(!meta) return;
+        const store = MOCK[meta.pageId] = MOCK[meta.pageId] || {};
+        store[meta.tab] = store[meta.tab] || [];
+        const existing = store[meta.tab].find(r=> String(r[meta.noKey]||'')===noticeNo);
+        if(existing){
+          const carrier = waybillCarrierFields(wayNo);
+          patchNoticeCarrierFields(existing, carrier);
+          const partyName = String(s['订单号']||'').split(/\s*\/\s*/)[1]?.trim() || existing['供应商名称'] || existing['客户名称'] || '';
+          fillNoticeLineDefaults(existing, s, partyName);
+          if(meta.pageId==='wh-po-in') syncQcLedgerFromPoInNotice(existing[meta.noKey], existing._lines);
+        } else {
+          createWarehouseNoticeFromShip(s, wayNo, noticeNo, whBiz);
+        }
+      });
     }
     function pickupList(){
       const pk = (MOCK['lg-pickup'] = MOCK['lg-pickup'] || { main: [] });
@@ -5070,7 +5514,23 @@ const app = createApp({
     }
     function detailDisplayValue(name, v){
       if(String(name||'').includes('身份证')) return maskIdCard(v);
+      if(pageId.value==='lg-dispatch' && name==='配送类型'){
+        const biz = resolveWhBizType(detailRow.value || {});
+        if(biz !== '销售发货') return '—';
+      }
       return (v===undefined || v===null || v==='') ? '—' : v;
+    }
+    function overlayWaybillFromShips(row){
+      if(!row) return row;
+      const ships = shipsOfWaybill(row);
+      if(!ships.length) return row;
+      const next = Object.assign({}, row);
+      const pick = (field)=> ships.map(s=> s[field]).find(v=> v && v!=='—') || '';
+      if(!next['装货联系人']) next['装货联系人'] = pick('装货联系人');
+      if(!next['装货联系电话']) next['装货联系电话'] = pick('装货联系电话');
+      if(!next['卸货联系人']) next['卸货联系人'] = pick('卸货联系人');
+      if(!next['卸货联系电话']) next['卸货联系电话'] = pick('卸货联系电话');
+      return next;
     }
     function waybillShipNos(way){
       if(!way) return [];
@@ -5128,6 +5588,7 @@ const app = createApp({
       if(!mode || mode==='—') mode = (mr && mr['管理方式']) || '条码管理';
       return Object.assign({}, r, {
         _i: i+1,
+        行号: lineNoOf(r, i+1),
         物料信息: info || matInfoText(r),
         库存单位: r['库存单位'] || (mr && (mr['库存单位']||mr['基本单位'])) || 'KG',
         管理方式: mode,
@@ -5229,6 +5690,7 @@ const app = createApp({
     function applyOutToSoRetForm(outRow){
       if(pageId.value!=='wh-so-ret' || !outRow) return false;
       const notice = findSoOutNotice(outRow);
+      const hasOut = !!codeOf(formModel['关联销售出库单'] || outRow['出库单号']);
       const srcLines = Array.isArray(notice._lines) && notice._lines.length
         ? notice._lines
         : [{ 物料信息: outRow['物料信息'], 批号: '—', 库存单位: outRow['库存单位']||'KG', 管理方式:'条码管理', 计划件数: outRow['已完成件数']||'1', 计划数量: outRow['已完成数量']||'1.000', 备注:'' }];
@@ -5236,7 +5698,7 @@ const app = createApp({
         _i: i+1,
         行状态: '待执行',
         物料信息: r['物料信息'] || outRow['物料信息'],
-        批号: (r['批号'] && r['批号']!=='—') ? r['批号'] : '—',
+        批号: hasOut && String(r['管理方式']||'').includes('条码') ? '' : ((r['批号'] && r['批号']!=='—') ? r['批号'] : '—'),
         库存单位: r['库存单位'] || outRow['库存单位'] || 'KG',
         管理方式: r['管理方式'] || '条码管理',
         计划件数: String(r['计划件数'] || r['已完成件数'] || outRow['已完成件数'] || '1'),
@@ -5439,7 +5901,7 @@ const app = createApp({
         if(f.name==='关联运单' && isFormPickerDisabled(f)) return isLoadPage() ? '请先选择关联单号' : (isOsPoPage() ? '请先选择关联委外加工单' : '请先选择关联采购订单');
         if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
       }
-      if(pageId.value==='wh-stocktake' && f && f.name==='物料信息') return '请点击多选物料';
+      if(pageId.value==='lg-dispatch' && f && f.name==='前置关联单据') return '请选择销售出库单（选填）';
       return '请点击选择';
     }
     function applyStocktakeMatFilter(codes){
@@ -5525,8 +5987,12 @@ const app = createApp({
         formModel['合并后剩余数量'] = '';
         delete formModel._mergeMainBase;
       }
-      if(pageId.value==='lg-dispatch' && (f.name==='订单号' || f.name==='前置关联单据' || f.name==='采购订单')){
-        if(f.name!=='前置关联单据' || !formModel['订单号']) formLineRows.value = [];
+      if(pageId.value==='lg-dispatch' && (f.name==='订单号' || f.name==='采购订单')){
+        if(f.name==='订单号'){
+          formModel['关联销售备货单'] = '';
+          formModel['关联销售预出货单'] = '';
+        }
+        formLineRows.value = [];
       }
       if(pageId.value==='wh-stocktake' && f.name==='物料信息'){
         applyStocktakeMatFilter([]);
@@ -6224,7 +6690,11 @@ const app = createApp({
       }
       return f.type==='readonly';
     }
-    const detailLineFields = computed(()=> page.value?.detailLineFields || []);
+    const detailLineFields = computed(()=>{
+      const fields = page.value?.detailLineFields || [];
+      if(usesErpLineNoCol()) return fields.filter(f=> f && f.name!=='行号');
+      return fields;
+    });
     const detailRowFiltered = computed(()=>{
       const row = detailRow.value || {};
       const skip = new Set(['id','_actions','typeId','_addrs','_addrSeq','_lines','_photos','_signature','_vendors','_grades','_projects','_flow','_scores','_locs','_items','_pickLines']);
@@ -6614,7 +7084,11 @@ const app = createApp({
       pickerPrepQ.loc = '';
       pickerPrepFilterTick.value++;
     }
-    const pickerDialogTitle = computed(()=> pickerTitle.value==='拣货流水码' ? '选择流水码档案' : ('选择 · ' + (pickerTitle.value||'选单')));
+    const pickerDialogTitle = computed(()=>{
+      if(pickerTitle.value==='拣货流水码') return '选择流水码档案';
+      if(pageId.value==='wh-so-ret' && pickerTitle.value==='批号') return '选择流水码档案（原出库厂外）';
+      return '选择 · ' + (pickerTitle.value||'选单');
+    });
     const pickerPrepSelQty = computed(()=>{
       return (pickerSelected.value||[]).reduce((s,r)=> s + (Number(r.当前数量)||0), 0).toFixed(3);
     });
@@ -6666,12 +7140,14 @@ const app = createApp({
       let all = [];
       if(t==='订单号'){
         const typ = splitPickerMode.value ? (splitForm.订单类型 || '') : (formModel['订单类型'] || '');
+        const biz = dispatchBizForOrderPicker();
+        const okOrder = st => dispatchOrderStatusOk(st, biz);
         if(typ==='采购订单'){
-          all = wrapPickerModuleRows('po', (MOCK.po||{}).main||[], '采购订单号', '供应商名称');
+          all = wrapPickerModuleRows('po', ((MOCK.po||{}).main||[]).filter(r=> okOrder(r['订单状态'])), '采购订单号', '供应商名称');
         } else if(typ==='销售订单'){
-          all = wrapPickerModuleRows('so', (MOCK.so||{}).main||[], '销售订单号', '客户名称');
+          all = wrapPickerModuleRows('so', ((MOCK.so||{}).main||[]).filter(r=> okOrder(r['订单状态'])), '销售订单号', '客户名称');
         } else if(typ==='委外加工单' || typ==='委外加工订单'){
-          all = wrapPickerModuleRows('wwpo', (MOCK.wwpo||{}).main||[], '委外订单号', '供应商名称');
+          all = wrapPickerModuleRows('wwpo', ((MOCK.wwpo||{}).main||[]).filter(r=> okOrder(r['订单状态'])), '委外订单号', '供应商名称');
         }
       } else if(t==='前置关联单据' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         const kind = dispatchPreDocKind(splitPickerMode.value ? splitBizOf() : '');
@@ -6682,12 +7158,8 @@ const app = createApp({
             规格: '销售预出货通知单'
           }));
         } else if(kind==='so-ret-pre'){
-          const outs = (((MOCK['wh-so-ship']||{}).tab2)||[]).concat(((MOCK['wh-so-preout']||{}).tab2)||[]);
-          all = wrapPickerModuleRows('wh-so-ship', outs, '出库单号', '物料信息').map(r=>({
-            ...r,
-            名称: (r.名称 || r['物料信息'] || '') + ' / 销售出库单',
-            规格: '销售出库单'
-          }));
+          const so = codeOf(splitPickerMode.value ? splitForm.订单号 : formModel['订单号']);
+          all = wrapSoOutboundPickerRows(completedSoOutboundRows(so));
         }
       } else if(t==='采购订单' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         all = wrapPickerModuleRows('po', tradeDirectPos(), '采购订单号', '供应商名称');
@@ -6700,13 +7172,23 @@ const app = createApp({
         all = wrapPickerModuleRows('so', (MOCK.so||{}).main||[], '销售订单号', '客户名称');
       } else if(t==='关联销售备货单' || t==='关联备货通知单'){
         const rows = ((MOCK['wh-so-prep']||{}).main||[]);
-        const filtered = pageId.value==='wh-so-ship'
-          ? rows.filter(r=> ['执行中','已完成'].includes(r['备货状态']))
-          : rows.filter(r=> r['备货状态']!=='已完成');
+        const dispatchBiz = pageId.value==='lg-dispatch' ? (formModel['关联仓储业务']||formModel['仓库业务类型']||'') : '';
+        let filtered;
+        if(pageId.value==='wh-so-ship'){
+          filtered = rows.filter(r=> ['执行中','已完成'].includes(r['备货状态']));
+        } else if(pageId.value==='lg-dispatch' && dispatchBiz==='销售预出货'){
+          filtered = rows.filter(r=> ['待执行','执行中','已完成','已关闭'].includes(r['备货状态']));
+        } else if(pageId.value==='lg-dispatch'){
+          filtered = rows.filter(r=> ['执行中','已完成'].includes(r['备货状态']));
+        } else {
+          filtered = rows.filter(r=> r['备货状态']!=='已完成');
+        }
+        const so = codeOf(pageId.value==='lg-dispatch' ? formModel['订单号'] : formModel['关联销售订单']);
+        if(so) filtered = filtered.filter(r=> codeOf(r['关联销售订单'] || stockSoMap(r['备货通知单号']))===so);
         all = wrapPickerModuleRows('wh-so-prep', filtered.length ? filtered : rows, '备货通知单号', '客户名称');
       } else if(t==='关联销售预出货单'){
         let outs = ((MOCK['wh-so-preout']||{}).tab2||[]).filter(r=> r['单据状态']==='已完成');
-        const so = codeOf(formModel['关联销售订单']);
+        const so = codeOf(pageId.value==='lg-dispatch' ? formModel['订单号'] : formModel['关联销售订单']);
         if(so) outs = outs.filter(r=> codeOf(r['关联销售订单'])===so);
         all = wrapPickerModuleRows('wh-so-preout', outs, '出库单号', '客户名称', 'tab2');
       } else if(t==='选择车辆与司机'){
@@ -6859,6 +7341,30 @@ const app = createApp({
         if(qo) all = all.filter(r=> String(r.存储位置||'').includes(qo));
       } else if(t==='批号' || t.includes('流水码档案') || t==='包材档案'){
         const matCode = pickerLineRow.value ? codeOf(pickerLineRow.value['物料信息']) : '';
+        if(pageId.value==='wh-so-ret' && t==='批号'){
+          const outNo = String(formModel['关联销售出库单']||'').trim();
+          if(outNo && outNo!=='—'){
+            const candidates = soRetSerialArchRows(outNo, matCode);
+            const allowedBc = new Set(candidates.map(r=> String(r['条码号']||'').trim()).filter(Boolean));
+            all = serialArchPickerRows(r=> allowedBc.has(String(r['条码号']||'').trim()));
+            if(!all.length){
+              all = candidates.map(r=>{
+                const wrapped = wrapPickerModuleRows('serial-arch', [r], '条码号', '物料批号')[0];
+                return {
+                  ...wrapped,
+                  名称: (r['物料批号'] || wrapped.名称 || '') + (r['库存状态'] ? (' / ' + r['库存状态']) : ''),
+                  规格: r['物料信息'] || wrapped.规格 || ''
+                };
+              });
+            }
+          } else {
+            all = serialArchPickerRows(r=>{
+              if(r['使用状态']==='报废') return false;
+              if(matCode && codeOf(r['物料信息'])!==matCode) return false;
+              return ['厂外','初始化','仓库'].includes(String(r['库存状态']||''));
+            });
+          }
+        } else {
         const outerAnchor = (pageId.value==='outer-serial' && t==='包材档案') ? outerBindAnchor() : null;
         const boundCodes = new Set((detailLineRows.value||[]).map(r=> String(r['包材编号']||r['条码号']||'').trim()).filter(Boolean));
         all = serialArchPickerRows(r=>{
@@ -6896,6 +7402,7 @@ const app = createApp({
           return true;
         });
         if(matCode && pageId.value!=='wh-so-preout' && pageId.value!=='wh-so-ship' && !(pageId.value==='outer-serial' && t==='包材档案')) all = all.filter(r=> codeOf(r['物料信息'])===matCode);
+        }
       } else if(t==='领至线边仓' || t==='来源线边仓'){
         const rows = ((MOCK['line-side']||{}).main||[]).filter(r=> r['启用状态']==='启用');
         all = wrapPickerModuleRows('line-side', rows, '线边仓编码', '线边仓名称', 'main').map(r=>{
@@ -6921,14 +7428,8 @@ const app = createApp({
           return { ...m, 编码: m.编码||'', 名称: m.名称||'', _pickerPageId:'mat-list', _pickerTab:'main', _pickerCodeField:'物料编码' };
         });
       } else if(t==='关联销售出库单'){
-        const outs = (((MOCK['wh-so-ship']||{}).tab2)||[]).concat(((MOCK['wh-so-preout']||{}).tab2)||[])
-          .filter(r=> r['单据状态']==='已完成');
         const so = codeOf(formModel['关联销售订单']);
-        const filtered = so ? outs.filter(r=> codeOf(r['关联销售订单'])===so) : outs;
-        all = filtered.map(r=>{
-          const pid = String(r['出库单号']||'').startsWith('CKYC') ? 'wh-so-preout' : 'wh-so-ship';
-          return wrapPickerModuleRows(pid, [r], '出库单号', '物料信息', 'tab2')[0];
-        });
+        all = wrapSoOutboundPickerRows(completedSoOutboundRows(so)).map(r=>({ ...r, 规格: r.规格 || '销售出库单' }));
       } else if(t==='关联来源单据'){
         all = restWhSourceDocRows();
       } else if(t==='往来单位' || t==='委托方' || t==='委托方名称'){
@@ -7992,8 +8493,9 @@ const app = createApp({
           日期: ymd,
           申请部门: '仓储部',
           申请人: '张三',
+          用车类型: '发货',
           是否带托盘: '否',
-          配送类型: '正常业务'
+          配送类型: ''
         });
       }
       if(pageId.value==='lg-carrier-evt' && formMode.value==='add'){
@@ -8067,6 +8569,9 @@ const app = createApp({
       detailRow.value = STORE ? STORE.overlayPcRow(pageId.value, { ...row }) : { ...row };
       if(pageId.value==='lg-dispatch'){
         detailRow.value['关联仓储业务'] = resolveWhBizType(row);
+        const pre = normalizeDispatchSoShipPreDocs(row);
+        detailRow.value['关联销售备货单'] = pre.关联销售备货单 || '—';
+        detailRow.value['关联销售预出货单'] = pre.关联销售预出货单 || '—';
         if(!detailRow.value['前置关联单据']) detailRow.value['前置关联单据'] = '—';
       }
       if(pageId.value==='lg-ship'){
@@ -8076,6 +8581,7 @@ const app = createApp({
       }
       if(isWaybillPage()){
         detailRow.value['仓库业务类型'] = resolveWhBizType(row);
+        detailRow.value = overlayWaybillFromShips(detailRow.value);
       }
       if(pageId.value==='wh-insp-plan'){
         detailRow.value['巡检人员'] = row['巡检人员'] || row['巡检人'] || '—';
@@ -8097,6 +8603,11 @@ const app = createApp({
         const lines = (Array.isArray(mockLines) && mockLines.length) ? mockLines
           : (Array.isArray(row?._lines) ? row._lines : []);
         detailLineRows.value = lines.map((r,i)=>normPoInDetailLine(r,i));
+      } else if(pageId.value==='lg-dispatch'){
+        detailLineRows.value = ensureLineNos(mockLines||[]).map((r,i)=>({
+          ...r,
+          行号: lineNoOf(r, i+1)
+        }));
       } else if(pageId.value==='lg-ship'){
         detailLineRows.value = shipLinesOf(row);
       } else if(pageId.value==='wh-so-prep'){
@@ -8913,8 +9424,8 @@ const app = createApp({
         }
       }
       if(op.name==='编辑' && pageId.value==='tank-arch'){
-        if(row['使用状态']!=='在用' || row['库存状态']!=='初始化'){
-          ElMessage.warning('仅使用状态=在用且库存状态=初始化时可编辑'); return;
+        if(!canEditTankArch(row)){
+          ElMessage.warning('仅使用状态=在用且行物料无值（空罐）时可编辑'); return;
         }
       }
       if(op.name==='编辑' && pageId.value==='wh-insp-scheme'){
@@ -9158,6 +9669,7 @@ const app = createApp({
           formLineRows.value = lines.map((r,i)=>({_i:i+1, ...r}));
         }
         if(pageId.value==='lg-dispatch'){
+          const pre = normalizeDispatchSoShipPreDocs(row);
           const vt = row['用车类型']||'';
           const isOther = vt && !VEHICLE_OPTS.includes(vt);
           Object.assign(formModel, {
@@ -9171,6 +9683,8 @@ const app = createApp({
             配送类型: row['配送类型']||'正常业务',
             订单类型: row['订单类型']||'',
             订单号: row['订单号']||'',
+            关联销售备货单: pre.关联销售备货单,
+            关联销售预出货单: pre.关联销售预出货单,
             前置关联单据: row['前置关联单据']||'',
             采购订单: row['采购订单']||'',
             合同号: row['合同号']||'',
@@ -9187,7 +9701,7 @@ const app = createApp({
             要求送达时间: row['要求送达时间']||'',
             备注: row['备注'] && row['备注']!=='—' ? row['备注'] : ''
           });
-          formLineRows.value = dispatchLinesOf(row).map((r,i)=>({_i:i+1, ...r}));
+          formLineRows.value = ensureLineNos(dispatchLinesOf(row)).map((r,i)=>({_i:i+1, ...r, 行号: lineNoOf(r, i+1)}));
         }
         if(pageId.value==='lg-ship'){
           if(row['状态']!=='待调度'){ ElMessage.warning('仅待调度状态的发货单可编辑'); return; }
@@ -9345,9 +9859,12 @@ const app = createApp({
         if(row['审核状态']!=='已通过'){ ElMessage.warning('仅审核通过的派车申请单可拆分'); return; }
         if(!(row['状态']==='待执行' || row['状态']==='执行中')){ ElMessage.warning('当前执行状态不可拆分'); return; }
         splitRow.value = row;
+        const pre = normalizeDispatchSoShipPreDocs(row);
         Object.assign(splitForm, {
           订单类型: row['订单类型'] || dispatchOrderTypeForBiz(row['关联仓储业务']||row['仓库业务类型']||resolveWhBizType(row)) || '',
           订单号: row['订单号']||'',
+          关联销售备货单: pre.关联销售备货单,
+          关联销售预出货单: pre.关联销售预出货单,
           前置关联单据: row['前置关联单据']||'',
           采购订单: row['采购订单']||'',
           合同号: row['合同号']||'',
@@ -9362,7 +9879,7 @@ const app = createApp({
           备注: ''
         });
         splitPickerMode.value = false;
-        const baseLines = dispatchLinesOf(row).map(r=>{
+        const baseLines = ensureLineNos(dispatchLinesOf(row)).map(r=>{
           const remain = Number(r['未拆数量'] ?? ((Number(r['需求数量'])||0) - (Number(r['已拆数量'])||0)));
           return { ...r, 批号: r['批号']||'', 未拆数量: String(remain), 本次发货数量: remain>0 ? String(remain) : '' };
         });
@@ -9476,19 +9993,28 @@ const app = createApp({
       ElMessage.info(op.name);
     }
     function normalizeSplitLines(rows){
-      const order = [];
-      const countByKey = new Map();
-      return (rows||[]).map((r, idx)=>{
+      const list = rows || [];
+      const countByOrderLine = new Map();
+      list.forEach((r, idx)=>{
+        const base = orderLineNoBase(r, idx + 1);
+        countByOrderLine.set(base, (countByOrderLine.get(base) || 0) + 1);
+      });
+      const subByOrderLine = new Map();
+      return list.map((r, idx)=>{
         const mat = r['物料信息'] || '';
-        const key = r._matKey || codeOf(mat) || mat || ('mat-' + (idx+1));
-        if(!order.includes(key)) order.push(key);
-        const sub = (countByKey.get(key) || 0) + 1;
-        countByKey.set(key, sub);
-        const gidx = order.indexOf(key) + 1;
+        const orderLineNo = orderLineNoBase(r, idx + 1);
+        const matCode = codeOf(mat) || mat || ('mat-' + (idx+1));
+        const key = r._matKey || (orderLineNo + '::' + matCode);
+        const total = countByOrderLine.get(orderLineNo) || 1;
+        const sub = (subByOrderLine.get(orderLineNo) || 0) + 1;
+        subByOrderLine.set(orderLineNo, sub);
+        const displayNo = total <= 1 ? orderLineNo : (orderLineNo + '-' + sub);
         return {
           ...r,
+          行号: displayNo,
+          _orderLineNo: orderLineNo,
           _matKey: key,
-          _rowNo: `${gidx}-${sub}`
+          _rowNo: displayNo
         };
       });
     }
@@ -9612,7 +10138,6 @@ const app = createApp({
         if(!splitForm.订单类型 || splitForm.订单类型==='无'){ ElMessage.warning('请选择订单类型'); return; }
         if(!splitForm.订单号){ ElMessage.warning('请选择订单号'); return; }
       }
-      if(splitPreDocRequired.value && !splitForm.前置关联单据){ ElMessage.warning('销售退货请选择前置关联的销售出库单'); return; }
       if(splitShowPo.value && !splitForm.采购订单){ ElMessage.warning('直发业务（贸易）请选择采购订单'); return; }
       const lines = splitLines.value || [];
       if(!lines.length){ ElMessage.warning('拆分数量或信息存在错误，请检查'); return; }
@@ -9654,8 +10179,11 @@ const app = createApp({
       const src = splitRow.value;
       const used = lines.filter(r=> Number(r['本次发货数量'])>0);
       const shipLines = used.map(r=>({
+        行号: r['行号'] || r._rowNo || '',
+        _orderLineNo: r._orderLineNo || orderLineNoBase(r),
         物料信息: r['物料信息']||'',
         发货数量: String(r['本次发货数量']||''),
+        计划件数: r['计划件数'] != null && r['计划件数'] !== '' ? String(r['计划件数']) : '',
         已签收数量: '—',
         '体积(长*宽*高)': r['体积(长*宽*高)']||'',
         单位: r['单位']||'',
@@ -9689,6 +10217,8 @@ const app = createApp({
         订单号: splitForm.订单号||'',
         合同号: splitForm.合同号||lookupContractNo(splitForm.订单类型, splitForm.订单号),
         采购订单: splitForm.采购订单||'',
+        关联销售备货单: splitForm.关联销售备货单||'',
+        关联销售预出货单: splitForm.关联销售预出货单||'',
         前置关联单据: splitForm.前置关联单据||'',
         订单类型: splitForm.订单类型||'',
         物料信息: used.map(r=> r['物料信息']).filter(Boolean).join('；'),
@@ -10361,7 +10891,11 @@ const app = createApp({
         运输类型: mergeForm.运输类型,
         '运费单价（元）': mergeForm.运费单价===undefined || mergeForm.运费单价===null ? '' : String(mergeForm.运费单价).trim(),
         装货点: [...new Set(rows.map(r=> r['装货点']).filter(v=> v && v!=='—'))].join('、') || '—',
+        装货联系人: first['装货联系人'] || rows.map(r=> r['装货联系人']).find(v=> v && v!=='—') || '',
+        装货联系电话: first['装货联系电话'] || rows.map(r=> r['装货联系电话']).find(v=> v && v!=='—') || '',
         卸货点: [...new Set(rows.map(r=> r['卸货点']).filter(v=> v && v!=='—'))].join('、') || '—',
+        卸货联系人: first['卸货联系人'] || rows.map(r=> r['卸货联系人']).find(v=> v && v!=='—') || '',
+        卸货联系电话: first['卸货联系电话'] || rows.map(r=> r['卸货联系电话']).find(v=> v && v!=='—') || '',
         车型要求: first['车型要求']||'',
         是否带托盘: first['是否带托盘']||'',
         特殊要求: first['特殊要求']||'—',
@@ -10414,7 +10948,7 @@ const app = createApp({
         r['状态'] = '已调度';
         r['关联运单'] = wayNo;
         r['关联仓储通知单'] = notice;
-        if(notice !== '—') createWarehouseNoticeFromShip(cur || r, wayNo, notice, whBiz);
+        // 通知单延至运单「确认派车」后生成，以便带入承运信息与行默认值
       });
       if(wb.main[0] && Array.isArray(wb.main[0]._lines)){
         wb.main[0]._lines.forEach(l=>{
@@ -10427,7 +10961,7 @@ const app = createApp({
       selectedIds.value = [];
       mergeVisible.value = false;
       bumpStore();
-      ElMessage.success(`发货单合并下发成功，已生成运单 (${wayNo})，状态更新为已调度`);
+      ElMessage.success(`发货单合并下发成功，已生成运单 (${wayNo})；仓储通知单将在运单确认派车后生成`);
     }
     function onFormOk(){
       if(pageId.value==='warehouse'){
@@ -10784,6 +11318,7 @@ const app = createApp({
           if(old && old['行状态']==='已关闭') lineSt = '已关闭';
           const pcsRaw = String(r['计划件数'] ?? '').trim();
           return {
+            行号: r['行号'] || erpLineNo(i+1),
             物料编码: codeOf(r['物料信息']),
             物料信息: r['物料信息']||matInfoText(r['物料信息']),
             采购单位: r['采购单位']||matUnit(r['物料信息'],'po'),
@@ -10858,6 +11393,7 @@ const app = createApp({
           if(old && old['行状态']==='已关闭') lineSt = '已关闭';
           const pcsRaw = String(r['计划件数'] ?? '').trim();
           return {
+            行号: r['行号'] || erpLineNo(i+1),
             物料编码: codeOf(r['物料信息']),
             物料信息: r['物料信息']||matInfoText(r['物料信息']),
             销售单位: r['销售单位']||matUnit(r['物料信息'],'so'),
@@ -11377,7 +11913,6 @@ const app = createApp({
         if(!vol){ ElMessage.warning('请选择容积'); return; }
         let bc = String(formModel['条码号']||'').trim();
         if(!bc) bc = nextTmNo();
-        if(!/^TM\d{12}$/.test(bc)){ ElMessage.warning('条码号格式须为 TM+年月日+4位流水'); return; }
         if(tmBarcodeTaken(bc, formModel._editId)){ ElMessage.warning('条码号已存在，请保持全局唯一'); return; }
         const list = ((MOCK['tank-arch'] = MOCK['tank-arch'] || {}).main = (MOCK['tank-arch'].main || []));
         if(list.some(r=> r['储罐编号']===tankNo && r.id!==formModel._editId)){
@@ -11422,7 +11957,7 @@ const app = createApp({
         const cur = list.find(r=> r.id===formModel._editId);
         if(!cur){ ElMessage.warning('未找到待编辑储罐档案'); return; }
         if(!canEditTankArch(cur)){
-          ElMessage.warning('仅使用状态=在用且空罐（无物料明细）时可编辑'); return;
+          ElMessage.warning('仅使用状态=在用且行物料无值（空罐）时可编辑'); return;
         }
         Object.assign(cur, payload, {
           id: cur.id,
@@ -11497,15 +12032,14 @@ const app = createApp({
         if(!formLineRows.value.length){ ElMessage.warning('请至少添加一行派车物料明细'); return; }
         if(formLineRows.value.some(r=> !r['物料信息'])){ ElMessage.warning('请完善物料明细中的物料信息'); return; }
         if(formLineRows.value.some(r=> !(Number(r['需求数量'])>0))){ ElMessage.warning('请输入正确的物料需求数量'); return; }
-        if(!formModel['配送类型']){ ElMessage.warning('请选择配送类型'); return; }
+        if(whBiz==='销售发货' && !formModel['配送类型']){ ElMessage.warning('请选择配送类型'); return; }
         if(dispatchNeedsOrderNo()){
           const needType = dispatchOrderTypeForBiz(whBiz);
           if(!formModel['订单类型'] || formModel['订单类型']==='无'){ ElMessage.warning('请选择订单类型'); return; }
           if(needType && formModel['订单类型']!==needType){ ElMessage.warning('订单类型须为'+needType); return; }
           if(!formModel['订单号']){ ElMessage.warning('请选择订单号'); return; }
         }
-        if(whBiz==='销售退货' && !formModel['前置关联单据']){ ElMessage.warning('销售退货请选择前置关联的销售出库单'); return; }
-        if(formModel['配送类型']==='直发业务（贸易）' && !formModel['采购订单']){ ElMessage.warning('直发业务（贸易）请选择采购订单'); return; }
+        if(whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）' && !formModel['采购订单']){ ElMessage.warning('直发业务（贸易）请选择采购订单'); return; }
         const list = ((MOCK['lg-dispatch'] = MOCK['lg-dispatch'] || {}).main = (MOCK['lg-dispatch'].main || []));
         const matInfo = formLineRows.value.map(r=> r['物料信息']).filter(Boolean).join('；');
         const qtySum = formLineRows.value.reduce((s,r)=> s + (Number(r['需求数量'])||0), 0);
@@ -11518,11 +12052,13 @@ const app = createApp({
           申请人: formModel['申请人']||'',
           用车类型: vehicleType,
           关联仓储业务: whBiz,
-          配送类型: formModel['配送类型']||'正常业务',
+          配送类型: whBiz==='销售发货' ? (formModel['配送类型']||'正常业务') : '—',
           订单类型: orderType,
           订单号: (orderType && orderType!=='无') ? (formModel['订单号']||'') : '',
-          前置关联单据: (whBiz==='销售发货' || whBiz==='销售退货') ? (formModel['前置关联单据']||'') : '',
-          采购订单: formModel['配送类型']==='直发业务（贸易）' ? (formModel['采购订单']||'') : '',
+          关联销售备货单: (whBiz==='销售发货' || whBiz==='销售预出货') ? (formModel['关联销售备货单']||'') : '',
+          关联销售预出货单: whBiz==='销售发货' ? (formModel['关联销售预出货单']||'') : '',
+          前置关联单据: whBiz==='销售退货' ? (formModel['前置关联单据']||'') : '',
+          采购订单: (whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）') ? (formModel['采购订单']||'') : '',
           合同号: formModel['合同号']||lookupContractNo(orderType, formModel['订单号']),
           车型要求: formModel['车型要求']||'',
           是否带托盘: formModel['是否带托盘']||'否',
@@ -11539,8 +12075,11 @@ const app = createApp({
           总数量: qtySum + (unit ? (' ' + unit) : ''),
           备注: formModel['备注']||'',
           _lines: formLineRows.value.map(r=>({
+            行号: r['行号'] || r._orderLineNo || '',
+            _orderLineNo: r._orderLineNo || r['行号'] || '',
             物料信息: r['物料信息']||'',
             需求数量: r['需求数量']||'',
+            计划件数: r['计划件数'] != null && r['计划件数'] !== '' ? r['计划件数'] : '',
             已拆数量: r['已拆数量']||'0',
             已拆未签收数量: r['已拆未签收数量']||'0',
             已签收数量: r['已签收数量']||'0',
@@ -11614,6 +12153,7 @@ const app = createApp({
             const qty = Number(r['发货数量'])||0;
             const signed = shipLineSigned(r);
             return {
+              行号: r['行号'] || r._rowNo || '',
               物料信息: r['物料信息']||'',
               发货数量: String(r['发货数量']||''),
               已签收数量: r['已签收数量']||'—',
@@ -11658,6 +12198,7 @@ const app = createApp({
           else if(doneQty>=plan && plan>0) lineSt = '已完成';
           const pcsRaw = String(r['计划件数'] ?? '').trim();
           return {
+            行号: r['行号'] || erpLineNo(i+1),
             物料编码: codeOf(r['物料信息']),
             物料信息: r['物料信息']||matInfoText(r['物料信息']),
             采购单位: r['采购单位']||matUnit(r['物料信息'],'po'),
@@ -12131,6 +12672,7 @@ const app = createApp({
         if(!(formLineRows.value||[]).length){ ElMessage.warning('请至少添加一行物料明细'); return; }
         if(formLineRows.value.some(r=> !r['物料信息'])){ ElMessage.warning('请完善物料信息'); return; }
         if(formLineRows.value.some(r=> !(Number(r['计划数量'])>0))){ ElMessage.warning('请填写计划数量'); return; }
+        if(!assertPoInLineMatLotUnique(formLineRows.value)) return;
         const phone = String(formModel['司机电话']||'').trim();
         if(phone && phone!=='—' && !/^1\d{10}$/.test(phone)){
           ElMessage.warning('请输入正确的 11 位司机手机号'); return;
@@ -12164,19 +12706,23 @@ const app = createApp({
           司机身份证号: dash(idno),
           _lines: formLineRows.value.map((r,i)=>({ ...r, _i: i+1 }))
         };
+        let savedNo = '';
         if(isAdd){
           const d = new Date();
           const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
           const sameDay = list.filter(r=> String(r['单号']||'').startsWith('CGST'+ymd));
           payload.id = 'cgst-' + Date.now();
           payload.单号 = 'CGST' + ymd + String(sameDay.length + 1).padStart(4,'0');
+          savedNo = payload.单号;
           list.unshift(payload);
         } else {
           const cur = list.find(r=> r.id===formModel._editId || r['单号']===formModel['单号']);
           if(!cur){ ElMessage.warning('未找到待编辑收料通知单'); return; }
           if(cur['单据状态']!=='待执行'){ ElMessage.warning('仅「待执行」状态可编辑'); return; }
+          savedNo = cur['单号'];
           Object.assign(cur, payload, { id: cur.id, 单号: cur['单号'], 单据状态: cur['单据状态'] });
         }
+        syncQcLedgerFromPoInNotice(savedNo, payload._lines);
         formVisible.value=false;
         bumpStore();
         ElMessage.success(isAdd ? '采购收料通知单已新增' : '采购收料通知单已保存');
@@ -13054,12 +13600,19 @@ const app = createApp({
         const opts = whBizTypesForVehicle(formModel['用车类型']==='其他' ? '其他' : formModel['用车类型']);
         const cur = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
         formModel['关联仓储业务'] = opts.includes(cur) ? cur : (opts[0] || '');
+        formModel['关联销售备货单'] = '';
+        formModel['关联销售预出货单'] = '';
         formModel['前置关联单据'] = '';
         syncDispatchOrderTypeByBiz();
       }
       if(pageId.value==='lg-dispatch' && f && (f.name==='关联仓储业务' || f.name==='仓库业务类型')){
+        formModel['关联销售备货单'] = '';
+        formModel['关联销售预出货单'] = '';
         formModel['前置关联单据'] = '';
         syncDispatchOrderTypeByBiz();
+      }
+      if(pageId.value==='lg-dispatch' && f && f.name==='配送类型' && formModel['配送类型']!=='直发业务（贸易）'){
+        formModel['采购订单'] = '';
       }
       if(pageId.value==='wh-prod-in' && f && f.name==='业务类型'){
         if(formModel['业务类型']!=='受托加工完工'){
@@ -13107,12 +13660,27 @@ const app = createApp({
       }
     }
     function openPicker(title, lineRow, bind){
+      if(pageId.value==='wh-so-ret' && title==='批号'){
+        const outNo = String(formModel['关联销售出库单']||'').trim();
+        if(outNo && outNo!=='—' && lineRow && !codeOf(lineRow['物料信息'])){
+          ElMessage.warning('请先选择物料信息'); return;
+        }
+      }
       if(pageId.value==='wh-prod-issue' && title==='领至线边仓' && formModel['领料类型']==='备品备件领料'){
         ElMessage.warning('备品备件领料不可填写领至线边仓'); return;
       }
       if(title==='订单号' && !splitPickerMode.value && (!formModel['订单类型'] || formModel['订单类型']==='无')){ ElMessage.warning('请先选择订单类型'); return; }
-      if(title==='前置关联单据' && pageId.value==='lg-dispatch' && !splitPickerMode.value && !dispatchPreDocKind()){
-        ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return;
+      if(title==='前置关联单据' && pageId.value==='lg-dispatch' && !splitPickerMode.value){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        if(biz!=='销售退货'){ ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return; }
+      }
+      if(title==='关联销售预出货单' && pageId.value==='lg-dispatch' && !splitPickerMode.value){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        if(biz!=='销售发货'){ ElMessage.warning('仅销售发货业务可选择预出货出库单'); return; }
+      }
+      if(title==='关联销售备货单' && pageId.value==='lg-dispatch' && !splitPickerMode.value){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        if(!['销售发货','销售预出货'].includes(biz)){ ElMessage.warning('仅销售发货/销售预出货业务可选择备货通知单'); return; }
       }
       if(pageId.value==='wh-stocktake' && (title==='物料信息' || (title||'').includes('物料')) && !formModel['盘点方式']){
         ElMessage.warning('请先选择盘点方式'); return;
@@ -13248,7 +13816,7 @@ const app = createApp({
       } else if(t==='前置关联单据' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         if(splitPickerMode.value){
           const kind = dispatchPreDocKind(splitBizOf());
-          const docLabel = row.规格 || (kind==='so-ret-pre' ? '销售出库单' : '销售预出货通知单');
+          const docLabel = row.规格 || '销售出库单';
           splitForm.前置关联单据 = (row.编码||'') + ' / ' + docLabel;
           const lots = dispatchLinesFromPreDoc(kind, row.编码);
           if(lots.length && (splitLines.value||[]).length){
@@ -13262,7 +13830,7 @@ const app = createApp({
           return;
         }
         const kind = dispatchPreDocKind();
-        const docLabel = row.规格 || (kind==='so-ret-pre' ? '销售出库单' : '销售预出货通知单');
+        const docLabel = row.规格 || '销售出库单';
         formModel['前置关联单据'] = (row.编码||'') + ' / ' + docLabel;
         const lines = dispatchLinesFromPreDoc(kind, row.编码);
         if(lines.length) formLineRows.value = lines;
@@ -13310,9 +13878,20 @@ const app = createApp({
         ElMessage.success('已选择销售订单并带入物料明细');
       } else if(t==='关联销售备货单'){
         const no = row.编码 || row['备货通知单号'] || label;
+        if(splitPickerMode.value){
+          splitForm.关联销售备货单 = no;
+          ElMessage.success('已选择备货单（写入本张发货单）：'+no);
+          splitPickerMode.value = false;
+          pickerVisible.value=false;
+          pickerLineRow.value=null;
+          return;
+        }
         formModel['关联销售备货单'] = no;
         const prep = ((MOCK['wh-so-prep']||{}).main||[]).find(r=> r['备货通知单号']===no) || row;
-        if(pageId.value==='wh-so-ship'){
+        if(pageId.value==='lg-dispatch'){
+          applyPrepToDispatchForm(prep, no);
+          ElMessage.success('已选择备货单并带入物料：'+no);
+        } else if(pageId.value==='wh-so-ship'){
           if(prep['关联销售订单']){
             formModel['关联销售订单'] = prep['关联销售订单'];
             formModel['客户名称'] = prep['客户名称'] || formModel['客户名称'] || '';
@@ -13555,10 +14134,27 @@ const app = createApp({
           备注: r['备注'] || ''
         }));
         ElMessage.success('已选择销售订单并带入客户与物料：'+formModel['关联销售订单']);
-      } else if(t==='关联销售预出货单' && pageId.value==='wh-so-ship'){
+      } else if(t==='关联销售预出货单' && (pageId.value==='wh-so-ship' || pageId.value==='lg-dispatch' || splitPickerMode.value)){
         const outNo = row.编码 || row['出库单号'] || label;
         if(row['单据状态'] && row['单据状态']!=='已完成'){
           ElMessage.warning('仅可选择「已完成」的销售预出货出库单');
+          return;
+        }
+        if(splitPickerMode.value){
+          splitForm.关联销售预出货单 = outNo;
+          ElMessage.success('已选择预出货出库单（写入本张发货单）：'+outNo);
+          splitPickerMode.value = false;
+          pickerVisible.value=false;
+          pickerLineRow.value=null;
+          return;
+        }
+        if(pageId.value==='lg-dispatch'){
+          const ok = applyPreoutToDispatchForm(row);
+          pickerVisible.value = false;
+          pickerLineRow.value = null;
+          ElMessage.success(ok
+            ? ('已关联预出货出库单 '+outNo+'，已按实际出库带入物料')
+            : ('已关联预出货出库单：'+outNo+'（未找到出库明细）'));
           return;
         }
         const doApply = ()=>{
@@ -13642,7 +14238,7 @@ const app = createApp({
         formModel['司机电话'] = notice['司机电话'] || '—';
         formModel['司机身份证号'] = notice['司机身份证号'] || '—';
         applyOutToSoRetForm(row);
-        ElMessage.success('已关联销售出库单并带入订单/运力/物料：'+outNo);
+        ElMessage.success('已关联销售出库单并带入订单/运力/物料；批号请从原出库流水码档案选择');
       } else if(t==='关联销售出库单'){
         formModel['关联销售出库单'] = row.编码 || row['出库单号'] || label;
         ElMessage.success('已选择销售出库单：'+formModel['关联销售出库单']);
@@ -13775,9 +14371,11 @@ const app = createApp({
           if(!rows.length){ ElMessage.warning('请至少选择一条物料'); return; }
           const unitField = pageId.value==='po' || pageId.value==='wwpo' ? '采购单位' : '销售单位';
           const unitKind = pageId.value==='po' || pageId.value==='wwpo' ? 'po' : 'so';
-          const makeLine = (m, idx)=>{
+          const makeLine = (m, idx, lineNoOverride)=>{
+            const lineNo = lineNoOverride || (target ? lineNoOf(target, target._i || formLineRows.value.indexOf(target)+1) : nextErpLineNo(formLineRows.value));
             const line = {
               _i: idx,
+              行号: lineNo,
               物料信息: matInfoText(m),
               [unitField]: matUnit(m, unitKind),
               计划数量: '',
@@ -13790,10 +14388,23 @@ const app = createApp({
           if(target){
             Object.assign(target, makeLine(rows[0], target._i || formLineRows.value.indexOf(target)+1));
             if(rows.length>1){
-              formLineRows.value = formLineRows.value.concat(rows.slice(1).map((m,i)=> makeLine(m, formLineRows.value.length+i+1)));
+              let tmp = formLineRows.value.slice();
+              const extra = rows.slice(1).map((m,i)=>{
+                const ln = nextErpLineNo(tmp);
+                const line = makeLine(m, tmp.length+1, ln);
+                tmp = tmp.concat([line]);
+                return line;
+              });
+              formLineRows.value = formLineRows.value.concat(extra);
             }
           } else {
-            formLineRows.value = formLineRows.value.concat(rows.map((m,i)=> makeLine(m, formLineRows.value.length+i+1)));
+            let tmp = formLineRows.value.slice();
+            formLineRows.value = tmp.concat(rows.map((m,i)=>{
+              const ln = nextErpLineNo(tmp);
+              const line = makeLine(m, tmp.length+1, ln);
+              tmp = tmp.concat([line]);
+              return line;
+            }));
           }
           pickerVisible.value=false;
           ElMessage.success('已选择 '+rows.length+' 条物料');
@@ -13819,6 +14430,7 @@ const app = createApp({
             } else {
               const line = {
                 _i: formLineRows.value.length+1,
+                行号: pageId.value==='lg-dispatch' ? nextErpLineNo(formLineRows.value) : String(formLineRows.value.length+1),
                 物料信息: info,
                 单位: unit,
                 '体积(长*宽*高)': '',
@@ -13992,6 +14604,10 @@ const app = createApp({
         const target = pickerLineRow.value;
         if(target){
           target['批号'] = lot;
+          if(pageId.value==='wh-so-ret'){
+            const bc = row.编码 || row['条码号'] || '';
+            if(bc) target['_退货流水码'] = bc;
+          }
           if(!target['物料信息'] && (row.物料信息 || row.规格)){
             target['物料信息'] = row.物料信息 || row.规格;
             target['库存单位'] = row.库存单位 || matUnit(row);
@@ -14743,11 +15359,19 @@ const app = createApp({
     }
 
     let unsubStore = null;
+    let syncApplying = false;
+    let syncToastTimer = null;
+    const SYNC_TOAST_SKIP = { storage: 1, 'mock-storage': 1, 'mock-save': 1 };
     onMounted(()=> {
+      syncAllPoReceivedQty();
       loadPage(firstId);
       if(STORE){
         unsubStore = STORE.subscribe((msg)=>{
+          if(syncApplying) return;
+          syncApplying = true;
+          try {
           if (STORE.applyWhPoInToMock) STORE.applyWhPoInToMock(MOCK);
+          syncAllPoReceivedQty();
           if (STORE.applyWhPoRetToMock) STORE.applyWhPoRetToMock(MOCK);
           if (STORE.applyWhOsIssueToMock) STORE.applyWhOsIssueToMock(MOCK);
           if (STORE.applyWhProdIssueToMock) STORE.applyWhProdIssueToMock(MOCK);
@@ -14768,7 +15392,8 @@ const app = createApp({
               patchSignsByWaybill(w['运单号'], { 状态: '已完成', 收货确认状态: '已确认' }, true);
             }
           });
-          bumpStore();
+          storeTick.value += 1;
+          if(STORE.saveMockSilent) STORE.saveMockSilent(MOCK);
           if(detailVisible.value && detailRow.value){
             const id = detailRow.value['运单号'] || detailRow.value['单号'] || detailRow.value['入库单号'] || detailRow.value.id;
             const refreshed = tableData.value.find(r => (r['运单号']||r['单号']||r['入库单号']||r.id) === id);
@@ -14779,14 +15404,22 @@ const app = createApp({
               detailRow.value = STORE.overlayPcRow(pageId.value, detailRow.value);
             }
           }
-          if(msg && msg.reason && msg.reason !== 'storage'){
-            ElMessage.success({ message: '已同步 APP 联动更新', duration: 1600 });
+          const reason = msg && msg.reason;
+          if(reason && !SYNC_TOAST_SKIP[reason]){
+            clearTimeout(syncToastTimer);
+            syncToastTimer = setTimeout(()=>{
+              ElMessage.success({ message: '已同步 APP 联动更新', duration: 1600 });
+            }, 120);
+          }
+          } finally {
+            syncApplying = false;
           }
         });
       }
     });
     onBeforeUnmount(()=>{
       if(typeof unsubStore==='function') unsubStore();
+      if(syncToastTimer) clearTimeout(syncToastTimer);
       document.body.classList.remove('remarks-open');
     });
 
@@ -14795,7 +15428,7 @@ const app = createApp({
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       remarksOpen, remarksNote, remarksTitle, remarksTabDefs, remarksActiveTab, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTabClick, onRemarksTocClick, toggleRemarks, closeRemarks,
       query, queryExpanded, hasMoreQuery, visibleQueryFields, selectedIds, pageNum, pageSize, tableData, pagedData, vxeColumns, canMergeShip, canCloseShip, canCloseDispatch, canCloseWaybill, canCloseInspPlan, canSettleWaybill, canDeleteKpiPlan,
-      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineRows,
+      formVisible, formMode, formDialogTitle, formDialogWidth, formSwitch, formModel, poMatPool, formLineSelected, dispatchAuditVisible, dispatchAuditRow, dispatchAuditForm, splitVisible, splitRow, splitForm, splitLines, splitLineSelected, splitNeedsOrder, splitShowPreDoc, splitShowSoShipPreDocs, splitShowSoPreoutPrepDoc, splitPreDocRequired, splitShowPo, onSplitOrderTypeChange, openSplitPicker, settleVisible, settleRows, settleForm, totalSettleQty, totalSettleFee, openSettleModal, onSettleOk, secondaryAssignVisible, secondaryAssignRow, secondaryAssignForm, resetSecondaryAssignForm, onSecondaryAssignOk, assignVisible, assignRow, assignForm, assignCarriers, assignVehicles, assignTrailers, activeFormFields, activeFormLineFields, formLineRows,
       kpiCfgVisible, kpiGrades, kpiGradeSel, kpiProjects, kpiProjSel, kpiScoreVisible, kpiScoreReadonly, kpiScoreVendor, kpiScoreProjects, kpiScoreExplain, kpiScoreRemark, kpiScoreTotal, kpiScoreGrade, kpiVendorRows, kpiVendorCols, kpiVendorSel,
       kpiFlowVisible, kpiFlowRow, kpiFlowNodes, kpiFlowStamp, kpiFlowStampClass,
       qcInspectVisible, qcInspectRow, qcInspectForm,
@@ -14812,7 +15445,7 @@ const app = createApp({
       jobLogiMode, jobStockMode, jobInvTip, jobInvCols, jobBarcodeCols, jobInvRows, jobBarcodeRows, formBarcodeRows, formBarcodeSelected,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeCollapsed, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,
       visibleTypeFormFields, dictTypeOptions,
-      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, addrPopoverField,
       resetDemoStore, storeTick,
       openPicker, onPickerOk, onGenerateBatch, onBatchDeleteLines, onBatchOk, refreshSerialExpire,

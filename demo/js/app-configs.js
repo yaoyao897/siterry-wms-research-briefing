@@ -1243,6 +1243,13 @@ window.APP_CFG = (function () {
           remark: '—', manageMode: '条码管理',
           planPcs: 50, planQty: 25000, doneQty: 0, remainQty: 25000, remainPcs: 50,
         },
+        {
+          lineNo: 30, status: '待执行', code: 'SP-BRG-6205', name: '轴承（6205）',
+          spec: 'P5级', kind: '备品备件', unit: '个', lot: '20260801030',
+          remark: '同单混有计数物料（计数入口可见）', manageMode: '计数管理',
+          planPcs: 0, planQty: 50, doneQty: 0, remainQty: 50, remainPcs: 0,
+          prodDate: '2026-08-01', validMonths: 36, maker: '成都某某机电制造',
+        },
       ],
     },
     {
@@ -2092,24 +2099,24 @@ window.APP_CFG = (function () {
       phone: '13900000004',
       driverId: '51010419880512001X',
       erpNo: 'ERP-WWST-020',
-      remark: '委外精制硫酸成品槽车到货',
-      materialSummary: 'RM-H2SO4 / 工业浓硫酸 / 98% / 危化原料',
+      remark: '委外碳酸锂料浆槽车到货（介质对照 PC mat-medium）',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       packSpec: '槽车散装/储罐',
       lines: [
         {
-          lineNo: 1, status: '待执行', code: 'RM-H2SO4', name: '工业浓硫酸',
-          spec: '98%', kind: '危化原料', unit: 'Kg', lot: '20260803020',
-          remark: '优先打入丁A罐', manageMode: '条码管理', medium: '浓硫酸',
+          lineNo: 1, status: '待执行', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'Kg', lot: '20260803020',
+          remark: '优先打入 TK-STR-001', manageMode: '条码管理', medium: '高纯碳酸锂料浆',
           planPcs: 2, planQty: 50000, doneQty: 0, remainQty: 50000, remainPcs: 2,
-          prodDate: '2026-08-03', validMonths: 24, maker: '赣锋锂业股份',
+          prodDate: '2026-08-03', validMonths: 24, factory: '赣锋锂业股份',
         },
       ],
     },
     {
       id: 'WWST202608060021',
       status: '执行中',
-      partner: '中化蓝天',
-      supplier: '中化蓝天',
+      partner: '雅化集团',
+      supplier: '雅化集团',
       refNo: 'WWDD202608060021',
       poNo: 'WWDD202608060021',
       planDate: '2026-08-06',
@@ -2122,16 +2129,16 @@ window.APP_CFG = (function () {
       phone: '13900000006',
       driverId: '511402198812200067',
       erpNo: 'ERP-WWST-021',
-      remark: '液碱成品分批打罐',
-      materialSummary: 'RM-NaOH / 液碱 / 32% / 危化原料',
+      remark: '碳酸锂料浆分批打罐（介质对照 PC mat-medium）',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       packSpec: '槽车散装/储罐',
       lines: [
         {
-          lineNo: 1, status: '执行中', code: 'RM-NaOH', name: '液碱',
-          spec: '32%', kind: '危化原料', unit: 'Kg', lot: '20260806021',
-          remark: '—', manageMode: '条码管理', medium: '液碱',
+          lineNo: 1, status: '执行中', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'Kg', lot: '20260806021',
+          remark: '优先打入 TK-STR-001', manageMode: '条码管理', medium: '高纯碳酸锂料浆',
           planPcs: 3, planQty: 30000, doneQty: 10000, remainQty: 20000, remainPcs: 2,
-          prodDate: '2026-08-06', validMonths: 12, maker: '中化蓝天',
+          prodDate: '2026-08-06', validMonths: 12, factory: '雅化集团',
         },
       ],
     },
@@ -4892,7 +4899,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-01',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: 'TP-001', step: '', sourceNo: 'BHT2026082001',
       prepBound: true, remark: '备货绑定推荐',
     },
@@ -4901,7 +4908,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-01',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: 'TP-001', step: '', sourceNo: 'BHT2026082001',
       prepBound: true, remark: '备货绑定推荐',
     },
@@ -4910,7 +4917,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-02',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SCRK20260818001',
       prepBound: false, remark: '在库可用补充',
     },
@@ -5101,7 +5108,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-01',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: 'TP-021', step: '', sourceNo: 'BHT2026082001',
       prepBound: true, remark: '发货备货绑定推荐',
     },
@@ -5110,7 +5117,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-01',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: 'TP-021', step: '', sourceNo: 'BHT2026082001',
       prepBound: true, remark: '发货备货绑定推荐',
     },
@@ -5119,7 +5126,7 @@ window.APP_CFG = (function () {
       material: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lot: 'BAT20260818-01', unit: '吨', archiveQty: '1', qty: '1',
       maker: '思特瑞', supplier: '思特瑞', prodDate: '2026-08-18', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'A-01-02',
+      expireDate: '2027-08-18', useStatus: '在用', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SCRK20260818001',
       prepBound: false, remark: '发货在库可用补充',
     },
@@ -5364,8 +5371,8 @@ window.APP_CFG = (function () {
     {
       id: 'CGST202608030003',
       status: '待执行',
-      partner: '赣锋锂业股份',
-      supplier: '赣锋锂业股份',
+      partner: '天齐锂业股份',
+      supplier: '天齐锂业股份',
       refNo: 'CGDD202608030003',
       poNo: 'CGDD202608030003',
       planDate: '2026-08-03',
@@ -5378,24 +5385,24 @@ window.APP_CFG = (function () {
       phone: '13900000004',
       driverId: '51010419880512001X',
       erpNo: 'ERP-CGST-003',
-      remark: '槽车浓硫酸到货',
-      materialSummary: 'RM-H2SO4 / 工业浓硫酸 / 98% / 危化原料',
+      remark: '槽车碳酸锂料浆到货（介质对照 PC mat-medium）',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       packSpec: '槽车散装/储罐',
       lines: [
         {
-          lineNo: 1, status: '待执行', code: 'RM-H2SO4', name: '工业浓硫酸',
-          spec: '98%', kind: '危化原料', unit: 'Kg', lot: '20260803001',
-          remark: '优先打入丁A罐', manageMode: '计数管理', medium: '浓硫酸',
+          lineNo: 1, status: '待执行', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'Kg', lot: '20260803001',
+          remark: '优先打入 TK-STR-001', manageMode: '条码管理', medium: '高纯碳酸锂料浆',
           planPcs: 2, planQty: 50000, doneQty: 0, remainQty: 50000, remainPcs: 2,
-          prodDate: '2026-08-03', validMonths: 24, maker: '赣锋锂业股份',
+          prodDate: '2026-08-03', validMonths: 24, factory: '天齐锂业股份',
         },
       ],
     },
     {
       id: 'CGST202608060006',
       status: '执行中',
-      partner: '中化蓝天',
-      supplier: '中化蓝天',
+      partner: '赣锋锂业股份',
+      supplier: '赣锋锂业股份',
       refNo: 'CGDD202608060006',
       poNo: 'CGDD202608060006',
       planDate: '2026-08-06',
@@ -5408,16 +5415,16 @@ window.APP_CFG = (function () {
       phone: '13900000006',
       driverId: '511402198812200067',
       erpNo: 'ERP-CGST-006',
-      remark: '液碱分批打罐',
-      materialSummary: 'RM-NaOH / 液碱 / 32% / 危化原料',
+      remark: '碳酸锂料浆分批打罐（介质对照 PC mat-medium）',
+      materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       packSpec: '槽车散装/储罐',
       lines: [
         {
-          lineNo: 1, status: '执行中', code: 'RM-NaOH', name: '液碱',
-          spec: '32%', kind: '危化原料', unit: 'Kg', lot: '20260806001',
-          remark: '—', manageMode: '计数管理', medium: '液碱',
+          lineNo: 1, status: '执行中', code: 'RM-Li2CO3-BG', name: '电池级碳酸锂',
+          spec: 'Li2CO3≥99.5%', kind: '锂盐原料', unit: 'Kg', lot: '20260806001',
+          remark: '优先打入 TK-STR-001', manageMode: '条码管理', medium: '高纯碳酸锂料浆',
           planPcs: 3, planQty: 30000, doneQty: 10000, remainQty: 20000, remainPcs: 2,
-          prodDate: '2026-08-06', validMonths: 12, maker: '中化蓝天',
+          prodDate: '2026-08-06', validMonths: 12, factory: '赣锋锂业股份',
         },
       ],
     },
@@ -5562,40 +5569,11 @@ window.APP_CFG = (function () {
     },
   ];
 
-  /** 储罐档案 Mock */
-  const tankArchRows = [
-    {
-      barcode: 'TK-DA-001', tankNo: '丁A', loc: 'GQ-01', medium: '浓硫酸',
-      material: 'RM-H2SO4', materialName: '工业浓硫酸', maxQty: 80000, qty: 20000,
-      useStatus: '在用', stockStatus: '库内',
-      lots: [{ lot: 'lot001', qty: 5000, inDate: '2026-07-01' }, { lot: 'lot002', qty: 15000, inDate: '2026-07-20' }],
-    },
-    {
-      barcode: 'TK-DB-001', tankNo: '丁B', loc: 'GQ-02', medium: '浓硫酸',
-      material: '', materialName: '', maxQty: 60000, qty: 0,
-      useStatus: '在用', stockStatus: '库内',
-      lots: [],
-    },
-    {
-      barcode: 'TK-WC-001', tankNo: '戊C', loc: 'GQ-03', medium: '液碱',
-      material: 'RM-NaOH', materialName: '液碱', maxQty: 50000, qty: 10000,
-      useStatus: '在用', stockStatus: '库内',
-      lots: [{ lot: '20260801001', qty: 10000, inDate: '2026-08-01' }],
-    },
-    {
-      barcode: 'TK-JD-001', tankNo: '己D', loc: 'GQ-04', medium: '盐酸',
-      material: '', materialName: '', maxQty: 40000, qty: 0,
-      useStatus: '停用', stockStatus: '库内',
-      lots: [],
-    },
-  ];
+  /** 储罐档案：运行时由 demo-store 从 PC tank-arch 同步，禁止维护私有丁A/丁B 等码 */
+  const tankArchRows = [];
 
-  /** 物料介质对照：物料编码 → 允许介质 */
-  const mediumMap = {
-    'RM-H2SO4': ['浓硫酸'],
-    'RM-NaOH': ['液碱'],
-    'RM-HCl': ['盐酸'],
-  };
+  /** 物料介质对照：运行时由 PC mat-medium 同步 */
+  const mediumMap = {};
 
   /** 直接调拨-流水码（APP）：与 PC wh-direct-xfer tab1 同源；纯执行无新增/编辑 */
   const noticesXferSerial = [
@@ -5886,28 +5864,28 @@ window.APP_CFG = (function () {
   ];
   const tankRows = [
     {
-      barcode: 'TK001',
-      tankNo: '丁A',
-      loc: 'A01-01',
+      barcode: 'TM202608050001',
+      tankNo: 'TK-STR-001',
+      loc: 'WH-RAW-A01',
       beforeQty: 20,
-      beforeLot: 'lot001,lot002',
+      beforeLot: 'LOT-Li-2026001,LOT-Li-2026001-B',
       afterQty: 45,
-      lotDetails: [{ lot: 'lot001', qty: 5 }, { lot: 'lot002', qty: 15 }],
+      lotDetails: [{ lot: 'LOT-Li-2026001', qty: 5 }, { lot: 'LOT-Li-2026001-B', qty: 15 }],
     },
   ];
   const tankRowsOut = [
     {
-      barcode: 'TK001',
-      tankNo: '丁A',
-      loc: 'A01-01',
+      barcode: 'TM202608050001',
+      tankNo: 'TK-STR-001',
+      loc: 'WH-RAW-A01',
       beforeQty: 20,
-      beforeLot: 'lot001,lot002',
+      beforeLot: 'LOT-Li-2026001,LOT-Li-2026001-B',
       afterQty: 12,
       qty: 8,
       lotDetails: [{ lot: 'lot001', qty: 5 }, { lot: 'lot002', qty: 15 }],
     },
   ];
-  const scanRowsTankRet = scanRowsPick.map((r) => ({ ...r, inLoc: 'A01-01' }));
+  const scanRowsTankRet = scanRowsPick.map((r) => ({ ...r, inLoc: 'WH-RAW-A01' }));
 
   /** 执行页 mock 预填：在库可扫条码（step/docNo 为空，供出库/领料/调拨 seed） */
   const execScanSeedArchExtra = [
@@ -5932,15 +5910,15 @@ window.APP_CFG = (function () {
       material: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
       lot: '20260802001', unit: 'KG', archiveQty: '500', qty: '500',
       maker: '雅化集团', supplier: '雅化集团', prodDate: '2026-08-02', validPeriod: '12', validUnit: '月',
-      expireDate: '2027-08-02', useStatus: '在用', inspectStatus: '合格', stockStatus: '仓库', loc: 'A-01-02-03',
+      expireDate: '2027-08-02', useStatus: '在用', inspectStatus: '合格', stockStatus: '仓库', loc: 'WH-RAW-01',
       bindStatus: '未绑定', bindOuter: '—', step: '', sourceNo: 'SEED-DEMO', remark: '执行页预填mock-3',
     },
   ];
 
   const innerScanRows = [
-    { barcode: 'SC101', pkgNo: 'BK-001', code: 'RM-Li2CO3-BG', loc: 'A-01-01', qty: 20 },
-    { barcode: 'SC102', pkgNo: 'BK-002', code: 'RM-Li2CO3-BG', loc: 'A-01-01', qty: 15 },
-    { barcode: 'SC103', pkgNo: 'BK-003', code: 'RM-Li2CO3-BG', loc: 'A-01-02-03', qty: 10 },
+    { barcode: 'SC101', pkgNo: 'BK-001', code: 'RM-Li2CO3-BG', loc: 'WH-RAW-01', qty: 20 },
+    { barcode: 'SC102', pkgNo: 'BK-002', code: 'RM-Li2CO3-BG', loc: 'WH-RAW-01', qty: 15 },
+    { barcode: 'SC103', pkgNo: 'BK-003', code: 'RM-Li2CO3-BG', loc: 'WH-RAW-01', qty: 10 },
   ];
 
   const outerBindMap = {
@@ -6045,7 +6023,7 @@ window.APP_CFG = (function () {
     { code: 'SP-SEAL-NBR', lot: 'LOT-SEAL-01', loc: 'WH-RAW-01 / 原料仓库位01', qty: 300, inDate: '2026-07-15', unit: '个' },
     { code: 'SP-SEAL-NBR', lot: 'LOT-SEAL-01', loc: 'WH-PM-03 / 包材仓库位03', qty: 200, inDate: '2026-08-02', unit: '个' },
     { code: 'FL001', lot: 'BAT20260810-01', loc: 'WH-PM-01', qty: 800, inDate: '2026-08-10', unit: '个' },
-    { code: 'FL001', lot: 'BAT20260810-01', loc: 'A-01-01', qty: 200, inDate: '2026-08-12', unit: '个' },
+    { code: 'FL001', lot: 'BAT20260810-01', loc: 'WH-RAW-01', qty: 200, inDate: '2026-08-12', unit: '个' },
     { code: 'FL002', lot: 'LOT-TAPE-01', loc: 'WH-PM-01', qty: 300, inDate: '2026-08-05', unit: '卷' },
     { code: 'FL002', lot: 'LOT-TAPE-02', loc: 'WH-PM-02', qty: 150, inDate: '2026-08-08', unit: '卷' },
   ];
@@ -6261,27 +6239,8 @@ window.APP_CFG = (function () {
     { code: 'YD202608250011', ships: ['FHD202608250011'], plate: '川B33445', trailer: '川B001挂', driver: '赵六', phone: '13900139002', driverId: '510107199203150023', poHint: 'WWDD202608150011', bizType: '委外退货' },
   ];
 
-  /** APP 执行页目标库位：对齐 PC 仓库列表 · 库位 Tab（仅启用可入库） */
-  const locRows = [
-    { code: 'WH-RAW-01', name: '原料仓库位01', warehouse: '原料仓', status: '启用' },
-    { code: 'WH-RAW-02', name: '原料仓库位02', warehouse: '原料仓', status: '启用' },
-    { code: 'WH-CS-01', name: '受托原料仓位01', warehouse: '受托加工原料仓', status: '启用' },
-    { code: 'WH-CS-02', name: '受托原料仓位02', warehouse: '受托加工原料仓', status: '启用' },
-    { code: 'WH-FG-01', name: '成品仓库位01', warehouse: '成品仓', status: '启用' },
-    { code: 'WH-FG-02', name: '成品仓库位02', warehouse: '成品仓', status: '启用' },
-    { code: 'WH-PM-01', name: '包材仓库位01', warehouse: '包材仓', status: '启用' },
-    { code: 'WH-PM-02', name: '包材仓库位02', warehouse: '包材仓', status: '启用' },
-    { code: 'WH-PM-03', name: '包材仓库位03', warehouse: '包材仓', status: '启用' },
-    { code: 'A-01-01', name: '原料区货位A-01-01', warehouse: '原料仓', status: '启用' },
-    { code: 'WH-LB-04', name: '线边仓库位04', warehouse: '线边仓', status: '启用' },
-    { code: 'WH-LB-01', name: '线边仓库位01', warehouse: '线边仓', status: '启用' },
-    { code: 'WH-LB-02', name: '线边仓库位02', warehouse: '线边仓', status: '启用' },
-    { code: 'WH-QC-05', name: '待检仓库位05', warehouse: '待检仓', status: '启用' },
-    { code: 'A-01-02-03', name: '原料区货位A-01-02-03', warehouse: '原料仓', status: '启用' },
-    { code: 'KH-XINLI-01', name: '四川新锂现场仓', warehouse: '客户仓', status: '启用' },
-    { code: 'KH-BAMO-02', name: '成都巴莫现场仓', warehouse: '客户仓', status: '启用' },
-    { code: 'KH-HUALI-02', name: '德阳华力寄售仓', warehouse: '客户仓', status: '启用' },
-  ];
+  /** APP 库位主数据：运行时由 demo-store 从 PC warehouse.tab2 同步，禁止维护私有库位码 */
+  const locRows = [];
 
   return {
     menu: menu,
@@ -6335,7 +6294,7 @@ window.APP_CFG = (function () {
       carrier: '顺丰物流',
       driverName: '赵六',
     },
-    tanks: ['丁A', '丁B', '戊C', '己D'],
+    tanks: [],
     operator: '张三',
   };
 })();

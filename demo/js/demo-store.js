@@ -453,6 +453,26 @@ window.WMS_DEMO_STORE = (function () {
     return (wp.drafts && wp.drafts[draftKey]) || null;
   }
 
+  function getWhPoInDraftForLine(noticeId, line) {
+    if (!noticeId || !line) return null;
+    const keys = [];
+    const push = function (k) { if (k && keys.indexOf(k) < 0) keys.push(k); };
+    if (line.id) push(noticeId + '::' + line.id);
+    if (line.code) push(noticeId + '::C' + line.code);
+    if (line.lineNo != null && line.lineNo !== '') push(noticeId + '::L' + line.lineNo);
+    const m = String(line.id || '').match(/-l(\d+)$/i);
+    if (m) {
+      push(noticeId + '::L' + m[1]);
+      const erpNo = Number(m[1]);
+      if (erpNo > 0 && erpNo < 100) push(noticeId + '::L' + (erpNo * 10));
+    }
+    for (let i = 0; i < keys.length; i++) {
+      const draft = getWhPoInDraft(keys[i]);
+      if (draft) return { draftKey: keys[i], draft: draft };
+    }
+    return null;
+  }
+
   function clearWhPoInDraft(draftKey) {
     if (!draftKey) return load();
     return mutate((s) => {
@@ -2366,13 +2386,18 @@ window.WMS_DEMO_STORE = (function () {
   /* ---- MOCK 数据持久化（用户在 PC 端新增/编辑/删除的列表行） ---- */
   const MOCK_KEY = 'wms-demo-mock-v1';
 
-  function saveMock(mockObj) {
+  function writeMockLocal(mockObj) {
     if (!mockObj) return;
     try {
       localStorage.setItem(MOCK_KEY, JSON.stringify(mockObj));
     } catch (e) {
       console.warn('[WMS_DEMO_STORE] MOCK localStorage 写入失败', e);
     }
+  }
+
+  function saveMock(mockObj) {
+    if (!mockObj) return;
+    writeMockLocal(mockObj);
     const payload = { type: 'sync', reason: 'mock-save', at: nowStr() };
     try {
       channel && channel.postMessage(payload);
@@ -2380,6 +2405,11 @@ window.WMS_DEMO_STORE = (function () {
     try {
       window.dispatchEvent(new CustomEvent('wms-demo-sync', { detail: payload }));
     } catch (e) { /* ignore */ }
+  }
+
+  /** 仅写 localStorage，不广播（PC 侧处理 APP 联动回写时用，避免 save→subscribe→toast 连锁） */
+  function saveMockSilent(mockObj) {
+    writeMockLocal(mockObj);
   }
 
   function loadMock() {
@@ -2479,6 +2509,185 @@ window.WMS_DEMO_STORE = (function () {
     });
   }
 
+  /** 仓库/库位主数据：按编码补齐种子行（PC↔APP 同源，历史 localStorage 也能拿到新增库位） */
+  function warehouseRowCode(r, kind) {
+    if (!r || typeof r !== 'object') return '';
+    if (kind === 'wh') return String(r['仓库编码'] || r.id || '').trim();
+    return String(r['库位编码'] || r.id || '').trim();
+  }
+  function appendMissingWarehouseRows(savedArr, seedArr, kind) {
+    const list = Array.isArray(savedArr) ? savedArr.slice() : [];
+    const seed = Array.isArray(seedArr) ? seedArr : [];
+    if (!seed.length) return { list: list, changed: false };
+    const have = new Set(list.map(function (r) { return warehouseRowCode(r, kind); }).filter(Boolean));
+    let changed = false;
+    seed.forEach(function (r) {
+      const code = warehouseRowCode(r, kind);
+      if (!code || have.has(code)) return;
+      list.push(JSON.parse(JSON.stringify(r)));
+      have.add(code);
+      changed = true;
+    });
+    return { list: list, changed: changed };
+  }
+  function ensureWarehouseMaster(target) {
+    const seed = (window.WMS_MOCK_ROWS || {}).warehouse;
+    if (!target || !seed) return false;
+    if (!target.warehouse) target.warehouse = { tab1: [], tab2: [] };
+    const bag = target.warehouse;
+    let changed = false;
+    const wh = appendMissingWarehouseRows(bag.tab1, seed.tab1, 'wh');
+    bag.tab1 = wh.list;
+    if (wh.changed) changed = true;
+    const loc = appendMissingWarehouseRows(bag.tab2, seed.tab2, 'loc');
+    bag.tab2 = loc.list;
+    if (loc.changed) changed = true;
+    return changed;
+  }
+  function resolveMockRoot(preferred) {
+    if (preferred && typeof preferred === 'object') return preferred;
+    const saved = loadMock();
+    if (saved && typeof saved === 'object') return saved;
+    return window.WMS_MOCK_ROWS || null;
+  }
+  /** APP 形态库位行：{ code, name, warehouse, status } */
+  function mapLocRowToApp(r) {
+    if (!r) return null;
+    const code = String(r['库位编码'] || r.code || '').trim();
+    if (!code) return null;
+    return {
+      code: code,
+      name: String(r['库位名称'] || r.name || code).trim(),
+      warehouse: String(r['所属仓库'] || r.warehouse || '').trim(),
+      status: String(r['启用状态'] || r.status || '启用').trim() || '启用',
+    };
+  }
+  function getLocRows(preferredMock) {
+    const seed = (window.WMS_MOCK_ROWS || {}).warehouse || {};
+    const saved = loadMock();
+    const root = preferredMock && typeof preferredMock === 'object'
+      ? preferredMock
+      : (saved || { warehouse: { tab1: [], tab2: [] } });
+    if (!root.warehouse) root.warehouse = { tab1: [], tab2: [] };
+    const bag = root.warehouse;
+    const wh = appendMissingWarehouseRows(bag.tab1, seed.tab1, 'wh');
+    bag.tab1 = wh.list;
+    const loc = appendMissingWarehouseRows(bag.tab2, seed.tab2, 'loc');
+    bag.tab2 = loc.list;
+    // 仅在已有完整 MOCK 缓存时回写，避免 APP 单独写入残缺 mock 覆盖 PC
+    if (saved && (wh.changed || loc.changed)) {
+      saved.warehouse = bag;
+      saveMockSilent(saved);
+    }
+    return (bag.tab2 || []).map(mapLocRowToApp).filter(Boolean);
+  }
+  function findEnabledLoc(code, preferredMock) {
+    const c = String(code || '').trim();
+    if (!c) return null;
+    return getLocRows(preferredMock).find(function (l) { return l.code === c && l.status === '启用'; }) || null;
+  }
+  function syncAppLocRows(cfg, preferredMock) {
+    if (!cfg) return getLocRows(preferredMock);
+    cfg.locRows = getLocRows(preferredMock);
+    return cfg.locRows;
+  }
+
+  function parseTankVolumeToMaxQty(vol) {
+    const s = String(vol == null ? '' : vol).trim();
+    if (!s || s === '—') return 0;
+    const n = parseFloat(s.replace(/[^\d.]/g, ''));
+    if (!Number.isFinite(n) || n <= 0) return 0;
+    if (/m³|m3|立方/i.test(s)) return Math.round(n * 1000); // 按升近似
+    if (/L|升/i.test(s)) return Math.round(n);
+    return Math.round(n);
+  }
+  function mapPcTankArchToApp(pc) {
+    if (!pc) return null;
+    const tankNo = String(pc['储罐编号'] || '').trim();
+    const barcode = String(pc['条码号'] || '').trim();
+    if (!tankNo && !barcode) return null;
+    const matInfo = String(pc['物料信息'] || '').trim();
+    const matParts = matInfo && matInfo !== '—' ? matInfo.split('/').map(function (x) { return x.trim(); }) : [];
+    const lines = Array.isArray(pc._lines) ? pc._lines : [];
+    const lots = lines.map(function (ln) {
+      return {
+        lot: String(ln['批号'] || '').trim() || '—',
+        qty: Number(ln['当前数量'] || 0) || 0,
+        inDate: String(ln['生产日期'] || '').trim() || '—',
+        code: String(ln['物料编码'] || '').trim(),
+        name: String(ln['物料名称'] || '').trim(),
+        unit: String(ln['库存单位'] || '').trim() || 'KG',
+      };
+    }).filter(function (l) { return l.lot && l.lot !== '—'; });
+    const materialCode = (lines[0] && lines[0]['物料编码']) || matParts[0] || '';
+    const materialName = (lines[0] && lines[0]['物料名称']) || matParts[1] || '';
+    const qty = Number(pc['当前数量'] || 0) || lots.reduce(function (s, l) { return s + Number(l.qty || 0); }, 0);
+    const maxQty = parseTankVolumeToMaxQty(pc['容积']) || Math.max(qty, 0);
+    return {
+      barcode: barcode || tankNo,
+      tankNo: tankNo || barcode,
+      tankType: String(pc['储罐类型'] || '').trim(),
+      loc: String(pc['库存位置'] || '').trim() || '—',
+      medium: String(pc['充装介质'] || '').trim(),
+      material: materialCode === '—' ? '' : materialCode,
+      materialName: materialName === '—' ? '' : materialName,
+      materialInfo: matInfo === '—' ? '' : matInfo,
+      maxQty: maxQty,
+      qty: qty,
+      unit: String(pc['库存单位'] || '').trim() || 'KG',
+      useStatus: String(pc['使用状态'] || '').trim() || '在用',
+      stockStatus: String(pc['库存状态'] || '').trim() || '库内',
+      inspectStatus: String(pc['检验状态'] || '').trim(),
+      lot: String(pc['物料批号'] || '').trim(),
+      lots: lots,
+      step: (String(pc['当前步骤'] || '').trim() === '—' ? '' : String(pc['当前步骤'] || '').trim()),
+      docNo: (String(pc['当前单据号'] || '').trim() === '—' ? '' : String(pc['当前单据号'] || '').trim()),
+      stage: (String(pc['所属阶段'] || '').trim() === '—' ? '' : String(pc['所属阶段'] || '').trim()),
+      fromPc: true,
+    };
+  }
+  function getTankArchRows(preferredMock) {
+    const seed = ((window.WMS_MOCK_ROWS || {})['tank-arch'] || {}).main || [];
+    const saved = loadMock();
+    const root = preferredMock && typeof preferredMock === 'object'
+      ? preferredMock
+      : (saved || {});
+    const pcList = (((root['tank-arch'] || {}).main) && (root['tank-arch'].main).length)
+      ? root['tank-arch'].main
+      : seed;
+    return (pcList || []).map(mapPcTankArchToApp).filter(Boolean);
+  }
+  function syncAppTankArchRows(cfg, preferredMock) {
+    if (!cfg) return getTankArchRows(preferredMock);
+    cfg.tankArchRows = getTankArchRows(preferredMock);
+    cfg.tanks = (cfg.tankArchRows || []).filter(function (t) { return t.useStatus === '在用'; }).map(function (t) { return t.tankNo; });
+    return cfg.tankArchRows;
+  }
+  function getMediumMap(preferredMock) {
+    const seed = ((window.WMS_MOCK_ROWS || {})['mat-medium'] || {}).main || [];
+    const saved = loadMock();
+    const root = preferredMock && typeof preferredMock === 'object'
+      ? preferredMock
+      : (saved || {});
+    const pcList = (((root['mat-medium'] || {}).main) && (root['mat-medium'].main).length)
+      ? root['mat-medium'].main
+      : seed;
+    const map = {};
+    (pcList || []).forEach(function (r) {
+      const code = String((r && r['物料编码']) || '').trim();
+      const medium = String((r && r['充装介质']) || '').trim();
+      if (!code || !medium || medium === '—') return;
+      if (!map[code]) map[code] = [];
+      if (map[code].indexOf(medium) < 0) map[code].push(medium);
+    });
+    return map;
+  }
+  function syncAppMediumMap(cfg, preferredMock) {
+    if (!cfg) return getMediumMap(preferredMock);
+    cfg.mediumMap = getMediumMap(preferredMock);
+    return cfg.mediumMap;
+  }
+
   /** 合并系统字典种子：按模块分组 + 各单据独立「单据类型」；保留用户新增项 */
   function normalizeDictTypes(target) {
     const catalog = window.WMS_DICT;
@@ -2514,6 +2723,7 @@ window.WMS_DEMO_STORE = (function () {
       }
     });
     if (migrateInvalidManageMode(target)) saveMock(target);
+    if (ensureWarehouseMaster(target)) saveMock(target);
   }
 
   function resetMock() {
@@ -2570,6 +2780,7 @@ window.WMS_DEMO_STORE = (function () {
     hydrateAppDocs: hydrateAppDocs,
     upsertWhPoInFromApp: upsertWhPoInFromApp,
     getWhPoInDraft: getWhPoInDraft,
+    getWhPoInDraftForLine: getWhPoInDraftForLine,
     clearWhPoInDraft: clearWhPoInDraft,
     applyWhPoInToMock: applyWhPoInToMock,
     upsertWhPoRetFromApp: upsertWhPoRetFromApp,
@@ -2615,9 +2826,18 @@ window.WMS_DEMO_STORE = (function () {
     appendBarcodesToPrepNotice: appendBarcodesToPrepNotice,
     applyWhSoPrepToMock: applyWhSoPrepToMock,
     saveMock: saveMock,
+    saveMockSilent: saveMockSilent,
     loadMock: loadMock,
     hydrateMock: hydrateMock,
     normalizeDictTypes: normalizeDictTypes,
     resetMock: resetMock,
+    ensureWarehouseMaster: ensureWarehouseMaster,
+    getLocRows: getLocRows,
+    findEnabledLoc: findEnabledLoc,
+    syncAppLocRows: syncAppLocRows,
+    getTankArchRows: getTankArchRows,
+    syncAppTankArchRows: syncAppTankArchRows,
+    getMediumMap: getMediumMap,
+    syncAppMediumMap: syncAppMediumMap,
   };
 })();
