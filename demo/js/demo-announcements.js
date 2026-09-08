@@ -2,7 +2,7 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-07",
-    latestVersion: "v1.3.274",
+    latestVersion: "v1.3.275",
     notes: [
   {
     "id": "since-shared",
@@ -1674,6 +1674,14 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.3.275",
+    "date": "2026-09-08",
+    "terminal": "APP/PRD",
+    "module": "全罐区模块 · 扫码明细列表口径统一",
+    "type": "[Refactor]",
+    "summary": "统一 APP 仓储 7 个罐区执行页明细 8 列：条码号、前/后数量命名规范、生产领料批号前置、补齐当前工序列；同步 PRD 说明"
+  },
   {
     "version": "v1.3.274",
     "date": "2026-09-07",

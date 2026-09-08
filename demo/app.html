@@ -2084,7 +2084,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div class="sec" style="padding:0;overflow:hidden">
                       <div class="table-scroll">
                         <table class="scan-table">
-                          <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th><th class="col-op">操作</th></tr></thead>
+                          <thead><tr><th>条码号</th><th>储罐编号</th><th>库存位置</th><th>收料前数量</th><th>收料前批号</th><th>收料后数量</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                           <tbody>
                             <tr v-for="(r,i) in tankRows" :key="'po-tank-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                               <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
@@ -2093,9 +2093,10 @@ body.remarks-open .demo-scope-tip{display:none}
                               <td>{{ r.beforeQty }}</td>
                               <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
                               <td>{{ r.afterQty }}</td>
+                              <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                               <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
                             </tr>
-                            <tr v-if="!tankRows.length"><td colspan="7" style="text-align:center;color:#8C8C8C">暂无储罐明细</td></tr>
+                            <tr v-if="!tankRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐明细</td></tr>
                           </tbody>
                         </table>
                       </div>
@@ -2127,7 +2128,7 @@ body.remarks-open .demo-scope-tip{display:none}
                 <div class="sec" style="padding:0;overflow:hidden">
                   <div class="table-scroll">
                     <table class="scan-table">
-                        <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>收料前量</th><th>收料前批号</th><th>收料后量</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>储罐编号</th><th>库存位置</th><th>收料前数量</th><th>收料前批号</th><th>收料后数量</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                       <tbody>
                           <tr v-for="(r,i) in tankRows" :key="'tank-in-'+i">
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
@@ -2136,8 +2137,10 @@ body.remarks-open .demo-scope-tip{display:none}
                             <td>{{ r.beforeQty }}</td>
                             <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
                             <td><input v-model.number="r.afterQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
                         </tr>
+                          <tr v-if="!tankRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐明细</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -2164,16 +2167,16 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>储罐编号</th><th>*领料数量(可改)</th><th>剩余数量</th><th>原位置</th><th>批号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>储罐编号</th><th>*领料数量(可改)</th><th>剩余数量</th><th>批号</th><th>原位置</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'tank-pick-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo || r.pkgNo }}</a></td>
                             <td><input v-model.number="r.qty" type="number" min="0" style="width:48px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onTankPickQtyChange(r)" /></td>
                             <td>{{ r.remainQty != null ? r.remainQty : '—' }}</td>
-                            <td>{{ r.fromLoc }}</td>
-                            <td>{{ r.lot }}</td>
-                            <td>{{ r.process }}</td>
+                            <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.lot }}</a></td>
+                            <td>{{ r.fromLoc || '—' }}</td>
+                            <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
                           </tr>
                           <tr v-if="!scanRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐领料明细</td></tr>
@@ -2212,7 +2215,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>退料前量</th><th>退料前批号</th><th>退料后量</th><th>工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>储罐编号</th><th>库存位置</th><th>退料前数量</th><th>退料前批号</th><th>退料后数量</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in tankRows" :key="'prod-ret-tank-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
@@ -2256,7 +2259,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码</th><th>储罐编号</th><th>库存位置</th><th>出库前量</th><th>出库前批号</th><th>出库后量</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>储罐编号</th><th>库存位置</th><th>出库前数量</th><th>出库前批号</th><th>出库后数量</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in tankRows" :key="'tank-out-'+i">
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
@@ -2265,8 +2268,10 @@ body.remarks-open .demo-scope-tip{display:none}
                             <td>{{ r.beforeQty }}</td>
                             <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
                             <td><input v-model.number="r.afterQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
                           </tr>
+                          <tr v-if="!tankRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐明细</td></tr>
                         </tbody>
                       </table>
                     </div>
@@ -3675,7 +3680,7 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.274"></script>
+<script src="./js/demo-announcements.js?v=1.3.275"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/demo-store.js"></script>
 <script src="./js/app-configs.js"></script>
