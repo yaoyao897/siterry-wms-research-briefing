@@ -1063,7 +1063,7 @@ window.APP_CFG = (function () {
     'lg-waybill': {
       title: '运单',
       mode: 'waybill',
-      showDocAdd: true,
+      showDocAdd: false,
       execVariant: 'waybill',
       hasProcess: true,
       hasMaterials: false,

@@ -494,7 +494,7 @@ body.remarks-open .demo-scope-tip{display:none}
           <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
-            <a href="./app.html" class="on">APP</a>
+            <a href="./思特瑞WMS_APP_Demo.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -3685,8 +3685,8 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/mock-rows.js?v=1.3.309"></script>
 <script src="./js/demo-store.js?v=1.3.302"></script>
-<script src="./js/app-configs.js?v=1.3.298"></script>
-<script src="./js/page-prd-notes.js?v=1.3.301"></script>
+<script src="./js/app-configs.js?v=1.3.315"></script>
+<script src="./js/page-prd-notes.js?v=1.3.316"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
@@ -4033,8 +4033,9 @@ createApp({
     }
     const remarksBodyRef = ref(null);
     const remarksTocActive = ref('');
-    /** APP 装卸 flowId 与 PC wh-load 共用键，备注 alias 到 APP 专用条目 */
+    /** flowId 与 PC 同键时，备注 alias 到 APP 专用条目（优先于 PC 同名键） */
     const APP_WH_NOTES_ALIAS = { 'wh-load': 'app-wh-load' };
+    const APP_LG_NOTES_ALIAS = { 'lg-waybill': 'app-lg-waybill', 'lg-waybill-carrier': 'app-lg-waybill' };
     /** APP 包材空壳页临时复用 PC 条码管理备注 */
     const APP_PKG_NOTES_ALIAS = {
       'pkg-split': 'bc-serial-split',
@@ -4046,7 +4047,9 @@ createApp({
     };
     const remarksNote = computed(() => {
       const id = flowId.value;
-      return PAGE_PRD_NOTES[id] || PAGE_PRD_NOTES[APP_WH_NOTES_ALIAS[id]] || PAGE_PRD_NOTES[APP_PKG_NOTES_ALIAS[id]] || null;
+      const alias = APP_LG_NOTES_ALIAS[id] || APP_WH_NOTES_ALIAS[id] || APP_PKG_NOTES_ALIAS[id];
+      if (alias && PAGE_PRD_NOTES[alias]) return PAGE_PRD_NOTES[alias];
+      return PAGE_PRD_NOTES[id] || null;
     });
     const remarksTitle = computed(() => (remarksNote.value && remarksNote.value.title) || (flowTitle.value ? (flowTitle.value + ' · 页面说明') : '页面说明'));
     function renderRemarksMd(src) {
@@ -4433,11 +4436,41 @@ createApp({
       if (mode) return mode.includes('条码');
       return !isCountManageLine(ln);
     }
-    function filterNoticeLinesForEntry(lines, docsKey, execMode) {
+    function normalizeLineForEntryFilter(ln) {
+      if (!ln) return null;
+      if (ln.code || ln.manageMode) {
+        return { code: ln.code, manageMode: ln.manageMode, medium: ln.medium };
+      }
+      const mat = waybillMatParts(ln['物料信息']);
+      return {
+        code: mat.code,
+        manageMode: ln['管理方式'] || '条码管理',
+        medium: ln['充装介质'] || ln.medium || '',
+      };
+    }
+    function isCountEntryDocsKey(docsKey, execMode) {
+      return execMode === 'count' || String(docsKey || '').includes('count');
+    }
+    function isTankEntryDocsKey(docsKey, execMode) {
+      return execMode === 'tank' || String(docsKey || '').includes('tank');
+    }
+    function isSerialEntryDocsKey(docsKey, execMode) {
+      if (isCountEntryDocsKey(docsKey, execMode) || isTankEntryDocsKey(docsKey, execMode)) return false;
+      return execMode === 'serial' || String(docsKey || '').includes('serial');
+    }
+    function lineMatchesEntryFilter(ln, docsKey, execMode) {
+      const norm = normalizeLineForEntryFilter(ln);
+      if (!norm) return false;
+      if (isCountEntryDocsKey(docsKey, execMode)) return isCountManageLine(norm);
+      if (isTankEntryDocsKey(docsKey, execMode)) return isLiquidMatLine(norm);
+      if (isSerialEntryDocsKey(docsKey, execMode)) return isBarcodeManageLine(norm) && !isLiquidMatLine(norm);
       const bucket = whEntryManageBucket(docsKey, execMode);
+      if (bucket === 'count') return isCountManageLine(norm);
+      return isBarcodeManageLine(norm);
+    }
+    function filterNoticeLinesForEntry(lines, docsKey, execMode) {
       const src = lines || [];
-      if (bucket === 'count') return src.filter(isCountManageLine);
-      return src.filter(isBarcodeManageLine);
+      return src.filter((ln) => lineMatchesEntryFilter(ln, docsKey, execMode));
     }
     function noticeHasLinesForEntry(notice, docsKey, execMode) {
       return filterNoticeLinesForEntry(notice && notice.lines, docsKey, execMode).length > 0;
@@ -4461,8 +4494,14 @@ createApp({
       if (isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value || isOsRecvTank.value) {
         return wwpoOptions.filter(poBarcode);
       }
-      if (isPoInSerial.value || isPoInTank.value || isPoRetSerial.value) {
-        return poOptions.filter(poBarcode);
+      if (isPoInSerial.value || isPoRetSerial.value) {
+        return poOptions.filter((p) => (p.lines || []).some((l) => {
+          const norm = { code: l.code, manageMode: l.manageMode };
+          return isBarcodeManageLine(norm) && !isLiquidMatLine(norm);
+        }));
+      }
+      if (isPoInTank.value) {
+        return poOptions.filter((p) => (p.lines || []).some((l) => isLiquidMatLine({ code: l.code, medium: l.medium })));
       }
       if (isPoInCount.value || isPoRetCount.value) {
         return poOptions.filter(poCount);
@@ -6819,17 +6858,22 @@ createApp({
         prodDate: ln['生产日期'] || '',
         validPeriod: ln['有效期'] || '',
         maker: ln['生产厂家'] || '',
+        medium: ln['充装介质'] || ln.medium || '',
       };
+    }
+    function whMaterialSummaryFromLines(lines) {
+      if (!lines || !lines.length) return '';
+      return lines.map((ln) => [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / ')).join('；');
     }
     function mapPcWhNoticeToApp(pc, pageId, docsKey) {
       const noKey = pageId === 'wh-transfer' ? '移库单号' : '单号';
       const id = String((pc && pc[noKey]) || '').trim();
       if (!id) return null;
-      const bucket = whDocsKeyBucket(docsKey);
+      const execMode = String(docsKey || '').includes('count') ? 'count' : (String(docsKey || '').includes('tank') ? 'tank' : (String(docsKey || '').includes('serial') ? 'serial' : ''));
       const srcLines = Array.isArray(pc._lines) ? pc._lines : [];
       const lines = srcLines
         .map((ln, i) => ({ ln, app: mapPcWhLineToApp(ln, i, id) }))
-        .filter(({ ln }) => whLineManageBucket(ln['管理方式']) === bucket)
+        .filter(({ ln }) => lineMatchesEntryFilter(ln, docsKey, execMode))
         .map(({ app }) => app);
       if (srcLines.length && !lines.length) return null;
       const supplier = pc['供应商名称'] || pc['客户名称'] || pc['受益人'] || '';
@@ -6853,7 +6897,7 @@ createApp({
         driverId: waybillDash(pc['司机身份证号']),
         erpNo: waybillDash(pc['ERP单据号']),
         remark: waybillDash(pc['备注']),
-        materialSummary: pc['物料信息'] || '',
+        materialSummary: whMaterialSummaryFromLines(lines) || pc['物料信息'] || '',
         packSpec: waybillDash(pc['包装规格']),
         createTime: pc['创建时间'] || (pc.fromPc !== false && id.match(/\d{8}/) ? noticeSortKey({ id }) : ''),
         lines: lines.length ? lines : srcLines.map(mapPcWhLineToApp),
@@ -10121,13 +10165,21 @@ createApp({
     const barcodeMatOptions = CFG.barcodeMatOptions || [];
     const filteredPoInMatOptions = computed(() => {
       const kw = String(poInMatPickerKw.value || '').trim().toLowerCase();
-      const baseOpts = isInTankDoc.value ? liquidMatOptions : ((isInCountDoc.value || isOutCountDoc.value) ? countMatOptions : barcodeMatOptions);
-      let list = baseOpts.slice();
+      let list;
+      if (isInTankDoc.value) {
+        list = (liquidMatOptions || []).slice();
+      } else if (isInCountDoc.value || isOutCountDoc.value) {
+        list = (countMatOptions || []).slice();
+      } else if (isPoInSerial.value) {
+        list = (barcodeMatOptions || []).filter((m) => !liquidMatCodes.value.has(m.code));
+      } else {
+        list = (barcodeMatOptions || []).slice();
+      }
       // 已选上游订单时，优先把订单行物料排在前面
       const po = (refOrderOptions.value || []).find(p => p.code === poInForm.poNo);
       if (po && Array.isArray(po.lines) && po.lines.length) {
         const fromPo = po.lines.map(l => {
-          const hit = baseOpts.find(m => m.code === l.code);
+          const hit = (isInTankDoc.value ? liquidMatOptions : (isInCountDoc.value || isOutCountDoc.value ? countMatOptions : barcodeMatOptions)).find(m => m.code === l.code);
           return {
             code: l.code,
             name: l.name,

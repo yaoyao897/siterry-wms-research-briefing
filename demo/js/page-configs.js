@@ -20909,7 +20909,7 @@ window.WMS_PAGE_CONFIGS = {
           "queryFields": [
             { "name": "单据状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
             { "name": "单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["直接调拨申请单"] },
+            { "name": "单据类型", "type": "select", "options": ["直接调拨申请单", "直接调拨通知单"] },
             { "name": "调出仓库", "type": "input" },
             { "name": "调入仓库", "type": "input" },
             { "name": "计划执行日期", "type": "daterange" },
@@ -25254,8 +25254,7 @@ window.WMS_PAGE_CONFIGS = {
                 "受托收料",
                 "委外退料",
                 "其他入库",
-                "调拨出库",
-                "调拨入库",
+                "直接调拨",
                 "库内转移"
               ]
             },
@@ -25988,8 +25987,7 @@ window.WMS_PAGE_CONFIGS = {
                 "受托收料",
                 "委外退料",
                 "其他入库",
-                "调拨出库",
-                "调拨入库",
+                "直接调拨",
                 "库内转移"
               ]
             },
@@ -26575,8 +26573,7 @@ window.WMS_PAGE_CONFIGS = {
                 "受托收料",
                 "委外退料",
                 "其他入库",
-                "调拨出库",
-                "调拨入库",
+                "直接调拨",
                 "库内转移"
               ]
             },

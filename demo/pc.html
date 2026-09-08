@@ -784,7 +784,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
           <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
-            <a href="./pc.html" class="on">PC</a>
+            <a href="./思特瑞WMS_Demo.html" class="on">PC</a>
             <a href="./app.html">APP</a>
           </div>
           <button type="button" class="sync-chip" @click="resetDemoStore" title="清空 PC/APP 联动缓存，恢复初始 Mock">重置</button>
@@ -2369,10 +2369,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.3.309"></script>
-<script src="./js/page-configs.js?v=1.3.308"></script>
+<script src="./js/page-configs.js?v=1.3.310"></script>
 <script src="./js/mock-rows.js?v=1.3.309"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/page-prd-notes.js?v=1.3.301"></script>
+<script src="./js/page-prd-notes.js?v=1.3.316"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
@@ -2854,7 +2854,7 @@ const app = createApp({
     const WH_BIZ_BY_VEHICLE = {
       '发货': ['销售发货','销售预出货','采购退料','委外发料','受托退料','其他出库'],
       '提货': ['采购入库','销售退货','委外收货','受托收料','委外退料','其他入库'],
-      '厂内/园区倒短运输': ['调拨出库','调拨入库','库内转移'],
+      '厂内/园区倒短运输': ['直接调拨','库内转移'],
       '设备发运': ['无','其他出库','其他入库'],
       '物资转运': ['无','其他出库','其他入库'],
       '其他': ['无','其他出库','其他入库']
@@ -2862,7 +2862,7 @@ const app = createApp({
     const WH_BIZ_DEFAULT = {
       '发货': '销售发货',
       '提货': '采购入库',
-      '厂内/园区倒短运输': '调拨出库',
+      '厂内/园区倒短运输': '直接调拨',
       '设备发运': '无',
       '物资转运': '无',
       '其他': '无'
@@ -4783,7 +4783,7 @@ const app = createApp({
       return WH_BIZ_DEFAULT[vehicleTypeKey(vt)] || '无';
     }
     function normalizeWhBizType(v){
-      const map = { '采购送货':'采购入库', '调拨发货':'调拨出库', '委外发货':'委外发料' };
+      const map = { '采购送货':'采购入库', '调拨发货':'直接调拨', '委外发货':'委外发料', '调拨出库':'直接调拨', '调拨入库':'直接调拨' };
       return map[String(v||'').trim()] || String(v||'').trim();
     }
     function resolveWhBizType(row){
@@ -4810,8 +4810,7 @@ const app = createApp({
         '委外退料': { pageId:'wh-os-ret-mat', prefix:'WWTT', noKey:'单号', docType:'委外退料', tab:'tab1' },
         '委外退货': { pageId:'wh-os-ret-goods', prefix:'WWTH', noKey:'单号', docType:'委外退货', tab:'tab1' },
         '其他入库': { pageId:'wh-other-in', prefix:'QTST', noKey:'单号', docType:'盘盈入库', tab:'tab1' },
-        '调拨出库': { pageId:'wh-transfer', prefix:'YKCK', noKey:'移库单号', docType:'调拨出库', tab:'tab1' },
-        '调拨入库': { pageId:'wh-transfer', prefix:'YKRK', noKey:'移库单号', docType:'调拨入库', tab:'tab1' },
+        '直接调拨': { pageId:'wh-direct-xfer', prefix:'ZJDBSQ', noKey:'单号', docType:'直接调拨通知单', tab:'tab1' },
         '库内转移': { pageId:'wh-transfer', prefix:'YKT', noKey:'移库单号', docType:'库内转移', tab:'tab1' },
         '无': null
       };
@@ -4988,6 +4987,13 @@ const app = createApp({
           司机姓名: (way && way['司机姓名']) ? String(way['司机姓名']) : '—',
           司机电话: (way && way['司机电话']) ? String(way['司机电话']) : '—',
           司机身份证号: (veh && veh['司机身份证号']) ? String(veh['司机身份证号']) : '—'
+        });
+      } else if(meta.pageId==='wh-direct-xfer'){
+        Object.assign(base, {
+          调出仓库: ship['装货地点'] || '—',
+          调入仓库: ship['卸货地点'] || '—',
+          来源派车单号: ship['来源派车单号'] || '—',
+          ...carrier
         });
       } else if(meta.pageId==='wh-transfer'){
         Object.assign(base, { 移入仓库编码:'—', 移入库位编码:'—', 已完成件数:'0', 制单时间: planDate+' 08:00:00', 制单人: ship['申请人']||'张三', 包装规格:'—' });
