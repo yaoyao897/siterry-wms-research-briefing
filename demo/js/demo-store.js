@@ -1578,6 +1578,95 @@ window.WMS_DEMO_STORE = (function () {
     return changed;
   }
 
+  function ensureWhProdIn(s) {
+    if (!s.whProdIn) s.whProdIn = { notices: {}, tab2: {}, tab3: {}, drafts: {} };
+    if (!s.whProdIn.notices) s.whProdIn.notices = {};
+    if (!s.whProdIn.tab2) s.whProdIn.tab2 = {};
+    if (!s.whProdIn.tab3) s.whProdIn.tab3 = {};
+    if (!s.whProdIn.drafts) s.whProdIn.drafts = {};
+    return s.whProdIn;
+  }
+
+  /** APP 生产入库申请单写入 PC 同源缓存（wh-prod-in tab1） */
+  function upsertWhProdInFromApp(payload) {
+    if (!payload || !payload.noticeId) return load();
+    return mutate((s) => {
+      const wp = ensureWhProdIn(s);
+      const noticeId = payload.noticeId;
+      const prevNotice = wp.notices[noticeId] || {};
+      wp.notices[noticeId] = Object.assign({}, prevNotice, {
+        status: payload.noticeStatus || prevNotice.status,
+        lines: payload.noticeLines || prevNotice.lines,
+        row: payload.noticeRow || prevNotice.row,
+        updatedAt: nowStr(),
+      });
+      if (payload.clearDraft && payload.draftKey) {
+        delete wp.drafts[payload.draftKey];
+      } else if (payload.draftKey && payload.draft) {
+        wp.drafts[payload.draftKey] = Object.assign({}, payload.draft, { updatedAt: nowStr() });
+      }
+      s.docs[noticeId] = Object.assign({}, s.docs[noticeId] || {}, {
+        id: noticeId,
+        status: payload.noticeStatus || (s.docs[noticeId] && s.docs[noticeId].status) || '待执行',
+        source: 'APP',
+        updatedAt: nowStr(),
+        action: payload.action || 'prod-in-notice',
+      });
+    }, payload.action || 'wh-prod-in');
+  }
+
+  /** 将 APP 写入的生产入库申请单缓存合并进 PC MOCK['wh-prod-in'] */
+  function applyWhProdInToMock(MOCK) {
+    if (!MOCK || !MOCK['wh-prod-in']) return false;
+    const wp = load().whProdIn;
+    if (!wp) return false;
+    let changed = false;
+    const page = MOCK['wh-prod-in'];
+    page.tab1 = page.tab1 || [];
+
+    Object.keys(wp.notices || {}).forEach(function (noticeId) {
+      const patch = wp.notices[noticeId];
+      let row = page.tab1.find(function (r) { return String(r['单号'] || '') === noticeId; });
+      if (!row && patch.row) {
+        row = Object.assign({ id: String(page.tab1.length + 1) }, patch.row);
+        page.tab1.unshift(row);
+        changed = true;
+      } else if (row && patch.row) {
+        Object.assign(row, patch.row);
+        changed = true;
+      }
+      if (!row) return;
+      if (patch.status && row['单据状态'] !== patch.status) {
+        row['单据状态'] = patch.status;
+        changed = true;
+      }
+      if (Array.isArray(patch.lines) && Array.isArray(row._lines)) {
+        patch.lines.forEach(function (ln) {
+          const hit = row._lines.find(function (x) {
+            const mat = String(x['物料信息'] || '');
+            const code = String(ln.code || '');
+            return String(x.id || '') === String(ln.id || '')
+              || (code && mat.indexOf(code) === 0)
+              || (ln.lineNo != null && (
+                String(x.id || '').endsWith('-l' + ln.lineNo)
+                || String(x['行号'] || '') === String(ln.erpLineNo || ln.lineNo || '')
+              ));
+          });
+          if (!hit) return;
+          if (ln.status) hit['行状态'] = ln.status;
+          if (ln.doneQty != null) hit['已完成数量'] = Number(ln.doneQty).toFixed(2);
+          if (ln.remainQty != null) hit['未完成数量'] = Number(ln.remainQty).toFixed(2);
+          changed = true;
+        });
+      } else if (patch.row && Array.isArray(patch.row._lines)) {
+        row._lines = JSON.parse(JSON.stringify(patch.row._lines));
+        changed = true;
+      }
+    });
+
+    return changed;
+  }
+
   /**
    * APP 委外发料出库写入 PC 同源缓存
    * payload: {
@@ -2617,6 +2706,11 @@ window.WMS_DEMO_STORE = (function () {
         code: String(ln['物料编码'] || '').trim(),
         name: String(ln['物料名称'] || '').trim(),
         unit: String(ln['库存单位'] || '').trim() || 'KG',
+        maker: String(ln['生产厂家'] || '').trim(),
+        supplier: String(ln['供应商名称'] || '').trim(),
+        prodDate: String(ln['生产日期'] || '').trim() || '—',
+        validPeriod: String(ln['有效期'] || '').trim(),
+        expireDate: String(ln['失效日期'] || '').trim(),
       };
     }).filter(function (l) { return l.lot && l.lot !== '—'; });
     const materialCode = (lines[0] && lines[0]['物料编码']) || matParts[0] || '';
@@ -2799,6 +2893,8 @@ window.WMS_DEMO_STORE = (function () {
     getWhProdRetDraft: getWhProdRetDraft,
     clearWhProdRetDraft: clearWhProdRetDraft,
     applyWhProdRetToMock: applyWhProdRetToMock,
+    upsertWhProdInFromApp: upsertWhProdInFromApp,
+    applyWhProdInToMock: applyWhProdInToMock,
     upsertWhOsRetMatFromApp: upsertWhOsRetMatFromApp,
     getWhOsRetMatDraft: getWhOsRetMatDraft,
     clearWhOsRetMatDraft: clearWhOsRetMatDraft,

@@ -209,6 +209,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"He
 .scan-link{color:#1A4099;cursor:pointer;text-decoration:none;font-weight:500}
 .scan-link.done{color:#52C41A}
 .scan-link:active{opacity:.7}
+.scan-table td.col-lot{max-width:132px}
+.scan-table td.col-lot .scan-link{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .scan-op-del{border:none;background:transparent;color:#FF4D4F;font-size:12px;padding:4px 8px;cursor:pointer;border-radius:4px}
 .scan-op-del:active{background:#FFF1F0}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0;padding-bottom:2px}
@@ -494,7 +496,7 @@ body.remarks-open .demo-scope-tip{display:none}
           <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
-            <a href="./思特瑞WMS_APP_Demo.html" class="on">APP</a>
+            <a href="./app.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -540,7 +542,7 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-nav">
                 <button class="m-nav__back" @click="goHome">←</button>
                 <div class="m-nav__title">{{ flowTitle }}</div>
-                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）')))))">新增</button>
+                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isProdInDoc ? openProdInForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）'))))))">新增</button>
               </div>
               <div class="m-scroll">
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
@@ -577,17 +579,19 @@ body.remarks-open .demo-scope-tip{display:none}
                       <template v-if="isExpanded('doc', n.id)">
                         <div><span class="doc-label">承运商</span>{{ n.carrier || '—' }}</div>
                         <div><span class="doc-label">车型要求</span>{{ n.vehicleReq || '—' }}</div>
-                        <div class="full" v-if="n.transportType==='专线' && (n.secondaryPlate || n.secondaryDriver)"><span class="doc-label">专线送货</span>{{ n.secondaryPlate || '—' }}{{ n.secondaryTrailer ? ' / ' + n.secondaryTrailer : '' }} ({{ n.secondaryDriver || '—' }} / {{ n.secondaryPhone || '—' }})</div>
+                        <div class="full" v-if="n.transportType==='专线'"><span class="doc-label">司机（专线）</span>{{ waybillSecondaryDriverText(n) }}</div>
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
                       </template>
                     </div>
                     <div class="doc-grid" v-else-if="flowMode==='waybill'">
                       <div><span class="doc-label">关联派车单</span>{{ n.dispatchNo }}</div>
                       <div><span class="doc-label">用车类型</span>{{ n.shipMode }}</div>
+                      <div><span class="doc-label">运输类型</span>{{ n.transportType || '—' }}</div>
                       <div><span class="doc-label">司机</span>{{ n.driver }} / {{ n.plate }}</div>
                       <div><span class="doc-label">计划装货</span>{{ n.planLoad }}</div>
                       <div class="full"><span class="doc-label">装卸货点</span>{{ n.route }}</div>
                       <div v-if="n.scheduleAt"><span class="doc-label">排单时间</span>{{ n.scheduleAt }}</div>
+                      <div class="full" v-if="n.transportType==='专线'"><span class="doc-label">司机（专线）</span>{{ waybillSecondaryDriverText(n) }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">关联发货单</span>{{ n.shipNos || '—' }}</div>
                         <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
@@ -608,7 +612,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div class="full"><span class="doc-label">生成时间</span>{{ n.createTime || '—' }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div><span class="doc-label">关联发货单</span>{{ n.shipNo || '—' }}</div>
-                        <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                        <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                         <div class="full"><span class="doc-label">装卸地点</span>{{ (n.loadPlace || '—') + ' → ' + (n.unloadPlace || n.shipTo || '—') }}</div>
                       </template>
                     </div>
@@ -616,14 +620,15 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">客户名称</span>{{ n.partner || n.supplier }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ n.refNo || n.poNo || '—' }}</div>
-                      <div><span class="doc-label">关联出库单</span>{{ n.outCkNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">关联出库单</span>{{ n.outCkNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
-                      <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">送货车辆</span>{{ (n.plate || '—') + (n.driver ? (' (' + n.driver + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (n.plate || '—') + ' / ' + (n.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (n.driver || '—') + (n.phone ? (' (' + n.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div class="full"><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ n.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">ERP单据号</span>{{ n.erpNo || '—' }}</div>
@@ -632,16 +637,18 @@ body.remarks-open .demo-scope-tip{display:none}
                     </div>
                     <div class="doc-grid" v-else-if="isSoShipDoc">
                       <div><span class="doc-label">客户名称</span>{{ n.partner || n.supplier }}</div>
-                      <div><span class="doc-label">计划发货日期</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ n.refNo || n.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div><span class="doc-label">关联销售预出</span>{{ n.preoutNo || '—' }}</div>
                       <div><span class="doc-label">关联销售备货</span>{{ n.stockNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
                       <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (n.plate || '—') + ' / ' + (n.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (n.driver || '—') + (n.phone ? (' (' + n.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ n.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">ERP单据号</span>{{ n.erpNo || '—' }}</div>
@@ -650,16 +657,18 @@ body.remarks-open .demo-scope-tip{display:none}
                     </div>
                     <div class="doc-grid" v-else-if="isSoPreoutDoc">
                       <div><span class="doc-label">客户名称</span>{{ n.partner || n.supplier }}</div>
-                      <div><span class="doc-label">客户仓库库位</span>{{ (n.custWh || '—') + ' (' + (n.custLoc || '—') + ')' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ n.refNo || n.poNo || '—' }}</div>
-                      <div><span class="doc-label">计划发货日期</span>{{ n.planDate }}</div>
-                      <div><span class="doc-label">关联销售备货</span>{{ n.stockNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">客户仓库库位</span>{{ (n.custWh || '—') + ' (' + (n.custLoc || '—') + ')' }}</div>
+                      <div><span class="doc-label">关联销售备货</span>{{ n.stockNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
                       <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (n.plate || '—') + ' / ' + (n.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (n.driver || '—') + (n.phone ? (' (' + n.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ n.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
@@ -677,7 +686,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     </div>
                     <div class="doc-grid" v-else-if="isPoNoticeDoc">
                       <div><span class="doc-label">{{ isTrustPartyDoc ? '客户名称' : '供应商名称' }}</span>{{ n.partner || n.supplier }}</div>
-                      <div><span class="doc-label">{{ isTrustPartyDoc ? '计划执行日期' : (isOsIssueDoc ? '计划发料' : (isOsRmaDoc ? '计划退货' : ((isPoRetDoc || isOsRetDoc) ? '计划退料' : '计划到货'))) }}</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">{{ isTrustPartyDoc ? '关联销售订单' : (isOsWwpoDoc ? '关联委外加工单' : '关联采购订单') }}</span>{{ n.refNo || n.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
@@ -686,7 +695,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
                       <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
                       <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
@@ -694,7 +703,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     </div>
                     <div class="doc-grid" v-else-if="isLoadFlow">
                       <div class="full"><span class="doc-label">客供信息</span>{{ n.partner || n.supplier || '—' }}</div>
-                      <div><span class="doc-label">计划执行</span>{{ n.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">关联仓库业务</span>{{ n.whBiz || '—' }}</div>
                       <div><span class="doc-label">关联单号</span>{{ n.refNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
@@ -702,7 +711,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
                       <div><span class="doc-label">车牌/车挂</span>{{ (n.plate || '—') + ' / ' + (n.trailer || '—') }}</div>
                       <div class="full"><span class="doc-label">司机姓名</span>{{ (n.driver || '—') + (n.phone ? (' (' + n.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料</span>{{ n.materialSummary }}</div>
                       <div class="full"><span class="doc-label">计划件数/数量</span>{{ n.planPcs }}件 / {{ n.planQty }} {{ n.planUnit || '' }}</div>
                     </div>
@@ -755,7 +764,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div class="doc-grid" v-else-if="isProdPickDoc">
                       <div><span class="doc-label">关联生产订单</span>{{ n.refNo || n.poNo || '—' }}</div>
                       <div><span class="doc-label">领料类型</span>{{ n.pickType || '生产领料' }}</div>
-                      <div><span class="doc-label">领至线边仓</span>{{ isSparePickType(n.pickType) ? '—' : (n.lineSideLoc || '—') }}</div>
+                      <div><span class="doc-label">领至线边仓</span>{{ n.lineSideLoc || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div class="full"><span class="doc-label">物料</span>{{ n.materialSummary }}</div>
@@ -796,6 +805,10 @@ body.remarks-open .demo-scope-tip{display:none}
                     </template>
                     <template v-else-if="isProdPickDoc">
                       <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openProdPickForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
+                    <template v-else-if="isProdInDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openProdInForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <template v-else-if="isSoRmaDoc || isSoShipDoc || isSoPreoutDoc">
@@ -846,7 +859,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">提货车牌</span>{{ currentNotice.plate || '—' }}</div>
                       <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
                       <div class="full"><span class="doc-label">司机信息</span>{{ currentNotice.driver || '—' }} / {{ currentNotice.phone || '—' }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                       <div class="full"><span class="doc-label">装卸地点</span>{{ (currentNotice.loadPlace || '—') + ' → ' + (currentNotice.unloadPlace || currentNotice.shipTo || '—') }}</div>
                       <div class="full"><span class="doc-label">生成时间</span>{{ currentNotice.createTime || '—' }}</div>
                     </div>
@@ -997,7 +1010,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   </template>
                   <div class="field" style="padding:0"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
                 </div>
-                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ isTrustPartyDoc ? '请选择销售订单或添加物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料') }}</p>
+                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ isTrustPartyDoc ? '请选择销售订单或添加物料' : ((isOsIssueDoc || isOsRetDoc) ? '请选择委外加工单后点击新增挑选原料物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料')) }}</p>
               </div>
               <div class="m-footer" style="display:flex;gap:10px">
                 <button type="button" class="btn-ghost" style="flex:1" @click="backPoInNoticeForm">取消</button>
@@ -1154,9 +1167,9 @@ body.remarks-open .demo-scope-tip{display:none}
                     </select>
                   </div>
                   <div class="field">
-                    <label><span class="req" v-if="!isSparePickType(prodPickForm.pickType)">*</span>领至线边仓</label>
-                    <select v-model="prodPickForm.lineSideLoc" :disabled="isSparePickType(prodPickForm.pickType)">
-                      <option value="">{{ isSparePickType(prodPickForm.pickType) ? '备品备件领料不可填' : '请选择线边仓' }}</option>
+                    <label><span class="req">*</span>领至线边仓</label>
+                    <select v-model="prodPickForm.lineSideLoc">
+                      <option value="">请选择线边仓</option>
                       <option v-for="w in lineSideWhOptions" :key="w" :value="w">{{ w }}</option>
                     </select>
                   </div>
@@ -1222,6 +1235,104 @@ body.remarks-open .demo-scope-tip{display:none}
               </div>
             </template>
 
+            <!-- ===== 生产入库 · 新增/编辑申请单 ===== -->
+            <template v-else-if="view==='prod-in-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backProdInForm">←</button>
+                <div class="m-nav__title">{{ (prodInFormMode==='edit' ? '编辑' : '新增') + (isProdInCount ? '生产入库申请单-计数' : '生产入库申请单-流水码') }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field">
+                    <label><span class="req">*</span>关联生产订单</label>
+                    <select v-model="prodInForm.poNo" @change="onProdInMoChange">
+                      <option value="">请选择生产订单</option>
+                      <option v-for="p in prodInMoOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.dept }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>生产部门</label><input v-model="prodInForm.partner" readonly placeholder="选择生产订单后带入" /></div>
+                  <div class="field">
+                    <label><span class="req">*</span>业务类型</label>
+                    <select v-model="prodInForm.bizType" @change="onProdInBizTypeChange">
+                      <option v-for="o in prodInBizTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field" v-if="prodInForm.bizType==='受托加工完工'">
+                    <label>关联销售订单</label><input v-model="prodInForm.soNo" placeholder="选填" />
+                  </div>
+                  <div class="field" v-if="prodInForm.bizType==='受托加工完工'">
+                    <label>客户名称</label><input v-model="prodInForm.customer" placeholder="选填，可按销售订单带出" />
+                  </div>
+                  <div class="field">
+                    <label>关联备货通知单</label>
+                    <select v-model="prodInForm.prepNoticeNo">
+                      <option value="">请选择（选填）</option>
+                      <option v-for="b in prepNoticeOptions" :key="b" :value="b">{{ b }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label><span class="req">*</span>单据类型</label>
+                    <select v-model="prodInForm.docType">
+                      <option v-for="o in noticeDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>计划执行日期</label><input type="date" v-model="prodInForm.planDate" /></div>
+                  <div class="field"><label>备注</label><input v-model="prodInForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                </div>
+                <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
+                  <span>物料明细（{{ (prodInForm.lines||[]).length }} 行）</span>
+                  <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openProdInMatPicker">+ 添加物料</button>
+                </div>
+                <div v-for="(ln, idx) in prodInForm.lines" :key="'pi-ln-'+idx" class="line-card" style="cursor:default">
+                  <button type="button" class="scan-op-del" style="position:absolute;right:12px;top:10px" @click="removeProdInFormLine(idx)">删除</button>
+                  <div class="line-fields" style="padding-right:48px">
+                    <div><span class="k">行号：</span>{{ ln.erpLineNo || ln.lineNo || '—' }}</div>
+                    <div><span class="k">物料编码：</span>{{ ln.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ ln.name }}</div>
+                    <div><span class="k">规格/单位：</span>{{ ln.spec }} / {{ ln.unit }}</div>
+                    <div><span class="k">管理方式：</span>{{ ln.manageMode || (isProdInCount ? '计数管理' : '条码管理') }}</div>
+                  </div>
+                  <div class="field" style="padding:0 0 8px" v-if="isProdInCount"><label>计划件数</label><input value="—" readonly /></div>
+                  <div class="field" style="padding:0 0 8px" v-else><label><span class="req">*</span>计划件数</label><input v-model.number="ln.planPcs" type="number" min="1" /></div>
+                  <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>计划数量</label><input v-model.number="ln.planQty" type="number" min="0.01" step="0.01" /></div>
+                  <div class="field" style="padding:0 0 8px"><label>批号</label><input v-model="ln.lot" :placeholder="isProdInCount ? '选填，可手输' : '选填，可手输或执行时选档案'" /></div>
+                  <div class="field" style="padding:0 0 8px"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
+                  <div style="padding:0 0 8px"><button type="button" class="btn-sm" @click="cloneProdInLineForNewLot(idx)">新增批号</button></div>
+                </div>
+                <p v-if="!(prodInForm.lines||[]).length" class="hint" style="text-align:center">选择关联生产订单后自动带入物料，或点击添加物料</p>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backProdInForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveProdInNotice">确认保存</button>
+              </div>
+              <div v-if="prodInMatPickerVisible" class="m-sheet-mask" @click.self="prodInMatPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>{{ isProdInCount ? '选择计数物料' : '选择物料（条码管理）' }}</span>
+                    <button type="button" class="m-sheet__close" @click="prodInMatPickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="prodInMatPickerKw" placeholder="搜索编码 / 名称 / 规格" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="m in filteredProdInMatOptions"
+                      :key="m.code"
+                      class="line-card m-sheet__item"
+                      @click="selectProdInMat(m)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">物料编码：</span>{{ m.code }}</div>
+                        <div><span class="k">物料名称：</span>{{ m.name }}</div>
+                        <div><span class="k">规格/单位：</span>{{ m.spec }} / {{ m.unit }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredProdInMatOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可选物料</p>
+                  </div>
+                </div>
+              </div>
+            </template>
+
             <!-- ===== 生产领料 · 直接领料（计数可选类型；罐区固定生产领料+选储罐） ===== -->
             <template v-else-if="view==='direct-pick-form'">
               <div class="m-nav">
@@ -1257,9 +1368,9 @@ body.remarks-open .demo-scope-tip{display:none}
                     <p class="hint" v-if="directPickForm.tankNo" style="margin-top:6px">条码 {{ directPickSelectedTank && directPickSelectedTank.barcode }} · 库位 {{ directPickSelectedTank && directPickSelectedTank.loc }}</p>
                   </div>
                   <div class="field">
-                    <label><span class="req" v-if="isProdPickTank || !isSparePickType(directPickForm.pickType)">*</span>领至线边仓</label>
-                    <select v-model="directPickForm.lineSideLoc" :disabled="isProdPickCount && isSparePickType(directPickForm.pickType)">
-                      <option value="">{{ (isProdPickCount && isSparePickType(directPickForm.pickType)) ? '备品备件领料不可填' : '请选择领至线边仓' }}</option>
+                    <label><span class="req">*</span>领至线边仓</label>
+                    <select v-model="directPickForm.lineSideLoc">
+                      <option value="">请选择领至线边仓</option>
                       <option v-for="w in lineSideWhOptions" :key="'dp-'+w" :value="w">{{ w }}</option>
                     </select>
                   </div>
@@ -1360,40 +1471,45 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">客户名称</span>{{ currentNotice.partner || currentNotice.supplier }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
-                      <div><span class="doc-label">关联出库单</span>{{ currentNotice.outCkNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div><span class="doc-label">关联出库单</span>{{ currentNotice.outCkNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ currentNotice.waybillNo || '—' }}</div>
-                      <div><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">送货车辆</span>{{ (currentNotice.plate || '—') + (currentNotice.driver ? (' (' + currentNotice.driver + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (currentNotice.plate || '—') + ' / ' + (currentNotice.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (currentNotice.driver || '—') + (currentNotice.phone ? (' (' + currentNotice.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div class="full"><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ currentNotice.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="isSoShipDoc">
                       <div><span class="doc-label">客户名称</span>{{ currentNotice.partner || currentNotice.supplier }}</div>
-                      <div><span class="doc-label">计划发货日期</span>{{ currentNotice.planDate }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
                       <div><span class="doc-label">关联销售预出</span>{{ currentNotice.preoutNo || '—' }}</div>
                       <div><span class="doc-label">关联销售备货</span>{{ currentNotice.stockNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ currentNotice.waybillNo || '—' }}</div>
                       <div><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (currentNotice.plate || '—') + ' / ' + (currentNotice.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (currentNotice.driver || '—') + (currentNotice.phone ? (' (' + currentNotice.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ currentNotice.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="isSoPreoutDoc">
                       <div><span class="doc-label">客户名称</span>{{ currentNotice.partner || currentNotice.supplier }}</div>
-                      <div><span class="doc-label">客户仓库库位</span>{{ (currentNotice.custWh || '—') + ' (' + (currentNotice.custLoc || '—') + ')' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">关联销售订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
-                      <div><span class="doc-label">计划发货日期</span>{{ currentNotice.planDate }}</div>
-                      <div><span class="doc-label">关联销售备货</span>{{ currentNotice.stockNo || '—' }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div><span class="doc-label">客户仓库库位</span>{{ (currentNotice.custWh || '—') + ' (' + (currentNotice.custLoc || '—') + ')' }}</div>
+                      <div><span class="doc-label">关联销售备货</span>{{ currentNotice.stockNo || '—' }}</div>
                       <div><span class="doc-label">关联运单</span>{{ currentNotice.waybillNo || '—' }}</div>
                       <div><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
-                      <div class="full"><span class="doc-label">车牌/车挂</span>{{ (currentNotice.plate || '—') + ' / ' + (currentNotice.trailer || '—') }}</div>
-                      <div class="full"><span class="doc-label">司机姓名</span>{{ (currentNotice.driver || '—') + (currentNotice.phone ? (' (' + currentNotice.phone + ')') : '') }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ currentNotice.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="isPoNoticeDoc">
                       <div><span class="doc-label">{{ isTrustPartyDoc ? '客户名称' : '供应商名称' }}</span>{{ currentNotice.partner || currentNotice.supplier }}</div>
@@ -1406,7 +1522,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
                       <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
                       <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
-                      <div class="full"><span class="doc-label">司机身份证</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="isProdRetDoc">
                       <div><span class="doc-label">申请单号</span>{{ currentNotice.id }}</div>
@@ -1429,9 +1545,18 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div class="doc-grid" v-else-if="isProdPickDoc">
                       <div><span class="doc-label">关联生产订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
                       <div><span class="doc-label">领料类型</span>{{ currentNotice.pickType || '生产领料' }}</div>
-                      <div><span class="doc-label">领至线边仓</span>{{ isSparePickType(currentNotice.pickType) ? '—' : (currentNotice.lineSideLoc || '—') }}</div>
+                      <div><span class="doc-label">领至线边仓</span>{{ currentNotice.lineSideLoc || '—' }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="isProdInDoc">
+                      <div><span class="doc-label">关联生产订单</span>{{ currentNotice.refNo || currentNotice.poNo || '—' }}</div>
+                      <div><span class="doc-label">业务类型</span>{{ currentNotice.bizType || '自产完工' }}</div>
+                      <div><span class="doc-label">关联备货通知单</span>{{ currentNotice.prepNoticeNo || '—' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div v-if="currentNotice.bizType==='受托加工完工'" class="full"><span class="doc-label">关联销售订单</span>{{ currentNotice.soNo || '—' }}（{{ currentNotice.customer || '—' }}）</div>
                       <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
                     </div>
                     <div class="doc-grid" v-else>
@@ -1453,6 +1578,7 @@ body.remarks-open .demo-scope-tip{display:none}
                 >
                   <span class="line-card__status tag" :class="statusTag(line.status)">{{ line.status }}</span>
                   <div class="line-fields">
+                    <div v-if="isProdInDoc"><span class="k">行号：</span>{{ line.erpLineNo || line.lineNo || '—' }}</div>
                     <div><span class="k">物料编码：</span>{{ line.code }}</div>
                     <div><span class="k">物料名称：</span>{{ line.name }}</div>
                     <div><span class="k">物料规格：</span>{{ line.spec }}</div>
@@ -1463,7 +1589,6 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="k">批次编号：</span>{{ line.lot || '—' }}</div>
                     </template>
                     <template v-else-if="isSoRmaDoc || isSoShipDoc || isSoPreoutDoc">
-                      <div v-if="line.manageMode"><span class="k">管理方式：</span>{{ line.manageMode }}</div>
                       <div><span class="k">批号：</span>{{ (line.lot && line.lot !== '—') ? (line.lot + ' (强控)') : (isSoRmaDoc ? '— (允许录入实际批次)' : '— (允许任意合格批次)') }}</div>
                     </template>
                     <div v-else><span class="k">批号：</span>{{ line.lot }}</div>
@@ -1471,12 +1596,11 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                   <div class="line-stats">
                     <div v-if="isLoadFlow && line.manageMode==='条码管理'"><span class="k">计划件数</span><span class="v">{{ line.planPcs ?? '—' }}</span></div>
-                    <div v-else-if="isLoadFlow"><span class="k">计划件数</span><span class="v">—</span></div>
-                    <div v-else-if="!(isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank || isProdRetCount || isProdRetTank || isProdPickCount || isSoRmaCount || isXferCountDoc || (isOutCountDoc && !line.planPcs))"><span class="k">计划件数</span><span class="v">{{ line.planPcs }}</span></div>
-                    <div v-else-if="isTrustRetCount || isTrustRecvCount || isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isSoRmaCount || isXferCountDoc || (isOutCountDoc && !line.planPcs)"><span class="k">计划件数</span><span class="v">—</span></div>
+                    <div v-else-if="!(isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank || isProdRetCount || isProdRetTank || isProdPickCount || isProdPickTank || isSoRmaCount || isXferCountDoc || (isOutCountDoc && !line.planPcs))"><span class="k">计划件数</span><span class="v">{{ line.planPcs }}</span></div>
+                    <div v-else><span class="k">计划件数</span><span class="v">—</span></div>
                     <div><span class="k">计划数量</span><span class="v">{{ line.planQty }}</span></div>
-                    <div><span class="k">{{ isLoadFlow ? '已完成数量' : '已完成' }}</span><span class="v">{{ line.doneQty }}</span></div>
-                    <div><span class="k">{{ isLoadFlow ? '未完成数量' : '未完成' }}</span><span class="v" :class="{ zero: line.remainQty===0 }">{{ line.remainQty }}</span></div>
+                    <div><span class="k">已完成数量</span><span class="v">{{ line.doneQty }}</span></div>
+                    <div><span class="k">未完成数量</span><span class="v" :class="{ zero: line.remainQty===0 }">{{ line.remainQty }}</span></div>
                   </div>
                 </div>
                 <p v-if="allLinesDone" class="hint" style="text-align:center;margin-top:12px">{{ flowMeta.doneHint || '所有物料行已完成' }}</p>
@@ -1579,7 +1703,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>数量</th><th>批号</th><th>源库位</th><th>*目标库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>*数量</th><th>批号</th><th>原位置</th><th>*目标库位</th><th>外包材编号</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
                           <tr v-for="(r,i) in scanRows" :key="'xfer-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                             <td>
@@ -1773,15 +1897,8 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </template>
 
-                <!-- 出库类流水码：采购退料出库 / 委外发料出库 / 委外退货出库 -->
+                <!-- 出库类流水码：采购退料出库 / 委外发料出库 / 委外退货出库（退货源库位由条码档案带出，无需单独录入） -->
                 <template v-else-if="isOutSerialDoc">
-                  <div class="sec" v-if="isOsRmaSerial">
-                    <div class="sec__title">{{ flowMeta.addLocTitle || '添加委外退货出库信息' }}</div>
-                    <div class="field">
-                      <label><span class="req">*</span>{{ flowMeta.locLabel || '源库位编号' }}</label>
-                      <input v-model="form.loc" placeholder="扫码 / 输入源库位编码，回车（须为库位列表启用库位）" @keyup.enter="confirmPoInLoc" />
-                    </div>
-                  </div>
                   <div class="sec">
                     <div class="sec__title">{{ flowMeta.addMatTitle || '添加退料出库信息' }}</div>
                     <div class="field"><label><span class="req">*</span>条码号</label><input v-model="form.barcode" placeholder="扫单品流水码或外包材整托条码，回车" @keyup.enter="addSerialScan" /></div>
@@ -2152,6 +2269,13 @@ body.remarks-open .demo-scope-tip{display:none}
                 <!-- 生产领料-罐区：库内储罐领出（流水仅条码号=储罐条码 + 储罐编号） -->
                 <template v-else-if="tankExec==='pick'">
                   <div class="sec">
+                    <div class="sec__title">领至线边仓信息</div>
+                    <div class="field">
+                      <label>领至线边仓</label>
+                      <input :value="form.lineSideWh || (currentNotice && currentNotice.lineSideLoc) || '—'" readonly />
+                    </div>
+                  </div>
+                  <div class="sec">
                     <div class="sec__title">库内储罐与领料录入</div>
                     <div class="field"><label>储罐条码</label><input v-model="form.tankBarcode" placeholder="扫储罐条码，回车" @keyup.enter="addTankRow" /></div>
                     <div class="field">
@@ -2175,7 +2299,7 @@ body.remarks-open .demo-scope-tip{display:none}
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo || r.pkgNo }}</a></td>
                             <td><input v-model.number="r.qty" type="number" min="0" style="width:48px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onTankPickQtyChange(r)" /></td>
                             <td>{{ r.remainQty != null ? r.remainQty : '—' }}</td>
-                            <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.lot }}</a></td>
+                            <td class="col-lot"><a class="scan-link" href="#" :title="tankPickLotLabel(r)" @click.prevent="openLotDetail(r)">{{ tankPickLotLabel(r) }}</a></td>
                             <td>{{ r.fromLoc || '—' }}</td>
                             <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('scan', i)">删除</button></td>
@@ -2235,7 +2359,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </template>
 
-                <!-- 其他出库：出库方向 + 库内储罐 -->
+                <!-- 其他出库-罐区：出库方向 + 库内储罐 FIFO 多批号扣减 -->
                 <template v-else>
                   <div class="sec">
                     <div class="sec__title">出库方向</div>
@@ -2247,32 +2371,44 @@ body.remarks-open .demo-scope-tip{display:none}
                         <option value="出至线边仓">出至线边仓</option>
                       </select>
                     </div>
+                    <div class="field" v-if="form.outDir==='出至线边仓'">
+                      <label><span class="req">*</span>领至线边仓</label>
+                      <select v-model="form.lineSideWh">
+                        <option value="">请选择线边仓</option>
+                        <option v-for="w in lineSideWhOptions" :key="w" :value="w">{{ w }}</option>
+                      </select>
+                    </div>
                   </div>
                   <div class="sec">
-                    <div class="sec__title">添加库内储罐</div>
-                    <div class="field"><label>条码号</label><input v-model="form.tankBarcode" placeholder="输入后回车 / 失焦校验" @keyup.enter="addTankRow" /></div>
+                    <div class="sec__title">库内储罐与出库录入</div>
+                    <div class="field"><label>储罐条码</label><input v-model="form.tankBarcode" placeholder="扫储罐条码，回车" @keyup.enter="addTankRow" /></div>
                     <div class="field">
                       <label><span class="req">*</span>储罐编号</label>
-                      <select v-model="form.tankNo"><option v-for="t in tanks" :key="t" :value="t">{{ t }}</option></select>
+                      <select v-model="form.tankNo" @change="onPoInTankNoChange">
+                        <option value="">请选择储罐</option>
+                        <option v-for="t in tanks" :key="t" :value="t">{{ t }}</option>
+                      </select>
                     </div>
+                    <div class="field"><label><span class="req">*</span>出库数量</label><input v-model.number="form.pkgQty" type="number" min="0.01" step="0.01" placeholder="本次出库数量" @keyup.enter="addTankRow" /></div>
+                    <button type="button" class="btn-sm" style="margin:4px 0 8px" @click="addTankRow">添加确认</button>
                   </div>
                   <div class="stat-bar"><span>扫码件数：{{ tankRows.length }}</span><span>扫码数量：{{ tankQtySum }}</span></div>
                   <div class="sec" style="padding:0;overflow:hidden">
                     <div class="table-scroll">
                       <table class="scan-table">
-                        <thead><tr><th>条码号</th><th>储罐编号</th><th>库存位置</th><th>出库前数量</th><th>出库前批号</th><th>出库后数量</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
+                        <thead><tr><th>条码号</th><th>储罐编号</th><th>*出库数量</th><th>剩余数量</th><th>批号</th><th>原位置</th><th>当前工序</th><th class="col-op">操作</th></tr></thead>
                         <tbody>
-                          <tr v-for="(r,i) in tankRows" :key="'tank-out-'+i">
+                          <tr v-for="(r,i) in tankRows" :key="'tank-out-'+i" :style="{ color: r.done ? '#52C41A' : '#262626' }">
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.barcode }}</a></td>
                             <td><a class="scan-link" href="#" @click.prevent="openProcess(r)">{{ r.tankNo }}</a></td>
-                            <td>{{ r.loc }}</td>
-                            <td>{{ r.beforeQty }}</td>
-                            <td><a class="scan-link" href="#" @click.prevent="openLotDetail(r)">{{ r.beforeLot }}</a></td>
-                            <td><input v-model.number="r.afterQty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" /></td>
+                            <td><input v-model.number="r.qty" type="number" min="0" style="width:56px;height:28px;border:1px solid #D9D9D9;border-radius:4px;padding:0 4px" @change="onTankOutQtyChange(r)" /></td>
+                            <td>{{ r.remainQty != null ? r.remainQty : (r.afterQty != null ? r.afterQty : '—') }}</td>
+                            <td class="col-lot"><a class="scan-link" href="#" :title="tankPickLotLabel(r)" @click.prevent="openLotDetail(r)">{{ tankPickLotLabel(r) }}</a></td>
+                            <td>{{ r.loc || r.fromLoc || '—' }}</td>
                             <td>{{ r.process || (r.done ? '已完成' : '—') }}</td>
                             <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('tank', i)">删除</button></td>
                           </tr>
-                          <tr v-if="!tankRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐明细</td></tr>
+                          <tr v-if="!tankRows.length"><td colspan="8" style="text-align:center;color:#8C8C8C">暂无储罐出库明细</td></tr>
                         </tbody>
                       </table>
                     </div>
@@ -2308,21 +2444,20 @@ body.remarks-open .demo-scope-tip{display:none}
 
               <div v-if="lotDetailVisible" style="position:absolute;inset:0;z-index:21;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;border-radius:20px">
                 <div style="width:100%;background:#fff;border-radius:12px;overflow:hidden">
-                  <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid #eee">储罐批号存量详情</div>
+                  <div style="padding:14px 16px;font-weight:600;border-bottom:1px solid #eee">{{ lotDetailTitle }}</div>
                   <table class="scan-table">
-                    <thead><tr><th>序号</th><th>批号</th><th>在库数量</th><th>单位</th><th>入库日期</th></tr></thead>
+                    <thead><tr><th>序号</th><th>批号</th><th>{{ lotDetailQtyHeader }}</th><th>单位</th></tr></thead>
                     <tbody>
                       <tr v-for="(d,i) in lotDetailRows" :key="'lot-'+i">
                         <td>{{ i + 1 }}</td>
                         <td>{{ d.lot }}</td>
                         <td>{{ d.qty }}</td>
                         <td>{{ d.unit || (currentLine && currentLine.unit) || 'Kg' }}</td>
-                        <td>{{ d.inDate || '—' }}</td>
                       </tr>
-                      <tr v-if="!lotDetailRows.length"><td colspan="5" style="text-align:center;color:#8C8C8C">暂无批号存量</td></tr>
+                      <tr v-if="!lotDetailRows.length"><td colspan="4" style="text-align:center;color:#8C8C8C">{{ lotDetailEmptyText }}</td></tr>
                     </tbody>
                   </table>
-                  <div style="padding:10px 16px;font-size:13px;color:#595959">在库合计：{{ lotDetailSum }}</div>
+                  <div style="padding:10px 16px;font-size:13px;color:#595959">{{ lotDetailSumLabel }}：{{ lotDetailSum }} {{ (lotDetailRows[0] && lotDetailRows[0].unit) || (currentLine && currentLine.unit) || 'Kg' }}</div>
                   <div style="padding:12px 16px;text-align:center">
                     <button type="button" class="btn-primary" style="width:auto;padding:8px 28px;height:auto" @click="lotDetailVisible=false">关闭</button>
                   </div>
@@ -2348,7 +2483,6 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div v-if="isLoadFlow"><span class="k">通知单号：</span>{{ currentNotice.id }}</div>
                     <template v-else-if="isSoRmaCount || isSoShipCount || isSoPreoutCount">
                       <div><span class="k">批号：</span>{{ (currentLine.lot && currentLine.lot !== '—') ? (currentLine.lot + ' (强控)') : (isSoRmaCount ? '— (允许录入客户退货实际批次)' : '— (允许选择库内任意合格批次)') }}</div>
-                      <div v-if="currentLine.manageMode"><span class="k">管理方式：</span>{{ currentLine.manageMode }}</div>
                     </template>
                     <div v-else><span class="k">批号：</span>{{ currentLine.lot }}</div>
                     <div v-if="isProdRetCount"><span class="k">来源线边仓：</span>{{ (currentNotice && currentNotice.lineSideLoc) || '—' }}</div>
@@ -2537,6 +2671,25 @@ body.remarks-open .demo-scope-tip{display:none}
                         >{{ t }}</button>
                       </div>
                       <p class="hint" style="margin-top:8px">须按序完成工序；全部变绿后方可提交。无工艺时可直接提交。</p>
+                    </div>
+                  </template>
+                  <!-- 生产领料-计数：领至线边仓（只读）+ 来源库位 + 出库录入 -->
+                  <template v-else-if="isProdPickCount">
+                    <div class="sec">
+                      <div class="sec__title">领至线边仓信息</div>
+                      <div class="field">
+                        <label>领至线边仓</label>
+                        <input :value="form.lineSideWh || (currentNotice && currentNotice.lineSideLoc) || '—'" readonly />
+                      </div>
+                    </div>
+                    <div class="sec">
+                      <div class="sec__title">{{ flowMeta.addLocTitle || '添加位置信息' }}</div>
+                      <div class="field"><label><span class="req">*</span>库位编号</label><input v-model="form.loc" placeholder="扫码 / 输入源库位编码，回车（须为库位列表启用库位）" @keyup.enter="confirmPoInLoc" /></div>
+                    </div>
+                    <div class="sec">
+                      <div class="sec__title">{{ flowMeta.addMatTitle || '添加出库信息' }}</div>
+                      <div class="field"><label>批号</label><input v-model="form.lotIn" :readonly="!!(currentLine && currentLine.lot && currentLine.lot !== '—')" :placeholder="(currentLine && currentLine.lot && currentLine.lot !== '—') ? '申请单已指定批号，不可修改' : '可手动录入批号'" /></div>
+                      <div class="field"><label><span class="req">*</span>{{ flowMeta.qtyLabel || '出库数量' }}</label><input v-model.number="form.inQty" type="number" min="0.01" step="0.01" :placeholder="'不超过未完成 ' + (currentLine.remainQty||0)" /></div>
                     </div>
                   </template>
                   <!-- 出库类计数（采购退料出库-计数 / 委外发料-计数 / 委外退货-计数，对齐 PRD） -->
@@ -2992,10 +3145,10 @@ body.remarks-open .demo-scope-tip{display:none}
                 </div>
                 <div class="sec">
                   <div class="sec__title">专线二次送货车辆与司机信息</div>
-                  <div class="field"><label><span class="req">*</span>送货车牌号(专线)</label><input v-model="carrierSecondaryForm.plate" placeholder="如川A66666" /></div>
-                  <div class="field"><label>送货车挂号(专线)</label><input v-model="carrierSecondaryForm.trailer" placeholder="选填" /></div>
-                  <div class="field"><label><span class="req">*</span>送货司机(专线)</label><input v-model="carrierSecondaryForm.driver" placeholder="末端送货司机" /></div>
-                  <div class="field"><label><span class="req">*</span>送货司机电话(专线)</label><input v-model="carrierSecondaryForm.phone" placeholder="11位手机号" maxlength="11" /></div>
+                  <div class="field"><label><span class="req">*</span>送货车牌号（专线）</label><input v-model="carrierSecondaryForm.plate" placeholder="如川A66666" /></div>
+                  <div class="field"><label>送货车挂号（专线）</label><input v-model="carrierSecondaryForm.trailer" placeholder="选填" /></div>
+                  <div class="field"><label><span class="req">*</span>送货司机（专线）</label><input v-model="carrierSecondaryForm.driver" placeholder="末端送货司机" /></div>
+                  <div class="field"><label><span class="req">*</span>送货司机电话（专线）</label><input v-model="carrierSecondaryForm.phone" placeholder="11位手机号" maxlength="11" /></div>
                   <div class="field"><label>中转送货备注</label><textarea v-model="carrierSecondaryForm.remark" rows="3" placeholder="中转网点/交接说明"></textarea></div>
                 </div>
               </div>
@@ -3066,7 +3219,9 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div class="doc-grid">
                       <div><span class="doc-label">状态</span><span class="tag" :class="statusTag(currentNotice.status)">{{ currentNotice.status }}</span></div>
                       <div><span class="doc-label">用车类型</span>{{ currentNotice.shipMode }}</div>
+                      <div><span class="doc-label">运输类型</span>{{ currentNotice.transportType || '—' }}</div>
                       <div class="full"><span class="doc-label">司机</span>{{ currentNotice.driver }} / {{ currentNotice.plate }} / {{ currentNotice.phone }}</div>
+                      <div class="full" v-if="currentNotice.transportType==='专线'"><span class="doc-label">司机（专线）</span>{{ waybillSecondaryDriverText(currentNotice) }}</div>
                       <div class="full"><span class="doc-label">排单时间</span>{{ currentNotice.scheduleAt }}</div>
                       <div class="full"><span class="doc-label">计划装货</span>{{ currentNotice.planLoad }}</div>
                       <div class="full"><span class="doc-label">关联派车单</span>{{ currentNotice.dispatchNo }}</div>
@@ -3143,9 +3298,13 @@ body.remarks-open .demo-scope-tip{display:none}
                 <div class="sec">
                   <div class="sec__title">装货点信息</div>
                   <div class="field"><label>关联发货单</label><input :value="wayPoint.shipNo" readonly /></div>
+                  <div class="field"><label>运输类型</label><input :value="currentNotice.transportType || '—'" readonly /></div>
                   <div class="field"><label>发货单位</label><input :value="wayPoint.unit" readonly /></div>
                   <div class="field"><label>装货地点</label><input :value="wayPoint.place" readonly /></div>
                   <div class="field"><label>装货联系人</label><input :value="wayPoint.contact" readonly /></div>
+                  <div class="field"><label>承运商</label><input :value="currentNotice.carrier || '—'" readonly /></div>
+                  <div class="field"><label>司机 / 车牌号</label><input :value="(currentNotice.driver || '—') + ' / ' + (currentNotice.plate || '—') + (currentNotice.trailer ? ' (挂:' + currentNotice.trailer + ')' : '')" readonly /></div>
+                  <div class="field" v-if="currentNotice.transportType==='专线'"><label>司机（专线）</label><input :value="waybillSecondaryDriverText(currentNotice)" readonly /></div>
                 </div>
                 <div class="m-group__title">物料明细</div>
                 <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
@@ -3188,10 +3347,14 @@ body.remarks-open .demo-scope-tip{display:none}
                 <div class="sec">
                   <div class="sec__title">卸货点信息</div>
                   <div class="field"><label>关联发货单</label><input :value="wayPoint.shipNo" readonly /></div>
+                  <div class="field"><label>运输类型</label><input :value="currentNotice.transportType || '—'" readonly /></div>
                   <div class="field"><label>收货单位</label><input :value="wayPoint.unit" readonly /></div>
                   <div class="field"><label>卸货地点</label><input :value="wayPoint.place" readonly /></div>
                   <div class="field"><label>卸货联系人</label><input :value="wayPoint.contact" readonly /></div>
                   <div class="field"><label>要求送达</label><input :value="wayPoint.due || '—'" readonly /></div>
+                  <div class="field"><label>承运商</label><input :value="currentNotice.carrier || '—'" readonly /></div>
+                  <div class="field"><label>司机 / 车牌号</label><input :value="(currentNotice.driver || '—') + ' / ' + (currentNotice.plate || '—') + (currentNotice.trailer ? ' (挂:' + currentNotice.trailer + ')' : '')" readonly /></div>
+                  <div class="field" v-if="currentNotice.transportType==='专线'"><label>司机（专线）</label><input :value="waybillSecondaryDriverText(currentNotice)" readonly /></div>
                 </div>
                 <div class="m-group__title">物料明细核对</div>
                 <div v-for="(line,i) in (wayPoint.lines||[])" :key="i" class="line-card" style="cursor:default">
@@ -3681,12 +3844,12 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.309"></script>
+<script src="./js/demo-announcements.js?v=1.3.354"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/mock-rows.js?v=1.3.309"></script>
-<script src="./js/demo-store.js?v=1.3.302"></script>
-<script src="./js/app-configs.js?v=1.3.315"></script>
-<script src="./js/page-prd-notes.js?v=1.3.316"></script>
+<script src="./js/mock-rows.js?v=1.3.352"></script>
+<script src="./js/demo-store.js?v=1.3.347"></script>
+<script src="./js/app-configs.js?v=1.3.352"></script>
+<script src="./js/page-prd-notes.js?v=1.3.339"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js"></script>
@@ -4069,6 +4232,7 @@ createApp({
       'po-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'gen-doc-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'prod-pick-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'prod-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'direct-pick-form': ['直接领料页', '直接领料'],
       materials: ['物料明细页', '物料明细', '页面 3：物料明细页', '页面结构'],
       exec: ['执行页', '页面 4：执行页', '页面 2：执行页', '页面结构'],
@@ -4099,6 +4263,7 @@ createApp({
       const hintMap = {
         docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页',
         'po-in-form': '新增编辑页',
+        'prod-in-form': '新增编辑页',
       };
       return hintMap[v] ? [hintMap[v]] : [];
     }
@@ -4240,18 +4405,18 @@ createApp({
     const isXferCountDoc = computed(() => isXferCount.value);
     const isXferSerialPick = computed(() => flowMeta.value.execVariant === 'xfer-serial');
     const isXferCountExec = computed(() => flowMeta.value.execVariant === 'xfer-count');
-    /** 出库类流水码（退料出库 / 委外发料 / 委外退货 / 受托退料 / 销售预出货 / 销售发货）共用扫码执行逻辑；退货另需源库位 */
-    const isOutSerialDoc = computed(() => isPoRetSerial.value || isOsIssueSerial.value || isOsRmaSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value);
-    const isInSerialDoc = computed(() => isPoInSerial.value || isOsRetSerial.value || isOsRecvSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || flowId.value === 'prod-in-serial' || isSoRmaSerial.value);
+    /** 出库类流水码（退料出库 / 委外发料 / 委外退货 / 受托退料 / 销售预出货 / 销售发货 / 其他出库）共用扫码执行逻辑；委外退货源库位由条码档案带出 */
+    const isOutSerialDoc = computed(() => isPoRetSerial.value || isOsIssueSerial.value || isOsRmaSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value || flowId.value === 'oth-out-serial');
+    const isInSerialDoc = computed(() => isPoInSerial.value || isOsRetSerial.value || isOsRecvSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || flowId.value === 'prod-in-serial' || isSoRmaSerial.value || flowId.value === 'oth-in-serial');
     const isProdInSerial = computed(() => flowId.value === 'prod-in-serial');
     const isProdInCount = computed(() => flowId.value === 'prod-in-count');
     const isProdInDoc = computed(() => isProdInSerial.value || isProdInCount.value);
-    /** 入库类计数（采购入库-计数 / 委外退料-计数 / 委外收货-计数 / 受托收料-计数 / 销售退货-计数） */
-    const isInCountDoc = computed(() => isPoInCount.value || isOsRetCount.value || isOsRecvCount.value || flowId.value === 'prod-ret-count' || isTrustRecvCount.value || isSoRmaCount.value);
-    /** 入库类罐区（采购入库-罐区 / 委外收货-罐区 / 受托收料-罐区）：槽车 + 储罐卸料 */
-    const isInTankDoc = computed(() => isPoInTank.value || isOsRecvTank.value || isTrustRecvTank.value);
-    /** 出库类计数（退料出库-计数 / 委外发料-计数 / 委外退货-计数 / 受托退料-计数 / 销售预出货-计数 / 销售发货-计数）共用执行逻辑：录源库位 + 出库数量 + 工序变绿 */
-    const isOutCountDoc = computed(() => isPoRetCount.value || isOsIssueCount.value || isOsRmaCount.value || isTrustRetCount.value || isSoPreoutCount.value || isSoShipCount.value);
+    /** 入库类计数（采购入库-计数 / 委外退料-计数 / 委外收货-计数 / 生产入库-计数 / 生产退料-计数 / 受托收料-计数 / 销售退货-计数 / 其他入库-计数） */
+    const isInCountDoc = computed(() => isPoInCount.value || isOsRetCount.value || isOsRecvCount.value || flowId.value === 'prod-ret-count' || isTrustRecvCount.value || isSoRmaCount.value || flowId.value === 'oth-in-count' || isProdInCount.value);
+    /** 入库类罐区（采购入库-罐区 / 委外收货-罐区 / 受托收料-罐区 / 其他入库-罐区）：槽车 + 储罐卸料 */
+    const isInTankDoc = computed(() => isPoInTank.value || isOsRecvTank.value || isTrustRecvTank.value || flowId.value === 'oth-in-tank');
+    /** 出库类计数（退料出库-计数 / 委外发料-计数 / 委外退货-计数 / 受托退料-计数 / 销售预出货-计数 / 销售发货-计数 / 其他出库-计数）共用执行逻辑：录源库位 + 出库数量 + 工序变绿 */
+    const isOutCountDoc = computed(() => isPoRetCount.value || isOsIssueCount.value || isOsRmaCount.value || isTrustRetCount.value || isSoPreoutCount.value || isSoShipCount.value || flowId.value === 'oth-out-count');
     const outCountLotLocked = computed(() => {
       if (!isOutCountDoc.value || !currentLine.value) return false;
       const lot = String(currentLine.value.lot || '').trim();
@@ -4470,7 +4635,10 @@ createApp({
     }
     function filterNoticeLinesForEntry(lines, docsKey, execMode) {
       const src = lines || [];
-      return src.filter((ln) => lineMatchesEntryFilter(ln, docsKey, execMode));
+      return src.filter((ln) => {
+        if (ln.status === '已完成' || ln.status === '已关闭' || ln.status === '已作废') return false;
+        return lineMatchesEntryFilter(ln, docsKey, execMode);
+      });
     }
     function noticeHasLinesForEntry(notice, docsKey, execMode) {
       return filterNoticeLinesForEntry(notice && notice.lines, docsKey, execMode).length > 0;
@@ -4518,16 +4686,15 @@ createApp({
       const lines = (currentNotice.value && currentNotice.value.lines) || [];
       const execMode = flowMeta.value.mode;
       const docsKey = flowMeta.value.docsKey || flowId.value;
+      let res = lines;
       if (execMode === 'count' || execMode === 'serial' || execMode === 'tank') {
-        return filterNoticeLinesForEntry(lines, docsKey, execMode);
+        res = filterNoticeLinesForEntry(lines, docsKey, execMode);
+      } else if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value || isXferCount.value) {
+        res = filterNoticeLinesForEntry(lines, 'count', 'count');
+      } else if (isOutSerialDoc.value || isOsRetSerial.value || isOsRecvSerial.value || isProdPickSerial.value || isProdRetSerial.value || isTrustRecvSerial.value || isSoRmaSerial.value || isXferSerial.value) {
+        res = filterNoticeLinesForEntry(lines, docsKey, 'serial');
       }
-      if (isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isProdPickCount.value || isProdRetCount.value || isTrustRecvCount.value || isXferCount.value) {
-        return filterNoticeLinesForEntry(lines, 'count', 'count');
-      }
-      if (isOutSerialDoc.value || isOsRetSerial.value || isOsRecvSerial.value || isProdPickSerial.value || isProdRetSerial.value || isTrustRecvSerial.value || isSoRmaSerial.value || isXferSerial.value) {
-        return filterNoticeLinesForEntry(lines, docsKey, 'serial');
-      }
-      return lines;
+      return (res || []).filter(l => l.status !== '已完成' && l.status !== '已关闭' && l.status !== '已作废');
     });
     const poInFormMode = ref('add');
     const genDocFormMode = ref('add');
@@ -4655,6 +4822,12 @@ createApp({
     });
     const lotDetailVisible = ref(false);
     const lotDetailRows = ref([]);
+    /** stock=罐内存量；allot=本次领出/扣减分配 */
+    const lotDetailMode = ref('stock');
+    const lotDetailTitle = computed(() => lotDetailMode.value === 'allot' ? '批号扣减分配详情' : '储罐批号存量详情');
+    const lotDetailSumLabel = computed(() => lotDetailMode.value === 'allot' ? (tankExec.value === 'out' ? '出库合计' : '领出合计') : '在库合计');
+    const lotDetailQtyHeader = computed(() => lotDetailMode.value === 'allot' ? (tankExec.value === 'out' ? '出库数量' : '领出数量') : '在库数量');
+    const lotDetailEmptyText = computed(() => lotDetailMode.value === 'allot' ? (tankExec.value === 'out' ? '暂无出库批号' : '暂无领出批号') : '暂无批号存量');
     const loadProcs = computed(() => (currentLine.value && currentLine.value.procs) || []);
     const activeExecMode = computed(() => {
       if (flowMode.value === 'stocktake') return stockExecOverride.value || 'serial';
@@ -4742,22 +4915,13 @@ createApp({
     const filteredNotices = computed(() => {
       const kw = docKw.value.trim();
       let list = currentDocs.value || [];
-      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isLoadFlow.value || flowMode.value === 'insp') {
-        list = list.filter(n => n.status === '待执行' || n.status === '执行中');
-        list = sortDocsByCreateDesc(list);
-      }
-      const entryExecMode = flowMeta.value.mode;
-      if (entryExecMode === 'count' || entryExecMode === 'serial' || entryExecMode === 'tank') {
-        const docsKey = flowMeta.value.docsKey || 'default';
-        list = list.filter(n => noticeHasLinesForEntry(n, docsKey, entryExecMode));
-      }
       if (flowMode.value === 'waybill') {
         const carrier = appUser.carrier || flowMeta.value.carrierName || (CFG.carrierDemo && CFG.carrierDemo.name) || '顺丰物流';
         const dispatcher = appUser.dispatcher || flowMeta.value.carrierDispatcher || (CFG.carrierDemo && CFG.carrierDemo.dispatcher) || '王调度';
         const driver = appUser.driverName || mineUser.name;
         if (isCarrierUser.value || waybillScopeTab.value === 'mine') {
           if (isCarrierUser.value) {
-            list = list.filter(n => (n.carrier || carrier) === carrier && (n.dispatcher || dispatcher) === dispatcher && n.status !== '已关闭');
+            list = list.filter(n => (n.carrier || carrier) === carrier && (n.dispatcher || dispatcher) === dispatcher && n.status !== '已关闭' && n.status !== '已完成');
             if (carrierStatusTab.value && carrierStatusTab.value !== '全部') {
               list = list.filter(n => n.status === carrierStatusTab.value);
             }
@@ -4765,13 +4929,22 @@ createApp({
             list = list.filter(n => ['待运输', '运输中', '待发运', '发运中'].includes(n.status) && (n.driver === driver || n.driver === mineUser.name));
           }
         } else {
-          list = list.filter(n => n.status !== '已关闭');
+          list = list.filter(n => n.status !== '已关闭' && n.status !== '已完成');
         }
         list = sortDocsByCreateDesc(list);
-      }
-      if (flowMode.value === 'gatepass') {
+      } else if (flowMode.value === 'gatepass') {
         list = list.filter(n => n.status === '待放行');
         list = sortDocsByCreateDesc(list);
+      } else {
+        // 全仓储管理单据（采购、委外、生产、受托、销售、调拨、其他、装卸、巡检等）：
+        // 核心口径：APP 只显示待执行、执行中的单据，隐藏已完成、已关闭的
+        list = list.filter(n => n.status === '待执行' || n.status === '执行中');
+        list = sortDocsByCreateDesc(list);
+      }
+      const entryExecMode = flowMeta.value.mode;
+      if (entryExecMode === 'count' || entryExecMode === 'serial' || entryExecMode === 'tank') {
+        const docsKey = flowMeta.value.docsKey || 'default';
+        list = list.filter(n => noticeHasLinesForEntry(n, docsKey, entryExecMode));
       }
       if (!kw) return list;
       const blob = (n) => {
@@ -4865,7 +5038,10 @@ createApp({
     });
     const lotDetailSum = computed(() => lotDetailRows.value.reduce((s, d) => s + Number(d.qty || 0), 0));
     const innerQtySum = computed(() => innerRows.value.reduce((s, r) => s + Number(r.qty || 0), 0));
-    const allLinesDone = computed(() => (displayedLines.value || []).every(l => l.status === '已完成' || l.status === '已关闭'));
+    const allLinesDone = computed(() => {
+      const all = (currentNotice.value && currentNotice.value.lines) || [];
+      return all.length > 0 && all.every(l => l.status === '已完成' || l.status === '已关闭' || l.status === '已作废');
+    });
     const splitRemain = computed(() => {
       const base = Number(pkgSrc.remain) || 0;
       const used = splitRows.value.reduce((s, r) => s + Number(r.qty || 0), 0);
@@ -5069,6 +5245,16 @@ createApp({
       const trailer = n.trailer;
       if (!trailer || trailer === '—') return plate + ' (无挂车)';
       return plate + ' (挂:' + trailer + ')';
+    }
+    /** 专线末端送货：对齐已派车辆拼接口径 plate / trailer (driver / phone) */
+    function waybillSecondaryDriverText(n) {
+      if (!n) return '—';
+      const plate = n.secondaryPlate || '—';
+      const trailer = n.secondaryTrailer;
+      const driver = n.secondaryDriver || '—';
+      const phone = n.secondaryPhone || '—';
+      const veh = trailer && trailer !== '—' ? (plate + ' / ' + trailer) : plate;
+      return veh + ' (' + driver + ' / ' + phone + ')';
     }
     function gatepassLotQtyText(n) {
       if (!n) return '—';
@@ -5702,9 +5888,6 @@ createApp({
           if (!String(form.loc || '').trim()) form.loc = cl;
         }
       }
-      if (kind === 'out-serial' && flowId.value === 'os-rma-serial') {
-        if (!String(form.loc || '').trim()) form.loc = 'WH-RAW-01';
-      }
     }
     function buildScanSeedRow(arch, kind, form, notice) {
       const code = arch ? arch.barcode : '';
@@ -5758,7 +5941,12 @@ createApp({
       if (kind === 'tank-pick-scan') {
         const tankNo = arch.tankNo || ((CFG.tankArchRows||[])[0]&&CFG.tankArchRows[0].tankNo) || '';
         const qty = Number(arch.qty) || 10;
-        const maxQty = Number(arch.archQty) || 20;
+        const tankArch = (CFG.tankArchRows || []).find(t => t.tankNo === tankNo || t.barcode === arch.barcode) || null;
+        const maxQty = Number((tankArch && tankArch.qty) || arch.archQty) || 20;
+        const lineLot = (currentLine.value && currentLine.value.lot && currentLine.value.lot !== '—')
+          ? String(currentLine.value.lot).trim() : '';
+        const unit = (currentLine.value && currentLine.value.unit) || 'Kg';
+        const lotDetails = buildTankPickLotDetails(tankArch, lineLot, qty, unit);
         return {
           barcode: arch.barcode || ('TK-SEED-' + tankNo),
           tankNo,
@@ -5766,9 +5954,11 @@ createApp({
           qty,
           archQty: maxQty,
           remainQty: Math.max(0, maxQty - qty),
-          fromLoc: arch.fromLoc || 'GQ-01',
-          inLoc: arch.inLoc || 'GQ-01',
-          lot: (currentLine.value && currentLine.value.lot) || arch.lot || 'LOT-Li-2026001',
+          fromLoc: (tankArch && tankArch.loc) || arch.fromLoc || 'GQ-01',
+          inLoc: (tankArch && tankArch.loc) || arch.inLoc || 'GQ-01',
+          lot: lotDetails.map((d) => d.lot).filter(Boolean).join('；') || (lineLot || '—'),
+          lotDetails,
+          pickAllot: true,
           process: '外观检查',
           outer: '—',
           done: false,
@@ -5781,10 +5971,48 @@ createApp({
       if (!kind || !line) return [];
       applyExecScanSeedFormDefaults(kind, notice, form);
       if (kind === 'tank-pick-scan') {
+        const code = String((line && line.code) || '').trim();
+        const unit = (line && line.unit) || 'Kg';
+        const matched = (CFG.tankArchRows || []).filter((t) => {
+          if (t.useStatus !== '在用') return false;
+          if (code && String(t.material || '') !== code) return false;
+          return Array.isArray(t.lots) && t.lots.length > 0;
+        });
+        const multi = matched.filter((t) => t.lots.length >= 2);
+        const picks = (multi.length ? multi : matched).slice(0, 3);
+        if (picks.length) {
+          return picks.map((t) => {
+            const lots = (t.lots || []).slice().sort((a, b) => String(a.inDate || '').localeCompare(String(b.inDate || '')));
+            // 默认领出数量：至少覆盖前两个批号，便于演示多批号分配
+            let need = 0;
+            lots.slice(0, Math.min(2, lots.length)).forEach((l) => { need += Number(l.qty || 0); });
+            if (lots.length >= 3) need += Math.min(Number(lots[2].qty || 0), Math.max(1, Math.round(Number(lots[2].qty || 0) * 0.25)));
+            const maxQty = Number(t.qty || 0) || need;
+            const qty = Math.min(Math.max(need, 1), maxQty);
+            const row = buildScanSeedRow({
+              barcode: t.barcode,
+              tankNo: t.tankNo,
+              qty,
+              archQty: maxQty,
+              fromLoc: t.loc,
+              inLoc: t.loc,
+            }, kind, form, notice);
+            if (row) {
+              // 演示跨批：seed 不按申请单指定批号过滤
+              const lotDetails = buildTankPickLotDetails(t, '', qty, unit);
+              row.lotDetails = lotDetails;
+              row.pickAllot = true;
+              row.lot = lotDetails.length === 1
+                ? lotDetails[0].lot
+                : (lotDetails.length > 1 ? lotDetails.map((d) => d.lot).filter(Boolean).join('；') : '—');
+            }
+            return row;
+          }).filter(Boolean);
+        }
         const presets = [
-          { barcode: 'TM202608050001', tankNo: 'TK-STR-001', qty: 10, archQty: 20 },
-          { barcode: 'TM202608050002', tankNo: 'TK-STR-002', qty: 8, archQty: 18 },
-          { barcode: 'TM202608050004', tankNo: 'TK-STR-004', qty: 12, archQty: 25 },
+          { barcode: 'TM202608050001', tankNo: 'TK-STR-001', qty: 900, archQty: 1000 },
+          { barcode: 'TM202608050002', tankNo: 'TK-STR-002', qty: 550, archQty: 800 },
+          { barcode: 'TM202608070010', tankNo: 'TK-H2SO4-001', qty: 25000, archQty: 48000 },
         ];
         return presets.map((p) => buildScanSeedRow(p, kind, form, notice)).filter(Boolean);
       }
@@ -5849,6 +6077,10 @@ createApp({
       if (isLoadFlow.value && line.status === '待执行') line.status = '执行中';
       if (isLoadFlow.value && currentNotice.value && currentNotice.value.status === '待执行') currentNotice.value.status = '执行中';
       resetExecForm();
+      if (isProdPickCount.value || isProdPickTank.value) {
+        form.lineSideWh = (currentNotice.value && currentNotice.value.lineSideLoc) || '';
+        if (isProdPickCount.value) form.inQty = Number(currentLine.value?.remainQty || 0) || null;
+      }
       if (flowMeta.value.execVariant === 'line-side-pick') {
         form.lineSideWh = (currentNotice.value && currentNotice.value.lineSideLoc) || '';
         const draftKey = poInDraftKey();
@@ -6135,7 +6367,10 @@ createApp({
           scanRows.value = JSON.parse(JSON.stringify(CFG.scanRowsTankRet || CFG.scanRowsPick || []));
           tankRows.value = [];
         } else if (tankExec.value === 'out') {
-          tankRows.value = JSON.parse(JSON.stringify(CFG.tankRowsOut || CFG.tankRows || []));
+          const seeded = seedOthOutTankRows(line);
+          tankRows.value = seeded.length
+            ? seeded
+            : JSON.parse(JSON.stringify(CFG.tankRowsOut || CFG.tankRows || []));
           applyTankAreaCraft(null, { toast: true });
         } else {
           tankRows.value = JSON.parse(JSON.stringify(CFG.tankRows || []));
@@ -6250,18 +6485,32 @@ createApp({
         const vol = String(pc['容积'] || '');
         let maxQty = parseFloat(vol.replace(/[^\d.]/g, '')) || 0;
         if (/m³|m3/i.test(vol)) maxQty = Math.round(maxQty * 1000);
+        const lines = Array.isArray(pc._lines) ? pc._lines : [];
+        const lots = lines.map((ln) => ({
+          lot: String(ln['批号'] || '').trim() || '—',
+          qty: Number(ln['当前数量'] || 0) || 0,
+          inDate: String(ln['生产日期'] || '').trim() || '—',
+          code: String(ln['物料编码'] || '').trim(),
+          name: String(ln['物料名称'] || '').trim(),
+          unit: String(ln['库存单位'] || '').trim() || 'KG',
+          maker: String(ln['生产厂家'] || '').trim(),
+          supplier: String(ln['供应商名称'] || '').trim(),
+          prodDate: String(ln['生产日期'] || '').trim() || '—',
+          validPeriod: String(ln['有效期'] || '').trim(),
+          expireDate: String(ln['失效日期'] || '').trim(),
+        })).filter((l) => l.lot && l.lot !== '—');
         return {
           barcode: barcode || tankNo,
           tankNo: tankNo || barcode,
           loc: pc['库存位置'] || '—',
           medium: pc['充装介质'] || '',
-          material: mat[0] && mat[0] !== '—' ? mat[0] : '',
-          materialName: mat[1] || '',
+          material: (lines[0] && lines[0]['物料编码']) || (mat[0] && mat[0] !== '—' ? mat[0] : ''),
+          materialName: (lines[0] && lines[0]['物料名称']) || mat[1] || '',
           maxQty: maxQty,
-          qty: Number(pc['当前数量'] || 0) || 0,
+          qty: Number(pc['当前数量'] || 0) || lots.reduce((s, l) => s + Number(l.qty || 0), 0),
           useStatus: pc['使用状态'] || '在用',
           stockStatus: pc['库存状态'] || '库内',
-          lots: [],
+          lots,
           fromPc: true,
         };
       }).filter((t) => t.tankNo);
@@ -6328,6 +6577,40 @@ createApp({
       }
       return true;
     }
+    /**
+     * 委外/生产退料入库：扫「仓库」在库条码时，目标库位自动改为该条码本身的存储位置，
+     * 避免合入在库码时目标库位与条码原库位不一致导致冲突。
+     */
+    function syncRetInTargetLocFromWarehouseArch(arch) {
+      if (!isOsRetSerial.value && !isProdRetSerial.value) return '';
+      if (!arch || String(arch.stockStatus || '') !== '仓库') return '';
+      const archLoc = parseCountInvLoc(arch.loc);
+      const code = String(arch.barcode || '').trim() || '—';
+      if (!archLoc || archLoc === '—') {
+        return `库内条码[${code}]存储位置为空，无法合入退料入库`;
+      }
+      if (!findEnabledLoc(archLoc)) {
+        return `库内条码[${code}]存储位置[${archLoc}]不在启用库位列表中`;
+      }
+      const cur = String(form.loc || '').trim();
+      if (cur && cur !== archLoc) {
+        const conflict = (scanRows.value || []).some((r) => {
+          const rl = String(r.loc || '').trim();
+          return rl && rl !== '—' && rl !== archLoc;
+        });
+        if (conflict) {
+          return `库内条码存储位置[${archLoc}]与当前作业目标库位[${cur}]不一致，禁止混扫不同库位`;
+        }
+        form.loc = archLoc;
+        ElementPlus.ElMessage.info(`已按库内条码存储位置自动切换目标库位为 ${archLoc}`);
+      } else if (cur !== archLoc) {
+        form.loc = archLoc;
+        if (!cur) {
+          ElementPlus.ElMessage.info(`已按库内条码存储位置自动带入目标库位 ${archLoc}`);
+        }
+      }
+      return '';
+    }
 
     /** 扫码成功后静默暂存（统一口径：扫码即为保存；无独立保存按钮） */
     function autosaveAfterScan() {
@@ -6377,7 +6660,6 @@ createApp({
           ElementPlus.ElMessage.error('请先扫描或输入目标客户库位编码');
           return;
         }
-        if (isOsRmaSerial.value && !assertPoInLoc()) return;
         const outerMap = CFG.outerBindMap || {};
         if (outerMap[code] || /^TJ/i.test(code)) {
           form.barcode = '';
@@ -6395,7 +6677,6 @@ createApp({
         return;
       }
       if (isInSerialDoc.value) {
-        if (!assertPoInLoc()) return;
         const outerMap = CFG.outerBindMap || {};
         if (outerMap[code] || /^TJ/i.test(code)) {
           form.barcode = '';
@@ -6403,6 +6684,11 @@ createApp({
           return;
         }
         const arch = findSerialArch(code);
+        if (isOsRetSerial.value || isProdRetSerial.value) {
+          const syncErr = syncRetInTargetLocFromWarehouseArch(arch);
+          if (syncErr) { ElementPlus.ElMessage.error(syncErr); return; }
+        }
+        if (!assertPoInLoc()) return;
         const err = inSerialValidate(arch, code, { allowBound: false });
         if (err) { ElementPlus.ElMessage.error(err); return; }
         pushPoInScanRow(arch, code, '—');
@@ -6521,6 +6807,10 @@ createApp({
     function waybillDash(v) {
       const s = String(v == null ? '' : v).trim();
       return !s || s === '-' ? '—' : s;
+    }
+    function waybillOptional(v) {
+      const s = waybillDash(v);
+      return s === '—' ? '' : s;
     }
     function formatWayContact(name, phone) {
       const n = waybillDash(name);
@@ -6741,6 +7031,10 @@ createApp({
         applicantDept: pc['申请部门'] || '',
         applicant: pc['申请人'] || '',
         vehicleReq: pc['车型要求'] || '',
+        secondaryPlate: waybillOptional(pc['送货车牌号（专线）']),
+        secondaryTrailer: waybillOptional(pc['送货车挂号（专线）']),
+        secondaryDriver: waybillOptional(pc['送货司机（专线）']),
+        secondaryPhone: waybillOptional(pc['送货司机电话（专线）']),
         loads: buildWaybillLoadsFromPc(pc, status),
         unloads: buildWaybillUnloadsFromPc(pc, status),
         enroute: { location: '', remark: '', updatedAt: '' },
@@ -6869,17 +7163,19 @@ createApp({
       const noKey = pageId === 'wh-transfer' ? '移库单号' : '单号';
       const id = String((pc && pc[noKey]) || '').trim();
       if (!id) return null;
-      const execMode = String(docsKey || '').includes('count') ? 'count' : (String(docsKey || '').includes('tank') ? 'tank' : (String(docsKey || '').includes('serial') ? 'serial' : ''));
+      const key = String(docsKey || '');
+      const execMode = key.includes('count') ? 'count' : (key.includes('tank') ? 'tank' : (key.includes('serial') ? 'serial' : ''));
       const srcLines = Array.isArray(pc._lines) ? pc._lines : [];
+      // 无入口后缀的 docsKey（历史兼容）保留全量行；串/计/罐入口按管理方式分流
       const lines = srcLines
         .map((ln, i) => ({ ln, app: mapPcWhLineToApp(ln, i, id) }))
-        .filter(({ ln }) => lineMatchesEntryFilter(ln, docsKey, execMode))
+        .filter(({ ln }) => !execMode || lineMatchesEntryFilter(ln, docsKey, execMode))
         .map(({ app }) => app);
       if (srcLines.length && !lines.length) return null;
       const supplier = pc['供应商名称'] || pc['客户名称'] || pc['受益人'] || '';
       const refRaw = pc['关联采购订单'] || pc['关联销售订单'] || pc['关联委外加工单'] || pc['关联订单号'] || '';
       const refNo = whNoticeCode(refRaw) || whNoticeCode(pc['关联业务单号']) || refRaw;
-      return {
+      const out = {
         id: id,
         status: pc['单据状态'] || '待执行',
         partner: supplier || '—',
@@ -6900,9 +7196,12 @@ createApp({
         materialSummary: whMaterialSummaryFromLines(lines) || pc['物料信息'] || '',
         packSpec: waybillDash(pc['包装规格']),
         createTime: pc['创建时间'] || (pc.fromPc !== false && id.match(/\d{8}/) ? noticeSortKey({ id }) : ''),
-        lines: lines.length ? lines : srcLines.map(mapPcWhLineToApp),
         fromPc: true,
       };
+      // 无 _lines 时不要写 lines:[]，避免冲掉 APP 种子明细
+      if (lines.length) out.lines = lines;
+      else if (srcLines.length) out.lines = srcLines.map(mapPcWhLineToApp);
+      return out;
     }
     const WH_PC_HYDRATE_ROUTES = [
       { pageId: 'wh-po-in', tab: 'tab1', docsKeys: ['po-in-serial', 'po-in-tank', 'po-in-count'] },
@@ -6916,16 +7215,21 @@ createApp({
       { pageId: 'wh-os-ret-goods', tab: 'tab1', docsKeys: ['os-rma-serial', 'os-rma-count'] },
       { pageId: 'wh-cs-recv', tab: 'tab1', docsKeys: ['trust-recv-serial', 'trust-recv-count', 'trust-recv-tank', 'trust-recv'] },
       { pageId: 'wh-cs-ret', tab: 'tab1', docsKeys: ['trust-ret-serial', 'trust-ret-count', 'trust-ret'] },
-      { pageId: 'wh-other-in', tab: 'tab1', docsKeys: ['oth-in'] },
-      { pageId: 'wh-other-out', tab: 'tab1', docsKeys: ['oth-out'] },
-      { pageId: 'wh-transfer', tab: 'tab1', docsKeys: ['xfer-serial', 'xfer-count'] },
+      { pageId: 'wh-other-in', tab: 'tab1', docsKeys: ['oth-in-serial', 'oth-in-count', 'oth-in-tank'] },
+      { pageId: 'wh-other-out', tab: 'tab1', docsKeys: ['oth-out-serial', 'oth-out-count', 'oth-out-tank'] },
+      // 直接调拨 APP 同源 PC 为 wh-direct-xfer（有 _lines）；wh-transfer 是库内移库且无行明细，勿混用
+      { pageId: 'wh-direct-xfer', tab: 'tab1', docsKeys: ['xfer-serial', 'xfer-count'] },
     ];
     function mergeAppNoticeFromPc(list, mapped) {
       if (!list || !mapped || !mapped.id) return;
       const hit = list.find((n) => n && n.id === mapped.id);
       if (hit) {
-        const keepLines = hit.lines && hit.lines.length && !hit.fromPc && !(mapped.lines && mapped.lines.length);
-        Object.assign(hit, mapped, { lines: keepLines ? hit.lines : (mapped.lines || hit.lines) });
+        // PC 头表无 _lines 时 mapped.lines 常为 []；[] 在 JS 为 truthy，不可用 `mapped.lines || hit.lines`
+        // 否则第二次 hydrate 会把 APP 种子明细冲掉，流水码/计数入口过滤后整表变空
+        const nextLines = (mapped.lines && mapped.lines.length)
+          ? mapped.lines
+          : (hit.lines || []);
+        Object.assign(hit, mapped, { lines: nextLines });
         hit.fromPc = true;
       } else {
         list.unshift(mapped);
@@ -7632,6 +7936,16 @@ createApp({
       if (arch.stockStatus !== '初始化' && arch.stockStatus !== '仓库') {
         return `条码[${code}]库存状态异常（当前：${arch.stockStatus || '—'}），禁止退料入库`;
       }
+      if (arch.stockStatus === '仓库') {
+        const archLoc = parseCountInvLoc(arch.loc);
+        const curLoc = String(form.loc || '').trim();
+        if (!archLoc || archLoc === '—') {
+          return `库内条码[${code}]存储位置为空，无法合入退料入库`;
+        }
+        if (curLoc && curLoc !== archLoc) {
+          return `库内条码存储位置[${archLoc}]与目标库位[${curLoc}]不一致，请先清空明细或扫同库位条码`;
+        }
+      }
       const mat = archMaterialCode(arch);
       if (currentLine.value && mat && mat !== currentLine.value.code) {
         return '所扫条码物料与当前执行物料不一致';
@@ -7796,7 +8110,7 @@ createApp({
         archQty,
         remainQty: Math.max(0, archQty - retQty),
         lot: (arch && arch.lot) || currentLine.value?.lot || '—',
-        fromLoc: (isOsRmaSerial.value && form.loc) ? form.loc : ((arch && arch.loc) || '—'),
+        fromLoc: (arch && (parseCountInvLoc(arch.loc) || arch.loc)) || '—',
         custLoc: isSoPreoutSerial.value ? String(form.custLoc || '').trim() : '',
         loc: isSoPreoutSerial.value ? ((arch && arch.loc) || '—') : undefined,
         process: (poInCraftTabs.value && poInCraftTabs.value[0]) || '—',
@@ -7854,7 +8168,9 @@ createApp({
         pkgNo: (arch && arch.pkgNo) || '—',
         qty,
         lot: (arch && arch.lot) || currentLine.value?.lot || '—',
-        loc: form.loc || '—',
+        loc: ((isOsRetSerial.value || isProdRetSerial.value) && arch && arch.stockStatus === '仓库')
+          ? (parseCountInvLoc(arch.loc) || form.loc || '—')
+          : (form.loc || '—'),
         process: (poInCraftTabs.value && poInCraftTabs.value[0]) || '—',
         outer: outer || '—',
         packType: (arch && arch.packType) || '',
@@ -7875,7 +8191,6 @@ createApp({
       if (!isInSerialDoc.value && !isOutSerialDoc.value) return;
       const outer = String(outerOverride != null ? outerOverride : (form.outerNo || '')).trim();
       if (!outer) return;
-      if ((isInSerialDoc.value || isOsRmaSerial.value) && !assertPoInLoc()) return;
       const kids = (CFG.outerBindMap && CFG.outerBindMap[outer]) || [];
       if (!kids.length) {
         ElementPlus.ElMessage.error(`外包材[${outer}]下无绑定子包材`);
@@ -7883,6 +8198,17 @@ createApp({
       }
       hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
+      if (isOsRetSerial.value || isProdRetSerial.value) {
+        for (const code of kids) {
+          const arch = archRows.find(r => r.barcode === code);
+          const syncErr = syncRetInTargetLocFromWarehouseArch(arch);
+          if (syncErr) {
+            ElementPlus.ElMessage.error(`外包材[${outer}]内条码[${code}]：${syncErr}`);
+            return;
+          }
+        }
+      }
+      if (isInSerialDoc.value && !assertPoInLoc()) return;
       const validateFn = isOutSerialDoc.value ? validatePoRetBarcode : inSerialValidate;
       for (const code of kids) {
         const arch = archRows.find(r => r.barcode === code);
@@ -7969,18 +8295,117 @@ createApp({
       row.remainQty = Math.max(0, archQty - Number(row.qty || 0));
     }
     function onTankPickQtyChange(row) {
-      const archQty = Number(row.archQty || 0);
+      const archQty = Number(row.archQty != null ? row.archQty : row.beforeQty) || 0;
       let qty = Number(row.qty || 0);
+      const act = tankExec.value === 'out' ? '出库' : '领料';
       if (!(qty > 0)) {
-        ElementPlus.ElMessage.error('领料数量必须大于 0');
+        ElementPlus.ElMessage.error(`${act}数量必须大于 0`);
         row.qty = archQty > 0 ? Math.min(archQty, 0.01) : 0.01;
         qty = Number(row.qty);
       }
       if (archQty && qty > archQty) {
-        ElementPlus.ElMessage.error(`领料数量不能超过储罐在库数量（${archQty}）`);
+        ElementPlus.ElMessage.error(`${act}数量不能超过储罐在库数量（${archQty}）`);
         row.qty = archQty;
+        qty = archQty;
       }
       row.remainQty = Math.max(0, archQty - Number(row.qty || 0));
+      row.afterQty = row.remainQty;
+      refreshTankPickLotDetails(row);
+    }
+    function onTankOutQtyChange(row) {
+      onTankPickQtyChange(row);
+    }
+    function buildTankPickLotDetails(arch, lineLot, qty, unit) {
+      const u = unit || 'Kg';
+      const need = Number(qty);
+      let allot = previewTankFifoAllot(arch, lineLot, need) || [];
+      if (!allot.length && need > 0) {
+        const fallbackLot = lineLot || (arch && arch.lot) || 'LOT-DEMO';
+        const before = Number((arch && arch.qty) || need) || need;
+        allot = [{
+          lot: fallbackLot,
+          inDate: '—',
+          beforeQty: before,
+          deduct: need,
+          remain: Math.max(0, before - need),
+        }];
+      }
+      return allot.map((d) => ({
+        lot: d.lot || '—',
+        qty: d.deduct,
+        unit: u,
+        inDate: d.inDate || '—',
+        beforeQty: d.beforeQty,
+        remain: d.remain,
+        maker: d.maker || (arch && arch.maker) || '',
+        supplier: d.supplier || (arch && arch.supplier) || '',
+        prodDate: d.prodDate || d.inDate || '',
+        validPeriod: d.validPeriod || '',
+        expireDate: d.expireDate || '',
+      }));
+    }
+    function refreshTankPickLotDetails(row) {
+      if (!row) return;
+      const tankArch = (CFG.tankArchRows || []).find(t => t.tankNo === row.tankNo || t.barcode === row.barcode) || null;
+      const lineLot = (currentLine.value && currentLine.value.lot && currentLine.value.lot !== '—')
+        ? String(currentLine.value.lot).trim() : '';
+      const unit = (currentLine.value && currentLine.value.unit) || 'Kg';
+      const details = buildTankPickLotDetails(tankArch, lineLot, Number(row.qty || 0), unit);
+      row.lotDetails = details;
+      row.pickAllot = true;
+      if (details.length === 1) row.lot = details[0].lot;
+      else if (details.length > 1) row.lot = details.map((d) => d.lot).filter(Boolean).join('；');
+      else row.lot = lineLot || '—';
+      row.beforeLot = details.map((d) => d.lot).join(',') || row.beforeLot;
+    }
+    function seedOthOutTankRows(line) {
+      const code = String((line && line.code) || '').trim();
+      const unit = (line && line.unit) || 'Kg';
+      const matched = (CFG.tankArchRows || []).filter((t) => {
+        if (t.useStatus !== '在用') return false;
+        if (code && String(t.material || '') !== code) return false;
+        return Array.isArray(t.lots) && t.lots.length > 0;
+      });
+      const multi = matched.filter((t) => t.lots.length >= 2);
+      const picks = (multi.length ? multi : matched).slice(0, 3);
+      return picks.map((t) => {
+        const lots = (t.lots || []).slice().sort((a, b) => String(a.inDate || '').localeCompare(String(b.inDate || '')));
+        let need = 0;
+        lots.slice(0, Math.min(2, lots.length)).forEach((l) => { need += Number(l.qty || 0); });
+        if (lots.length >= 3) need += Math.min(Number(lots[2].qty || 0), Math.max(1, Math.round(Number(lots[2].qty || 0) * 0.25)));
+        const beforeQty = Number(t.qty || 0) || need;
+        const qty = Math.min(Math.max(need, 1), beforeQty);
+        const lotDetails = buildTankPickLotDetails(t, '', qty, unit);
+        return {
+          barcode: t.barcode,
+          tankNo: t.tankNo,
+          pkgNo: t.tankNo,
+          loc: t.loc || '—',
+          fromLoc: t.loc || '—',
+          beforeQty,
+          beforeLot: lotDetails.map((d) => d.lot).join(','),
+          afterQty: Math.max(0, beforeQty - qty),
+          qty,
+          archQty: beforeQty,
+          remainQty: Math.max(0, beforeQty - qty),
+          lot: lotDetails.map((d) => d.lot).filter(Boolean).join('；') || '—',
+          lotDetails,
+          pickAllot: true,
+          process: '包装检查',
+          outer: '—',
+          done: false,
+        };
+      });
+    }
+    function tankPickLotLabel(row) {
+      const details = (row && row.lotDetails) || [];
+      if (details.length) {
+        return details.map((d) => String(d.lot || '').trim() || '—').join('；');
+      }
+      const raw = String((row && row.lot) || '').trim();
+      if (!raw || raw === '—') return '—';
+      if (/^多批次/.test(raw)) return raw.replace(/^多批次\(\d+\)\s*-?\s*/, '').replace(/查看分配详情\s*>?$/, '').trim() || raw;
+      return raw.replace(/（[^）]*）/g, '').replace(/\([^)]*\)/g, '').trim() || raw;
     }
     function addPickScan() {
       const code = String(form.barcode || '').trim();
@@ -8339,6 +8764,27 @@ createApp({
         }
         const tankArch = (CFG.tankArchRows || []).find(t => t.tankNo === form.tankNo || t.barcode === code);
         const archQty = Number((tankArch && tankArch.qty) || 0);
+        if (archQty && qty > archQty) {
+          ElementPlus.ElMessage.error(`领料数量不能超过储罐在库数量（${archQty}）`);
+          return;
+        }
+        const lineLot = (currentLine.value && currentLine.value.lot && currentLine.value.lot !== '—')
+          ? String(currentLine.value.lot).trim() : '';
+        const unit = (currentLine.value && currentLine.value.unit) || 'Kg';
+        const lotDetails = buildTankPickLotDetails(tankArch, lineLot, qty, unit);
+        if (!lotDetails.length) {
+          ElementPlus.ElMessage.error(lineLot
+            ? '未找到该批号在所选储罐的在库库存'
+            : '未找到储罐可用批号库存，无法领料');
+          return;
+        }
+        const allotSum = lotDetails.reduce((s, d) => s + Number(d.qty || 0), 0);
+        if (allotSum + 1e-9 < qty) {
+          ElementPlus.ElMessage.error(lineLot
+            ? '领料数量不可大于该批号当前在库可用数量'
+            : '领料数量不可大于储罐当前在库物料总量');
+          return;
+        }
         scanRows.value.push({
           barcode: code,
           tankNo: form.tankNo,
@@ -8348,7 +8794,9 @@ createApp({
           remainQty: Math.max(0, archQty - qty),
           fromLoc: (tankArch && tankArch.loc) || 'GQ-01',
           inLoc: (tankArch && tankArch.loc) || 'GQ-01',
-          lot: currentLine.value?.lot || (tankArch && tankArch.lot) || 'LOT-Li-2026001',
+          lot: lotDetails.map((d) => d.lot).filter(Boolean).join('；') || '—',
+          lotDetails,
+          pickAllot: true,
           process: '外观检查',
           outer: '—',
           done: false,
@@ -8359,15 +8807,102 @@ createApp({
         autosaveAfterScan();
         return;
       }
-      const before = tankExec.value === 'out' ? 20 : 10;
-      const addQty = Number(form.qty) || (tankExec.value === 'out' ? 8 : 25);
+      if (tankExec.value === 'out') {
+        if (!form.outDir) {
+          ElementPlus.ElMessage.error('出库方向为必填项，请选择出库去向');
+          return;
+        }
+        if (form.outDir === '出至线边仓' && !String(form.lineSideWh || '').trim()) {
+          ElementPlus.ElMessage.error('请选择领至线边仓');
+          return;
+        }
+        const qty = Number(form.pkgQty);
+        if (!(qty > 0)) {
+          ElementPlus.ElMessage.error('出库数量必须填写大于 0 的正数');
+          return;
+        }
+        if (!form.tankNo) {
+          ElementPlus.ElMessage.error('储罐编号为必填，请完善表单');
+          return;
+        }
+        if (tankRows.value.some(r => (r.tankNo || r.pkgNo) === form.tankNo || r.barcode === code)) {
+          ElementPlus.ElMessage.warning('该储罐已在明细中');
+          return;
+        }
+        const tankArch = (CFG.tankArchRows || []).find(t => t.tankNo === form.tankNo || t.barcode === code);
+        if (!tankArch) {
+          ElementPlus.ElMessage.error(form.tankBarcode && !form.tankNo ? '扫入条码非储罐档案，禁止操作' : '请选择或扫描库内储罐编号');
+          return;
+        }
+        if (tankArch.useStatus !== '在用') {
+          ElementPlus.ElMessage.error(`储罐[${tankArch.tankNo}]状态非在用，禁止操作`);
+          return;
+        }
+        const line = currentLine.value;
+        if (line && tankArch.material && String(tankArch.material) !== String(line.code || '')) {
+          ElementPlus.ElMessage.error(`储罐[${tankArch.tankNo}]在库物料与当前单据物料不一致`);
+          return;
+        }
+        const beforeQty = Number(tankArch.qty || 0);
+        if (!(beforeQty > 0)) {
+          ElementPlus.ElMessage.error('储罐当前无在库数量，无法出库');
+          return;
+        }
+        if (qty > beforeQty) {
+          ElementPlus.ElMessage.error(`出库数量不能超过储罐在库数量（${beforeQty}）`);
+          return;
+        }
+        const lineLot = (line && line.lot && line.lot !== '—') ? String(line.lot).trim() : '';
+        const unit = (line && line.unit) || 'Kg';
+        const lotDetails = buildTankPickLotDetails(tankArch, lineLot, qty, unit);
+        if (!lotDetails.length) {
+          ElementPlus.ElMessage.error(lineLot
+            ? '未找到该批号在所选储罐的在库库存'
+            : '未找到储罐可用批号库存，无法出库');
+          return;
+        }
+        const allotSum = lotDetails.reduce((s, d) => s + Number(d.qty || 0), 0);
+        if (allotSum + 1e-9 < qty) {
+          ElementPlus.ElMessage.error(lineLot
+            ? '出库数量不可大于该批号当前在库可用数量'
+            : '出库数量不可大于储罐当前在库物料总量');
+          return;
+        }
+        const afterQty = Math.max(0, beforeQty - qty);
+        tankRows.value.push({
+          barcode: tankArch.barcode || code,
+          tankNo: tankArch.tankNo || form.tankNo,
+          pkgNo: tankArch.tankNo || form.tankNo,
+          loc: tankArch.loc || '—',
+          fromLoc: tankArch.loc || '—',
+          beforeQty,
+          beforeLot: lotDetails.map((d) => d.lot).join(','),
+          afterQty,
+          qty,
+          archQty: beforeQty,
+          remainQty: afterQty,
+          lot: lotDetails.map((d) => d.lot).filter(Boolean).join('；') || '—',
+          lotDetails,
+          pickAllot: true,
+          process: (poInCraftTabs.value[0]) || (flowMeta.value.processTabs && flowMeta.value.processTabs[0]) || '包装检查',
+          outer: '—',
+          done: false,
+        });
+        form.tankBarcode = '';
+        form.pkgQty = null;
+        toast('已添加储罐出库明细');
+        autosaveAfterScan();
+        return;
+      }
+      const before = 10;
+      const addQty = Number(form.qty) || 25;
       tankRows.value.push({
         barcode: code,
         tankNo: form.tankNo,
         loc: 'A01-01',
         beforeQty: before,
         beforeLot: currentLine.value?.lot || 'lot001',
-        afterQty: tankExec.value === 'out' ? Math.max(0, before - addQty) : addQty,
+        afterQty: addQty,
         qty: addQty,
         lotDetails: [{ lot: currentLine.value?.lot || 'lot001', qty: before }],
       });
@@ -8828,21 +9363,40 @@ createApp({
       toast('已添加扫码明细');
     }
     function openLotDetail(row) {
+      const unit = (currentLine.value && currentLine.value.unit) || 'Kg';
+      const isPickAllot = !!(row && (row.pickAllot || tankExec.value === 'pick' || tankExec.value === 'out'));
+      if (isPickAllot) {
+        let details = Array.isArray(row.lotDetails) ? row.lotDetails : [];
+        if (!details.length) {
+          refreshTankPickLotDetails(row);
+          details = Array.isArray(row.lotDetails) ? row.lotDetails : [];
+        }
+        lotDetailMode.value = 'allot';
+        lotDetailRows.value = details.map((d) => ({
+          lot: d.lot || '—',
+          qty: d.qty != null ? d.qty : d.deduct,
+          unit: d.unit || unit,
+          inDate: d.inDate || '—',
+        }));
+        lotDetailVisible.value = true;
+        return;
+      }
       let details = row.lotDetails;
       if (!details || !details.length) {
         const arch = (CFG.tankArchRows || []).find(t => t.barcode === row.barcode || t.tankNo === row.tankNo);
         if (arch && Array.isArray(arch.lots) && arch.lots.length) {
           details = arch.lots.map(l => ({
             lot: l.lot, qty: l.qty, inDate: l.inDate || '—',
-            unit: (currentLine.value && currentLine.value.unit) || 'Kg',
+            unit,
           }));
         } else {
           details = String(row.beforeLot || '').split(',').filter(Boolean).map((lot, i) => ({
             lot: lot.trim(), qty: i === 0 ? 5 : 15, inDate: '—',
-            unit: (currentLine.value && currentLine.value.unit) || 'Kg',
+            unit,
           }));
         }
       }
+      lotDetailMode.value = 'stock';
       lotDetailRows.value = details;
       lotDetailVisible.value = true;
     }
@@ -9274,7 +9828,7 @@ createApp({
           poNo: n.refNo || n.poNo || '',
           partner: n.partner || '',
           pickType: n.pickType || firstPickType(),
-          lineSideLoc: isSparePickType(n.pickType) ? '' : (n.lineSideLoc || ''),
+          lineSideLoc: (n.lineSideLoc && n.lineSideLoc !== '—') ? n.lineSideLoc : '',
           planDate: n.planDate || todayYmd(),
           remark: n.remark === '—' ? '' : (n.remark || ''),
           docType: n.docType || firstNoticeDocType(),
@@ -9304,7 +9858,6 @@ createApp({
     }
     function onProdPickTypeChange() {
       if (isSparePickType(prodPickForm.pickType)) {
-        prodPickForm.lineSideLoc = '';
         const before = (prodPickForm.lines || []).length;
         prodPickForm.lines = (prodPickForm.lines || []).filter(ln => {
           const mode = ln.manageMode || (countMatCodes.value.has(ln.code) ? '计数管理' : '条码管理');
@@ -9372,7 +9925,7 @@ createApp({
         物料信息: n.materialSummary || '—',
         关联生产订单: n.refNo || n.poNo || '—',
         领料类型: n.pickType || '生产领料',
-        领至线边仓: isSparePickType(n.pickType) ? '—' : (n.lineSideLoc || '—'),
+        领至线边仓: n.lineSideLoc || '—',
         备注: n.remark || '—',
         关联发货单: n.logisticsNo || '—',
         包装规格: n.packSpec || '—',
@@ -9404,7 +9957,7 @@ createApp({
     function saveProdPickNotice() {
       if (!prodPickForm.poNo) { ElementPlus.ElMessage.error('请选择关联生产订单'); return; }
       if (!prodPickForm.pickType) { ElementPlus.ElMessage.error('请选择领料类型'); return; }
-      if (!isSparePickType(prodPickForm.pickType) && !prodPickForm.lineSideLoc) {
+      if (!prodPickForm.lineSideLoc) {
         ElementPlus.ElMessage.error('请选择领至线边仓'); return;
       }
       if (!prodPickForm.planDate) { ElementPlus.ElMessage.error('请选择计划执行日期'); return; }
@@ -9438,7 +9991,7 @@ createApp({
         planDate: prodPickForm.planDate,
         docType: prodPickForm.docType || firstNoticeDocType(),
         pickType: prodPickForm.pickType || firstPickType(),
-        lineSideLoc: isSparePickType(prodPickForm.pickType) ? '—' : prodPickForm.lineSideLoc,
+        lineSideLoc: prodPickForm.lineSideLoc,
         remark: prodPickForm.remark || '—',
         materialSummary: summary,
         packSpec: isProdPickTank.value ? '槽车散装/储罐' : (isProdPickCount.value ? '计数/无包材' : '吨袋+托架'),
@@ -9478,6 +10031,382 @@ createApp({
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
         syncProdPickNoticeToPc(created);
         ElementPlus.ElMessage.success('生产领料申请单创建成功');
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+
+    const prodInFormMode = ref('add');
+    const prodInForm = reactive({
+      id: '', poNo: '', partner: '', bizType: '自产完工', prepNoticeNo: '', soNo: '', customer: '',
+      planDate: '', remark: '', docType: '', lines: [],
+    });
+    const prodInMatPickerVisible = ref(false);
+    const prodInMatPickerKw = ref('');
+    const prodInBizTypeOptions = ['自产完工', '受托加工完工'];
+    const prodInMoOptions = computed(() => {
+      const main = ((window.WMS_MOCK_ROWS || {})['prod-order'] || {}).main || [];
+      return main
+        .filter(r => ['待执行', '执行中'].includes(r['订单状态']))
+        .map(r => ({
+          code: r['生产订单号'],
+          dept: r['生产部门'] || '',
+          planDate: r['计划完工日期'] || '',
+          lines: Array.isArray(r._lines) ? r._lines : [],
+        }));
+    });
+    const prepNoticeOptions = computed(() => {
+      const main = ((window.WMS_MOCK_ROWS || {})['wh-so-prep'] || {}).main || [];
+      return main
+        .filter(r => ['待执行', '执行中'].includes(r['备货状态']))
+        .map(r => r['备货通知单号'])
+        .filter(Boolean);
+    });
+    function parseMatInfoParts(info) {
+      const parts = String(info || '').split(' / ').map(s => s.trim());
+      return { code: parts[0] || '', name: parts[1] || '', spec: parts[2] || '', kind: parts[3] || '' };
+    }
+    function prodInManageModeOf(code) {
+      return countMatCodes.value.has(code) ? '计数管理' : '条码管理';
+    }
+    function prodInLineMatchesFlow(ln) {
+      const mode = ln.manageMode || prodInManageModeOf(ln.code);
+      if (isProdInCount.value) return mode === '计数管理';
+      return mode === '条码管理' && !liquidMatCodes.value.has(ln.code);
+    }
+    function assignProdInLineNos(lines) {
+      const list = (lines || []).map(ln => ({ ...ln }));
+      const byBase = new Map();
+      list.forEach((ln, i) => {
+        const raw = String(ln.erpLineNo || ln.orderLineNo || '').trim();
+        let base = '';
+        if (raw && /^\d+-\d+$/.test(raw)) base = raw.split('-')[0];
+        else if (raw) base = raw.replace(/-\d+$/, '');
+        else base = String((i + 1) * 10);
+        if (!byBase.has(base)) byBase.set(base, []);
+        byBase.get(base).push({ ln, raw });
+      });
+      byBase.forEach((group, base) => {
+        if (group.length <= 1) {
+          const { ln, raw } = group[0];
+          if (!raw || raw === '—') {
+            ln.erpLineNo = base;
+            ln.orderLineNo = ln.orderLineNo || base;
+          }
+          return;
+        }
+        group.forEach(({ ln, raw }, idx) => {
+          const want = base + '-' + (idx + 1);
+          if (!raw || raw === base || /^\d+$/.test(raw)) {
+            ln.erpLineNo = want;
+            ln.orderLineNo = ln.orderLineNo || base;
+          }
+        });
+      });
+      return list;
+    }
+    function finalizeProdInFormLines(lines) {
+      return assignProdInLineNos(lines || []).map((ln, i) => ({
+        ...ln,
+        lineNo: i + 1,
+      }));
+    }
+    function buildProdInLinesFromMo(mo) {
+      const src = (mo && mo.lines) || [];
+      const built = src.map((ln, i) => {
+        const mat = parseMatInfoParts(ln['物料信息']);
+        const code = ln['物料编码'] || mat.code;
+        const manageMode = prodInManageModeOf(code);
+        const isCount = manageMode === '计数管理';
+        const planQty = Number(ln['未完工数量'] || ln['计划数量'] || 0) || (isCount ? 100 : 800);
+        const planPcs = isCount ? 0 : (Number(ln['计划件数']) > 0 ? Number(ln['计划件数']) : Math.max(1, Math.round(planQty >= 1000 ? planQty / 1000 : planQty)));
+        return {
+          orderLineNo: String(ln['行号'] || ((i + 1) * 10)),
+          erpLineNo: String(ln['行号'] || ((i + 1) * 10)),
+          code,
+          name: mat.name,
+          spec: mat.spec,
+          kind: mat.kind,
+          unit: ln['库存单位'] || 'KG',
+          planPcs,
+          planQty,
+          lot: '',
+          remark: ln['备注'] === '—' ? '' : (ln['备注'] || ''),
+          manageMode,
+          status: '待执行',
+          doneQty: 0,
+          remainQty: planQty,
+          remainPcs: isCount ? 0 : planPcs,
+        };
+      });
+      return finalizeProdInFormLines(built.filter(prodInLineMatchesFlow));
+    }
+    function prodInSelectableMats() {
+      if (isProdInCount.value) return (CFG.countMatOptions || []).map(m => tagMatManageMode(m, '计数管理'));
+      return (CFG.barcodeMatOptions || []).filter(m => !liquidMatCodes.value.has(m.code)).map(m => tagMatManageMode(m, '条码管理'));
+    }
+    const filteredProdInMatOptions = computed(() => {
+      const kw = String(prodInMatPickerKw.value || '').trim().toLowerCase();
+      const base = prodInSelectableMats();
+      const mo = (prodInMoOptions.value || []).find(p => p.code === prodInForm.poNo);
+      let list = base.slice();
+      if (mo && Array.isArray(mo.lines) && mo.lines.length) {
+        const fromMo = mo.lines.map(ln => {
+          const mat = parseMatInfoParts(ln['物料信息']);
+          const code = ln['物料编码'] || mat.code;
+          const hit = base.find(m => m.code === code);
+          return {
+            code,
+            name: mat.name || (hit && hit.name) || '',
+            spec: mat.spec || (hit && hit.spec) || '',
+            kind: mat.kind || (hit && hit.kind) || '',
+            unit: ln['库存单位'] || (hit && hit.unit) || 'KG',
+            planPcs: Number(ln['计划件数']) || (hit && hit.planPcs) || 1,
+            planQty: Number(ln['未完工数量'] || ln['计划数量']) || (hit && hit.planQty) || 100,
+            manageMode: prodInManageModeOf(code),
+          };
+        }).filter(m => prodInLineMatchesFlow(m));
+        const moCodes = new Set(fromMo.map(m => m.code));
+        list = fromMo.concat(base.filter(m => !moCodes.has(m.code)));
+      }
+      if (!kw) return list;
+      return list.filter(m => [m.code, m.name, m.spec, m.kind, m.manageMode].join(' ').toLowerCase().includes(kw));
+    });
+    function openProdInForm(mode, n) {
+      prodInFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      if (mode === 'edit' && n) {
+        Object.assign(prodInForm, {
+          id: n.id,
+          poNo: n.refNo || n.poNo || '',
+          partner: n.partner || '',
+          bizType: n.bizType || '自产完工',
+          prepNoticeNo: n.prepNoticeNo || '',
+          soNo: n.soNo || '',
+          customer: n.customer || '',
+          planDate: n.planDate || todayYmd(),
+          remark: n.remark === '—' ? '' : (n.remark || ''),
+          docType: n.docType || firstNoticeDocType(),
+          lines: finalizeProdInFormLines(JSON.parse(JSON.stringify((n.lines || []).map(ln => ({
+            code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+            planPcs: ln.planPcs, planQty: ln.planQty, lot: ln.lot || '',
+            remark: ln.remark === '—' ? '' : (ln.remark || ''),
+            manageMode: ln.manageMode || prodInManageModeOf(ln.code),
+            erpLineNo: ln.erpLineNo || String(ln.lineNo || ''),
+            orderLineNo: ln.orderLineNo || ln.erpLineNo || '',
+            status: ln.status || '待执行',
+            doneQty: ln.doneQty || 0,
+            remainQty: ln.remainQty,
+            remainPcs: ln.remainPcs,
+          }))))),
+        });
+      } else {
+        Object.assign(prodInForm, {
+          id: '', poNo: '', partner: '', bizType: '自产完工', prepNoticeNo: '', soNo: '', customer: '',
+          planDate: todayYmd(), remark: '', docType: firstNoticeDocType(), lines: [],
+        });
+      }
+      view.value = 'prod-in-form';
+    }
+    function backProdInForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function onProdInBizTypeChange() {
+      if (prodInForm.bizType !== '受托加工完工') {
+        prodInForm.soNo = '';
+        prodInForm.customer = '';
+      }
+    }
+    function onProdInMoChange() {
+      const mo = (prodInMoOptions.value || []).find(p => p.code === prodInForm.poNo);
+      if (!mo) {
+        prodInForm.partner = '';
+        prodInForm.lines = [];
+        return;
+      }
+      prodInForm.partner = mo.dept || '';
+      if (mo.planDate) prodInForm.planDate = mo.planDate;
+      prodInForm.lines = buildProdInLinesFromMo(mo);
+    }
+    function openProdInMatPicker() {
+      prodInMatPickerKw.value = '';
+      prodInMatPickerVisible.value = true;
+    }
+    function selectProdInMat(m) {
+      if (!m || !m.code) return;
+      const manageMode = m.manageMode || prodInManageModeOf(m.code);
+      if (!prodInLineMatchesFlow({ code: m.code, manageMode })) {
+        ElementPlus.ElMessage.warning(isProdInCount.value ? '当前为计数入库，仅可添加计数管理物料' : '当前为流水码入库，仅可添加条码管理物料');
+        return;
+      }
+      const isCount = manageMode === '计数管理';
+      const pcs = Number(m.planPcs) > 0 ? Number(m.planPcs) : 1;
+      const qty = Number(m.planQty) > 0 ? Number(m.planQty) : (isCount ? 100 : 800);
+      prodInForm.lines = finalizeProdInFormLines((prodInForm.lines || []).concat([{
+        orderLineNo: '',
+        erpLineNo: '',
+        code: m.code,
+        name: m.name || '',
+        spec: m.spec || '',
+        kind: m.kind || '',
+        unit: m.unit || 'KG',
+        planPcs: isCount ? 0 : pcs,
+        planQty: qty,
+        lot: '',
+        remark: '',
+        manageMode,
+        status: '待执行',
+        doneQty: 0,
+        remainQty: qty,
+        remainPcs: isCount ? 0 : pcs,
+      }]));
+      prodInMatPickerVisible.value = false;
+    }
+    function removeProdInFormLine(idx) {
+      prodInForm.lines.splice(idx, 1);
+      prodInForm.lines = finalizeProdInFormLines(prodInForm.lines);
+    }
+    function cloneProdInLineForNewLot(idx) {
+      const src = (prodInForm.lines || [])[idx];
+      if (!src || !src.code) { ElementPlus.ElMessage.warning('请先选择物料'); return; }
+      const copy = JSON.parse(JSON.stringify(src));
+      copy.lot = '';
+      const lines = prodInForm.lines.slice();
+      lines.splice(idx + 1, 0, copy);
+      prodInForm.lines = finalizeProdInFormLines(lines);
+      ElementPlus.ElMessage.success('已复制一行，请填写新批号');
+    }
+    function assertProdInMatLotUnique(lines) {
+      const seen = new Set();
+      for (const ln of lines || []) {
+        const key = String(ln.code || '') + '::' + String(ln.lot || '').trim();
+        if (seen.has(key)) return false;
+        seen.add(key);
+      }
+      return true;
+    }
+    function syncProdInNoticeToPc(n) {
+      if (!n || !STORE || !STORE.upsertWhProdInFromApp) return;
+      const moText = n.refNo || n.poNo || '—';
+      const dept = n.partner && n.partner !== '—' ? n.partner : '';
+      const noticeRow = {
+        单号: n.id,
+        单据状态: n.status || '待执行',
+        单据类型: n.docType || '生产入库申请单',
+        计划执行日期: n.planDate || '',
+        物料信息: n.materialSummary || '—',
+        关联生产订单: dept ? (moText + ' / ' + dept) : moText,
+        业务类型: n.bizType || '自产完工',
+        关联备货通知单: n.prepNoticeNo || '—',
+        关联销售订单: n.soNo || '—',
+        客户名称: n.customer || '—',
+        备注: n.remark || '—',
+        关联发货单: n.logisticsNo || '—',
+        包装规格: n.packSpec || '—',
+        _lines: (n.lines || []).map((ln, i) => ({
+          id: n.id + '-l' + (ln.lineNo || (i + 1)),
+          行号: ln.erpLineNo || String(ln.lineNo || ((i + 1) * 10)),
+          行状态: ln.status || '待执行',
+          物料信息: [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / '),
+          库存单位: ln.unit || 'KG',
+          管理方式: ln.manageMode || prodInManageModeOf(ln.code),
+          计划件数: String(ln.planPcs || 0),
+          计划数量: Number(ln.planQty || 0).toFixed(2),
+          已完成数量: Number(ln.doneQty || 0).toFixed(2),
+          未完成数量: Number(ln.remainQty || 0).toFixed(2),
+          批号: ln.lot || '—',
+          备注: ln.remark || '—',
+        })),
+      };
+      STORE.upsertWhProdInFromApp({
+        action: 'create-notice',
+        noticeId: n.id,
+        noticeStatus: n.status || '待执行',
+        noticeRow,
+        noticeLines: (n.lines || []).map((ln, i) => ({
+          lineNo: ln.lineNo || (i + 1),
+          erpLineNo: ln.erpLineNo,
+          id: n.id + '-l' + (ln.lineNo || (i + 1)),
+          code: ln.code,
+          status: ln.status,
+          doneQty: ln.doneQty,
+          remainQty: ln.remainQty,
+          remainPcs: ln.remainPcs,
+        })),
+      });
+    }
+    function saveProdInNotice() {
+      if (!prodInForm.poNo) { ElementPlus.ElMessage.error('请选择关联生产订单'); return; }
+      if (!prodInForm.bizType) { ElementPlus.ElMessage.error('请选择业务类型'); return; }
+      if (!(prodInForm.lines || []).length) { ElementPlus.ElMessage.error('请至少添加一行物料明细'); return; }
+      const flowLines = (prodInForm.lines || []).filter(prodInLineMatchesFlow);
+      if (!flowLines.length) {
+        ElementPlus.ElMessage.error(isProdInCount.value ? '请添加计数管理物料明细' : '请添加条码管理物料明细');
+        return;
+      }
+      if (!assertProdInMatLotUnique(flowLines)) {
+        ElementPlus.ElMessage.error('同一物料+批号不可重复，请检查明细行');
+        return;
+      }
+      if (isProdInCount.value) {
+        if (flowLines.some(ln => !(Number(ln.planQty) > 0))) {
+          ElementPlus.ElMessage.error('计划数量必须为大于 0 的正数');
+          return;
+        }
+      } else if (flowLines.some(ln => !(Number(ln.planPcs) > 0) || !(Number(ln.planQty) > 0))) {
+        ElementPlus.ElMessage.error('计划件数与计划数量必须为大于 0 的正数');
+        return;
+      }
+      const docsKey = isProdInCount.value ? 'prod-in-count' : 'prod-in-serial';
+      const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
+      const summary = flowLines.map(ln => `${ln.code} / ${ln.name} / ${ln.spec} / ${ln.kind}`).join('；');
+      const payload = {
+        status: '待执行',
+        partner: prodInForm.partner || '生产部门',
+        refNo: prodInForm.poNo,
+        poNo: prodInForm.poNo,
+        bizType: prodInForm.bizType,
+        prepNoticeNo: prodInForm.prepNoticeNo || '',
+        soNo: prodInForm.soNo || '',
+        customer: prodInForm.customer || '',
+        planDate: prodInForm.planDate || todayYmd(),
+        docType: prodInForm.docType || firstNoticeDocType(),
+        remark: prodInForm.remark || '—',
+        materialSummary: summary,
+        packSpec: isProdInCount.value ? '计数/无包材' : '吨袋+托架',
+        lines: finalizeProdInFormLines(flowLines).map((ln) => ({
+          lineNo: ln.lineNo,
+          erpLineNo: ln.erpLineNo,
+          orderLineNo: ln.orderLineNo,
+          status: ln.status || '待执行',
+          code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit, lot: ln.lot || '',
+          remark: ln.remark || '—',
+          manageMode: ln.manageMode || prodInManageModeOf(ln.code),
+          planPcs: Number(ln.planPcs || 0),
+          planQty: Number(ln.planQty),
+          doneQty: Number(ln.doneQty || 0),
+          remainQty: Number(ln.remainQty != null ? ln.remainQty : ln.planQty),
+          remainPcs: Number(ln.remainPcs != null ? ln.remainPcs : ln.planPcs),
+        })),
+      };
+      if (prodInFormMode.value === 'edit' && prodInForm.id) {
+        const hit = list.find(x => x.id === prodInForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        if (hit.status && hit.status !== '待执行') {
+          ElementPlus.ElMessage.error('仅待执行单据可编辑');
+          return;
+        }
+        Object.assign(hit, payload, { id: prodInForm.id });
+        syncProdInNoticeToPc(hit);
+        ElementPlus.ElMessage.success('生产入库申请单修改成功');
+      } else {
+        const id = 'SCRKSQ' + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
+        list.unshift(created);
+        if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
+        syncProdInNoticeToPc(created);
+        ElementPlus.ElMessage.success('生产入库申请单创建成功');
       }
       bumpStore();
       view.value = 'docs';
@@ -9558,6 +10487,11 @@ createApp({
           beforeQty: before,
           deduct,
           remain: before - deduct,
+          maker: x.maker || arch.maker || '',
+          supplier: x.supplier || arch.supplier || '',
+          prodDate: x.prodDate || x.inDate || '',
+          validPeriod: x.validPeriod || '',
+          expireDate: x.expireDate || '',
         });
       });
       return rows;
@@ -9572,9 +10506,7 @@ createApp({
     const directPickAllotLabel = computed(() => {
       const rows = directPickAllotRows.value || [];
       if (!rows.length) return '';
-      const unit = directPickForm.unit || 'Kg';
-      if (rows.length === 1) return `批号：${rows[0].lot}（${rows[0].deduct} ${unit}）`;
-      return `多批次(${rows.length}) - 查看分配详情 >`;
+      return rows.map((r) => String(r.lot || '').trim() || '—').join('；');
     });
     const directPickStockHint = computed(() => {
       if (!directPickForm.code) return '';
@@ -9610,7 +10542,6 @@ createApp({
     }
     function onDirectPickTypeChange() {
       if (isSparePickType(directPickForm.pickType)) {
-        directPickForm.lineSideLoc = '';
         if (directPickForm.code && !countMatCodes.value.has(directPickForm.code)) {
           directPickForm.code = '';
           directPickForm.name = '';
@@ -9723,6 +10654,11 @@ createApp({
           lot: x.lot || '',
           tankNo: arch.tankNo,
           barcode: arch.barcode,
+          maker: x.maker || arch.maker || '',
+          supplier: x.supplier || arch.supplier || '',
+          prodDate: x.prodDate || x.inDate || '',
+          validPeriod: x.validPeriod || '',
+          expireDate: x.expireDate || '',
         });
       });
       arch.qty = (arch.lots || []).reduce((s, x) => s + Number(x.qty || 0), 0);
@@ -9759,7 +10695,7 @@ createApp({
           return;
         }
       } else {
-        if (!isSparePickType(pickType) && !String(directPickForm.lineSideLoc || '').trim()) {
+        if (!String(directPickForm.lineSideLoc || '').trim()) {
           ElementPlus.ElMessage.error('请选择领至线边仓'); return;
         }
         const rows = listDirectPickInv(directPickForm.code, lot);
@@ -9799,7 +10735,7 @@ createApp({
         const ckId = nextDirectPickCkId();
         const stamp = STORE && STORE.nowStr ? STORE.nowStr() : nowStamp();
         const matInfo = [directPickForm.code, directPickForm.name, directPickForm.spec, directPickForm.kind].filter(Boolean).join(' / ');
-        const lineSide = (isProdPickCount.value && isSparePickType(pickType)) ? '—' : (directPickForm.lineSideLoc || '—');
+        const lineSide = directPickForm.lineSideLoc || '—';
         const unit = directPickForm.unit || (isProdPickTank.value ? 'Kg' : '个');
         const packSpec = isProdPickTank.value ? '槽车散装/储罐' : '计数/无包材';
         const ckRow = {
@@ -9819,22 +10755,40 @@ createApp({
           关联发货单: '—',
           包装规格: packSpec,
         };
-        const flowRows = deducted.took.map((t, i) => {
-          const flowLot = t.lot || lot || '—';
-          return {
-            key: ckId + '::' + (t.loc || '') + '::' + flowLot + '::' + i,
+        let flowRows;
+        if (isProdPickTank.value) {
+          const lotDetailRows = deducted.took.map((t) => ({
+            批号: t.lot || lot || '—',
+            领出数量: String(t.qty),
+            库存单位: t.unit || unit,
+            物料编码: directPickForm.code || '',
+            物料名称: directPickForm.name || '',
+            物料规格: directPickForm.spec || '',
+            物料种类: directPickForm.kind || '',
+            生产厂家: t.maker || '—',
+            供应商名称: t.supplier || '—',
+            生产日期: t.prodDate || t.inDate || '—',
+            有效期: t.validPeriod || '—',
+            失效日期: t.expireDate || '—',
+          }));
+          const lotText = lotDetailRows.length
+            ? lotDetailRows.map((d) => `${d.批号}（${d.领出数量} ${d.库存单位}）`).join('；')
+            : (lot || '—');
+          const first = deducted.took[0] || {};
+          flowRows = [{
+            key: ckId + '::tank::' + (directPickForm.tankNo || first.tankNo || ''),
             流水状态: '已完成',
             当前工序: '已完成',
             检查结果: '合格',
-            档案类型: isProdPickTank.value ? '储罐' : '计数',
-            条码号: isProdPickTank.value ? (t.barcode || directPickForm.tankBarcode || '—') : '—',
+            档案类型: '储罐',
+            条码号: first.barcode || directPickForm.tankBarcode || '—',
             外包材编号: '—',
             物料信息: matInfo,
-            物料批号: flowLot,
-            总数量: String(t.qty),
-            库存单位: t.unit || unit,
-            储罐编号: isProdPickTank.value ? (t.tankNo || directPickForm.tankNo || '—') : '—',
-            原位置: t.loc || '—',
+            物料批号: lotText,
+            总数量: String(qty),
+            库存单位: unit,
+            储罐编号: first.tankNo || directPickForm.tankNo || '—',
+            原位置: first.loc || '—',
             新位置: lineSide,
             单据类型: '生产领料出库单',
             申请单号: '—',
@@ -9843,8 +10797,36 @@ createApp({
             包装规格: packSpec,
             领至线边仓: lineSide,
             领料类型: pickType,
-          };
-        });
+            _lotDetails: lotDetailRows,
+          }];
+        } else {
+          flowRows = deducted.took.map((t, i) => {
+            const flowLot = t.lot || lot || '—';
+            return {
+              key: ckId + '::' + (t.loc || '') + '::' + flowLot + '::' + i,
+              流水状态: '已完成',
+              当前工序: '已完成',
+              检查结果: '合格',
+              档案类型: '计数',
+              条码号: '—',
+              外包材编号: '—',
+              物料信息: matInfo,
+              物料批号: flowLot,
+              总数量: String(t.qty),
+              库存单位: t.unit || unit,
+              储罐编号: '—',
+              原位置: t.loc || '—',
+              新位置: lineSide,
+              单据类型: '生产领料出库单',
+              申请单号: '—',
+              出库单号: ckId,
+              备注: directPickForm.remark || '—',
+              包装规格: packSpec,
+              领至线边仓: lineSide,
+              领料类型: pickType,
+            };
+          });
+        }
         if (STORE && STORE.upsertWhProdIssueFromApp) {
           STORE.upsertWhProdIssueFromApp({
             action: 'direct-pick',
@@ -10120,6 +11102,10 @@ createApp({
       }
       poInForm.supplier = po.supplier || po.name || '';
       poInForm.planDate = po.planDate || todayYmd();
+      if (isOsIssueDoc.value || isOsRetDoc.value) {
+        poInForm.lines = [];
+        return;
+      }
       const makerName = poInForm.supplier;
       let srcLines = (po.lines || []).slice();
       if (isTrustRecvCount.value || isTrustRetCount.value) {
@@ -10177,7 +11163,7 @@ createApp({
       }
       // 已选上游订单时，优先把订单行物料排在前面
       const po = (refOrderOptions.value || []).find(p => p.code === poInForm.poNo);
-      if (po && Array.isArray(po.lines) && po.lines.length) {
+      if (po && Array.isArray(po.lines) && po.lines.length && !isOsIssueDoc.value && !isOsRetDoc.value) {
         const fromPo = po.lines.map(l => {
           const hit = (isInTankDoc.value ? liquidMatOptions : (isInCountDoc.value || isOutCountDoc.value ? countMatOptions : barcodeMatOptions)).find(m => m.code === l.code);
           return {
@@ -11996,6 +12982,7 @@ createApp({
       };
       const ckRow = {
         单据状态: ckStatus,
+        出库单号: ckId,
         退货单号: ckId,
         物料信息: matInfo,
         已完成件数: String(pcs),
@@ -12164,6 +13151,7 @@ createApp({
       };
       const rkRow = {
         单据状态: status,
+        入库单号: rkId,
         退料单号: rkId,
         物料信息: matInfo,
         已完成件数: String(pcs),
@@ -13025,16 +14013,21 @@ createApp({
           arch.step = '';
           arch.docNo = '';
           if (isSoShipSerial.value) {
-            // 整件按本身数量出库：不扣减数量，状态厂外，位置=对应客户
+            // 整件按本身数量出库：不扣减数量，状态厂外，位置=对应客户信息（客户库位优先，否则客户名称）
+            const shipCustomerLoc = String(
+              r.custLoc || custLoc
+              || (currentNotice.value && (currentNotice.value.custLoc || currentNotice.value.custWh || currentNotice.value.partner || currentNotice.value.supplier))
+              || ''
+            ).trim() || customerLoc;
             if (fullOut) {
               arch.stockStatus = '厂外';
-              arch.loc = customerLoc;
+              arch.loc = shipCustomerLoc;
             } else {
               arch.qty = String(remain);
               arch.archiveQty = String(remain);
               if (remain === 0) {
                 arch.stockStatus = '厂外';
-                arch.loc = customerLoc;
+                arch.loc = shipCustomerLoc;
               }
             }
             arch.bindStatus = '未绑定';
@@ -13096,23 +14089,31 @@ createApp({
       hydrateSerialArchFromPcMock();
       const archRows = CFG.serialArchRows || [];
       const noticeId = (currentNotice.value && currentNotice.value.id) || '';
+      // 全部发完：存储位置写对应供应商（对齐销售发货写客户），库存状态→厂外
+      const supplierLoc = String(
+        (currentNotice.value && (currentNotice.value.partner || currentNotice.value.supplier)) || ''
+      ).trim() || '厂外';
       scanRows.value.forEach((r) => {
         const arch = archRows.find(a => a.barcode === r.barcode);
         if (!arch) return;
         const outQty = Number(r.qty || 0);
-        const remain = Math.max(0, Number(arch.qty || arch.archiveQty || 0) - outQty);
+        const srcQty = Number(arch.qty || arch.archiveQty || 0);
+        const remain = Math.max(0, srcQty - outQty);
+        const fullOut = !(outQty + 1e-9 < srcQty);
         if (final) {
-          arch.qty = String(remain);
-          arch.archiveQty = String(remain);
           arch.sourceNo = noticeId || arch.sourceNo;
           arch.stage = '委外发料';
           arch.step = '';
           arch.docNo = '';
-          if (remain === 0) {
+          if (fullOut || remain === 0) {
+            // 全额发料：数量不改写为 0（保留装量历史），位置→供应商
             arch.stockStatus = '厂外';
-            arch.loc = '厂外';
+            arch.loc = supplierLoc;
             arch.bindStatus = '未绑定';
             arch.bindOuter = '—';
+          } else {
+            arch.qty = String(remain);
+            arch.archiveQty = String(remain);
           }
         } else {
           arch.step = '委外发料';
@@ -13214,28 +14215,50 @@ createApp({
         包装规格: packSpec,
       };
       const isTankPick = isProdPickTank.value;
-      const flowRows = scanRows.value.map((r) => ({
-        key: ckId + '::' + r.barcode + (poInBatchKey.value ? ('::' + poInBatchKey.value) : ''),
-        流水状态: status,
-        当前工序: r.done ? '已完成' : (r.process || '—'),
-        检查结果: '合格',
-        档案类型: isTankPick ? '储罐' : '流水码',
-        条码号: r.barcode || '—',
-        外包材编号: isTankPick ? '—' : (r.outer || '—'),
-        物料信息: matInfo,
-        物料批号: r.lot || (line && line.lot) || '—',
-        总数量: String(r.qty || 0),
-        库存单位: (line && line.unit) || 'KG',
-        储罐编号: isTankPick ? (r.tankNo || r.pkgNo || form.tankNo || '—') : '—',
-        原位置: r.fromLoc || '—',
-        新位置: isTankPick ? lineSide : (r.fromLoc || '—'),
-        单据类型: '生产领料出库单',
-        申请单号: n.id,
-        出库单号: ckId,
-        备注: form.remark || '—',
-        包装规格: isTankPick ? (n.packSpec || '槽车散装/储罐') : (r.packSpec || packSpec),
-        领至线边仓: lineSide,
-      }));
+      const unit = (line && line.unit) || 'KG';
+      const flowRows = scanRows.value.map((r) => {
+        const lotDetails = Array.isArray(r.lotDetails) ? r.lotDetails : [];
+        const lotDetailRows = lotDetails.map((d) => ({
+          批号: d.lot || '—',
+          领出数量: String(d.qty != null ? d.qty : (d.deduct != null ? d.deduct : 0)),
+          库存单位: d.unit || unit,
+          物料编码: (line && line.code) || '',
+          物料名称: (line && line.name) || '',
+          物料规格: (line && line.spec) || '',
+          物料种类: (line && line.kind) || '',
+          生产厂家: d.maker || '—',
+          供应商名称: d.supplier || '—',
+          生产日期: d.inDate || d.prodDate || '—',
+          有效期: d.validPeriod || '—',
+          失效日期: d.expireDate || '—',
+        }));
+        const lotText = lotDetailRows.length
+          ? lotDetailRows.map((d) => `${d.批号}（${d.领出数量} ${d.库存单位}）`).join('；')
+          : (r.lot || (line && line.lot) || '—');
+        return {
+          key: ckId + '::' + r.barcode + (poInBatchKey.value ? ('::' + poInBatchKey.value) : ''),
+          流水状态: status,
+          当前工序: r.done ? '已完成' : (r.process || '—'),
+          检查结果: '合格',
+          档案类型: isTankPick ? '储罐' : '流水码',
+          条码号: r.barcode || '—',
+          外包材编号: isTankPick ? '—' : (r.outer || '—'),
+          物料信息: matInfo,
+          物料批号: lotText,
+          总数量: String(r.qty || 0),
+          库存单位: unit,
+          储罐编号: isTankPick ? (r.tankNo || r.pkgNo || form.tankNo || '—') : '—',
+          原位置: r.fromLoc || '—',
+          新位置: isTankPick ? lineSide : (r.fromLoc || '—'),
+          单据类型: '生产领料出库单',
+          申请单号: n.id,
+          出库单号: ckId,
+          备注: form.remark || '—',
+          包装规格: isTankPick ? (n.packSpec || '槽车散装/储罐') : (r.packSpec || packSpec),
+          领至线边仓: lineSide,
+          _lotDetails: isTankPick ? lotDetailRows : undefined,
+        };
+      });
       const draftKey = poInDraftKey();
       const draft = opts.keepDraft ? {
         remark: form.remark,
@@ -14287,7 +15310,6 @@ createApp({
           ElementPlus.ElMessage.error('请先扫描或输入目标客户库位编码');
           return;
         }
-        if (isOsRmaSerial.value && !assertPoInLoc()) return;
         if (!scanRows.value.length) { ElementPlus.ElMessage.error('请先扫码录入明细后再提交'); return; }
         if (poInHasCraft.value) {
           const undone = scanRows.value.find(r => !r.done);
@@ -15265,7 +16287,18 @@ createApp({
       if (mode === 'tank' && tankExec.value === 'out' && !form.outDir) {
         ElementPlus.ElMessage.error('出库方向为必填项，请选择出库去向'); return;
       }
-      if (mode === 'tank' && tankExec.value !== 'pick' && tankExec.value !== 'ret' && !form.tankNo) {
+      if (mode === 'tank' && tankExec.value === 'out' && form.outDir === '出至线边仓' && !String(form.lineSideWh || '').trim()) {
+        ElementPlus.ElMessage.error('请选择领至线边仓'); return;
+      }
+      if (mode === 'tank' && tankExec.value === 'out') {
+        if (!tankRows.value.length) {
+          ElementPlus.ElMessage.error('请先添加储罐出库明细'); return;
+        }
+        if (tankRows.value.some(r => !(Number(r.qty) > 0))) {
+          ElementPlus.ElMessage.error('出库数量必须填写正数'); return;
+        }
+      }
+      if (mode === 'tank' && tankExec.value !== 'pick' && tankExec.value !== 'ret' && tankExec.value !== 'out' && !form.tankNo) {
         ElementPlus.ElMessage.error('储罐编号为必填'); return;
       }
       if (mode === 'tank' && tankExec.value === 'pick') {
@@ -15392,17 +16425,19 @@ createApp({
       currentNotice, currentLine, processTab, processRef, stubTitle,
       stockRows, pkgSearch, pkgDetail, pkgForm, pkgEditable, pkgQueryPairs,
       operator, tanks, scanRows, tankRows, innerRows, form, procForm,
-      recommendVisible, lotDetailVisible, lotDetailRows, lineSideWhOptions, recommendBarcodes,
+      recommendVisible, lotDetailVisible, lotDetailRows, lotDetailMode, lotDetailTitle, lotDetailSumLabel, lotDetailQtyHeader, lotDetailEmptyText, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, pkgRows, wayPoint, wayBackView,
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute, canWaybillEnroute, toDatetimeLocal, fromDatetimeLocal,
       flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
-      statusTag, gatepassStatusTag, gatepassDisplayLines, maskPhoneApp, gatepassPlateText, gatepassLotQtyText, gatepassLineInfo, gatepassLinePcs, gatepassLineQty, gatepassMatStats, openGatepassDetail, scanGatepass, toast, goHome, openStub, openModule, onMenuSelect, maskIdCardApp,
+      statusTag, gatepassStatusTag, gatepassDisplayLines, maskPhoneApp, gatepassPlateText, waybillSecondaryDriverText, gatepassLotQtyText, gatepassLineInfo, gatepassLinePcs, gatepassLineQty, gatepassMatStats, openGatepassDetail, scanGatepass, toast, goHome, openStub, openModule, onMenuSelect, maskIdCardApp,
       poOptions, poInSelectablePos, tankArchOptions, poInFormMode, poInForm, poInWaybillOpts, poInShipOpts, noticeDocTypeOptions, pickTypeOptions, isSparePickType,
       poInMatPickerVisible, poInMatPickerKw, filteredPoInMatOptions,
       openProdPickForm, backProdPickForm, onProdPickMoChange, onProdPickTypeChange, openProdPickMatPicker, selectProdPickMat, removeProdPickFormLine, saveProdPickNotice,
+      prodInFormMode, prodInForm, prodInMoOptions, prodInBizTypeOptions, prepNoticeOptions, prodInMatPickerVisible, prodInMatPickerKw, filteredProdInMatOptions,
+      openProdInForm, backProdInForm, onProdInMoChange, onProdInBizTypeChange, openProdInMatPicker, selectProdInMat, removeProdInFormLine, cloneProdInLineForNewLot, saveProdInNotice,
       openDirectPickForm, backDirectPickForm, openDirectPickMatPicker, selectDirectPickMat, submitDirectPick, onDirectPickTypeChange,
       onDirectPickLotChange, onDirectPickTankChange, openDirectPickLotDetail,
       directPickForm, directPickMatPickerVisible, directPickMatPickerKw, filteredDirectPickMatOptions, directPickMatPickerTitle, directPickMatLabel, directPickStockHint,
@@ -15416,7 +16451,7 @@ createApp({
       openPoInMatPicker, selectPoInMat, isPoInMatAlreadyAdded, addPoInFormLine, removePoInFormLine, savePoInNotice,
       autoSavePoInExec, autoSavePoRetExec, autoSaveTrustRetExec, autoSaveTrustRetCountExec, autoSavePoRetCountExec, autoSaveOsIssueCountExec, autoSaveOsRmaCountExec, autoSaveOsRetCountExec, autoSaveProdRetCountExec, autoSaveProdRetTankExec, autoSaveOsRecvCountExec, autoSaveOsRecvTankExec, autoSaveOsRetExec, autoSaveOsRecvExec, savePoInTankExec, saveTrustRecvTankExec, savePoInCountDraft, savePoRetCountDraft, saveOsIssueCountDraft, saveOsRmaCountDraft, saveOsRetCountDraft, saveOsRecvCountDraft, scanTankerBarcode, scanProdRetWorkshopBarcode, onPoInTankNoChange, addPoInTankRow, addProdRetTankRow, addOuterBindScan, confirmPoInLoc, onPoRetQtyChange, onInSerialQtyChange,
       openMaterials, openDocAction, openStockExec, openInspExec, openExec, backFromExec,
-      addSerialScan, addPickScan, addXferScan, onXferQtyChange, onXferToLocChange, confirmXferFromLoc, confirmXferToLoc, onXferCountLocChange, onXferCountLotChange, autoSaveXferCountExec, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail,
+      addSerialScan, addPickScan, addXferScan, onXferQtyChange, onXferToLocChange, confirmXferFromLoc, confirmXferToLoc, onXferCountLocChange, onXferCountLotChange, autoSaveXferCountExec, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail, tankPickLotLabel, onTankPickQtyChange, onTankOutQtyChange,
       addStockScan, onStockQtyChange, scanInspWh, mockInspPhoto, mockInspSign, inspForm,
       openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,

@@ -1,580 +1,580 @@
 window.WMS_PAGE_CONFIGS = {
   "menu": [
-  {
-    "title": "基础数据",
-    "index": "g-基础数据",
-    "children": [
-      {
-        "title": "基础资料",
-        "index": "g-基础数据/基础资料",
-        "children": [
-          {
-            "title": "物料列表",
-            "index": "mat-list",
-            "pageId": "mat-list"
-          },
-          {
-            "title": "物料单位换算",
-            "index": "mat-uom",
-            "pageId": "mat-uom"
-          },
-          {
-            "title": "物料介质对照表",
-            "index": "mat-medium",
-            "pageId": "mat-medium"
-          },
-          {
-            "title": "客户列表",
-            "index": "customer",
-            "pageId": "customer"
-          },
-          {
-            "title": "供应商列表",
-            "index": "supplier",
-            "pageId": "supplier"
-          },
-          {
-            "title": "单位列表",
-            "index": "unit",
-            "pageId": "unit"
-          },
-          {
-            "title": "数据字典",
-            "index": "dict",
-            "pageId": "dict"
-          }
-        ]
-      },
-      {
-        "title": "物流资料",
-        "index": "g-基础数据/物流资料",
-        "children": [
-          {
-            "title": "承运商列表",
-            "index": "carrier",
-            "pageId": "carrier"
-          },
-          {
-            "title": "车辆及司机列表",
-            "index": "vehicle",
-            "pageId": "vehicle"
-          },
-          {
-            "title": "运费参照表",
-            "index": "freight",
-            "pageId": "freight"
-          }
-        ]
-      },
-      {
-        "title": "仓储资料",
-        "index": "g-基础数据/仓储资料",
-        "children": [
-          {
-            "title": "仓库列表",
-            "index": "warehouse",
-            "pageId": "warehouse"
-          },
-          {
-            "title": "库存预警",
-            "index": "stock-warn",
-            "pageId": "stock-warn"
-          },
-          {
-            "title": "检查工序",
-            "index": "insp-proc",
-            "pageId": "insp-proc"
-          },
-          {
-            "title": "检查工艺",
-            "index": "insp-craft",
-            "pageId": "insp-craft"
-          }
-        ]
-      },
-      {
-        "title": "生产资料",
-        "index": "g-基础数据/生产资料",
-        "children": [
-          {
-            "title": "线边仓",
-            "index": "line-side",
-            "pageId": "line-side"
-          }
-        ]
-      },
-      {
-        "title": "订单资料",
-        "index": "g-基础数据/订单资料",
-        "children": [
-          {
-            "title": "采购订单",
-            "index": "po",
-            "pageId": "po"
-          },
-          {
-            "title": "销售订单",
-            "index": "so",
-            "pageId": "so"
-          },
-          {
-            "title": "委外加工订单",
-            "index": "wwpo",
-            "pageId": "wwpo"
-          }
-        ]
-      },
-      {
-        "title": "包材资料",
-        "index": "g-基础数据/包材资料",
-        "children": [
-          {
-            "title": "流水码档案",
-            "index": "serial-arch",
-            "pageId": "serial-arch"
-          },
-          {
-            "title": "固定包材档案",
-            "index": "g-基础数据/包材资料/固定包材档案",
-            "children": [
-              {
-                "title": "储罐档案",
-                "index": "tank-arch",
-                "pageId": "tank-arch"
-              }
-            ]
-          },
-          {
-            "title": "APP信息查看配置",
-            "index": "app-view-cfg",
-            "pageId": "app-view-cfg"
-          },
-          {
-            "title": "包材工序",
-            "index": "pkg-proc",
-            "pageId": "pkg-proc"
-          },
-          {
-            "title": "包材工艺",
-            "index": "pkg-craft",
-            "pageId": "pkg-craft"
-          }
-        ]
-      },
-      {
-        "title": "外包材资料",
-        "index": "g-基础数据/外包材资料",
-        "children": [
-          {
-            "title": "流水外包材档案",
-            "index": "outer-serial",
-            "pageId": "outer-serial"
-          }
-        ]
-      },
-      {
-        "title": "标签配置",
-        "index": "g-基础数据/标签配置",
-        "children": [
-          {
-            "title": "标签数据源",
-            "index": "label-ds",
-            "pageId": "label-ds"
-          },
-          {
-            "title": "标签配置",
-            "index": "label-cfg",
-            "pageId": "label-cfg"
-          },
-          {
-            "title": "打印任务",
-            "index": "print-task",
-            "pageId": "print-task"
-          }
-        ]
-      },
-      {
-        "title": "表单配置",
-        "index": "g-基础数据/表单配置",
-        "children": [
-          {
-            "title": "表单数据源",
-            "index": "form-ds",
-            "pageId": "form-ds"
-          },
-          {
-            "title": "表单设计器",
-            "index": "form-designer",
-            "pageId": "form-designer"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "物流管理",
-    "index": "g-物流管理",
-    "children": [
-      {
-        "title": "派车申请单",
-        "index": "lg-dispatch",
-        "pageId": "lg-dispatch"
-      },
-      {
-        "title": "发货单",
-        "index": "lg-ship",
-        "pageId": "lg-ship"
-      },
-      {
-        "title": "运单",
-        "index": "lg-waybill",
-        "pageId": "lg-waybill"
-      },
-      {
-        "title": "运单-承运商派车",
-        "index": "lg-waybill-carrier",
-        "pageId": "lg-waybill-carrier"
-      },
-      {
-        "title": "提货单",
-        "index": "lg-pickup",
-        "pageId": "lg-pickup"
-      },
-      {
-        "title": "签收单",
-        "index": "lg-sign",
-        "pageId": "lg-sign"
-      },
-      {
-        "title": "承运商管理",
-        "index": "g-物流管理/承运商管理",
-        "children": [
-          {
-            "title": "承运商事件",
-            "index": "lg-carrier-evt",
-            "pageId": "lg-carrier-evt"
-          },
-          {
-            "title": "承运商考核",
-            "index": "g-物流管理/承运商管理/承运商考核",
-            "children": [
-              {
-                "title": "考核方案",
-                "index": "lg-kpi-scheme",
-                "pageId": "lg-kpi-scheme"
-              },
-              {
-                "title": "考核计划",
-                "index": "lg-kpi-plan",
-                "pageId": "lg-kpi-plan"
-              },
-              {
-                "title": "考核记录",
-                "index": "lg-kpi-record",
-                "pageId": "lg-kpi-record"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "仓储管理",
-    "index": "g-仓储管理",
-    "children": [
-      {
-        "title": "采购",
-        "index": "g-仓储管理/采购",
-        "children": [
-          {
-            "title": "采购入库",
-            "index": "wh-po-in",
-            "pageId": "wh-po-in"
-          },
-          {
-            "title": "采购退料",
-            "index": "wh-po-ret",
-            "pageId": "wh-po-ret"
-          }
-        ]
-      },
-      {
-        "title": "委外",
-        "index": "g-仓储管理/委外",
-        "children": [
-          {
-            "title": "委外发料",
-            "index": "wh-os-issue",
-            "pageId": "wh-os-issue"
-          },
-          {
-            "title": "委外退料",
-            "index": "wh-os-ret-mat",
-            "pageId": "wh-os-ret-mat"
-          },
-          {
-            "title": "委外收货",
-            "index": "wh-os-recv",
-            "pageId": "wh-os-recv"
-          },
-          {
-            "title": "委外退货",
-            "index": "wh-os-ret-goods",
-            "pageId": "wh-os-ret-goods"
-          }
-        ]
-      },
-      {
-        "title": "生产",
-        "index": "g-仓储管理/生产",
-        "children": [
-          {
-            "title": "生产领料",
-            "index": "wh-prod-issue",
-            "pageId": "wh-prod-issue"
-          },
-          {
-            "title": "生产退料",
-            "index": "wh-prod-ret",
-            "pageId": "wh-prod-ret"
-          },
-          {
-            "title": "生产入库",
-            "index": "wh-prod-in",
-            "pageId": "wh-prod-in"
-          }
-        ]
-      },
-      {
-        "title": "受托",
-        "index": "g-仓储管理/受托",
-        "children": [
-          {
-            "title": "受托收料",
-            "index": "wh-cs-recv",
-            "pageId": "wh-cs-recv"
-          },
-          {
-            "title": "受托退料",
-            "index": "wh-cs-ret",
-            "pageId": "wh-cs-ret"
-          }
-        ]
-      },
-      {
-        "title": "销售",
-        "index": "g-仓储管理/销售",
-        "children": [
-          {
-            "title": "备货通知",
-            "index": "wh-so-prep",
-            "pageId": "wh-so-prep"
-          },
-          {
-            "title": "销售预出货",
-            "index": "wh-so-preout",
-            "pageId": "wh-so-preout"
-          },
-          {
-            "title": "销售发货",
-            "index": "wh-so-ship",
-            "pageId": "wh-so-ship"
-          },
-          {
-            "title": "销售退货",
-            "index": "wh-so-ret",
-            "pageId": "wh-so-ret"
-          }
-        ]
-      },
-      {
-        "title": "调拨",
-        "index": "g-仓储管理/调拨",
-        "children": [
-          {
-            "title": "直接调拨",
-            "index": "wh-direct-xfer",
-            "pageId": "wh-direct-xfer"
-          }
-        ]
-      },
-      {
-        "title": "其他",
-        "index": "g-仓储管理/其他",
-        "children": [
-          {
-            "title": "其他入库",
-            "index": "wh-other-in",
-            "pageId": "wh-other-in"
-          },
-          {
-            "title": "其他出库",
-            "index": "wh-other-out",
-            "pageId": "wh-other-out"
-          }
-        ]
-      },
-      {
-        "title": "装卸",
-        "index": "g-仓储管理/装卸",
-        "children": [
-          {
-            "title": "装卸货",
-            "index": "wh-load",
-            "pageId": "wh-load"
-          }
-        ]
-      },
-      {
-        "title": "库内",
-        "index": "g-仓储管理/库内",
-        "children": [
-          {
-            "title": "库内转移",
-            "index": "wh-transfer",
-            "pageId": "wh-transfer"
-          },
-          {
-            "title": "库内转序",
-            "index": "wh-seq",
-            "pageId": "wh-seq"
-          }
-        ]
-      },
-      {
-        "title": "盘点",
-        "index": "g-仓储管理/盘点",
-        "children": [
-          {
-            "title": "库存全盘",
-            "index": "wh-stocktake",
-            "pageId": "wh-stocktake"
-          }
-        ]
-      },
-      {
-        "title": "仓库巡检",
-        "index": "g-仓储管理/仓库巡检",
-        "children": [
-          {
-            "title": "巡检方案",
-            "index": "wh-insp-scheme",
-            "pageId": "wh-insp-scheme"
-          },
-          {
-            "title": "巡检计划",
-            "index": "wh-insp-plan",
-            "pageId": "wh-insp-plan"
-          }
-        ]
-      },
-      {
-        "title": "报表统计",
-        "index": "g-仓储管理/报表统计",
-        "children": [
-          {
-            "title": "仓库库存",
-            "index": "wh-inv-rpt",
-            "pageId": "wh-inv-rpt"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "title": "质量管理",
-    "index": "g-质量管理",
-    "children": [
-      {
-        "title": "检验数据台账",
-        "index": "qc-ledger",
-        "pageId": "qc-ledger"
-      }
-    ]
-  },
-  {
-    "title": "门卫管理",
-    "index": "g-门卫管理",
-    "children": [
-      {
-        "title": "出门条",
-        "index": "lg-gatepass",
-        "pageId": "lg-gatepass"
-      }
-    ]
-  },
-  {
-    "title": "条码管理",
-    "index": "g-条码管理",
-    "children": [
-      {
-        "title": "流水码拆组",
-        "index": "g-条码管理/流水码拆组",
-        "children": [
-          {
-            "title": "流水码拆分",
-            "index": "bc-serial-split",
-            "pageId": "bc-serial-split"
-          },
-          {
-            "title": "流水码合并",
-            "index": "bc-serial-merge",
-            "pageId": "bc-serial-merge"
-          }
-        ]
-      },
-      {
-        "title": "外包材拆组",
-        "index": "g-条码管理/外包材拆组",
-        "children": [
-          {
-            "title": "外包材拆组",
-            "index": "bc-outer-split",
-            "pageId": "bc-outer-split"
-          }
-        ]
-      },
-      {
-        "title": "报废处理",
-        "index": "g-条码管理/报废处理",
-        "children": [
-          {
-            "title": "待报废清单",
-            "index": "bc-scrap-list",
-            "pageId": "bc-scrap-list"
-          },
-          {
-            "title": "报废处理",
-            "index": "bc-scrap-proc",
-            "pageId": "bc-scrap-proc"
-          }
-        ]
-      },
-      {
-        "title": "异常冻结",
-        "index": "g-条码管理/异常冻结",
-        "children": [
-          {
-            "title": "冻结中清单",
-            "index": "bc-freeze-list",
-            "pageId": "bc-freeze-list"
-          },
-          {
-            "title": "异常冻结",
-            "index": "bc-freeze",
-            "pageId": "bc-freeze"
-          },
-          {
-            "title": "冻结解除",
-            "index": "bc-unfreeze",
-            "pageId": "bc-unfreeze"
-          }
-        ]
-      }
-    ]
-  }
-],
+    {
+      "title": "基础数据",
+      "index": "g-基础数据",
+      "children": [
+        {
+          "title": "基础资料",
+          "index": "g-基础数据/基础资料",
+          "children": [
+            {
+              "title": "物料列表",
+              "index": "mat-list",
+              "pageId": "mat-list"
+            },
+            {
+              "title": "物料单位换算",
+              "index": "mat-uom",
+              "pageId": "mat-uom"
+            },
+            {
+              "title": "物料介质对照表",
+              "index": "mat-medium",
+              "pageId": "mat-medium"
+            },
+            {
+              "title": "客户列表",
+              "index": "customer",
+              "pageId": "customer"
+            },
+            {
+              "title": "供应商列表",
+              "index": "supplier",
+              "pageId": "supplier"
+            },
+            {
+              "title": "单位列表",
+              "index": "unit",
+              "pageId": "unit"
+            },
+            {
+              "title": "数据字典",
+              "index": "dict",
+              "pageId": "dict"
+            }
+          ]
+        },
+        {
+          "title": "物流资料",
+          "index": "g-基础数据/物流资料",
+          "children": [
+            {
+              "title": "承运商列表",
+              "index": "carrier",
+              "pageId": "carrier"
+            },
+            {
+              "title": "车辆及司机列表",
+              "index": "vehicle",
+              "pageId": "vehicle"
+            },
+            {
+              "title": "运费参照表",
+              "index": "freight",
+              "pageId": "freight"
+            }
+          ]
+        },
+        {
+          "title": "仓储资料",
+          "index": "g-基础数据/仓储资料",
+          "children": [
+            {
+              "title": "仓库列表",
+              "index": "warehouse",
+              "pageId": "warehouse"
+            },
+            {
+              "title": "库存预警",
+              "index": "stock-warn",
+              "pageId": "stock-warn"
+            },
+            {
+              "title": "检查工序",
+              "index": "insp-proc",
+              "pageId": "insp-proc"
+            },
+            {
+              "title": "检查工艺",
+              "index": "insp-craft",
+              "pageId": "insp-craft"
+            }
+          ]
+        },
+        {
+          "title": "生产资料",
+          "index": "g-基础数据/生产资料",
+          "children": [
+            {
+              "title": "线边仓",
+              "index": "line-side",
+              "pageId": "line-side"
+            }
+          ]
+        },
+        {
+          "title": "订单资料",
+          "index": "g-基础数据/订单资料",
+          "children": [
+            {
+              "title": "采购订单",
+              "index": "po",
+              "pageId": "po"
+            },
+            {
+              "title": "销售订单",
+              "index": "so",
+              "pageId": "so"
+            },
+            {
+              "title": "委外加工订单",
+              "index": "wwpo",
+              "pageId": "wwpo"
+            }
+          ]
+        },
+        {
+          "title": "包材资料",
+          "index": "g-基础数据/包材资料",
+          "children": [
+            {
+              "title": "流水码档案",
+              "index": "serial-arch",
+              "pageId": "serial-arch"
+            },
+            {
+              "title": "固定包材档案",
+              "index": "g-基础数据/包材资料/固定包材档案",
+              "children": [
+                {
+                  "title": "储罐档案",
+                  "index": "tank-arch",
+                  "pageId": "tank-arch"
+                }
+              ]
+            },
+            {
+              "title": "APP信息查看配置",
+              "index": "app-view-cfg",
+              "pageId": "app-view-cfg"
+            },
+            {
+              "title": "包材工序",
+              "index": "pkg-proc",
+              "pageId": "pkg-proc"
+            },
+            {
+              "title": "包材工艺",
+              "index": "pkg-craft",
+              "pageId": "pkg-craft"
+            }
+          ]
+        },
+        {
+          "title": "外包材资料",
+          "index": "g-基础数据/外包材资料",
+          "children": [
+            {
+              "title": "流水外包材档案",
+              "index": "outer-serial",
+              "pageId": "outer-serial"
+            }
+          ]
+        },
+        {
+          "title": "标签配置",
+          "index": "g-基础数据/标签配置",
+          "children": [
+            {
+              "title": "标签数据源",
+              "index": "label-ds",
+              "pageId": "label-ds"
+            },
+            {
+              "title": "标签配置",
+              "index": "label-cfg",
+              "pageId": "label-cfg"
+            },
+            {
+              "title": "打印任务",
+              "index": "print-task",
+              "pageId": "print-task"
+            }
+          ]
+        },
+        {
+          "title": "表单配置",
+          "index": "g-基础数据/表单配置",
+          "children": [
+            {
+              "title": "表单数据源",
+              "index": "form-ds",
+              "pageId": "form-ds"
+            },
+            {
+              "title": "表单设计器",
+              "index": "form-designer",
+              "pageId": "form-designer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "物流管理",
+      "index": "g-物流管理",
+      "children": [
+        {
+          "title": "派车申请单",
+          "index": "lg-dispatch",
+          "pageId": "lg-dispatch"
+        },
+        {
+          "title": "发货单",
+          "index": "lg-ship",
+          "pageId": "lg-ship"
+        },
+        {
+          "title": "运单",
+          "index": "lg-waybill",
+          "pageId": "lg-waybill"
+        },
+        {
+          "title": "运单-承运商派车",
+          "index": "lg-waybill-carrier",
+          "pageId": "lg-waybill-carrier"
+        },
+        {
+          "title": "提货单",
+          "index": "lg-pickup",
+          "pageId": "lg-pickup"
+        },
+        {
+          "title": "签收单",
+          "index": "lg-sign",
+          "pageId": "lg-sign"
+        },
+        {
+          "title": "承运商管理",
+          "index": "g-物流管理/承运商管理",
+          "children": [
+            {
+              "title": "承运商事件",
+              "index": "lg-carrier-evt",
+              "pageId": "lg-carrier-evt"
+            },
+            {
+              "title": "承运商考核",
+              "index": "g-物流管理/承运商管理/承运商考核",
+              "children": [
+                {
+                  "title": "考核方案",
+                  "index": "lg-kpi-scheme",
+                  "pageId": "lg-kpi-scheme"
+                },
+                {
+                  "title": "考核计划",
+                  "index": "lg-kpi-plan",
+                  "pageId": "lg-kpi-plan"
+                },
+                {
+                  "title": "考核记录",
+                  "index": "lg-kpi-record",
+                  "pageId": "lg-kpi-record"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "仓储管理",
+      "index": "g-仓储管理",
+      "children": [
+        {
+          "title": "采购",
+          "index": "g-仓储管理/采购",
+          "children": [
+            {
+              "title": "采购入库",
+              "index": "wh-po-in",
+              "pageId": "wh-po-in"
+            },
+            {
+              "title": "采购退料",
+              "index": "wh-po-ret",
+              "pageId": "wh-po-ret"
+            }
+          ]
+        },
+        {
+          "title": "委外",
+          "index": "g-仓储管理/委外",
+          "children": [
+            {
+              "title": "委外发料",
+              "index": "wh-os-issue",
+              "pageId": "wh-os-issue"
+            },
+            {
+              "title": "委外退料",
+              "index": "wh-os-ret-mat",
+              "pageId": "wh-os-ret-mat"
+            },
+            {
+              "title": "委外收货",
+              "index": "wh-os-recv",
+              "pageId": "wh-os-recv"
+            },
+            {
+              "title": "委外退货",
+              "index": "wh-os-ret-goods",
+              "pageId": "wh-os-ret-goods"
+            }
+          ]
+        },
+        {
+          "title": "生产",
+          "index": "g-仓储管理/生产",
+          "children": [
+            {
+              "title": "生产领料",
+              "index": "wh-prod-issue",
+              "pageId": "wh-prod-issue"
+            },
+            {
+              "title": "生产退料",
+              "index": "wh-prod-ret",
+              "pageId": "wh-prod-ret"
+            },
+            {
+              "title": "生产入库",
+              "index": "wh-prod-in",
+              "pageId": "wh-prod-in"
+            }
+          ]
+        },
+        {
+          "title": "受托",
+          "index": "g-仓储管理/受托",
+          "children": [
+            {
+              "title": "受托收料",
+              "index": "wh-cs-recv",
+              "pageId": "wh-cs-recv"
+            },
+            {
+              "title": "受托退料",
+              "index": "wh-cs-ret",
+              "pageId": "wh-cs-ret"
+            }
+          ]
+        },
+        {
+          "title": "销售",
+          "index": "g-仓储管理/销售",
+          "children": [
+            {
+              "title": "备货通知",
+              "index": "wh-so-prep",
+              "pageId": "wh-so-prep"
+            },
+            {
+              "title": "销售预出货",
+              "index": "wh-so-preout",
+              "pageId": "wh-so-preout"
+            },
+            {
+              "title": "销售发货",
+              "index": "wh-so-ship",
+              "pageId": "wh-so-ship"
+            },
+            {
+              "title": "销售退货",
+              "index": "wh-so-ret",
+              "pageId": "wh-so-ret"
+            }
+          ]
+        },
+        {
+          "title": "调拨",
+          "index": "g-仓储管理/调拨",
+          "children": [
+            {
+              "title": "直接调拨",
+              "index": "wh-direct-xfer",
+              "pageId": "wh-direct-xfer"
+            }
+          ]
+        },
+        {
+          "title": "其他",
+          "index": "g-仓储管理/其他",
+          "children": [
+            {
+              "title": "其他入库",
+              "index": "wh-other-in",
+              "pageId": "wh-other-in"
+            },
+            {
+              "title": "其他出库",
+              "index": "wh-other-out",
+              "pageId": "wh-other-out"
+            }
+          ]
+        },
+        {
+          "title": "装卸",
+          "index": "g-仓储管理/装卸",
+          "children": [
+            {
+              "title": "装卸货",
+              "index": "wh-load",
+              "pageId": "wh-load"
+            }
+          ]
+        },
+        {
+          "title": "库内",
+          "index": "g-仓储管理/库内",
+          "children": [
+            {
+              "title": "库内转移",
+              "index": "wh-transfer",
+              "pageId": "wh-transfer"
+            },
+            {
+              "title": "库内转序",
+              "index": "wh-seq",
+              "pageId": "wh-seq"
+            }
+          ]
+        },
+        {
+          "title": "盘点",
+          "index": "g-仓储管理/盘点",
+          "children": [
+            {
+              "title": "库存全盘",
+              "index": "wh-stocktake",
+              "pageId": "wh-stocktake"
+            }
+          ]
+        },
+        {
+          "title": "仓库巡检",
+          "index": "g-仓储管理/仓库巡检",
+          "children": [
+            {
+              "title": "巡检方案",
+              "index": "wh-insp-scheme",
+              "pageId": "wh-insp-scheme"
+            },
+            {
+              "title": "巡检计划",
+              "index": "wh-insp-plan",
+              "pageId": "wh-insp-plan"
+            }
+          ]
+        },
+        {
+          "title": "报表统计",
+          "index": "g-仓储管理/报表统计",
+          "children": [
+            {
+              "title": "仓库库存",
+              "index": "wh-inv-rpt",
+              "pageId": "wh-inv-rpt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "质量管理",
+      "index": "g-质量管理",
+      "children": [
+        {
+          "title": "检验数据台账",
+          "index": "qc-ledger",
+          "pageId": "qc-ledger"
+        }
+      ]
+    },
+    {
+      "title": "门卫管理",
+      "index": "g-门卫管理",
+      "children": [
+        {
+          "title": "出门条",
+          "index": "lg-gatepass",
+          "pageId": "lg-gatepass"
+        }
+      ]
+    },
+    {
+      "title": "条码管理",
+      "index": "g-条码管理",
+      "children": [
+        {
+          "title": "流水码拆组",
+          "index": "g-条码管理/流水码拆组",
+          "children": [
+            {
+              "title": "流水码拆分",
+              "index": "bc-serial-split",
+              "pageId": "bc-serial-split"
+            },
+            {
+              "title": "流水码合并",
+              "index": "bc-serial-merge",
+              "pageId": "bc-serial-merge"
+            }
+          ]
+        },
+        {
+          "title": "外包材拆组",
+          "index": "g-条码管理/外包材拆组",
+          "children": [
+            {
+              "title": "外包材拆组",
+              "index": "bc-outer-split",
+              "pageId": "bc-outer-split"
+            }
+          ]
+        },
+        {
+          "title": "报废处理",
+          "index": "g-条码管理/报废处理",
+          "children": [
+            {
+              "title": "待报废清单",
+              "index": "bc-scrap-list",
+              "pageId": "bc-scrap-list"
+            },
+            {
+              "title": "报废处理",
+              "index": "bc-scrap-proc",
+              "pageId": "bc-scrap-proc"
+            }
+          ]
+        },
+        {
+          "title": "异常冻结",
+          "index": "g-条码管理/异常冻结",
+          "children": [
+            {
+              "title": "冻结中清单",
+              "index": "bc-freeze-list",
+              "pageId": "bc-freeze-list"
+            },
+            {
+              "title": "异常冻结",
+              "index": "bc-freeze",
+              "pageId": "bc-freeze"
+            },
+            {
+              "title": "冻结解除",
+              "index": "bc-unfreeze",
+              "pageId": "bc-unfreeze"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "pages": {
     "mat-list": {
       "id": "mat-list",
@@ -5689,15 +5689,33 @@ window.WMS_PAGE_CONFIGS = {
       "detailSections": [
         {
           "title": "基本信息",
-          "fields": ["条码号", "储罐编号", "储罐类型", "充装介质", "容积", "备注"]
+          "fields": [
+            "条码号",
+            "储罐编号",
+            "储罐类型",
+            "充装介质",
+            "容积",
+            "备注"
+          ]
         },
         {
           "title": "状态信息",
-          "fields": ["使用状态", "库存状态", "库存位置"]
+          "fields": [
+            "使用状态",
+            "库存状态",
+            "库存位置"
+          ]
         },
         {
           "title": "业务进度信息",
-          "fields": ["当前步骤", "当前单据号", "所属阶段", "最新操作人", "最新操作时间", "创建时间"]
+          "fields": [
+            "当前步骤",
+            "当前单据号",
+            "所属阶段",
+            "最新操作人",
+            "最新操作时间",
+            "创建时间"
+          ]
         }
       ],
       "hasEdit": true,
@@ -5709,18 +5727,42 @@ window.WMS_PAGE_CONFIGS = {
       "formLineActions": [],
       "detailLineTitle": "物料明细",
       "detailLineFields": [
-        { "name": "物料编码" },
-        { "name": "物料名称" },
-        { "name": "物料规格" },
-        { "name": "物料种类" },
-        { "name": "库存单位" },
-        { "name": "当前数量" },
-        { "name": "批号" },
-        { "name": "生产厂家" },
-        { "name": "供应商名称" },
-        { "name": "生产日期" },
-        { "name": "有效期" },
-        { "name": "失效日期" }
+        {
+          "name": "物料编码"
+        },
+        {
+          "name": "物料名称"
+        },
+        {
+          "name": "物料规格"
+        },
+        {
+          "name": "物料种类"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "当前数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "生产厂家"
+        },
+        {
+          "name": "供应商名称"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "失效日期"
+        }
       ]
     },
     "app-view-cfg": {
@@ -6602,19 +6644,45 @@ window.WMS_PAGE_CONFIGS = {
         }
       ],
       "detailFields": [
-        { "name": "条码号" },
-        { "name": "外包材类型" },
-        { "name": "外包材材质" },
-        { "name": "生产厂家" },
-        { "name": "备注" },
-        { "name": "使用状态" },
-        { "name": "绑定状态" },
-        { "name": "库存状态" },
-        { "name": "库存位置" },
-        { "name": "物料信息" },
-        { "name": "批号" },
-        { "name": "当前绑定包材" },
-        { "name": "绑定时间" }
+        {
+          "name": "条码号"
+        },
+        {
+          "name": "外包材类型"
+        },
+        {
+          "name": "外包材材质"
+        },
+        {
+          "name": "生产厂家"
+        },
+        {
+          "name": "备注"
+        },
+        {
+          "name": "使用状态"
+        },
+        {
+          "name": "绑定状态"
+        },
+        {
+          "name": "库存状态"
+        },
+        {
+          "name": "库存位置"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "当前绑定包材"
+        },
+        {
+          "name": "绑定时间"
+        }
       ],
       "hasEdit": true,
       "hasDetail": true,
@@ -8268,12 +8336,6 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（正数）"
         },
         {
-          "name": "备注",
-          "type": "input",
-          "required": false,
-          "ctrl": "手动输入（文本）"
-        },
-        {
           "name": "批号",
           "type": "input",
           "required": false,
@@ -8296,18 +8358,30 @@ window.WMS_PAGE_CONFIGS = {
           "type": "select",
           "required": false,
           "ctrl": "默认带入供应商"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入（文本）"
         }
       ],
       "formLineActions": [
         {
           "name": "新增",
           "type": "primary",
-          "desc": "从采购订单物料中选择追加"
+          "desc": "从采购订单物料中选择追加（允许同物料多批）"
         },
         {
           "name": "批量删除",
           "type": "danger",
           "desc": "删除勾选明细行"
+        }
+      ],
+      "formLineRowActions": [
+        {
+          "name": "新增批号",
+          "desc": "复制当前行物料信息，批号置空供填写新批"
         }
       ],
       "detailLineFields": [
@@ -8416,52 +8490,47 @@ window.WMS_PAGE_CONFIGS = {
       },
       "formSections": [
         {
-          "title": "头信息",
+          "title": "基础信息",
           "fields": [
             {
               "name": "单号",
               "type": "readonly",
               "required": true,
-              "ctrl": "系统自动生成"
+              "ctrl": "系统自动生成 CGST"
             },
             {
               "name": "单据类型",
               "type": "select",
               "required": true,
+              "ctrl": "字典单选，默认首项",
               "options": [
                 "标准采购入库",
-                "紧急采购入库"
+                "急料采购入库"
               ]
             },
             {
               "name": "关联采购订单",
               "type": "picker",
               "required": true,
-              "ctrl": "弹窗选择采购订单（订单状态仅待执行/执行中，排除已完成/已关闭）"
+              "ctrl": "弹窗选择采购订单；选后自动带出供应商名称及物料，并解除关联运单置灰"
             },
             {
               "name": "供应商名称",
-              "type": "picker",
+              "type": "readonly",
               "required": true,
-              "ctrl": "选单/带入"
+              "ctrl": "选采购订单后自动带入，只读"
             },
             {
               "name": "计划执行日期",
-              "type": "date"
-            },
-            {
-              "name": "关联运单",
-              "type": "picker",
-              "ctrl": "弹窗选择运单，置于发货单前"
-            },
-            {
-              "name": "关联发货单",
-              "type": "picker",
-              "ctrl": "按运单联动过滤"
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
             },
             {
               "name": "备注",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，输入说明"
             }
           ]
         },
@@ -8469,27 +8538,46 @@ window.WMS_PAGE_CONFIGS = {
           "title": "派车与承运信息",
           "fields": [
             {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选采购订单置灰；选择订单后启用过滤；选定带出车辆与司机承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选择运单后过滤；运单仅1张时自动带入"
+            },
+            {
               "name": "车牌号",
               "type": "input",
-              "ctrl": "选运单只读带出 / 未选手动"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车挂号",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机姓名",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机电话",
               "type": "input",
-              "ctrl": "11位手机号"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
             },
             {
               "name": "司机身份证号",
               "type": "input",
-              "ctrl": "18位身份证"
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
             }
           ]
         }
@@ -8497,23 +8585,23 @@ window.WMS_PAGE_CONFIGS = {
       "formDialogWidth": "1100px",
       "detailSections": [
         {
-          "title": "头信息",
+          "title": "基础信息",
           "fields": [
             "单据状态",
             "单号",
             "单据类型",
-            "计划执行日期",
-            "备注",
-            "ERP单据号",
             "关联采购订单",
             "供应商名称",
-            "关联运单",
-            "关联发货单"
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
           ]
         },
         {
           "title": "派车与承运信息",
           "fields": [
+            "关联运单",
+            "关联发货单",
             "车牌号",
             "车挂号",
             "司机姓名",
@@ -8531,7 +8619,7 @@ window.WMS_PAGE_CONFIGS = {
         "批量建档"
       ]
     },
-    "wh-po-ret":     {
+    "wh-po-ret": {
       "id": "wh-po-ret",
       "title": "采购退料",
       "groups": [
@@ -9178,12 +9266,6 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "弹窗多选（列表）/ 自动带入"
         },
         {
-          "name": "批号",
-          "type": "input",
-          "required": false,
-          "ctrl": "手动输入（文本）；选填；有值时 APP 流水码扫码须校验批号一致，计数执行页自动带入且不可修改"
-        },
-        {
           "name": "库存单位",
           "type": "readonly",
           "required": false,
@@ -9208,6 +9290,12 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "手动输入（正数）"
         },
         {
+          "name": "批号",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入（文本）；选填；有值时 APP 流水码扫码须校验批号一致，计数执行页自动带入且不可修改"
+        },
+        {
           "name": "备注",
           "type": "input",
           "required": false,
@@ -9218,12 +9306,18 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "新增",
           "type": "primary",
-          "desc": "从采购订单物料中选择追加"
+          "desc": "从采购订单物料中选择追加（允许同物料多批）"
         },
         {
           "name": "批量删除",
           "type": "danger",
           "desc": "删除勾选明细行"
+        }
+      ],
+      "formLineRowActions": [
+        {
+          "name": "新增批号",
+          "desc": "复制当前行物料信息，批号置空供填写新批"
         }
       ],
       "detailLineFields": [
@@ -9235,9 +9329,6 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "物料信息"
-        },
-        {
-          "name": "批号"
         },
         {
           "name": "库存单位"
@@ -9256,6 +9347,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未完成数量"
+        },
+        {
+          "name": "批号"
         },
         {
           "name": "备注"
@@ -9323,52 +9417,47 @@ window.WMS_PAGE_CONFIGS = {
       },
       "formSections": [
         {
-          "title": "头信息",
+          "title": "基础信息",
           "fields": [
             {
               "name": "单号",
               "type": "readonly",
               "required": true,
-              "ctrl": "系统自动生成"
+              "ctrl": "系统自动生成 CGTL"
             },
             {
               "name": "单据类型",
               "type": "select",
               "required": true,
+              "ctrl": "字典单选，默认首项",
               "options": [
                 "标准采购退料",
-                "紧急采购退料"
+                "急料采购退料"
               ]
             },
             {
               "name": "关联采购订单",
               "type": "picker",
               "required": true,
-              "ctrl": "弹窗选择采购订单（订单状态仅执行中/已完成/已关闭，排除待执行）"
+              "ctrl": "弹窗选择采购订单；选后自动带出供应商名称及物料，并解除关联运单置灰"
             },
             {
               "name": "供应商名称",
               "type": "readonly",
               "required": true,
-              "ctrl": "自动带入，不可修改"
-            },
-            {
-              "name": "关联运单",
-              "type": "picker",
-              "ctrl": "弹窗选择运单，置于发货单前"
-            },
-            {
-              "name": "关联发货单",
-              "type": "picker",
-              "ctrl": "按运单联动过滤"
+              "ctrl": "选采购订单后自动带入，只读"
             },
             {
               "name": "计划执行日期",
-              "type": "date"
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
             },
             {
               "name": "备注",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，输入说明"
             }
           ]
         },
@@ -9376,27 +9465,46 @@ window.WMS_PAGE_CONFIGS = {
           "title": "派车与承运信息",
           "fields": [
             {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选采购订单置灰；选择订单后启用过滤；选定带出车辆与司机承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选择运单后过滤；运单仅1张时自动带入"
+            },
+            {
               "name": "车牌号",
               "type": "input",
-              "ctrl": "选运单只读带出 / 未选手动"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车挂号",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机姓名",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机电话",
               "type": "input",
-              "ctrl": "11位手机号"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
             },
             {
               "name": "司机身份证号",
               "type": "input",
-              "ctrl": "18位身份证"
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
             }
           ]
         }
@@ -9404,23 +9512,23 @@ window.WMS_PAGE_CONFIGS = {
       "formDialogWidth": "1100px",
       "detailSections": [
         {
-          "title": "头信息",
+          "title": "基础信息",
           "fields": [
             "单据状态",
             "单号",
             "单据类型",
-            "计划执行日期",
-            "备注",
-            "ERP单据号",
             "关联采购订单",
             "供应商名称",
-            "关联运单",
-            "关联发货单"
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
           ]
         },
         {
           "title": "派车与承运信息",
           "fields": [
+            "关联运单",
+            "关联发货单",
             "车牌号",
             "车挂号",
             "司机姓名",
@@ -9470,7 +9578,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "单据状态",
               "type": "select",
-              "options": ["发料中", "已完成", "已关闭"]
+              "options": [
+                "发料中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "单号",
@@ -9491,6 +9603,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9501,7 +9625,10 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "关联委外加工单",
-            "关联发货单"
+            "关联发货单",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -9568,9 +9695,42 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "_actions",
@@ -9636,6 +9796,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9649,7 +9821,10 @@ window.WMS_PAGE_CONFIGS = {
             "ERP单据号",
             "关联委外加工单",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -9731,14 +9906,47 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             }
           ],
           "rowOps": []
@@ -9750,7 +9958,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "流水状态",
               "type": "select",
-              "options": ["发料中", "已发料", "已关闭"]
+              "options": [
+                "发料中",
+                "已发料",
+                "已关闭"
+              ]
             },
             {
               "name": "检查结果",
@@ -9795,6 +10007,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -9810,7 +10026,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -9908,6 +10125,12 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
               "width": 160
@@ -9998,43 +10221,49 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-      {
-            "name": "物料信息",
-            "type": "picker",
-            "ctrl": "弹窗多选/自动带入"
-      },
-      {
-            "name": "库存单位",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "管理方式",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "计划件数",
-            "type": "input",
-            "ctrl": "计数管理显示—"
-      },
-      {
-            "name": "计划数量",
-            "type": "input",
-            "required": true,
-            "ctrl": "可编辑"
-      },
-      {
-            "name": "批号",
-            "type": "input",
-            "ctrl": "选填"
-      },
-      {
-            "name": "备注",
-            "type": "input",
-            "ctrl": "可编辑"
-      }
-],
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "ctrl": "弹窗多选/自动带入",
+          "required": true
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "ctrl": "计数管理显示—",
+          "required": false
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "input",
+          "ctrl": "选填",
+          "required": false
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "ctrl": "可编辑",
+          "required": false
+        }
+      ],
       "formLineActions": [
         {
           "name": "新增",
@@ -10047,22 +10276,40 @@ window.WMS_PAGE_CONFIGS = {
           "desc": "删除勾选明细行"
         }
       ],
-            "detailLineFields": [
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "批号" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "jobDetail": {
         "procs": [
@@ -10125,113 +10372,127 @@ window.WMS_PAGE_CONFIGS = {
         ]
       },
       "formSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  {
-                        "name": "单号",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "系统自动生成"
-                  },
-                  {
-                        "name": "单据类型",
-                        "type": "select",
-                        "required": true,
-                        "options": [
-                              "标准委外发料",
-                              "紧急委外发料"
-                        ]
-                  },
-                  {
-                        "name": "关联委外加工单",
-                        "type": "picker",
-                        "required": true,
-                        "ctrl": "弹窗选择委外加工单"
-                  },
-                  {
-                        "name": "供应商名称",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "自动带入，不可修改"
-                  },
-                  {
-                        "name": "关联运单",
-                        "type": "picker",
-                        "ctrl": "弹窗选择运单，置于发货单前"
-                  },
-                  {
-                        "name": "关联发货单",
-                        "type": "picker",
-                        "ctrl": "按运单联动过滤"
-                  },
-                  {
-                        "name": "计划执行日期",
-                        "type": "date"
-                  },
-                  {
-                        "name": "备注",
-                        "type": "input"
-                  }
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  {
-                        "name": "车牌号",
-                        "type": "input",
-                        "ctrl": "选运单只读带出 / 未选手动"
-                  },
-                  {
-                        "name": "车挂号",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机姓名",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机电话",
-                        "type": "input",
-                        "ctrl": "11位手机号"
-                  },
-                  {
-                        "name": "司机身份证号",
-                        "type": "input",
-                        "ctrl": "18位身份证"
-                  }
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选",
+              "options": [
+                "标准委外发料",
+                "紧急委外发料"
+              ]
+            },
+            {
+              "name": "关联委外加工单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择生效委外加工单；选后带出供应商名称并解除运单置灰"
+            },
+            {
+              "name": "供应商名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选委外加工单后自动带入，只读"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "备注",
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选加工单置灰；选加工单后联动过滤；选后带出承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选运单后联动过滤；运单仅1张时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
+            }
+          ]
+        }
+      ],
       "formDialogWidth": "1100px",
       "detailSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  "单据状态",
-                  "单号",
-                  "单据类型",
-                  "计划执行日期",
-                  "备注",
-                  "ERP单据号",
-                  "关联委外加工单",
-                  "供应商名称",
-                  "关联运单",
-                  "关联发货单"
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  "车牌号",
-                  "车挂号",
-                  "司机姓名",
-                  "司机电话",
-                  "司机身份证号"
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联委外加工单",
+            "供应商名称",
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
       "detailLineSelectable": true,
       "detailLineActions": [
         "关闭"
@@ -10272,7 +10533,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "单据状态",
               "type": "select",
-              "options": ["退料中", "已完成", "已关闭"]
+              "options": [
+                "退料中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "单号",
@@ -10293,6 +10558,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -10303,7 +10580,10 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "关联委外加工单",
-            "关联发货单"
+            "关联发货单",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -10370,9 +10650,42 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "_actions",
@@ -10395,7 +10708,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "tab2",
-          "label": "委外退料单",
+          "label": "委外退料入库单",
           "queryFields": [
             {
               "name": "单据状态",
@@ -10407,7 +10720,27 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
-              "name": "退料单号",
+              "name": "入库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联退料通知单号",
+              "type": "input"
+            },
+            {
+              "name": "供应商名称",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select"
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "关联委外加工单",
               "type": "input"
             },
             {
@@ -10417,15 +10750,35 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
-            "退料单号"
+            "入库单号",
+            "关联退料通知单号",
+            "供应商名称"
           ],
           "queryMore": [
+            "单据类型",
+            "ERP单据号",
+            "关联委外加工单",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -10442,9 +10795,9 @@ window.WMS_PAGE_CONFIGS = {
               "slot": "tag"
             },
             {
-              "field": "退料单号",
-              "title": "退料单号",
-              "width": 120
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
             },
             {
               "field": "物料信息",
@@ -10472,8 +10825,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联通知单",
-              "title": "关联通知单",
+              "field": "关联退料通知单号",
+              "title": "关联退料通知单号",
               "width": 160
             },
             {
@@ -10507,14 +10860,47 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             }
           ],
           "rowOps": []
@@ -10526,7 +10912,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "流水状态",
               "type": "select",
-              "options": ["退料中", "已退料", "已关闭"]
+              "options": [
+                "退料中",
+                "已退料",
+                "已关闭"
+              ]
             },
             {
               "name": "检查结果",
@@ -10562,7 +10952,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "退料单号",
+              "name": "入库单号",
               "type": "input"
             },
             {
@@ -10576,13 +10966,17 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "流水状态",
             "条码号",
             "通知单号",
-            "退料单号"
+            "入库单号"
           ],
           "queryMore": [
             "供应商名称",
@@ -10591,7 +10985,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -10674,9 +11069,9 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "退料单号",
-              "title": "退料单号",
-              "width": 120
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
             },
             {
               "field": "供应商名称",
@@ -10687,6 +11082,12 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "关联发货单",
@@ -10797,43 +11198,49 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-      {
-            "name": "物料信息",
-            "type": "picker",
-            "ctrl": "弹窗多选/自动带入"
-      },
-      {
-            "name": "库存单位",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "管理方式",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "计划件数",
-            "type": "input",
-            "ctrl": "计数管理显示—"
-      },
-      {
-            "name": "计划数量",
-            "type": "input",
-            "required": true,
-            "ctrl": "可编辑"
-      },
-      {
-            "name": "批号",
-            "type": "input",
-            "ctrl": "选填"
-      },
-      {
-            "name": "备注",
-            "type": "input",
-            "ctrl": "可编辑"
-      }
-],
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "ctrl": "弹窗多选/自动带入",
+          "required": true
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "ctrl": "计数管理显示—",
+          "required": false
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "input",
+          "ctrl": "选填",
+          "required": false
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "ctrl": "可编辑",
+          "required": false
+        }
+      ],
       "formLineActions": [
         {
           "name": "新增",
@@ -10846,22 +11253,40 @@ window.WMS_PAGE_CONFIGS = {
           "desc": "删除勾选明细行"
         }
       ],
-            "detailLineFields": [
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "批号" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "jobDetail": {
         "procs": [
@@ -10924,113 +11349,127 @@ window.WMS_PAGE_CONFIGS = {
         ]
       },
       "formSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  {
-                        "name": "单号",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "系统自动生成"
-                  },
-                  {
-                        "name": "单据类型",
-                        "type": "select",
-                        "required": true,
-                        "options": [
-                              "标准委外退料",
-                              "紧急委外退料"
-                        ]
-                  },
-                  {
-                        "name": "关联委外加工单",
-                        "type": "picker",
-                        "required": true,
-                        "ctrl": "弹窗选择委外加工单"
-                  },
-                  {
-                        "name": "供应商名称",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "自动带入，不可修改"
-                  },
-                  {
-                        "name": "关联运单",
-                        "type": "picker",
-                        "ctrl": "弹窗选择运单，置于发货单前"
-                  },
-                  {
-                        "name": "关联发货单",
-                        "type": "picker",
-                        "ctrl": "按运单联动过滤"
-                  },
-                  {
-                        "name": "计划执行日期",
-                        "type": "date"
-                  },
-                  {
-                        "name": "备注",
-                        "type": "input"
-                  }
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  {
-                        "name": "车牌号",
-                        "type": "input",
-                        "ctrl": "选运单只读带出 / 未选手动"
-                  },
-                  {
-                        "name": "车挂号",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机姓名",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机电话",
-                        "type": "input",
-                        "ctrl": "11位手机号"
-                  },
-                  {
-                        "name": "司机身份证号",
-                        "type": "input",
-                        "ctrl": "18位身份证"
-                  }
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选",
+              "options": [
+                "标准委外退料",
+                "紧急委外退料"
+              ]
+            },
+            {
+              "name": "关联委外加工单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择生效委外加工单；选后带出供应商名称并解除运单置灰"
+            },
+            {
+              "name": "供应商名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选委外加工单后自动带入，只读"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "备注",
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选加工单置灰；选加工单后联动过滤；选后带出承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选运单后联动过滤；运单仅1张时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
+            }
+          ]
+        }
+      ],
       "formDialogWidth": "1100px",
       "detailSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  "单据状态",
-                  "单号",
-                  "单据类型",
-                  "计划执行日期",
-                  "备注",
-                  "ERP单据号",
-                  "关联委外加工单",
-                  "供应商名称",
-                  "关联运单",
-                  "关联发货单"
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  "车牌号",
-                  "车挂号",
-                  "司机姓名",
-                  "司机电话",
-                  "司机身份证号"
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联委外加工单",
+            "供应商名称",
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
       "detailLineSelectable": true,
       "detailLineActions": [
         "关闭"
@@ -11071,7 +11510,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "单据状态",
               "type": "select",
-              "options": ["执行中", "已完成", "已关闭"]
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "单号",
@@ -11092,6 +11535,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -11102,7 +11557,10 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "关联委外加工单",
-            "关联发货单"
+            "关联发货单",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -11169,9 +11627,42 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "_actions",
@@ -11194,20 +11685,19 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "tab2",
-          "label": "委外收货单",
+          "label": "委外收货入库单",
           "queryFields": [
             {
               "name": "单据状态",
               "type": "select",
               "options": [
-                "待收货",
-                "收货中",
+                "执行中",
                 "已完成",
                 "已关闭"
               ]
             },
             {
-              "name": "收货单号",
+              "name": "入库单号",
               "type": "input"
             },
             {
@@ -11237,11 +11727,23 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
-            "收货单号",
+            "入库单号",
             "关联收货通知单号",
             "供应商名称"
           ],
@@ -11250,7 +11752,10 @@ window.WMS_PAGE_CONFIGS = {
             "ERP单据号",
             "关联委外加工单",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -11267,9 +11772,9 @@ window.WMS_PAGE_CONFIGS = {
               "slot": "tag"
             },
             {
-              "field": "收货单号",
-              "title": "收货单号",
-              "width": 120
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
             },
             {
               "field": "物料信息",
@@ -11332,14 +11837,47 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             }
           ],
           "rowOps": []
@@ -11351,7 +11889,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "流水状态",
               "type": "select",
-              "options": ["执行中", "已完成", "已关闭"]
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "检查结果",
@@ -11382,7 +11924,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "收货单号",
+              "name": "入库单号",
               "type": "input"
             },
             {
@@ -11396,13 +11938,17 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "流水状态",
             "条码号",
             "通知单号",
-            "收货单号"
+            "入库单号"
           ],
           "queryMore": [
             "供应商名称",
@@ -11411,7 +11957,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -11483,7 +12030,6 @@ window.WMS_PAGE_CONFIGS = {
               "title": "储罐编号",
               "width": 120
             },
-
             {
               "field": "原位置",
               "title": "原位置",
@@ -11505,9 +12051,9 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "收货单号",
-              "title": "收货单号",
-              "width": 120
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
             },
             {
               "field": "供应商名称",
@@ -11518,6 +12064,12 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "关联发货单",
@@ -11610,63 +12162,72 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-      {
-            "name": "物料信息",
-            "type": "picker",
-            "ctrl": "弹窗多选/自动带入"
-      },
-      {
-            "name": "库存单位",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "管理方式",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "计划件数",
-            "type": "input",
-            "ctrl": "计数管理显示—"
-      },
-      {
-            "name": "计划数量",
-            "type": "input",
-            "required": true,
-            "ctrl": "可编辑"
-      },
-      {
-            "name": "批号",
-            "type": "input",
-            "ctrl": "选填"
-      },
-      {
-            "name": "生产日期",
-            "type": "date",
-            "ctrl": "默认当天"
-      },
-      {
-            "name": "有效期",
-            "type": "input",
-            "ctrl": "自动带入质保期"
-      },
-      {
-            "name": "生产厂家",
-            "type": "input",
-            "ctrl": "默认加工商"
-      },
-      {
-            "name": "备注",
-            "type": "input",
-            "ctrl": "可编辑"
-      }
-],
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "ctrl": "弹窗多选/自动带入",
+          "required": true
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "ctrl": "计数管理显示—",
+          "required": false
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "input",
+          "ctrl": "选填",
+          "required": false
+        },
+        {
+          "name": "生产日期",
+          "type": "date",
+          "ctrl": "默认当天",
+          "required": false
+        },
+        {
+          "name": "有效期",
+          "type": "input",
+          "ctrl": "自动带入质保期",
+          "required": false
+        },
+        {
+          "name": "生产厂家",
+          "type": "input",
+          "ctrl": "默认加工商",
+          "required": false
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "ctrl": "可编辑",
+          "required": false
+        }
+      ],
       "formLineActions": [
         {
           "name": "新增",
           "type": "primary",
-          "desc": "新增明细行"
+          "desc": "从委外加工单物料中选择追加（允许同物料多批）"
         },
         {
           "name": "批量删除",
@@ -11674,25 +12235,55 @@ window.WMS_PAGE_CONFIGS = {
           "desc": "删除勾选明细行"
         }
       ],
-            "detailLineFields": [
+      "formLineRowActions": [
+        {
+          "name": "新增批号",
+          "desc": "复制当前行物料信息，批号置空供填写新批"
+        }
+      ],
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "批号" },
-        { "name": "生产日期" },
-        { "name": "有效期" },
-        { "name": "生产厂家" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "生产厂家"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "jobDetail": {
         "procs": [
@@ -11755,119 +12346,135 @@ window.WMS_PAGE_CONFIGS = {
         ]
       },
       "formSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  {
-                        "name": "单号",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "系统自动生成"
-                  },
-                  {
-                        "name": "单据类型",
-                        "type": "select",
-                        "required": true,
-                        "options": [
-                              "标准委外收货",
-                              "紧急委外收货"
-                        ]
-                  },
-                  {
-                        "name": "关联委外加工单",
-                        "type": "picker",
-                        "required": true,
-                        "ctrl": "弹窗选择委外加工单"
-                  },
-                  {
-                        "name": "供应商名称",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "自动带入，不可修改"
-                  },
-                  {
-                        "name": "关联运单",
-                        "type": "picker",
-                        "ctrl": "弹窗选择运单，置于发货单前"
-                  },
-                  {
-                        "name": "关联发货单",
-                        "type": "picker",
-                        "ctrl": "按运单联动过滤"
-                  },
-                  {
-                        "name": "计划执行日期",
-                        "type": "date"
-                  },
-                  {
-                        "name": "备注",
-                        "type": "input"
-                  }
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  {
-                        "name": "车牌号",
-                        "type": "input",
-                        "ctrl": "选运单只读带出 / 未选手动"
-                  },
-                  {
-                        "name": "车挂号",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机姓名",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机电话",
-                        "type": "input",
-                        "ctrl": "11位手机号"
-                  },
-                  {
-                        "name": "司机身份证号",
-                        "type": "input",
-                        "ctrl": "18位身份证"
-                  }
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选",
+              "options": [
+                "标准委外收货",
+                "紧急委外收货"
+              ]
+            },
+            {
+              "name": "关联委外加工单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择生效委外加工单；选后带出供应商名称并解除运单置灰"
+            },
+            {
+              "name": "供应商名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选委外加工单后自动带入，只读"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "备注",
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选加工单置灰；选加工单后联动过滤；选后带出承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选运单后联动过滤；运单仅1张时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
+            }
+          ]
+        }
+      ],
       "formDialogWidth": "1100px",
       "detailSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  "单据状态",
-                  "单号",
-                  "单据类型",
-                  "计划执行日期",
-                  "备注",
-                  "ERP单据号",
-                  "关联委外加工单",
-                  "供应商名称",
-                  "关联运单",
-                  "关联发货单"
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  "车牌号",
-                  "车挂号",
-                  "司机姓名",
-                  "司机电话",
-                  "司机身份证号"
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联委外加工单",
+            "供应商名称",
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
       "detailLineSelectable": true,
       "detailLineActions": [
         "关闭"
       ],
       "detailLineTitle": "物料明细",
-      "detailLineRowActions": ["批量建档"]
+      "detailLineRowActions": [
+        "批量建档"
+      ]
     },
     "wh-os-ret-goods": {
       "id": "wh-os-ret-goods",
@@ -11903,7 +12510,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "单据状态",
               "type": "select",
-              "options": ["退货中", "已完成", "已关闭"]
+              "options": [
+                "退货中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "单号",
@@ -11924,6 +12535,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -11934,7 +12557,10 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "关联委外加工单",
-            "关联发货单"
+            "关联发货单",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -12001,9 +12627,42 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "_actions",
@@ -12026,7 +12685,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "tab2",
-          "label": "委外退货单",
+          "label": "委外退货出库单",
           "queryFields": [
             {
               "name": "单据状态",
@@ -12038,7 +12697,27 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
-              "name": "退货单号",
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联退货通知单号",
+              "type": "input"
+            },
+            {
+              "name": "供应商名称",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select"
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "关联委外加工单",
               "type": "input"
             },
             {
@@ -12048,15 +12727,35 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
-            "退货单号"
+            "出库单号",
+            "关联退货通知单号",
+            "供应商名称"
           ],
           "queryMore": [
+            "单据类型",
+            "ERP单据号",
+            "关联委外加工单",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单",
+            "车牌号",
+            "司机姓名"
           ],
           "toolbar": [
             {
@@ -12073,9 +12772,9 @@ window.WMS_PAGE_CONFIGS = {
               "slot": "tag"
             },
             {
-              "field": "退货单号",
-              "title": "退货单号",
-              "width": 120
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
             },
             {
               "field": "物料信息",
@@ -12103,8 +12802,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
-              "field": "关联通知单",
-              "title": "关联通知单",
+              "field": "关联退货通知单号",
+              "title": "关联退货通知单号",
               "width": 160
             },
             {
@@ -12138,14 +12837,47 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
               "title": "包装规格",
               "width": 120
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             }
           ],
           "rowOps": []
@@ -12157,7 +12889,11 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "流水状态",
               "type": "select",
-              "options": ["退货中", "已完成", "已关闭"]
+              "options": [
+                "退货中",
+                "已完成",
+                "已关闭"
+              ]
             },
             {
               "name": "检查结果",
@@ -12193,7 +12929,7 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "退货单号",
+              "name": "出库单号",
               "type": "input"
             },
             {
@@ -12207,13 +12943,17 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "包装规格",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
             "流水状态",
             "条码号",
             "通知单号",
-            "退货单号"
+            "出库单号"
           ],
           "queryMore": [
             "供应商名称",
@@ -12222,7 +12962,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "关联发货单",
-            "包装规格"
+            "包装规格",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -12305,9 +13046,9 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
-              "field": "退货单号",
-              "title": "退货单号",
-              "width": 120
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
             },
             {
               "field": "供应商名称",
@@ -12318,6 +13059,12 @@ window.WMS_PAGE_CONFIGS = {
               "field": "备注",
               "title": "备注",
               "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "关联发货单",
@@ -12428,48 +13175,54 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-      {
-            "name": "物料信息",
-            "type": "picker",
-            "ctrl": "弹窗多选/自动带入"
-      },
-      {
-            "name": "库存单位",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "管理方式",
-            "type": "readonly",
-            "ctrl": "只读（自动带入）"
-      },
-      {
-            "name": "计划件数",
-            "type": "input",
-            "ctrl": "计数管理显示—"
-      },
-      {
-            "name": "计划数量",
-            "type": "input",
-            "required": true,
-            "ctrl": "可编辑"
-      },
-      {
-            "name": "批号",
-            "type": "input",
-            "ctrl": "选填"
-      },
-      {
-            "name": "备注",
-            "type": "input",
-            "ctrl": "可编辑"
-      }
-],
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "ctrl": "弹窗多选/自动带入",
+          "required": true
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "ctrl": "只读（自动带入）",
+          "required": false
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "ctrl": "计数管理显示—",
+          "required": false
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "input",
+          "ctrl": "选填",
+          "required": false
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "ctrl": "可编辑",
+          "required": false
+        }
+      ],
       "formLineActions": [
         {
           "name": "新增",
           "type": "primary",
-          "desc": "新增明细行"
+          "desc": "从委外加工单物料中选择追加（允许同物料多批）"
         },
         {
           "name": "批量删除",
@@ -12477,22 +13230,46 @@ window.WMS_PAGE_CONFIGS = {
           "desc": "删除勾选明细行"
         }
       ],
-            "detailLineFields": [
+      "formLineRowActions": [
+        {
+          "name": "新增批号",
+          "desc": "复制当前行物料信息，批号置空供填写新批"
+        }
+      ],
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "批号" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "jobDetail": {
         "procs": [
@@ -12555,113 +13332,127 @@ window.WMS_PAGE_CONFIGS = {
         ]
       },
       "formSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  {
-                        "name": "单号",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "系统自动生成"
-                  },
-                  {
-                        "name": "单据类型",
-                        "type": "select",
-                        "required": true,
-                        "options": [
-                              "标准委外退货",
-                              "紧急委外退货"
-                        ]
-                  },
-                  {
-                        "name": "关联委外加工单",
-                        "type": "picker",
-                        "required": true,
-                        "ctrl": "弹窗选择委外加工单"
-                  },
-                  {
-                        "name": "供应商名称",
-                        "type": "readonly",
-                        "required": true,
-                        "ctrl": "自动带入，不可修改"
-                  },
-                  {
-                        "name": "关联运单",
-                        "type": "picker",
-                        "ctrl": "弹窗选择运单，置于发货单前"
-                  },
-                  {
-                        "name": "关联发货单",
-                        "type": "picker",
-                        "ctrl": "按运单联动过滤"
-                  },
-                  {
-                        "name": "计划执行日期",
-                        "type": "date"
-                  },
-                  {
-                        "name": "备注",
-                        "type": "input"
-                  }
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  {
-                        "name": "车牌号",
-                        "type": "input",
-                        "ctrl": "选运单只读带出 / 未选手动"
-                  },
-                  {
-                        "name": "车挂号",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机姓名",
-                        "type": "input"
-                  },
-                  {
-                        "name": "司机电话",
-                        "type": "input",
-                        "ctrl": "11位手机号"
-                  },
-                  {
-                        "name": "司机身份证号",
-                        "type": "input",
-                        "ctrl": "18位身份证"
-                  }
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选",
+              "options": [
+                "标准委外退货",
+                "紧急委外退货"
+              ]
+            },
+            {
+              "name": "关联委外加工单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选择生效委外加工单；选后带出供应商名称并解除运单置灰"
+            },
+            {
+              "name": "供应商名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选委外加工单后自动带入，只读"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "备注",
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选加工单置灰；选加工单后联动过滤；选后带出承运信息"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选运单后联动过滤；运单仅1张时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
+            }
+          ]
+        }
+      ],
       "formDialogWidth": "1100px",
       "detailSections": [
-      {
-            "title": "头信息",
-            "fields": [
-                  "单据状态",
-                  "单号",
-                  "单据类型",
-                  "计划执行日期",
-                  "备注",
-                  "ERP单据号",
-                  "关联委外加工单",
-                  "供应商名称",
-                  "关联运单",
-                  "关联发货单"
-            ]
-      },
-      {
-            "title": "派车与承运信息",
-            "fields": [
-                  "车牌号",
-                  "车挂号",
-                  "司机姓名",
-                  "司机电话",
-                  "司机身份证号"
-            ]
-      }
-],
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联委外加工单",
+            "供应商名称",
+            "计划执行日期",
+            "备注",
+            "ERP单据号"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
       "detailLineSelectable": true,
       "detailLineActions": [
         "关闭"
@@ -12838,19 +13629,13 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
-            },
-            {
-              "name": "包装规格",
-              "type": "input"
             }
           ],
           "queryDefault": [
             "单据状态",
             "出库单号"
           ],
-          "queryMore": [
-            "包装规格"
-          ],
+          "queryMore": [],
           "toolbar": [
             {
               "name": "导出",
@@ -12919,11 +13704,6 @@ window.WMS_PAGE_CONFIGS = {
               "field": "操作人",
               "title": "操作人",
               "width": 100
-            },
-            {
-              "field": "包装规格",
-              "title": "包装规格",
-              "width": 120
             }
           ],
           "rowOps": []
@@ -13049,7 +13829,8 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "物料批号",
               "title": "物料批号",
-              "width": 120
+              "width": 220,
+              "slot": "prod_pick_lots"
             },
             {
               "field": "总数量",
@@ -13133,7 +13914,9 @@ window.WMS_PAGE_CONFIGS = {
           "name": "单据类型",
           "type": "select",
           "required": true,
-          "options": ["生产领料申请单"],
+          "options": [
+            "生产领料申请单"
+          ],
           "ctrl": "下拉选择（字典表，单选）"
         },
         {
@@ -13158,7 +13941,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "领至线边仓",
           "type": "picker",
           "required": true,
-          "ctrl": "弹窗选择线边仓主数据（仅启用，线边仓编码 - 线边仓名称）；生产领料必填，备品备件领料不可填；推送ERP携带ERP仓库编码"
+          "ctrl": "弹窗选择线边仓主数据（仅启用，线边仓编码 - 线边仓名称）；生产领料/备品备件领料均必填；生产领料推送ERP携带ERP仓库编码，备品备件领料对接杂发单不传线边仓给ERP"
         },
         {
           "name": "备注",
@@ -13210,14 +13993,8 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "物料信息",
           "type": "picker",
-          "required": false,
+          "required": true,
           "ctrl": "弹窗多选启用且条码/计数管理物料；确认后按所选条数追加明细行"
-        },
-        {
-          "name": "批号",
-          "type": "picker",
-          "required": false,
-          "ctrl": "条码管理：弹窗选流水码档案（同物料+在用+检验合格）；计数管理：模糊下拉库内（仓库且有数量）计数库存批号"
         },
         {
           "name": "库存单位",
@@ -13242,6 +14019,12 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": true,
           "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "条码管理：弹窗选流水码档案（同物料+在用+检验合格）；计数管理：模糊下拉库内（仓库且有数量）计数库存批号"
         },
         {
           "name": "备注",
@@ -13278,9 +14061,6 @@ window.WMS_PAGE_CONFIGS = {
           "name": "物料信息"
         },
         {
-          "name": "批号"
-        },
-        {
           "name": "库存单位"
         },
         {
@@ -13297,6 +14077,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未完成数量"
+        },
+        {
+          "name": "批号"
         },
         {
           "name": "备注"
@@ -13533,10 +14316,6 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联退料申请单号",
               "type": "input"
-            },
-            {
-              "name": "关联领料出库单号",
-              "type": "input"
             }
           ],
           "queryDefault": [
@@ -13544,8 +14323,7 @@ window.WMS_PAGE_CONFIGS = {
             "入库单号"
           ],
           "queryMore": [
-            "关联退料申请单号",
-            "关联领料出库单号"
+            "关联退料申请单号"
           ],
           "toolbar": [
             {
@@ -13587,16 +14365,6 @@ window.WMS_PAGE_CONFIGS = {
               "width": 80
             },
             {
-              "field": "来源线边仓",
-              "title": "来源线边仓",
-              "width": 160
-            },
-            {
-              "field": "目标仓库库位",
-              "title": "目标仓库库位",
-              "width": 160
-            },
-            {
               "field": "备注",
               "title": "备注",
               "width": 140
@@ -13604,11 +14372,6 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "关联退料申请单号",
               "title": "关联退料申请单号",
-              "width": 160
-            },
-            {
-              "field": "关联领料出库单号",
-              "title": "关联领料出库单号",
               "width": 160
             },
             {
@@ -13691,6 +14454,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -13705,7 +14472,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "包装规格",
-            "关联发货单"
+            "关联发货单",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -13808,9 +14576,16 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
@@ -13844,7 +14619,9 @@ window.WMS_PAGE_CONFIGS = {
           "name": "单据类型",
           "type": "select",
           "required": true,
-          "options": ["生产退料申请单"],
+          "options": [
+            "生产退料申请单"
+          ],
           "ctrl": "下拉选择（字典表，单选）"
         },
         {
@@ -13910,14 +14687,8 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "物料信息",
           "type": "picker",
-          "required": false,
+          "required": true,
           "ctrl": "可编辑（弹窗多选）"
-        },
-        {
-          "name": "批号",
-          "type": "picker",
-          "required": false,
-          "ctrl": "条码管理：弹窗选流水码档案（同物料+在用+检验合格，且属所选生产领料出库单出库批号）；计数管理：模糊下拉库内（仓库且有数量）计数库存批号"
         },
         {
           "name": "库存单位",
@@ -13942,6 +14713,12 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": true,
           "ctrl": "可编辑"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "条码管理：弹窗选流水码档案（同物料+在用+检验合格，且属所选生产领料出库单出库批号）；计数管理：模糊下拉库内（仓库且有数量）计数库存批号"
         },
         {
           "name": "备注",
@@ -13978,9 +14755,6 @@ window.WMS_PAGE_CONFIGS = {
           "name": "物料信息"
         },
         {
-          "name": "批号"
-        },
-        {
           "name": "库存单位"
         },
         {
@@ -13997,6 +14771,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未完成数量"
+        },
+        {
+          "name": "批号"
         },
         {
           "name": "备注"
@@ -14390,6 +15167,10 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联发货单",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -14404,7 +15185,8 @@ window.WMS_PAGE_CONFIGS = {
             "新位置",
             "单据类型",
             "包装规格",
-            "关联发货单"
+            "关联发货单",
+            "关联运单"
           ],
           "toolbar": [
             {
@@ -14497,9 +15279,16 @@ window.WMS_PAGE_CONFIGS = {
               "width": 140
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
               "field": "关联发货单",
               "title": "关联发货单",
-              "width": 160
+              "width": 160,
+              "slot": "link"
             },
             {
               "field": "包装规格",
@@ -14533,7 +15322,9 @@ window.WMS_PAGE_CONFIGS = {
           "name": "单据类型",
           "type": "select",
           "required": true,
-          "options": ["生产入库申请单"],
+          "options": [
+            "生产入库申请单"
+          ],
           "ctrl": "下拉选择（字典表，单选）"
         },
         {
@@ -14554,9 +15345,9 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "关联生产订单",
-          "type": "input",
-          "required": false,
-          "ctrl": "手动输入（文本）"
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择 ERP 生产订单（列表，单选）；选中后自动带入订单行物料"
         },
         {
           "name": "关联备货通知单",
@@ -14606,7 +15397,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "关联生产订单",
-          "spec": "文本"
+          "spec": "生产订单号 / 生产部门"
         },
         {
           "name": "关联备货通知单",
@@ -14633,14 +15424,8 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "物料信息",
           "type": "picker",
-          "required": false,
+          "required": true,
           "ctrl": "可编辑（弹窗多选）"
-        },
-        {
-          "name": "批号",
-          "type": "picker",
-          "required": false,
-          "ctrl": "条码管理：弹窗选待初始化流水码档案带入或手输批号；计数管理：手动输入（可空）；非必填"
         },
         {
           "name": "库存单位",
@@ -14667,6 +15452,30 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "可编辑"
         },
         {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "条码管理：弹窗选待初始化流水码档案带入或手输批号；计数管理：手动输入（可空）；非必填"
+        },
+        {
+          "name": "生产日期",
+          "type": "date",
+          "required": false,
+          "ctrl": "默认当天"
+        },
+        {
+          "name": "有效期",
+          "type": "input",
+          "required": false,
+          "ctrl": "质保期(月)"
+        },
+        {
+          "name": "生产厂家",
+          "type": "input",
+          "required": false,
+          "ctrl": "生产车间/工厂"
+        },
+        {
           "name": "备注",
           "type": "input",
           "required": false,
@@ -14685,6 +15494,12 @@ window.WMS_PAGE_CONFIGS = {
           "desc": "删除勾选明细行"
         }
       ],
+      "formLineRowActions": [
+        {
+          "name": "新增批号",
+          "desc": "复制当前行物料信息，批号置空供填写新批"
+        }
+      ],
       "detailLineSelectable": true,
       "detailLineActions": [
         "关闭"
@@ -14699,9 +15514,6 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "物料信息"
-        },
-        {
-          "name": "批号"
         },
         {
           "name": "库存单位"
@@ -14720,6 +15532,18 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "生产厂家"
         },
         {
           "name": "备注"
@@ -15339,7 +16163,6 @@ window.WMS_PAGE_CONFIGS = {
               "title": "储罐编号",
               "width": 120
             },
-
             {
               "field": "原位置",
               "title": "原位置",
@@ -15614,77 +16437,93 @@ window.WMS_PAGE_CONFIGS = {
       },
       "formSections": [
         {
-          "title": "基础与单据信息",
+          "title": "基础信息",
           "fields": [
             {
               "name": "单号",
               "type": "readonly",
               "required": true,
-              "ctrl": "系统自动生成 STST"
+              "ctrl": "系统自动生成"
             },
             {
-              "name": "计划执行日期",
-              "type": "date",
+              "name": "单据类型",
+              "type": "select",
               "required": true,
-              "ctrl": "默认当天"
+              "ctrl": "字典单选，默认首项",
+              "options": [
+                "受托收料"
+              ]
             },
             {
               "name": "关联销售订单",
               "type": "picker",
-              "required": false,
-              "ctrl": "弹窗选择销售订单，带出客户名称"
+              "required": true,
+              "ctrl": "必填；选择生效的客户委托加工销售订单；选后自动带出客户名称并解锁运单"
             },
             {
               "name": "客户名称",
-              "type": "picker",
-              "required": false,
-              "ctrl": "选销售订单自动带出；无订单可弹窗选客户"
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选销售订单后自动带入，只读锁定不可改"
             },
             {
-              "name": "关联运单",
-              "type": "picker",
+              "name": "计划执行日期",
+              "type": "date",
               "required": false,
-              "ctrl": "弹窗选择运单，置于发货单前；带出承运信息"
-            },
-            {
-              "name": "关联发货单",
-              "type": "picker",
-              "required": false,
-              "ctrl": "按运单联动过滤；有值时带入物料明细"
+              "ctrl": "默认当天，选填"
             },
             {
               "name": "备注",
               "type": "textarea",
               "required": false,
-              "ctrl": "多行文本"
+              "ctrl": "单据头补充说明，选填"
             }
           ]
         },
         {
-          "title": "承运与司机信息",
+          "title": "派车与承运信息",
           "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "选择物流运单；选后联动过滤发货单并自动带出车辆与司机"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "选择发货单；随关联运单联动过滤；仅1单自动带入并带入明细"
+            },
             {
               "name": "车牌号",
               "type": "input",
-              "ctrl": "选运单只读带出 / 未选手动"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车挂号",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机姓名",
-              "type": "input"
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机电话",
               "type": "input",
-              "ctrl": "11位手机号"
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选失焦校验11位手机号"
             },
             {
               "name": "司机身份证号",
               "type": "input",
-              "ctrl": "18位身份证"
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选校验18位身份证号"
             }
           ]
         }
@@ -15692,22 +16531,22 @@ window.WMS_PAGE_CONFIGS = {
       "formDialogWidth": "1100px",
       "detailSections": [
         {
-          "title": "头信息",
+          "title": "基础信息",
           "fields": [
             "单据状态",
             "单号",
             "单据类型",
-            "计划执行日期",
             "关联销售订单",
             "客户名称",
-            "关联运单",
-            "关联发货单",
+            "计划执行日期",
             "备注"
           ]
         },
         {
-          "title": "承运与司机信息",
+          "title": "派车与承运信息",
           "fields": [
+            "关联运单",
+            "关联发货单",
             "车牌号",
             "车挂号",
             "司机姓名",
@@ -15722,899 +16561,887 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "detailLineTitle": "物料明细"
     },
-      "wh-cs-ret": {
-    "id": "wh-cs-ret",
-    "title": "受托退料",
-    "groups": [
-      "仓储管理",
-      "受托"
-    ],
-    "breadcrumb": [
-      "仓储管理",
-      "受托",
-      "受托退料"
-    ],
-    "tabs": [
-      {
-        "name": "tab1",
-        "label": "受托退料通知单"
-      },
-      {
-        "name": "tab2",
-        "label": "受托退料单"
-      },
-      {
-        "name": "tab3",
-        "label": "退料流水"
-      }
-    ],
-    "tabViews": [
-      {
-        "name": "tab1",
-        "label": "受托退料通知单",
-        "queryFields": [
-          {
-            "name": "单据状态",
-            "type": "select",
-            "options": [
-              "待执行",
-              "执行中",
-              "已完成",
-              "已关闭"
-            ]
-          },
-          {
-            "name": "单号",
-            "type": "input"
-          },
-          {
-            "name": "单据类型",
-            "type": "select",
-            "options": [
-              "受托退料通知单"
-            ]
-          },
-          {
-            "name": "关联销售订单",
-            "type": "input"
-          },
-          {
-            "name": "客户名称",
-            "type": "input"
-          },
-          {
-            "name": "关联运单",
-            "type": "input"
-          },
-          {
-            "name": "关联发货单",
-            "type": "input"
-          },
-          {
-            "name": "车牌号",
-            "type": "input"
-          },
-          {
-            "name": "司机姓名",
-            "type": "input"
-          }
-        ],
-        "queryDefault": [
-          "单据状态",
-          "单号",
-          "关联销售订单",
-          "客户名称"
-        ],
-        "queryMore": [
-          "单据类型",
-          "关联运单",
-          "关联发货单",
-          "车牌号",
-          "司机姓名"
-        ],
-        "toolbar": [
-          {
-            "name": "新增",
-            "type": "primary",
-            "desc": "打开 [新增编辑页](./新增编辑页.md)（新增模式）"
-          },
-          {
-            "name": "关闭",
-            "type": "default",
-            "desc": "将勾选的受托退料通知单置为「已关闭」；已关闭单据不可再次关闭"
-          },
-          {
-            "name": "批量删除",
-            "type": "danger",
-            "desc": "仅允许删除单据状态为「待执行」的勾选行；勾选含非待执行时拦截并提示"
-          },
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "行为见通用功能规范 · 导出数据弹窗"
-          }
-        ],
-        "columns": [
-          {
-            "field": "单据状态",
-            "title": "单据状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "单号",
-            "title": "单号",
-            "width": 160
-          },
-          {
-            "field": "单据类型",
-            "title": "单据类型",
-            "width": 140
-          },
-          {
-            "field": "计划执行日期",
-            "title": "计划执行日期",
-            "width": 120
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "备注",
-            "title": "备注",
-            "width": 140
-          },
-          {
-            "field": "关联销售订单",
-            "title": "关联销售订单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 160
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "_actions",
-            "title": "操作",
-            "width": 140,
-            "fixed": "right",
-            "slot": "row_actions"
-          }
-        ],
-        "rowOps": [
-          {
-            "name": "详情",
-            "desc": "只读查看头信息 + 明细；明细区可关闭行"
-          },
-          {
-            "name": "编辑",
-            "desc": "仅 Tab 1 提供编辑入口"
-          }
-        ]
-      },
-      {
-        "name": "tab2",
-        "label": "受托退料单",
-        "queryFields": [
-          {
-            "name": "单据状态",
-            "type": "select",
-            "options": [
-              "待退料",
-              "退料中",
-              "已完成",
-              "已关闭"
-            ]
-          },
-          {
-            "name": "出库单号",
-            "type": "input"
-          },
-          {
-            "name": "关联退料通知单号",
-            "type": "input"
-          },
-          {
-            "name": "单据类型",
-            "type": "select",
-            "options": [
-              "受托退料单"
-            ]
-          },
-          {
-            "name": "ERP单据号",
-            "type": "input"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "input"
-          },
-          {
-            "name": "客户名称",
-            "type": "input"
-          },
-          {
-            "name": "关联运单",
-            "type": "input"
-          },
-          {
-            "name": "关联发货单",
-            "type": "input"
-          },
-          {
-            "name": "车牌号",
-            "type": "input"
-          },
-          {
-            "name": "司机姓名",
-            "type": "input"
-          }
-        ],
-        "queryDefault": [
-          "单据状态",
-          "出库单号",
-          "关联退料通知单号",
-          "关联销售订单"
-        ],
-        "queryMore": [
-          "客户名称",
-          "单据类型",
-          "ERP单据号",
-          "关联运单",
-          "关联发货单",
-          "车牌号",
-          "司机姓名"
-        ],
-        "toolbar": [
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "行为见通用功能规范 · 导出数据弹窗"
-          }
-        ],
-        "columns": [
-          {
-            "field": "单据状态",
-            "title": "单据状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "出库单号",
-            "title": "出库单号",
-            "width": 140
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "已完成件数",
-            "title": "已完成件数",
-            "width": 100
-          },
-          {
-            "field": "已完成数量",
-            "title": "已完成数量",
-            "width": 100
-          },
-          {
-            "field": "库存单位",
-            "title": "库存单位",
-            "width": 80
-          },
-          {
-            "field": "备注",
-            "title": "备注",
-            "width": 140
-          },
-          {
-            "field": "关联退料通知单号",
-            "title": "关联退料通知单号",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "单据类型",
-            "title": "单据类型",
-            "width": 120
-          },
-          {
-            "field": "ERP单据号",
-            "title": "ERP单据号",
-            "width": 140
-          },
-          {
-            "field": "操作时间",
-            "title": "操作时间",
-            "width": 160
-          },
-          {
-            "field": "操作人",
-            "title": "操作人",
-            "width": 100
-          },
-          {
-            "field": "关联销售订单",
-            "title": "关联销售订单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 160
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "车牌号",
-            "title": "车牌号",
-            "width": 120
-          },
-          {
-            "field": "车挂号",
-            "title": "车挂号",
-            "width": 120
-          },
-          {
-            "field": "司机姓名",
-            "title": "司机姓名",
-            "width": 100
-          },
-          {
-            "field": "司机电话",
-            "title": "司机电话",
-            "width": 130
-          },
-          {
-            "field": "司机身份证号",
-            "title": "司机身份证号",
-            "width": 170,
-            "slot": "idmask"
-          },
-          {
-            "field": "包装规格",
-            "title": "包装规格",
-            "width": 120
-          }
-        ],
-        "rowOps": []
-      },
-      {
-        "name": "tab3",
-        "label": "退料流水",
-        "queryFields": [
-          {
-            "name": "流水状态",
-            "type": "select",
-            "options": [
-              "待退料",
-              "已退料",
-              "已关闭"
-            ]
-          },
-          {
-            "name": "检查结果",
-            "type": "select",
-            "options": [
-              "合格",
-              "不合格"
-            ]
-          },
-          {
-            "name": "档案类型",
-            "type": "select",
-            "options": [
-              "流水码",
-              "储罐档案",
-              "常规物料"
-            ]
-          },
-          {
-            "name": "条码号",
-            "type": "input"
-          },
-          {
-            "name": "原位置",
-            "type": "input"
-          },
-          {
-            "name": "单据类型",
-            "type": "select",
-            "options": [
-              "受托退料单"
-            ]
-          },
-          {
-            "name": "通知单号",
-            "type": "input"
-          },
-          {
-            "name": "出库单号",
-            "type": "input"
-          },
-          {
-            "name": "客户名称",
-            "type": "input"
-          }
-        ],
-        "queryDefault": [
-          "流水状态",
-          "条码号",
-          "通知单号",
-          "出库单号"
-        ],
-        "queryMore": [
-          "客户名称",
-          "检查结果",
-          "档案类型",
-          "原位置",
-          "单据类型"
-        ],
-        "toolbar": [
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "行为见通用功能规范 · 导出数据弹窗"
-          }
-        ],
-        "columns": [
-          {
-            "field": "流水状态",
-            "title": "流水状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "当前工序",
-            "title": "当前工序",
-            "width": 120
-          },
-          {
-            "field": "检查结果",
-            "title": "检查结果",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "档案类型",
-            "title": "档案类型",
-            "width": 100
-          },
-          {
-            "field": "条码号",
-            "title": "条码号",
-            "width": 160
-          },
-          {
-            "field": "外包材编号",
-            "title": "外包材编号",
-            "width": 120
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "物料批号",
-            "title": "物料批号",
-            "width": 120
-          },
-          {
-            "field": "总数量",
-            "title": "总数量",
-            "width": 100
-          },
-          {
-            "field": "库存单位",
-            "title": "库存单位",
-            "width": 80
-          },
-          {
-            "field": "原位置",
-            "title": "原位置",
-            "width": 120
-          },
-          {
-            "field": "新位置",
-            "title": "新位置",
-            "width": 120
-          },
-          {
-            "field": "单据类型",
-            "title": "单据类型",
-            "width": 120
-          },
-          {
-            "field": "通知单号",
-            "title": "通知单号",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "出库单号",
-            "title": "出库单号",
-            "width": 140,
-            "slot": "link"
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 160
-          },
-          {
-            "field": "备注",
-            "title": "备注",
-            "width": 140
-          },
-          {
-            "field": "包装规格",
-            "title": "包装规格",
-            "width": 120
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 160,
-            "slot": "link"
-          },
-          {
-            "field": "_actions",
-            "title": "操作",
-            "width": 80,
-            "fixed": "right",
-            "slot": "row_actions"
-          }
-        ],
-        "rowOps": [
-          {
-            "name": "作业详情",
-            "desc": "查看该条码对应单据的工序填报详情，按APP工序配置动态展示工序信息与表单内容，支持表单PDF导出"
-          }
-        ]
-      }
-    ],
-    "formFields": [],
-    "detailFields": [
-      "单据状态",
-      "单号",
-      "单据类型",
-      "计划执行日期",
-      "关联销售订单",
-      "客户名称",
-      "关联运单",
-      "关联发货单",
-      "备注",
-      "车牌号",
-      "车挂号",
-      "司机姓名",
-      "司机电话",
-      "司机身份证号"
-    ],
-    "hasEdit": true,
-    "hasDetail": true,
-    "formFlat": false,
-    "stub": false,
-    "formLineFields": [
-      {
-        "name": "物料信息",
-        "type": "picker",
-        "required": true,
-        "ctrl": "弹窗选择（单选）/ 发货单带入"
-      },
-      {
-        "name": "库存单位",
-        "type": "readonly",
-        "required": false,
-        "ctrl": "自动带入"
-      },
-      {
-        "name": "管理方式",
-        "type": "readonly",
-        "required": false,
-        "ctrl": "自动带入（条码/计数/罐区）"
-      },
-      {
-        "name": "计划件数",
-        "type": "input",
-        "required": false,
-        "ctrl": "条码管理必填；计数/罐区显示—"
-      },
-      {
-        "name": "计划数量",
-        "type": "input",
-        "required": true,
-        "ctrl": "正数，支持3位小数"
-      },
-      {
-        "name": "批号",
-        "type": "input",
-        "required": false,
-        "ctrl": "发货单带入或手输/选在库批号"
-      },
-      {
-        "name": "生产日期",
-        "type": "date",
-        "required": false,
-        "ctrl": "默认当天"
-      },
-      {
-        "name": "有效期",
-        "type": "input",
-        "required": false,
-        "ctrl": "默认物料有效期(月)"
-      },
-      {
-        "name": "生产厂家",
-        "type": "select",
-        "required": false,
-        "ctrl": "默认带入客户名称"
-      },
-      {
-        "name": "备注",
-        "type": "input",
-        "required": false,
-        "ctrl": "行备注"
-      }
-    ],
-    "formLineActions": [
-      {
-        "name": "新增",
-        "type": "primary",
-        "desc": "弹窗多选物料主数据追加"
-      },
-      {
-        "name": "批量删除",
-        "type": "danger",
-        "desc": "删除勾选明细行；至少保留1行"
-      }
-    ],
-    "detailLineFields": [
+    "wh-cs-ret": {
+      "id": "wh-cs-ret",
+      "title": "受托退料",
+      "groups": [
+        "仓储管理",
+        "受托"
+      ],
+      "breadcrumb": [
+        "仓储管理",
+        "受托",
+        "受托退料"
+      ],
+      "tabs": [
+        {
+          "name": "tab1",
+          "label": "受托退料通知单"
+        },
+        {
+          "name": "tab2",
+          "label": "受托退料单"
+        },
+        {
+          "name": "tab3",
+          "label": "退料流水"
+        }
+      ],
+      "tabViews": [
+        {
+          "name": "tab1",
+          "label": "受托退料通知单",
+          "queryFields": [
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "受托退料通知单"
+              ]
+            },
+            {
+              "name": "关联销售订单",
+              "type": "input"
+            },
+            {
+              "name": "客户名称",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "单据状态",
+            "单号",
+            "关联销售订单",
+            "客户名称"
+          ],
+          "queryMore": [
+            "单据类型",
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "司机姓名"
+          ],
+          "toolbar": [
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开 [新增编辑页](./新增编辑页.md)（新增模式）"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选的受托退料通知单置为「已关闭」；已关闭单据不可再次关闭"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除单据状态为「待执行」的勾选行；勾选含非待执行时拦截并提示"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "行为见通用功能规范 · 导出数据弹窗"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 140
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联销售订单",
+              "title": "关联销售订单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 160
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "详情",
+              "desc": "只读查看头信息 + 明细；明细区可关闭行"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅 Tab 1 提供编辑入口"
+            }
+          ]
+        },
+        {
+          "name": "tab2",
+          "label": "受托退料单",
+          "queryFields": [
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待退料",
+                "退料中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联退料通知单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "受托退料单"
+              ]
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "关联销售订单",
+              "type": "input"
+            },
+            {
+              "name": "客户名称",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "单据状态",
+            "出库单号",
+            "关联退料通知单号",
+            "关联销售订单"
+          ],
+          "queryMore": [
+            "客户名称",
+            "单据类型",
+            "ERP单据号",
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "司机姓名"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "行为见通用功能规范 · 导出数据弹窗"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 140
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联退料通知单号",
+              "title": "关联退料通知单号",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "ERP单据号",
+              "title": "ERP单据号",
+              "width": 140
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            },
+            {
+              "field": "关联销售订单",
+              "title": "关联销售订单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 160
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 130
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            }
+          ],
+          "rowOps": []
+        },
+        {
+          "name": "tab3",
+          "label": "退料流水",
+          "queryFields": [
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "待退料",
+                "已退料",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "档案类型",
+              "type": "select",
+              "options": [
+                "流水码",
+                "储罐档案",
+                "常规物料"
+              ]
+            },
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "原位置",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "受托退料单"
+              ]
+            },
+            {
+              "name": "通知单号",
+              "type": "input"
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "客户名称",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "流水状态",
+            "条码号",
+            "通知单号",
+            "出库单号"
+          ],
+          "queryMore": [
+            "客户名称",
+            "检查结果",
+            "档案类型",
+            "原位置",
+            "单据类型"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "行为见通用功能规范 · 导出数据弹窗"
+            }
+          ],
+          "columns": [
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 120
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "原位置",
+              "title": "原位置",
+              "width": 120
+            },
+            {
+              "field": "新位置",
+              "title": "新位置",
+              "width": 120
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "通知单号",
+              "title": "通知单号",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 140,
+              "slot": "link"
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 160
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 80,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "作业详情",
+              "desc": "查看该条码对应单据的工序填报详情，按APP工序配置动态展示工序信息与表单内容，支持表单PDF导出"
+            }
+          ]
+        }
+      ],
+      "formFields": [],
+      "detailFields": [
+        "单据状态",
+        "单号",
+        "单据类型",
+        "计划执行日期",
+        "关联销售订单",
+        "客户名称",
+        "关联运单",
+        "关联发货单",
+        "备注",
+        "车牌号",
+        "车挂号",
+        "司机姓名",
+        "司机电话",
+        "司机身份证号"
+      ],
+      "hasEdit": true,
+      "hasDetail": true,
+      "formFlat": false,
+      "stub": false,
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选择（单选）/ 发货单带入"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入（条码/计数/罐区）"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "条码管理必填；计数/罐区显示—"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "正数，支持3位小数"
+        },
+        {
+          "name": "批号",
+          "type": "input",
+          "required": false,
+          "ctrl": "发货单带入或手输/选在库批号"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "行备注"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "弹窗多选物料主数据追加"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删除勾选明细行；至少保留1行"
+        }
+      ],
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-      {
-        "name": "物料信息"
-      },
-      {
-        "name": "库存单位"
-      },
-      {
-        "name": "管理方式"
-      },
-      {
-        "name": "计划件数"
-      },
-      {
-        "name": "计划数量"
-      },
-      {
-        "name": "已完成数量"
-      },
-      {
-        "name": "未完成数量"
-      },
-      {
-        "name": "批号"
-      },
-      {
-        "name": "生产日期"
-      },
-      {
-        "name": "有效期"
-      },
-      {
-        "name": "生产厂家"
-      },
-      {
-        "name": "备注"
-      }
-    ],
-    "jobDetail": {
-      "procs": [
         {
-          "name": "复核点验",
-          "submitTime": "2026-08-12 08:30",
-          "submitter": "王仓管",
-          "formTitle": "退料复核确认表",
-          "fields": [
-            [
-              "检查时间",
-              "2026-08-12 08:30"
-            ],
-            [
-              "检查人员",
-              "王仓管"
-            ],
-            [
-              "检查结果",
-              "合格"
-            ],
-            [
-              "备注",
-              "—"
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
+      ],
+      "jobDetail": {
+        "procs": [
+          {
+            "name": "复核点验",
+            "submitTime": "2026-08-12 08:30",
+            "submitter": "王仓管",
+            "formTitle": "退料复核确认表",
+            "fields": [
+              [
+                "检查时间",
+                "2026-08-12 08:30"
+              ],
+              [
+                "检查人员",
+                "王仓管"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
             ]
+          },
+          {
+            "name": "扫码下架",
+            "submitTime": "2026-08-12 09:10",
+            "submitter": "李仓管",
+            "formTitle": "下架出库记录表",
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-12 09:10"
+              ],
+              [
+                "作业人员",
+                "李仓管"
+              ],
+              [
+                "作业结果",
+                "完成"
+              ],
+              [
+                "源储位",
+                "ST-RM-01-A01"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          }
+        ]
+      },
+      "formSections": [
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选，默认首项",
+              "options": [
+                "受托退料"
+              ]
+            },
+            {
+              "name": "关联销售订单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "必填；选择生效的客户委托加工销售订单；选后自动带出客户名称并解锁运单"
+            },
+            {
+              "name": "客户名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选销售订单后自动带入，只读锁定不可改"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "单据头补充说明，选填"
+            }
           ]
         },
         {
-          "name": "扫码下架",
-          "submitTime": "2026-08-12 09:10",
-          "submitter": "李仓管",
-          "formTitle": "下架出库记录表",
+          "title": "派车与承运信息",
           "fields": [
-            [
-              "作业时间",
-              "2026-08-12 09:10"
-            ],
-            [
-              "作业人员",
-              "李仓管"
-            ],
-            [
-              "作业结果",
-              "完成"
-            ],
-            [
-              "源储位",
-              "ST-RM-01-A01"
-            ],
-            [
-              "备注",
-              "—"
-            ]
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "选择物流运单；选后联动过滤发货单并自动带出车辆与司机"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "选择发货单；随关联运单联动过滤；仅1单自动带入并带入明细"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选失焦校验11位手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选校验18位身份证号"
+            }
           ]
         }
-      ]
+      ],
+      "formDialogWidth": "1100px",
+      "detailSections": [
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联销售订单",
+            "客户名称",
+            "计划执行日期",
+            "备注"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
+      "detailLineSelectable": true,
+      "detailLineActions": [
+        "关闭"
+      ],
+      "detailLineTitle": "物料明细"
     },
-    "formSections": [
-      {
-        "title": "基础与单据信息",
-        "fields": [
-          {
-            "name": "单号",
-            "type": "readonly",
-            "required": true,
-            "ctrl": "系统自动生成 STTL"
-          },
-          {
-            "name": "计划执行日期",
-            "type": "date",
-            "required": true,
-            "ctrl": "默认当天"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "弹窗选择销售订单，带出客户名称"
-          },
-          {
-            "name": "客户名称",
-            "type": "picker",
-            "required": false,
-            "ctrl": "选销售订单自动带出；无订单可弹窗选客户"
-          },
-          {
-            "name": "关联运单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "弹窗选择运单，置于发货单前；带出承运信息"
-          },
-          {
-            "name": "关联发货单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "按运单联动过滤；有值时带入物料明细"
-          },
-          {
-            "name": "备注",
-            "type": "textarea",
-            "required": false,
-            "ctrl": "多行文本"
-          }
-        ]
-      },
-      {
-        "title": "承运与司机信息",
-        "fields": [
-          {
-            "name": "车牌号",
-            "type": "input",
-            "ctrl": "选运单只读带出 / 未选手动"
-          },
-          {
-            "name": "车挂号",
-            "type": "input"
-          },
-          {
-            "name": "司机姓名",
-            "type": "input"
-          },
-          {
-            "name": "司机电话",
-            "type": "input",
-            "ctrl": "11位手机号"
-          },
-          {
-            "name": "司机身份证号",
-            "type": "input",
-            "ctrl": "18位身份证"
-          }
-        ]
-      }
-    ],
-    "formDialogWidth": "1100px",
-    "detailSections": [
-      {
-        "title": "头信息",
-        "fields": [
-          "单据状态",
-          "单号",
-          "单据类型",
-          "计划执行日期",
-          "关联销售订单",
-          "客户名称",
-          "关联运单",
-          "关联发货单",
-          "备注"
-        ]
-      },
-      {
-        "title": "承运与司机信息",
-        "fields": [
-          "车牌号",
-          "车挂号",
-          "司机姓名",
-          "司机电话",
-          "司机身份证号"
-        ]
-      }
-    ],
-    "detailLineSelectable": true,
-    "detailLineActions": [
-      "关闭"
-    ],
-    "detailLineTitle": "物料明细"
-  },
-
     "wh-so-prep": {
       "id": "wh-so-prep",
       "title": "备货通知",
@@ -16903,23 +17730,57 @@ window.WMS_PAGE_CONFIGS = {
       "detailLineSelectable": true,
       "detailLineRowDelete": true,
       "detailLineFields": [
-        { "name": "存储位置" },
-        { "name": "条码号" },
-        { "name": "包装规格" },
-        { "name": "来源单号" },
-        { "name": "来源条码号" },
-        { "name": "物料信息" },
-        { "name": "物料批号" },
-        { "name": "客户批号" },
-        { "name": "当前数量" },
-        { "name": "库存单位" },
-        { "name": "供应商信息" },
-        { "name": "生产厂家" },
-        { "name": "生产日期" },
-        { "name": "有效期" },
-        { "name": "失效日期" },
-        { "name": "绑定状态" },
-        { "name": "当前绑定外包材" }
+        {
+          "name": "存储位置"
+        },
+        {
+          "name": "条码号"
+        },
+        {
+          "name": "包装规格"
+        },
+        {
+          "name": "来源单号"
+        },
+        {
+          "name": "来源条码号"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "物料批号"
+        },
+        {
+          "name": "客户批号"
+        },
+        {
+          "name": "当前数量"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "供应商信息"
+        },
+        {
+          "name": "生产厂家"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "失效日期"
+        },
+        {
+          "name": "绑定状态"
+        },
+        {
+          "name": "当前绑定外包材"
+        }
       ],
       "hasEdit": true,
       "hasDetail": true,
@@ -16938,829 +17799,831 @@ window.WMS_PAGE_CONFIGS = {
       ]
     },
     "wh-so-preout": {
-    "id": "wh-so-preout",
-    "title": "销售预出货",
-    "groups": [
-      "仓储管理",
-      "销售"
-    ],
-    "breadcrumb": [
-      "仓储管理",
-      "销售",
-      "销售预出货"
-    ],
-    "tabs": [
-      {
-        "name": "tab1",
-        "label": "销售预出货通知单"
-      },
-      {
-        "name": "tab2",
-        "label": "预出货出库单"
-      },
-      {
-        "name": "tab3",
-        "label": "预出货流水"
-      }
-    ],
-    "tabViews": [
-      {
-        "name": "tab1",
-        "label": "销售预出货通知单",
-        "queryFields": [
-          {
-            "name": "单据状态",
-            "type": "select",
-            "options": [
-              "待执行",
-              "执行中",
-              "已完成",
-              "已关闭"
-            ]
-          },
-          {
-            "name": "单号",
-            "type": "input"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "input"
-          },
-          {
-            "name": "客户名称",
-            "type": "input"
-          },
-          {
-            "name": "关联运单",
-            "type": "input"
-          },
-          {
-            "name": "关联发货单",
-            "type": "input"
-          },
-          {
-            "name": "车牌号",
-            "type": "input"
-          },
-          {
-            "name": "司机姓名",
-            "type": "input"
-          },
-          {
-            "name": "司机电话",
-            "type": "input"
-          },
-          {
-            "name": "司机身份证号",
-            "type": "input"
-          },
-          {
-            "name": "单据类型",
-            "type": "select",
-            "options": [
-              "标准预出货",
-              "紧急预出货",
-              "样品预出货"
-            ]
-          },
-          {
-            "name": "计划执行日期",
-            "type": "daterange"
-          }
-        ],
-        "queryDefault": [
-          "单据状态",
-          "单号",
-          "关联销售订单",
-          "客户名称"
-        ],
-        "queryMore": [
-          "关联运单",
-          "关联发货单",
-          "车牌号",
-          "司机姓名",
-          "司机电话",
-          "司机身份证号",
-          "单据类型",
-          "计划执行日期"
-        ],
-        "toolbar": [
-          {
-            "name": "新增",
-            "type": "primary",
-            "desc": "打开新增销售预出货通知单"
-          },
-          {
-            "name": "打印随车发货单",
-            "type": "default",
-            "desc": "勾选 1 条销售预出货通知单，预览随车发货单"
-          },
-          {
-            "name": "关闭",
-            "type": "default",
-            "desc": "将勾选的销售预出货通知单置为「已关闭」；已关闭单据不可再次关闭"
-          },
-          {
-            "name": "批量删除",
-            "type": "danger",
-            "desc": "仅允许删除单据状态为「待执行」的勾选行；勾选含非待执行时拦截并提示"
-          },
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "行为见通用功能规范 · 导出数据弹窗"
-          }
-        ],
-        "columns": [
-          {
-            "field": "单据状态",
-            "title": "单据状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "单号",
-            "title": "单号",
-            "width": 160
-          },
-          {
-            "field": "单据类型",
-            "title": "单据类型",
-            "width": 120
-          },
-          {
-            "field": "计划执行日期",
-            "title": "计划执行日期",
-            "width": 120
-          },
-          {
-            "field": "关联销售订单",
-            "title": "关联销售订单",
-            "width": 160
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 160
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "关联备货通知单",
-            "title": "关联备货通知单",
-            "width": 150
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 140
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 140
-          },
-          {
-            "field": "车牌号",
-            "title": "车牌号",
-            "width": 110
-          },
-          {
-            "field": "车挂号",
-            "title": "车挂号",
-            "width": 110
-          },
-          {
-            "field": "司机姓名",
-            "title": "司机姓名",
-            "width": 100
-          },
-          {
-            "field": "司机电话",
-            "title": "司机电话",
-            "width": 120
-          },
-          {
-            "field": "司机身份证号",
-            "title": "司机身份证号",
-            "width": 160,
-            "slot": "idmask"
-          },
-          {
-            "field": "备注",
-            "title": "备注",
-            "width": 120
-          },
-          {
-            "field": "_actions",
-            "title": "操作",
-            "width": 140,
-            "fixed": "right",
-            "slot": "row_actions"
-          }
-        ],
-        "rowOps": [
-          {
-            "name": "详情",
-            "desc": "只读查看头信息 + 明细；明细区可关闭行"
-          },
-          {
-            "name": "编辑",
-            "desc": "仅单据状态为「待执行」时显示"
-          }
-        ]
-      },
-      {
-        "name": "tab2",
-        "label": "预出货出库单",
-        "queryFields": [
-          {
-            "name": "单据状态",
-            "type": "select",
-            "options": [
-              "执行中",
-              "已完成",
-              "已关闭"
-            ]
-          },
-          {
-            "name": "出库单号",
-            "type": "input"
-          },
-          {
-            "name": "客户名称",
-            "type": "input"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "input"
-          },
-          {
-            "name": "物料信息",
-            "type": "input"
-          },
-          {
-            "name": "操作人",
-            "type": "input"
-          },
-          {
-            "name": "关联通知单号",
-            "type": "input"
-          },
-          {
-            "name": "关联运单",
-            "type": "input"
-          },
-          {
-            "name": "关联发货单",
-            "type": "input"
-          }
-        ],
-        "queryDefault": [
-          "单据状态",
-          "出库单号",
-          "客户名称",
-          "关联销售订单"
-        ],
-        "queryMore": [
-          "物料信息",
-          "操作人",
-          "关联通知单号",
-          "关联运单",
-          "关联发货单"
-        ],
-        "toolbar": [
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "导出出库单列表"
-          }
-        ],
-        "columns": [
-          {
-            "field": "单据状态",
-            "title": "单据状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "出库单号",
-            "title": "出库单号",
-            "width": 160
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 160
-          },
-          {
-            "field": "关联销售订单",
-            "title": "关联销售订单",
-            "width": 160
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "已完成件数",
-            "title": "已完成件数",
-            "width": 100
-          },
-          {
-            "field": "已完成数量",
-            "title": "已完成数量",
-            "width": 120
-          },
-          {
-            "field": "库存单位",
-            "title": "库存单位",
-            "width": 80
-          },
-          {
-            "field": "关联通知单号",
-            "title": "关联通知单号",
-            "width": 160
-          },
-          {
-            "field": "ERP单据号",
-            "title": "ERP单据号",
-            "width": 140
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 140
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 140
-          },
-          {
-            "field": "操作时间",
-            "title": "操作时间",
-            "width": 160
-          },
-          {
-            "field": "操作人",
-            "title": "操作人",
-            "width": 100
-          }
-        ],
-        "rowOps": []
-      },
-      {
-        "name": "tab3",
-        "label": "预出货流水",
-        "queryFields": [
-          {
-            "name": "条码号",
-            "type": "input"
-          },
-          {
-            "name": "批号",
-            "type": "input"
-          },
-          {
-            "name": "物料信息",
-            "type": "input"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "input"
-          },
-          {
-            "name": "通知单号",
-            "type": "input"
-          },
-          {
-            "name": "出库单号",
-            "type": "input"
-          }
-        ],
-        "queryDefault": [
-          "条码号",
-          "批号",
-          "物料信息",
-          "关联销售订单"
-        ],
-        "queryMore": [
-          "通知单号",
-          "出库单号"
-        ],
-        "toolbar": [
-          {
-            "name": "导出",
-            "type": "default",
-            "desc": "导出流水列表"
-          }
-        ],
-        "columns": [
-          {
-            "field": "流水状态",
-            "title": "状态",
-            "width": 100,
-            "slot": "tag"
-          },
-          {
-            "field": "条码号",
-            "title": "条码号",
-            "width": 160
-          },
-          {
-            "field": "外包材编号",
-            "title": "外包材编号",
-            "width": 130
-          },
-          {
-            "field": "物料信息",
-            "title": "物料信息",
-            "width": 220
-          },
-          {
-            "field": "批号",
-            "title": "批号",
-            "width": 140
-          },
-          {
-            "field": "出库数量",
-            "title": "出库数量",
-            "width": 100
-          },
-          {
-            "field": "库存单位",
-            "title": "库存单位",
-            "width": 80
-          },
-          {
-            "field": "原位置",
-            "title": "原位置",
-            "width": 120
-          },
-          {
-            "field": "关联销售订单",
-            "title": "关联销售订单",
-            "width": 160
-          },
-          {
-            "field": "客户名称",
-            "title": "客户名称",
-            "width": 150
-          },
-          {
-            "field": "通知单号",
-            "title": "关联通知单号",
-            "width": 160
-          },
-          {
-            "field": "出库单号",
-            "title": "出库单号",
-            "width": 160
-          },
-          {
-            "field": "关联运单",
-            "title": "关联运单",
-            "width": 140
-          },
-          {
-            "field": "关联发货单",
-            "title": "关联发货单",
-            "width": 140
-          },
-          {
-            "field": "操作人",
-            "title": "操作人",
-            "width": 100
-          },
-          {
-            "field": "操作时间",
-            "title": "操作时间",
-            "width": 160
-          },
-          {
-            "field": "备注",
-            "title": "备注",
-            "width": 120
-          },
-          {
-            "field": "_actions",
-            "title": "操作",
-            "width": 100,
-            "fixed": "right",
-            "slot": "row_actions"
-          }
-        ],
-        "rowOps": [
-          {
-            "name": "作业详情",
-            "desc": "查看该条码对应单据的工序填报详情"
-          }
-        ]
-      }
-    ],
-    "formSections": [
-      {
-        "title": "表头基本信息",
-        "fields": [
-          {
-            "name": "单号",
-            "type": "readonly",
-            "required": true,
-            "ctrl": "系统自动生成 XSYC"
-          },
-          {
-            "name": "单据类型",
-            "type": "select",
-            "required": true,
-            "ctrl": "字典单选，默认标准预出货",
-            "options": [
-              "标准预出货",
-              "紧急预出货",
-              "样品预出货"
-            ]
-          },
-          {
-            "name": "计划执行日期",
-            "type": "date",
-            "required": true,
-            "ctrl": "默认当天"
-          },
-          {
-            "name": "关联销售订单",
-            "type": "picker",
-            "required": true,
-            "ctrl": "必填；选后带出客户名称与订单物料，并解除关联运单置灰"
-          },
-          {
-            "name": "客户名称",
-            "type": "readonly",
-            "required": true,
-            "ctrl": "选销售订单后自动带入，只读"
-          },
-          {
-            "name": "关联备货通知单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "选填；联动带入销售订单/客户/已备批次"
-          },
-          {
-            "name": "ERP单据号",
-            "type": "input",
-            "required": false,
-            "ctrl": "选填，最大50字符"
-          },
-          {
-            "name": "备注",
-            "type": "textarea",
-            "required": false,
-            "ctrl": "选填，最大200字符"
-          }
-        ]
-      },
-      {
-        "title": "派车与承运信息",
-        "pickVehicleBtn": true,
-        "fields": [
-          {
-            "name": "关联运单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "未选销售订单时置灰；选后带出承运并解锁发货单"
-          },
-          {
-            "name": "关联发货单",
-            "type": "picker",
-            "required": false,
-            "ctrl": "未选运单时置灰；运单仅1单时自动带入"
-          },
-          {
-            "name": "车牌号",
-            "type": "readonly",
-            "required": false,
-            "ctrl": "运单或选择车辆与司机带入，严禁手输"
-          },
-          {
-            "name": "车挂号",
-            "type": "readonly",
-            "required": false,
-            "ctrl": "运单或选择车辆与司机带入，严禁手输"
-          },
-          {
-            "name": "司机姓名",
-            "type": "readonly",
-            "required": false,
-            "ctrl": "运单或选择车辆与司机带入，严禁手输"
-          },
-          {
-            "name": "司机电话",
-            "type": "readonly",
-            "required": false,
-            "ctrl": "运单或选择车辆与司机带入，严禁手输"
-          },
-          {
-            "name": "司机身份证号",
-            "type": "readonly",
-            "required": false,
-            "ctrl": "运单或选择车辆与司机带入，严禁手输"
-          }
-        ]
-      }
-    ],
-    "formDialogWidth": "1100px",
-    "detailSections": [
-      {
-        "title": "表头基本信息",
-        "fields": [
-          "单据状态",
-          "单号",
-          "单据类型",
-          "计划执行日期",
-          "关联销售订单",
-          "客户名称",
-          "关联备货通知单",
-          "ERP单据号",
-          "备注"
-        ]
-      },
-      {
-        "title": "派车与承运信息",
-        "fields": [
-          "关联运单",
-          "关联发货单",
-          "车牌号",
-          "车挂号",
-          "司机姓名",
-          "司机电话",
-          "司机身份证号"
-        ]
-      }
-    ],
-    "hasEdit": true,
-    "hasDetail": true,
-    "formFlat": false,
-    "stub": false,
-    "formLineFields": [
-      {
-        "name": "物料信息",
-        "type": "picker",
-        "required": true,
-        "ctrl": "弹窗多选/带入"
-      },
-      {
-        "name": "批号",
-        "type": "picker",
-        "required": false,
-        "ctrl": "选填；弹窗仅库内合格批次；物料+批号唯一"
-      },
-      {
-        "name": "库存单位",
-        "type": "readonly",
-        "required": false,
-        "ctrl": "只读带入"
-      },
-      {
-        "name": "管理方式",
-        "type": "readonly",
-        "required": false,
-        "ctrl": "只读带入"
-      },
-      {
-        "name": "计划件数",
-        "type": "input",
-        "required": false,
-        "ctrl": "条码物料维护；计数显示 —"
-      },
-      {
-        "name": "计划数量",
-        "type": "input",
-        "required": true,
-        "ctrl": "必填 >0；指定批号时 ≤ 可用量"
-      },
-      {
-        "name": "备注",
-        "type": "input",
-        "required": false,
-        "ctrl": "选填"
-      }
-    ],
-    "formLineActions": [
-      {
-        "name": "新增",
-        "type": "primary",
-        "desc": "新增明细行"
-      },
-      {
-        "name": "批量删除",
-        "type": "danger",
-        "desc": "删除勾选明细行"
-      }
-    ],
-    "detailLineFields": [
+      "id": "wh-so-preout",
+      "title": "销售预出货",
+      "groups": [
+        "仓储管理",
+        "销售"
+      ],
+      "breadcrumb": [
+        "仓储管理",
+        "销售",
+        "销售预出货"
+      ],
+      "tabs": [
+        {
+          "name": "tab1",
+          "label": "销售预出货通知单"
+        },
+        {
+          "name": "tab2",
+          "label": "预出货出库单"
+        },
+        {
+          "name": "tab3",
+          "label": "预出货流水"
+        }
+      ],
+      "tabViews": [
+        {
+          "name": "tab1",
+          "label": "销售预出货通知单",
+          "queryFields": [
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "关联销售订单",
+              "type": "input"
+            },
+            {
+              "name": "客户名称",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
+              "name": "司机电话",
+              "type": "input"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "标准预出货",
+                "紧急预出货",
+                "样品预出货"
+              ]
+            },
+            {
+              "name": "计划执行日期",
+              "type": "daterange"
+            }
+          ],
+          "queryDefault": [
+            "单据状态",
+            "单号",
+            "关联销售订单",
+            "客户名称"
+          ],
+          "queryMore": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号",
+            "单据类型",
+            "计划执行日期"
+          ],
+          "toolbar": [
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增销售预出货通知单"
+            },
+            {
+              "name": "打印随车发货单",
+              "type": "default",
+              "desc": "勾选 1 条销售预出货通知单，预览随车发货单"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选的销售预出货通知单置为「已关闭」；已关闭单据不可再次关闭"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除单据状态为「待执行」的勾选行；勾选含非待执行时拦截并提示"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "行为见通用功能规范 · 导出数据弹窗"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "关联销售订单",
+              "title": "关联销售订单",
+              "width": 160
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "关联备货通知单",
+              "title": "关联备货通知单",
+              "width": 150
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 140
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 140
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 110
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 110
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 160,
+              "slot": "idmask"
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "详情",
+              "desc": "只读查看头信息 + 明细；明细区可关闭行"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅单据状态为「待执行」时显示"
+            }
+          ]
+        },
+        {
+          "name": "tab2",
+          "label": "预出货出库单",
+          "queryFields": [
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "客户名称",
+              "type": "input"
+            },
+            {
+              "name": "关联销售订单",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "操作人",
+              "type": "input"
+            },
+            {
+              "name": "关联通知单号",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "单据状态",
+            "出库单号",
+            "客户名称",
+            "关联销售订单"
+          ],
+          "queryMore": [
+            "物料信息",
+            "操作人",
+            "关联通知单号"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出出库单列表"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 160
+            },
+            {
+              "field": "关联销售订单",
+              "title": "关联销售订单",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 120
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "关联通知单号",
+              "title": "关联通知单号",
+              "width": 160
+            },
+            {
+              "field": "ERP单据号",
+              "title": "ERP单据号",
+              "width": 140
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
+          ],
+          "rowOps": []
+        },
+        {
+          "name": "tab3",
+          "label": "预出货流水",
+          "queryFields": [
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "批号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "关联销售订单",
+              "type": "input"
+            },
+            {
+              "name": "通知单号",
+              "type": "input"
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "条码号",
+            "批号",
+            "物料信息",
+            "关联销售订单"
+          ],
+          "queryMore": [
+            "通知单号",
+            "出库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出流水列表"
+            }
+          ],
+          "columns": [
+            {
+              "field": "流水状态",
+              "title": "状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 130
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "批号",
+              "title": "批号",
+              "width": 140
+            },
+            {
+              "field": "出库数量",
+              "title": "出库数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "原位置",
+              "title": "原位置",
+              "width": 120
+            },
+            {
+              "field": "关联销售订单",
+              "title": "关联销售订单",
+              "width": 160
+            },
+            {
+              "field": "客户名称",
+              "title": "客户名称",
+              "width": 150
+            },
+            {
+              "field": "通知单号",
+              "title": "关联通知单号",
+              "width": 160
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 100,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "作业详情",
+              "desc": "查看该条码对应单据的工序填报详情"
+            }
+          ]
+        }
+      ],
+      "formSections": [
+        {
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成 XSYC"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选，默认标准预出货",
+              "options": [
+                "标准预出货",
+                "紧急预出货",
+                "样品预出货"
+              ]
+            },
+            {
+              "name": "关联销售订单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "必填；选后带出客户名称与订单物料，并解除关联运单置灰"
+            },
+            {
+              "name": "客户名称",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "选销售订单后自动带入，只读"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
+              "name": "关联备货通知单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "选填；联动带入销售订单/客户/已备批次"
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选填，最大50字符"
+            },
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "pickVehicleBtn": true,
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选销售订单时置灰；选后带出承运并解锁发货单"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单时置灰；运单仅1单时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单或选择车辆与司机带入，严禁手输"
+            },
+            {
+              "name": "车挂号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单或选择车辆与司机带入，严禁手输"
+            },
+            {
+              "name": "司机姓名",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单或选择车辆与司机带入，严禁手输"
+            },
+            {
+              "name": "司机电话",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单或选择车辆与司机带入，严禁手输"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单或选择车辆与司机带入，严禁手输"
+            }
+          ]
+        }
+      ],
+      "formDialogWidth": "1100px",
+      "detailSections": [
+        {
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联销售订单",
+            "客户名称",
+            "计划执行日期",
+            "关联备货通知单",
+            "ERP单据号",
+            "备注"
+          ]
+        },
+        {
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
+        }
+      ],
+      "hasEdit": true,
+      "hasDetail": true,
+      "formFlat": false,
+      "stub": false,
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗多选/带入"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读带入"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读带入"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "条码物料维护；计数显示 —"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "必填 >0；指定批号时 ≤ 可用量"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "选填；弹窗仅库内合格批次；物料+批号唯一"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "选填"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "新增明细行"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删除勾选明细行"
+        }
+      ],
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-      {
-        "name": "物料信息"
-      },
-      {
-        "name": "批号"
-      },
-      {
-        "name": "库存单位"
-      },
-      {
-        "name": "管理方式"
-      },
-      {
-        "name": "计划件数"
-      },
-      {
-        "name": "计划数量"
-      },
-      {
-        "name": "已完成数量"
-      },
-      {
-        "name": "未完成数量"
-      },
-      {
-        "name": "备注"
-      }
-    ],
-    "detailLineSelectable": true,
-    "detailLineActions": [
-      "关闭"
-    ],
-    "detailLineTitle": "物料明细",
-    "jobDetail": {
-      "procs": [
         {
-          "name": "工序1",
-          "submitTime": "2026-08-18 08:30",
-          "submitter": "张三",
-          "formTitle": "预出货合格批号检测",
-          "fields": [
-            [
-              "监测时间",
-              "2026-08-18 08:30"
-            ],
-            [
-              "检查区域",
-              "原料仓合格区"
-            ],
-            [
-              "合格批号",
-              "LOT-Li-2026002"
-            ],
-            [
-              "检验判定",
-              "合格"
-            ],
-            [
-              "备注",
-              "—"
-            ]
-          ]
+          "name": "物料信息"
         },
         {
-          "name": "工序2",
-          "submitTime": "2026-08-18 09:10",
-          "submitter": "李四",
-          "formTitle": "合格批号复核表（1）",
-          "fields": [
-            [
-              "复核时间",
-              "2026-08-18 09:10"
-            ],
-            [
-              "复核人员",
-              "李四"
-            ],
-            [
-              "合格批号",
-              "LOT-Li-2026002"
-            ],
-            [
-              "检验判定",
-              "合格"
-            ],
-            [
-              "备注",
-              "—"
-            ]
-          ]
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
         }
-      ]
-    }
-  },
+      ],
+      "detailLineSelectable": true,
+      "detailLineActions": [
+        "关闭"
+      ],
+      "detailLineTitle": "物料明细",
+      "jobDetail": {
+        "procs": [
+          {
+            "name": "工序1",
+            "submitTime": "2026-08-18 08:30",
+            "submitter": "张三",
+            "formTitle": "预出货合格批号检测",
+            "fields": [
+              [
+                "监测时间",
+                "2026-08-18 08:30"
+              ],
+              [
+                "检查区域",
+                "原料仓合格区"
+              ],
+              [
+                "合格批号",
+                "LOT-Li-2026002"
+              ],
+              [
+                "检验判定",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          },
+          {
+            "name": "工序2",
+            "submitTime": "2026-08-18 09:10",
+            "submitter": "李四",
+            "formTitle": "合格批号复核表（1）",
+            "fields": [
+              [
+                "复核时间",
+                "2026-08-18 09:10"
+              ],
+              [
+                "复核人员",
+                "李四"
+              ],
+              [
+                "合格批号",
+                "LOT-Li-2026002"
+              ],
+              [
+                "检验判定",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          }
+        ]
+      }
+    },
     "wh-so-ship": {
       "id": "wh-so-ship",
       "title": "销售发货",
@@ -18174,6 +19037,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "出库单号",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -18185,7 +19060,10 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "关联销售备货单",
             "通知单号",
-            "出库单号"
+            "出库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -18262,6 +19140,23 @@ window.WMS_PAGE_CONFIGS = {
               "width": 150
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
               "field": "操作人",
               "title": "操作人",
               "width": 100
@@ -18289,7 +19184,7 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "formSections": [
         {
-          "title": "表头基本信息",
+          "title": "基础信息",
           "fields": [
             {
               "name": "单号",
@@ -18309,16 +19204,10 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
-              "name": "计划执行日期",
-              "type": "date",
-              "required": true,
-              "ctrl": "默认当天"
-            },
-            {
               "name": "关联销售订单",
               "type": "picker",
               "required": true,
-              "ctrl": "必填；选后带出客户名称与订单物料，并解除关联运单置灰"
+              "ctrl": "必填；选后带出客户名称与订单未发货物料，并解除关联运单置灰"
             },
             {
               "name": "客户名称",
@@ -18327,16 +19216,22 @@ window.WMS_PAGE_CONFIGS = {
               "ctrl": "选销售订单或预出货单后自动带入，只读"
             },
             {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
               "name": "关联销售预出货单",
               "type": "picker",
               "required": false,
-              "ctrl": "选填；仅已完成预出货出库单 CKYC"
+              "ctrl": "选填；仅可选已完成预出货出库单；回填订单/客户/运力与物料"
             },
             {
               "name": "关联销售备货单",
               "type": "picker",
               "required": false,
-              "ctrl": "选填；联动带入销售订单/客户/已备批次"
+              "ctrl": "选填；联动带入销售订单/客户/已备物料批号"
             },
             {
               "name": "ERP单据号",
@@ -18404,14 +19299,14 @@ window.WMS_PAGE_CONFIGS = {
       "formDialogWidth": "1100px",
       "detailSections": [
         {
-          "title": "表头基本信息",
+          "title": "基础信息",
           "fields": [
             "单据状态",
             "单号",
             "单据类型",
-            "计划执行日期",
             "关联销售订单",
             "客户名称",
+            "计划执行日期",
             "关联销售预出货单",
             "关联销售备货单",
             "ERP单据号",
@@ -18443,12 +19338,6 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "弹窗多选/带入"
         },
         {
-          "name": "批号",
-          "type": "picker",
-          "required": false,
-          "ctrl": "选填；弹窗仅库内合格批次；物料+批号唯一"
-        },
-        {
           "name": "库存单位",
           "type": "readonly",
           "required": false,
@@ -18471,6 +19360,12 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": true,
           "ctrl": "必填 >0；≤订单未发货余量"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "选填；弹窗仅库内合格批次；物料+批号唯一"
         },
         {
           "name": "备注",
@@ -18966,6 +19861,18 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "入库单号",
               "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
             }
           ],
           "queryDefault": [
@@ -18977,7 +19884,10 @@ window.WMS_PAGE_CONFIGS = {
           "queryMore": [
             "关联销售出库单",
             "通知单号",
-            "入库单号"
+            "入库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
           ],
           "toolbar": [
             {
@@ -19054,6 +19964,23 @@ window.WMS_PAGE_CONFIGS = {
               "width": 150
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 150,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
               "field": "操作人",
               "title": "操作人",
               "width": 100
@@ -19081,7 +20008,7 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "formSections": [
         {
-          "title": "表头基本信息",
+          "title": "基础信息",
           "fields": [
             {
               "name": "单号",
@@ -19095,16 +20022,10 @@ window.WMS_PAGE_CONFIGS = {
               "required": true,
               "ctrl": "字典单选，默认标准退货",
               "options": [
-                "标准退货",
-                "拒收退货",
-                "换货退货"
+                "标准退货通知单",
+                "拒收退货通知单",
+                "换货退货通知单"
               ]
-            },
-            {
-              "name": "计划执行日期",
-              "type": "date",
-              "required": true,
-              "ctrl": "默认当天"
             },
             {
               "name": "关联销售订单",
@@ -19119,10 +20040,16 @@ window.WMS_PAGE_CONFIGS = {
               "ctrl": "选销售订单或出库单后自动带入，只读"
             },
             {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "默认当天，选填"
+            },
+            {
               "name": "关联销售出库单",
               "type": "picker",
               "required": false,
-              "ctrl": "选填；已完成 CKFH/CKYC 出库单，选后带订单/客户/物料批号"
+              "ctrl": "选填；选后联动带出订单/客户与出库物料明细"
             },
             {
               "name": "ERP单据号",
@@ -19134,7 +20061,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "退货原因",
               "type": "select",
               "required": false,
-              "ctrl": "质量问题退货/规格不符/客户拒收/其他",
+              "ctrl": "字典选填",
               "options": [
                 "质量问题退货",
                 "规格不符",
@@ -19202,14 +20129,14 @@ window.WMS_PAGE_CONFIGS = {
       "formDialogWidth": "1100px",
       "detailSections": [
         {
-          "title": "表头基本信息",
+          "title": "基础信息",
           "fields": [
             "单据状态",
             "单号",
             "单据类型",
-            "计划执行日期",
             "关联销售订单",
             "客户名称",
+            "计划执行日期",
             "关联销售出库单",
             "ERP单据号",
             "退货原因",
@@ -19241,12 +20168,6 @@ window.WMS_PAGE_CONFIGS = {
           "ctrl": "弹窗多选/带入"
         },
         {
-          "name": "批号",
-          "type": "picker",
-          "required": false,
-          "ctrl": "选填；关联销售出库单后，条码管理行从该出库单 tab3 流水匹配厂外流水码档案选批号；未关联时可手选/录入"
-        },
-        {
           "name": "库存单位",
           "type": "readonly",
           "required": false,
@@ -19269,6 +20190,12 @@ window.WMS_PAGE_CONFIGS = {
           "type": "input",
           "required": true,
           "ctrl": "必填 >0"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "选填；关联销售出库单后，条码管理行从该出库单 tab3 流水匹配厂外流水码档案选批号；未关联时可手选/录入"
         },
         {
           "name": "备注",
@@ -19369,98 +20296,405 @@ window.WMS_PAGE_CONFIGS = {
         "其他入库"
       ],
       "tabs": [
-        { "name": "tab1", "label": "其他入库通知单" },
-        { "name": "tab2", "label": "其他入库单" },
-        { "name": "tab3", "label": "入库流水" }
+        {
+          "name": "tab1",
+          "label": "其他入库通知单"
+        },
+        {
+          "name": "tab2",
+          "label": "其他入库单"
+        },
+        {
+          "name": "tab3",
+          "label": "入库流水"
+        }
       ],
       "tabViews": [
         {
           "name": "tab1",
           "label": "其他入库通知单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
-            { "name": "单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["盘盈入库", "样品入库", "研发入库"] },
-            { "name": "入库方向", "type": "select", "options": ["厂外", "线边仓"] },
-            { "name": "关联运单", "type": "input" },
-            { "name": "关联发货单", "type": "input" },
-            { "name": "受益人", "type": "input" },
-            { "name": "受益部门", "type": "select", "options": ["研发部", "生产部", "仓储部", "质量部"] },
-            { "name": "受益项目", "type": "select", "options": ["研发试剂项目", "固定资产改良", "样品送检", "其他"] },
-            { "name": "生产相关", "type": "select", "options": ["是", "否"] },
-            { "name": "车牌号", "type": "input" },
-            { "name": "司机姓名", "type": "input" },
-            { "name": "计划执行日期", "type": "daterange" },
-            { "name": "领至线边仓", "type": "input" },
-            { "name": "备注", "type": "input" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "盘盈入库",
+                "样品入库",
+                "研发入库"
+              ]
+            },
+            {
+              "name": "入库方向",
+              "type": "select",
+              "options": [
+                "厂外",
+                "线边仓"
+              ]
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "受益人",
+              "type": "input"
+            },
+            {
+              "name": "受益部门",
+              "type": "select",
+              "options": [
+                "研发部",
+                "生产部",
+                "仓储部",
+                "质量部"
+              ]
+            },
+            {
+              "name": "受益项目",
+              "type": "select",
+              "options": [
+                "研发试剂项目",
+                "固定资产改良",
+                "样品送检",
+                "其他"
+              ]
+            },
+            {
+              "name": "生产相关",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ]
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "daterange"
+            },
+            {
+              "name": "领至线边仓",
+              "type": "input"
+            },
+            {
+              "name": "备注",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["单据状态", "单号", "单据类型", "入库方向", "关联运单"],
-          "queryMore": ["关联发货单", "受益人", "受益部门", "受益项目", "生产相关", "车牌号", "司机姓名", "计划执行日期", "领至线边仓", "备注"],
+          "queryDefault": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "入库方向",
+            "关联运单"
+          ],
+          "queryMore": [
+            "关联发货单",
+            "受益人",
+            "受益部门",
+            "受益项目",
+            "生产相关",
+            "车牌号",
+            "司机姓名",
+            "计划执行日期",
+            "领至线边仓",
+            "备注"
+          ],
           "toolbar": [
-            { "name": "新增", "type": "primary", "desc": "打开新增其他入库通知单" },
-            { "name": "关闭", "type": "default", "desc": "将勾选的其他入库通知单置为「已关闭」" },
-            { "name": "批量删除", "type": "danger", "desc": "仅允许删除「待执行」且无下游执行记录的单据" },
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增其他入库通知单"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选的其他入库通知单置为「已关闭」"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除「待执行」且无下游执行记录的单据"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "单号", "title": "单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "入库方向", "title": "入库方向", "width": 100 },
-            { "field": "计划执行日期", "title": "计划执行日期", "width": 120 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "领至线边仓", "title": "领至线边仓", "width": 140 },
-            { "field": "受益人", "title": "受益人", "width": 100 },
-            { "field": "受益部门", "title": "受益部门", "width": 120 },
-            { "field": "受益项目", "title": "受益项目", "width": 140 },
-            { "field": "生产相关", "title": "生产相关", "width": 90, "slot": "tag" },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "关联运单", "title": "关联运单", "width": 160 },
-            { "field": "关联发货单", "title": "关联发货单", "width": 160 },
-            { "field": "承运商", "title": "承运商", "width": 140 },
-            { "field": "车牌号", "title": "车牌号", "width": 120 },
-            { "field": "车挂号", "title": "车挂号", "width": 120 },
-            { "field": "司机姓名", "title": "司机姓名", "width": 100 },
-            { "field": "司机电话", "title": "司机电话", "width": 120 },
-            { "field": "司机身份证号", "title": "司机身份证号", "width": 160 },
-            { "field": "_actions", "title": "操作", "width": 140, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "入库方向",
+              "title": "入库方向",
+              "width": 100
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "领至线边仓",
+              "title": "领至线边仓",
+              "width": 140
+            },
+            {
+              "field": "受益人",
+              "title": "受益人",
+              "width": 100
+            },
+            {
+              "field": "受益部门",
+              "title": "受益部门",
+              "width": 120
+            },
+            {
+              "field": "受益项目",
+              "title": "受益项目",
+              "width": 140
+            },
+            {
+              "field": "生产相关",
+              "title": "生产相关",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160
+            },
+            {
+              "field": "承运商",
+              "title": "承运商",
+              "width": 140
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 160
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "详情", "desc": "只读查看头信息（含物流运力）+ 明细；可关闭明细行" },
-            { "name": "编辑", "desc": "仅「待执行」可编辑" }
+            {
+              "name": "详情",
+              "desc": "只读查看头信息（含物流运力）+ 明细；可关闭明细行"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅「待执行」可编辑"
+            }
           ]
         },
         {
           "name": "tab2",
           "label": "其他入库单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "入库单号", "type": "input" },
-            { "name": "关联入库通知单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["其他入库单"] },
-            { "name": "ERP单据号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "操作人", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "入库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联入库通知单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "其他入库单"
+              ]
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "操作人",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["单据状态", "入库单号", "关联入库通知单号"],
-          "queryMore": ["单据类型", "ERP单据号", "物料信息", "操作人", "操作时间"],
+          "queryDefault": [
+            "单据状态",
+            "入库单号",
+            "关联入库通知单号"
+          ],
+          "queryMore": [
+            "单据类型",
+            "ERP单据号",
+            "物料信息",
+            "操作人",
+            "操作时间"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "入库单号", "title": "入库单号", "width": 160 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "已完成件数", "title": "已完成件数", "width": 100 },
-            { "field": "已完成数量", "title": "已完成数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "关联入库通知单号", "title": "关联入库通知单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "ERP单据号", "title": "ERP单据号", "width": 140 },
-            { "field": "操作时间", "title": "操作时间", "width": 160 },
-            { "field": "操作人", "title": "操作人", "width": 100 }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联入库通知单号",
+              "title": "关联入库通知单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "ERP单据号",
+              "title": "ERP单据号",
+              "width": 140
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
           ],
           "rowOps": []
         },
@@ -19468,43 +20702,205 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab3",
           "label": "入库流水",
           "queryFields": [
-            { "name": "流水状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "条码号", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "检查结果", "type": "select", "options": ["合格", "不合格"] },
-            { "name": "新位置", "type": "input" },
-            { "name": "通知单号", "type": "input" },
-            { "name": "入库单号", "type": "input" }
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "新位置",
+              "type": "input"
+            },
+            {
+              "name": "通知单号",
+              "type": "input"
+            },
+            {
+              "name": "入库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["流水状态", "条码号", "物料批号", "物料信息"],
-          "queryMore": ["检查结果", "新位置", "通知单号", "入库单号"],
+          "queryDefault": [
+            "流水状态",
+            "条码号",
+            "物料批号",
+            "物料信息"
+          ],
+          "queryMore": [
+            "检查结果",
+            "新位置",
+            "通知单号",
+            "入库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "流水状态", "title": "流水状态", "width": 100, "slot": "tag" },
-            { "field": "当前工序", "title": "当前工序", "width": 120 },
-            { "field": "检查结果", "title": "检查结果", "width": 90, "slot": "tag" },
-            { "field": "档案类型", "title": "档案类型", "width": 100 },
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "储罐条码号", "title": "储罐条码号", "width": 140 },
-            { "field": "储罐编号", "title": "储罐编号", "width": 120 },
-            { "field": "外包材编号", "title": "外包材编号", "width": 140 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "总数量", "title": "总数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "原位置", "title": "原位置", "width": 120 },
-            { "field": "新位置", "title": "新位置", "width": 120 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "通知单号", "title": "通知单号", "width": 160 },
-            { "field": "入库单号", "title": "入库单号", "width": 160 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "_actions", "title": "操作", "width": 100, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 120
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "储罐条码号",
+              "title": "储罐条码号",
+              "width": 140
+            },
+            {
+              "field": "储罐编号",
+              "title": "储罐编号",
+              "width": 120
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 140
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "原位置",
+              "title": "原位置",
+              "width": 120
+            },
+            {
+              "field": "新位置",
+              "title": "新位置",
+              "width": 120
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "通知单号",
+              "title": "通知单号",
+              "width": 160
+            },
+            {
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 100,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "作业详情", "desc": "查看 APP 工序填报详情，支持导出 PDF" }
+            {
+              "name": "作业详情",
+              "desc": "查看 APP 工序填报详情，支持导出 PDF"
+            }
           ]
         }
       ],
@@ -19512,29 +20908,147 @@ window.WMS_PAGE_CONFIGS = {
         {
           "title": "基础信息",
           "fields": [
-            { "name": "单号", "type": "readonly", "required": true, "ctrl": "系统自动生成 QTST" },
-            { "name": "单据类型", "type": "select", "required": true, "ctrl": "字典单选，默认首个", "options": ["盘盈入库", "样品入库", "研发入库"] },
-            { "name": "入库方向", "type": "select", "required": true, "ctrl": "厂外 / 线边仓", "options": ["厂外", "线边仓"] },
-            { "name": "计划执行日期", "type": "date", "required": false, "ctrl": "选填" },
-            { "name": "领至线边仓", "type": "select", "required": false, "ctrl": "仅入库方向=线边仓时显示" },
-            { "name": "生产相关", "type": "checkbox", "required": false, "ctrl": "默认否", "checkLabel": "是" },
-            { "name": "受益人", "type": "select", "required": false, "ctrl": "新增默认当前登录用户", "options": ["演示用户", "张三", "李四", "王强"] },
-            { "name": "受益部门", "type": "select", "required": false, "ctrl": "新增默认当前人主部门；切换受益人联动", "options": ["研发部", "生产部", "仓储部", "质量部"] },
-            { "name": "受益项目", "type": "select", "required": false, "ctrl": "字典选填", "options": ["研发试剂项目", "固定资产改良", "样品送检", "其他"] },
-            { "name": "备注", "type": "textarea", "required": false, "ctrl": "选填，最大200字符" }
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成 QTST"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选，默认首个",
+              "options": [
+                "盘盈入库",
+                "样品入库",
+                "研发入库"
+              ]
+            },
+            {
+              "name": "入库方向",
+              "type": "select",
+              "required": true,
+              "ctrl": "厂外 / 线边仓",
+              "options": [
+                "厂外",
+                "线边仓"
+              ]
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "选填"
+            },
+            {
+              "name": "领至线边仓",
+              "type": "select",
+              "required": false,
+              "ctrl": "仅入库方向=线边仓时显示"
+            },
+            {
+              "name": "生产相关",
+              "type": "checkbox",
+              "required": false,
+              "ctrl": "默认否",
+              "checkLabel": "是"
+            },
+            {
+              "name": "受益人",
+              "type": "select",
+              "required": false,
+              "ctrl": "新增默认当前登录用户",
+              "options": [
+                "演示用户",
+                "张三",
+                "李四",
+                "王强"
+              ]
+            },
+            {
+              "name": "受益部门",
+              "type": "select",
+              "required": false,
+              "ctrl": "新增默认当前人主部门；切换受益人联动",
+              "options": [
+                "研发部",
+                "生产部",
+                "仓储部",
+                "质量部"
+              ]
+            },
+            {
+              "name": "受益项目",
+              "type": "select",
+              "required": false,
+              "ctrl": "字典选填",
+              "options": [
+                "研发试剂项目",
+                "固定资产改良",
+                "样品送检",
+                "其他"
+              ]
+            },
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
           ]
         },
         {
-          "title": "物流运力信息",
+          "title": "派车与承运信息",
           "fields": [
-            { "name": "关联运单", "type": "picker", "required": false, "ctrl": "先选运单；选后联动过滤发货单" },
-            { "name": "关联发货单", "type": "picker", "required": false, "ctrl": "未选运单时置灰；运单仅1单时自动带入" },
-            { "name": "承运商", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "车牌号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "车挂号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机姓名", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机电话", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机身份证号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，脱敏只读" }
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "先选运单；选后联动过滤发货单"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单时置灰；运单仅1单时自动带入"
+            },
+            {
+              "name": "承运商",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "车牌号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "车挂号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机姓名",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机电话",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，脱敏只读"
+            }
           ]
         }
       ],
@@ -19543,11 +21057,32 @@ window.WMS_PAGE_CONFIGS = {
       "detailSections": [
         {
           "title": "基础信息",
-          "fields": ["单据状态", "单号", "单据类型", "入库方向", "计划执行日期", "领至线边仓", "受益人", "受益部门", "受益项目", "生产相关", "备注"]
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "入库方向",
+            "计划执行日期",
+            "领至线边仓",
+            "受益人",
+            "受益部门",
+            "受益项目",
+            "生产相关",
+            "备注"
+          ]
         },
         {
-          "title": "物流运力信息",
-          "fields": ["关联运单", "关联发货单", "承运商", "车牌号", "车挂号", "司机姓名", "司机电话", "司机身份证号"]
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "承运商",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
         }
       ],
       "hasEdit": true,
@@ -19555,16 +21090,54 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-        { "name": "物料信息", "type": "picker", "required": true, "ctrl": "弹窗多选；仅条码管理物料" },
-        { "name": "库存单位", "type": "readonly", "required": false, "ctrl": "只读带入" },
-        { "name": "管理方式", "type": "readonly", "required": false, "ctrl": "只读；仅条码管理" },
-        { "name": "计划件数", "type": "input", "required": false, "ctrl": "正整数选填" },
-        { "name": "计划数量", "type": "input", "required": true, "ctrl": "必填 >0" },
-        { "name": "备注", "type": "input", "required": false, "ctrl": "选填" }
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗多选；仅条码管理物料"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读带入"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读；仅条码管理"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "正整数选填"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "必填 >0"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "选填"
+        }
       ],
       "formLineActions": [
-        { "name": "新增", "type": "primary", "desc": "弹窗多选物料追加明细行" },
-        { "name": "批量删除", "type": "danger", "desc": "删除勾选明细行" }
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "弹窗多选物料追加明细行"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删除勾选明细行"
+        }
       ],
       "detailLineSelectable": true,
       "detailLineTitle": "物料明细",
@@ -19575,16 +21148,34 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "备注"
+        }
       ],
-      "detailLineActions": ["关闭"],
+      "detailLineActions": [
+        "关闭"
+      ],
       "jobDetail": {
         "procs": [
           {
@@ -19592,14 +21183,48 @@ window.WMS_PAGE_CONFIGS = {
             "submitTime": "2026-08-25 08:30",
             "submitter": "张三",
             "formTitle": "到货检查确认",
-            "fields": [["检查时间", "2026-08-25 08:30"], ["检查人员", "张三"], ["检查结果", "合格"], ["备注", "—"]]
+            "fields": [
+              [
+                "检查时间",
+                "2026-08-25 08:30"
+              ],
+              [
+                "检查人员",
+                "张三"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           },
           {
             "name": "扫码入库",
             "submitTime": "2026-08-25 09:10",
             "submitter": "李四",
             "formTitle": "扫码上架记录",
-            "fields": [["作业时间", "2026-08-25 09:10"], ["作业人员", "李四"], ["作业结果", "完成"], ["备注", "—"]]
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-25 09:10"
+              ],
+              [
+                "作业人员",
+                "李四"
+              ],
+              [
+                "作业结果",
+                "完成"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           }
         ]
       }
@@ -19617,98 +21242,405 @@ window.WMS_PAGE_CONFIGS = {
         "其他出库"
       ],
       "tabs": [
-        { "name": "tab1", "label": "其他出库通知单" },
-        { "name": "tab2", "label": "其他出库单" },
-        { "name": "tab3", "label": "出库流水" }
+        {
+          "name": "tab1",
+          "label": "其他出库通知单"
+        },
+        {
+          "name": "tab2",
+          "label": "其他出库单"
+        },
+        {
+          "name": "tab3",
+          "label": "出库流水"
+        }
       ],
       "tabViews": [
         {
           "name": "tab1",
           "label": "其他出库通知单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
-            { "name": "单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["盘亏出库", "样品出库", "研发领用"] },
-            { "name": "出库方向", "type": "select", "options": ["厂外", "线边仓"] },
-            { "name": "关联运单", "type": "input" },
-            { "name": "关联发货单", "type": "input" },
-            { "name": "受益人", "type": "input" },
-            { "name": "受益部门", "type": "select", "options": ["研发部", "生产部", "仓储部", "质量部"] },
-            { "name": "受益项目", "type": "select", "options": ["研发试剂项目", "固定资产改良", "样品送检", "其他"] },
-            { "name": "生产相关", "type": "select", "options": ["是", "否"] },
-            { "name": "车牌号", "type": "input" },
-            { "name": "司机姓名", "type": "input" },
-            { "name": "计划执行日期", "type": "daterange" },
-            { "name": "领至线边仓", "type": "input" },
-            { "name": "备注", "type": "input" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "盘亏出库",
+                "样品出库",
+                "研发领用"
+              ]
+            },
+            {
+              "name": "出库方向",
+              "type": "select",
+              "options": [
+                "厂外",
+                "线边仓"
+              ]
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "受益人",
+              "type": "input"
+            },
+            {
+              "name": "受益部门",
+              "type": "select",
+              "options": [
+                "研发部",
+                "生产部",
+                "仓储部",
+                "质量部"
+              ]
+            },
+            {
+              "name": "受益项目",
+              "type": "select",
+              "options": [
+                "研发试剂项目",
+                "固定资产改良",
+                "样品送检",
+                "其他"
+              ]
+            },
+            {
+              "name": "生产相关",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ]
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "daterange"
+            },
+            {
+              "name": "领至线边仓",
+              "type": "input"
+            },
+            {
+              "name": "备注",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["单据状态", "单号", "单据类型", "出库方向", "关联运单"],
-          "queryMore": ["关联发货单", "受益人", "受益部门", "受益项目", "生产相关", "车牌号", "司机姓名", "计划执行日期", "领至线边仓", "备注"],
+          "queryDefault": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "出库方向",
+            "关联运单"
+          ],
+          "queryMore": [
+            "关联发货单",
+            "受益人",
+            "受益部门",
+            "受益项目",
+            "生产相关",
+            "车牌号",
+            "司机姓名",
+            "计划执行日期",
+            "领至线边仓",
+            "备注"
+          ],
           "toolbar": [
-            { "name": "新增", "type": "primary", "desc": "打开新增其他出库通知单" },
-            { "name": "关闭", "type": "default", "desc": "将勾选的其他出库通知单置为「已关闭」" },
-            { "name": "批量删除", "type": "danger", "desc": "仅允许删除「待执行」且无下游执行记录的单据" },
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增其他出库通知单"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选的其他出库通知单置为「已关闭」"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除「待执行」且无下游执行记录的单据"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "单号", "title": "单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "出库方向", "title": "出库方向", "width": 100 },
-            { "field": "计划执行日期", "title": "计划执行日期", "width": 120 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "领至线边仓", "title": "领至线边仓", "width": 140 },
-            { "field": "受益人", "title": "受益人", "width": 100 },
-            { "field": "受益部门", "title": "受益部门", "width": 120 },
-            { "field": "受益项目", "title": "受益项目", "width": 140 },
-            { "field": "生产相关", "title": "生产相关", "width": 90, "slot": "tag" },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "关联运单", "title": "关联运单", "width": 160 },
-            { "field": "关联发货单", "title": "关联发货单", "width": 160 },
-            { "field": "承运商", "title": "承运商", "width": 140 },
-            { "field": "车牌号", "title": "车牌号", "width": 120 },
-            { "field": "车挂号", "title": "车挂号", "width": 120 },
-            { "field": "司机姓名", "title": "司机姓名", "width": 100 },
-            { "field": "司机电话", "title": "司机电话", "width": 120 },
-            { "field": "司机身份证号", "title": "司机身份证号", "width": 160 },
-            { "field": "_actions", "title": "操作", "width": 140, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "出库方向",
+              "title": "出库方向",
+              "width": 100
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "领至线边仓",
+              "title": "领至线边仓",
+              "width": 140
+            },
+            {
+              "field": "受益人",
+              "title": "受益人",
+              "width": 100
+            },
+            {
+              "field": "受益部门",
+              "title": "受益部门",
+              "width": 120
+            },
+            {
+              "field": "受益项目",
+              "title": "受益项目",
+              "width": 140
+            },
+            {
+              "field": "生产相关",
+              "title": "生产相关",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160
+            },
+            {
+              "field": "承运商",
+              "title": "承运商",
+              "width": 140
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 160
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "详情", "desc": "只读查看头信息（含物流运力）+ 明细；可关闭明细行" },
-            { "name": "编辑", "desc": "仅「待执行」可编辑" }
+            {
+              "name": "详情",
+              "desc": "只读查看头信息（含物流运力）+ 明细；可关闭明细行"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅「待执行」可编辑"
+            }
           ]
         },
         {
           "name": "tab2",
           "label": "其他出库单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "出库单号", "type": "input" },
-            { "name": "关联出库通知单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["其他出库单"] },
-            { "name": "ERP单据号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "操作人", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联出库通知单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "其他出库单"
+              ]
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "操作人",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["单据状态", "出库单号", "关联出库通知单号"],
-          "queryMore": ["单据类型", "ERP单据号", "物料信息", "操作人", "操作时间"],
+          "queryDefault": [
+            "单据状态",
+            "出库单号",
+            "关联出库通知单号"
+          ],
+          "queryMore": [
+            "单据类型",
+            "ERP单据号",
+            "物料信息",
+            "操作人",
+            "操作时间"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "出库单号", "title": "出库单号", "width": 160 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "已完成件数", "title": "已完成件数", "width": 100 },
-            { "field": "已完成数量", "title": "已完成数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "关联出库通知单号", "title": "关联出库通知单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "ERP单据号", "title": "ERP单据号", "width": 140 },
-            { "field": "操作时间", "title": "操作时间", "width": 160 },
-            { "field": "操作人", "title": "操作人", "width": 100 }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联出库通知单号",
+              "title": "关联出库通知单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "ERP单据号",
+              "title": "ERP单据号",
+              "width": 140
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
           ],
           "rowOps": []
         },
@@ -19716,43 +21648,206 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab3",
           "label": "出库流水",
           "queryFields": [
-            { "name": "流水状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "条码号", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "检查结果", "type": "select", "options": ["合格", "不合格"] },
-            { "name": "原位置", "type": "input" },
-            { "name": "通知单号", "type": "input" },
-            { "name": "出库单号", "type": "input" }
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "原位置",
+              "type": "input"
+            },
+            {
+              "name": "通知单号",
+              "type": "input"
+            },
+            {
+              "name": "出库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["流水状态", "条码号", "物料批号", "物料信息"],
-          "queryMore": ["检查结果", "原位置", "通知单号", "出库单号"],
+          "queryDefault": [
+            "流水状态",
+            "条码号",
+            "物料批号",
+            "物料信息"
+          ],
+          "queryMore": [
+            "检查结果",
+            "原位置",
+            "通知单号",
+            "出库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选数据" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选数据"
+            }
           ],
           "columns": [
-            { "field": "流水状态", "title": "流水状态", "width": 100, "slot": "tag" },
-            { "field": "当前工序", "title": "当前工序", "width": 120 },
-            { "field": "检查结果", "title": "检查结果", "width": 90, "slot": "tag" },
-            { "field": "档案类型", "title": "档案类型", "width": 100 },
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "储罐条码号", "title": "储罐条码号", "width": 140 },
-            { "field": "储罐编号", "title": "储罐编号", "width": 120 },
-            { "field": "外包材编号", "title": "外包材编号", "width": 140 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "总数量", "title": "总数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "原位置", "title": "原位置", "width": 120 },
-            { "field": "新位置", "title": "新位置", "width": 120 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "通知单号", "title": "通知单号", "width": 160 },
-            { "field": "出库单号", "title": "出库单号", "width": 160 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "_actions", "title": "操作", "width": 100, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 120
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "储罐条码号",
+              "title": "储罐条码号",
+              "width": 140
+            },
+            {
+              "field": "储罐编号",
+              "title": "储罐编号",
+              "width": 120
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 140
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 220,
+              "slot": "prod_pick_lots"
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "原位置",
+              "title": "原位置",
+              "width": 120
+            },
+            {
+              "field": "新位置",
+              "title": "新位置",
+              "width": 120
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "通知单号",
+              "title": "通知单号",
+              "width": 160
+            },
+            {
+              "field": "出库单号",
+              "title": "出库单号",
+              "width": 160
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 100,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "作业详情", "desc": "查看 APP 工序填报详情，支持导出 PDF" }
+            {
+              "name": "作业详情",
+              "desc": "查看 APP 工序填报详情，支持导出 PDF"
+            }
           ]
         }
       ],
@@ -19760,29 +21855,147 @@ window.WMS_PAGE_CONFIGS = {
         {
           "title": "基础信息",
           "fields": [
-            { "name": "单号", "type": "readonly", "required": true, "ctrl": "系统自动生成 QTCK" },
-            { "name": "单据类型", "type": "select", "required": true, "ctrl": "字典单选，默认首个", "options": ["盘亏出库", "样品出库", "研发领用"] },
-            { "name": "出库方向", "type": "select", "required": true, "ctrl": "厂外 / 线边仓", "options": ["厂外", "线边仓"] },
-            { "name": "计划执行日期", "type": "date", "required": false, "ctrl": "选填" },
-            { "name": "领至线边仓", "type": "select", "required": false, "ctrl": "仅出库方向=线边仓时显示" },
-            { "name": "生产相关", "type": "checkbox", "required": false, "ctrl": "默认否", "checkLabel": "是" },
-            { "name": "受益人", "type": "select", "required": false, "ctrl": "新增默认当前登录用户", "options": ["演示用户", "张三", "李四", "王强"] },
-            { "name": "受益部门", "type": "select", "required": false, "ctrl": "新增默认当前人主部门；切换受益人联动", "options": ["研发部", "生产部", "仓储部", "质量部"] },
-            { "name": "受益项目", "type": "select", "required": false, "ctrl": "字典选填", "options": ["研发试剂项目", "固定资产改良", "样品送检", "其他"] },
-            { "name": "备注", "type": "textarea", "required": false, "ctrl": "选填，最大200字符" }
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成 QTCK"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "ctrl": "字典单选，默认首个",
+              "options": [
+                "盘亏出库",
+                "样品出库",
+                "研发领用"
+              ]
+            },
+            {
+              "name": "出库方向",
+              "type": "select",
+              "required": true,
+              "ctrl": "厂外 / 线边仓",
+              "options": [
+                "厂外",
+                "线边仓"
+              ]
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "选填"
+            },
+            {
+              "name": "领至线边仓",
+              "type": "select",
+              "required": false,
+              "ctrl": "仅出库方向=线边仓时显示"
+            },
+            {
+              "name": "生产相关",
+              "type": "checkbox",
+              "required": false,
+              "ctrl": "默认否",
+              "checkLabel": "是"
+            },
+            {
+              "name": "受益人",
+              "type": "select",
+              "required": false,
+              "ctrl": "新增默认当前登录用户",
+              "options": [
+                "演示用户",
+                "张三",
+                "李四",
+                "王强"
+              ]
+            },
+            {
+              "name": "受益部门",
+              "type": "select",
+              "required": false,
+              "ctrl": "新增默认当前人主部门；切换受益人联动",
+              "options": [
+                "研发部",
+                "生产部",
+                "仓储部",
+                "质量部"
+              ]
+            },
+            {
+              "name": "受益项目",
+              "type": "select",
+              "required": false,
+              "ctrl": "字典选填",
+              "options": [
+                "研发试剂项目",
+                "固定资产改良",
+                "样品送检",
+                "其他"
+              ]
+            },
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "选填，最大200字符"
+            }
           ]
         },
         {
-          "title": "物流运力信息",
+          "title": "派车与承运信息",
           "fields": [
-            { "name": "关联运单", "type": "picker", "required": false, "ctrl": "先选运单；选后联动过滤发货单" },
-            { "name": "关联发货单", "type": "picker", "required": false, "ctrl": "未选运单时置灰；运单仅1单时自动带入" },
-            { "name": "承运商", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "车牌号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "车挂号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机姓名", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机电话", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，只读" },
-            { "name": "司机身份证号", "type": "readonly", "required": false, "ctrl": "运单/发货单带入，脱敏只读" }
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "先选运单；选后联动过滤发货单"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单时置灰；运单仅1单时自动带入"
+            },
+            {
+              "name": "承运商",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "车牌号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "车挂号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机姓名",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机电话",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，只读"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "readonly",
+              "required": false,
+              "ctrl": "运单/发货单带入，脱敏只读"
+            }
           ]
         }
       ],
@@ -19791,11 +22004,32 @@ window.WMS_PAGE_CONFIGS = {
       "detailSections": [
         {
           "title": "基础信息",
-          "fields": ["单据状态", "单号", "单据类型", "出库方向", "计划执行日期", "领至线边仓", "受益人", "受益部门", "受益项目", "生产相关", "备注"]
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "出库方向",
+            "计划执行日期",
+            "领至线边仓",
+            "受益人",
+            "受益部门",
+            "受益项目",
+            "生产相关",
+            "备注"
+          ]
         },
         {
-          "title": "物流运力信息",
-          "fields": ["关联运单", "关联发货单", "承运商", "车牌号", "车挂号", "司机姓名", "司机电话", "司机身份证号"]
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "承运商",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
         }
       ],
       "hasEdit": true,
@@ -19803,16 +22037,54 @@ window.WMS_PAGE_CONFIGS = {
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-        { "name": "物料信息", "type": "picker", "required": true, "ctrl": "弹窗多选；仅条码管理物料" },
-        { "name": "库存单位", "type": "readonly", "required": false, "ctrl": "只读带入" },
-        { "name": "管理方式", "type": "readonly", "required": false, "ctrl": "只读；仅条码管理" },
-        { "name": "计划件数", "type": "input", "required": false, "ctrl": "正整数选填" },
-        { "name": "计划数量", "type": "input", "required": true, "ctrl": "必填 >0" },
-        { "name": "备注", "type": "input", "required": false, "ctrl": "选填" }
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗多选；仅条码管理物料"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读带入"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读；仅条码管理"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "正整数选填"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "必填 >0"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "选填"
+        }
       ],
       "formLineActions": [
-        { "name": "新增", "type": "primary", "desc": "弹窗多选物料追加明细行" },
-        { "name": "批量删除", "type": "danger", "desc": "删除勾选明细行" }
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "弹窗多选物料追加明细行"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删除勾选明细行"
+        }
       ],
       "detailLineSelectable": true,
       "detailLineTitle": "物料明细",
@@ -19823,16 +22095,34 @@ window.WMS_PAGE_CONFIGS = {
         {
           "name": "行状态"
         },
-        { "name": "物料信息" },
-        { "name": "库存单位" },
-        { "name": "管理方式" },
-        { "name": "计划件数" },
-        { "name": "计划数量" },
-        { "name": "已完成数量" },
-        { "name": "未完成数量" },
-        { "name": "备注" }
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "备注"
+        }
       ],
-      "detailLineActions": ["关闭"],
+      "detailLineActions": [
+        "关闭"
+      ],
       "jobDetail": {
         "procs": [
           {
@@ -19840,1134 +22130,1394 @@ window.WMS_PAGE_CONFIGS = {
             "submitTime": "2026-08-25 08:30",
             "submitter": "张三",
             "formTitle": "出库拣选确认",
-            "fields": [["作业时间", "2026-08-25 08:30"], ["作业人员", "张三"], ["检查结果", "合格"], ["备注", "—"]]
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-25 08:30"
+              ],
+              [
+                "作业人员",
+                "张三"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           },
           {
             "name": "扫码复核",
             "submitTime": "2026-08-25 09:10",
             "submitter": "李四",
             "formTitle": "扫码出库复核",
-            "fields": [["作业时间", "2026-08-25 09:10"], ["作业人员", "李四"], ["作业结果", "完成"], ["备注", "—"]]
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-25 09:10"
+              ],
+              [
+                "作业人员",
+                "李四"
+              ],
+              [
+                "作业结果",
+                "完成"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           }
         ]
       }
     },
     "wh-load": {
-  "id": "wh-load",
-  "title": "装卸货",
-  "groups": [
-    "仓储管理",
-    "装卸"
-  ],
-  "breadcrumb": [
-    "仓储管理",
-    "装卸",
-    "装卸货"
-  ],
-  "tabs": [
-    {
-      "name": "tab1",
-      "label": "装卸货通知单"
-    },
-    {
-      "name": "tab2",
-      "label": "装卸货单"
-    },
-    {
-      "name": "tab3",
-      "label": "装卸流水"
-    }
-  ],
-  "tabViews": [
-    {
-      "name": "tab1",
-      "label": "装卸货通知单",
-      "queryFields": [
+      "id": "wh-load",
+      "title": "装卸货",
+      "groups": [
+        "仓储管理",
+        "装卸"
+      ],
+      "breadcrumb": [
+        "仓储管理",
+        "装卸",
+        "装卸货"
+      ],
+      "tabs": [
         {
-          "name": "单号",
-          "type": "input"
+          "name": "tab1",
+          "label": "装卸货通知单"
         },
         {
-          "name": "单据状态",
-          "type": "select",
-          "options": [
-            "待执行",
-            "执行中",
-            "已完成",
-            "已关闭"
+          "name": "tab2",
+          "label": "装卸货单"
+        },
+        {
+          "name": "tab3",
+          "label": "装卸流水"
+        }
+      ],
+      "tabViews": [
+        {
+          "name": "tab1",
+          "label": "装卸货通知单",
+          "queryFields": [
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单据类型",
+              "type": "select"
+            },
+            {
+              "name": "关联仓库业务",
+              "type": "select",
+              "options": [
+                "采购收料",
+                "采购退料",
+                "生产领料",
+                "生产退料",
+                "生产入库",
+                "委外发料",
+                "委外退料",
+                "委外收货",
+                "委外退货",
+                "受托收料",
+                "受托退料",
+                "销售发货",
+                "销售预出货",
+                "销售退货",
+                "其他入库",
+                "其他出库",
+                "库内移库",
+                "库内转序"
+              ]
+            },
+            {
+              "name": "关联单号",
+              "type": "input"
+            },
+            {
+              "name": "客供信息",
+              "type": "input"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "承运商",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "车挂号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
+              "name": "司机电话",
+              "type": "input"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "单号",
+            "单据状态",
+            "关联仓库业务",
+            "关联单号"
+          ],
+          "queryMore": [
+            "单据类型",
+            "客供信息",
+            "计划执行日期",
+            "关联运单",
+            "关联发货单",
+            "承运商",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ],
+          "toolbar": [
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增编辑页（新增模式）"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选的通知单置为「已关闭」"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除待执行且无下游装卸单的通知单"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选行"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "关联仓库业务",
+              "title": "关联仓库业务",
+              "width": 130
+            },
+            {
+              "field": "关联单号",
+              "title": "关联单号",
+              "width": 170,
+              "slot": "link"
+            },
+            {
+              "field": "客供信息",
+              "title": "客供信息",
+              "width": 160
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "承运商",
+              "title": "承运商",
+              "width": 140
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 110
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 110
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 160,
+              "slot": "idmask"
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "详情",
+              "desc": "只读查看头信息、运力信息与物料明细"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅待执行可编辑"
+            }
           ]
         },
         {
-          "name": "单据类型",
-          "type": "select"
-        },
-        {
-          "name": "关联仓库业务",
-          "type": "select",
-          "options": [
-            "采购收料",
-            "采购退料",
-            "生产领料",
-            "生产退料",
-            "生产入库",
-            "委外发料",
-            "委外退料",
-            "委外收货",
-            "委外退货",
-            "受托收料",
-            "受托退料",
-            "销售发货",
-            "销售预出货",
-            "销售退货",
-            "其他入库",
-            "其他出库",
-            "库内移库",
-            "库内转序"
+          "name": "tab2",
+          "label": "装卸货单",
+          "queryFields": [
+            {
+              "name": "装卸单号",
+              "type": "input"
+            },
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "关联装卸通知单号",
+              "type": "input"
+            },
+            {
+              "name": "关联仓库业务",
+              "type": "select",
+              "options": [
+                "采购收料",
+                "采购退料",
+                "生产领料",
+                "生产退料",
+                "生产入库",
+                "委外发料",
+                "委外退料",
+                "委外收货",
+                "委外退货",
+                "受托收料",
+                "受托退料",
+                "销售发货",
+                "销售预出货",
+                "销售退货",
+                "其他入库",
+                "其他出库",
+                "库内移库",
+                "库内转序"
+              ]
+            },
+            {
+              "name": "关联业务单号",
+              "type": "input"
+            },
+            {
+              "name": "客供信息",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "操作人",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "date"
+            }
+          ],
+          "queryDefault": [
+            "装卸单号",
+            "单据状态",
+            "关联装卸通知单号",
+            "关联业务单号"
+          ],
+          "queryMore": [
+            "关联仓库业务",
+            "客供信息",
+            "关联运单",
+            "关联发货单",
+            "操作人",
+            "操作时间"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选行"
+            }
+          ],
+          "columns": [
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "装卸单号",
+              "title": "装卸单号",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 110
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 70
+            },
+            {
+              "field": "关联装卸通知单号",
+              "title": "关联装卸通知单号",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联仓库业务",
+              "title": "关联仓库业务",
+              "width": 120
+            },
+            {
+              "field": "关联业务单号",
+              "title": "关联业务单号",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "客供信息",
+              "title": "客供信息",
+              "width": 150
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "承运商",
+              "title": "承运商",
+              "width": 140
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 110
+            },
+            {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 110
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 160,
+              "slot": "idmask"
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 80,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "详情",
+              "desc": "只读查看装卸货单头信息"
+            }
           ]
         },
         {
-          "name": "关联单号",
-          "type": "input"
-        },
-        {
-          "name": "客供信息",
-          "type": "input"
-        },
-        {
-          "name": "计划执行日期",
-          "type": "date"
-        },
-        {
-          "name": "关联运单",
-          "type": "input"
-        },
-        {
-          "name": "关联发货单",
-          "type": "input"
-        },
-        {
-          "name": "承运商",
-          "type": "input"
-        },
-        {
-          "name": "车牌号",
-          "type": "input"
-        },
-        {
-          "name": "车挂号",
-          "type": "input"
-        },
-        {
-          "name": "司机姓名",
-          "type": "input"
-        },
-        {
-          "name": "司机电话",
-          "type": "input"
-        },
-        {
-          "name": "司机身份证号",
-          "type": "input"
+          "name": "tab3",
+          "label": "装卸流水",
+          "queryFields": [
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "当前工序",
+              "type": "input"
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "装卸通知单号",
+              "type": "input"
+            },
+            {
+              "name": "装卸单号",
+              "type": "input"
+            },
+            {
+              "name": "关联仓库业务",
+              "type": "input"
+            },
+            {
+              "name": "关联业务单号",
+              "type": "input"
+            },
+            {
+              "name": "客供信息",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            }
+          ],
+          "queryDefault": [
+            "流水状态",
+            "条码号",
+            "物料批号",
+            "物料信息"
+          ],
+          "queryMore": [
+            "当前工序",
+            "检查结果",
+            "装卸通知单号",
+            "装卸单号",
+            "关联仓库业务",
+            "关联业务单号",
+            "客供信息",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选行"
+            }
+          ],
+          "columns": [
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 130
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "储罐编号",
+              "title": "储罐编号",
+              "width": 120
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 130
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 200
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 130
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 70
+            },
+            {
+              "field": "装卸通知单号",
+              "title": "装卸通知单号",
+              "width": 160
+            },
+            {
+              "field": "装卸单号",
+              "title": "装卸单号",
+              "width": 160
+            },
+            {
+              "field": "关联仓库业务",
+              "title": "关联仓库业务",
+              "width": 120
+            },
+            {
+              "field": "关联业务单号",
+              "title": "关联业务单号",
+              "width": 160
+            },
+            {
+              "field": "客供信息",
+              "title": "客供信息",
+              "width": 150
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 130
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 100,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
+          ],
+          "rowOps": [
+            {
+              "name": "作业详情",
+              "desc": "查看装卸作业工序轨迹与过磅数据"
+            }
+          ]
         }
       ],
-      "queryDefault": [
-        "单号",
-        "单据状态",
-        "关联仓库业务",
-        "关联单号"
-      ],
-      "queryMore": [
-        "单据类型",
-        "客供信息",
-        "计划执行日期",
-        "关联运单",
-        "关联发货单",
-        "承运商",
-        "车牌号",
-        "车挂号",
-        "司机姓名",
-        "司机电话",
-        "司机身份证号"
-      ],
-      "toolbar": [
+      "formSections": [
         {
-          "name": "新增",
-          "type": "primary",
-          "desc": "打开新增编辑页（新增模式）"
-        },
-        {
-          "name": "关闭",
-          "type": "default",
-          "desc": "将勾选的通知单置为「已关闭」"
-        },
-        {
-          "name": "批量删除",
-          "type": "danger",
-          "desc": "仅允许删除待执行且无下游装卸单的通知单"
-        },
-        {
-          "name": "导出",
-          "type": "default",
-          "desc": "导出当前筛选或勾选行"
-        }
-      ],
-      "columns": [
-        {
-          "field": "单据状态",
-          "title": "单据状态",
-          "width": 100,
-          "slot": "tag"
-        },
-        {
-          "field": "单号",
-          "title": "单号",
-          "width": 160
-        },
-        {
-          "field": "单据类型",
-          "title": "单据类型",
-          "width": 120
-        },
-        {
-          "field": "关联仓库业务",
-          "title": "关联仓库业务",
-          "width": 130
-        },
-        {
-          "field": "关联单号",
-          "title": "关联单号",
-          "width": 170,
-          "slot": "link"
-        },
-        {
-          "field": "客供信息",
-          "title": "客供信息",
-          "width": 160
-        },
-        {
-          "field": "计划执行日期",
-          "title": "计划执行日期",
-          "width": 120
-        },
-        {
-          "field": "物料信息",
-          "title": "物料信息",
-          "width": 220
-        },
-        {
-          "field": "关联运单",
-          "title": "关联运单",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "关联发货单",
-          "title": "关联发货单",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "承运商",
-          "title": "承运商",
-          "width": 140
-        },
-        {
-          "field": "车牌号",
-          "title": "车牌号",
-          "width": 110
-        },
-        {
-          "field": "车挂号",
-          "title": "车挂号",
-          "width": 110
-        },
-        {
-          "field": "司机姓名",
-          "title": "司机姓名",
-          "width": 100
-        },
-        {
-          "field": "司机电话",
-          "title": "司机电话",
-          "width": 120
-        },
-        {
-          "field": "司机身份证号",
-          "title": "司机身份证号",
-          "width": 160,
-          "slot": "idmask"
-        },
-        {
-          "field": "备注",
-          "title": "备注",
-          "width": 140
-        },
-        {
-          "field": "_actions",
-          "title": "操作",
-          "width": 140,
-          "fixed": "right",
-          "slot": "row_actions"
-        }
-      ],
-      "rowOps": [
-        {
-          "name": "详情",
-          "desc": "只读查看头信息、运力信息与物料明细"
-        },
-        {
-          "name": "编辑",
-          "desc": "仅待执行可编辑"
-        }
-      ]
-    },
-    {
-      "name": "tab2",
-      "label": "装卸货单",
-      "queryFields": [
-        {
-          "name": "装卸单号",
-          "type": "input"
-        },
-        {
-          "name": "单据状态",
-          "type": "select",
-          "options": [
-            "执行中",
-            "已完成",
-            "已关闭"
+          "title": "一、基础与单据信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成 ZXTT"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "options": [
+                "标准装卸",
+                "紧急装卸",
+                "厂内移库装卸"
+              ]
+            },
+            {
+              "name": "关联仓库业务",
+              "type": "select",
+              "required": true,
+              "options": [
+                "采购收料",
+                "采购退料",
+                "生产领料",
+                "生产退料",
+                "生产入库",
+                "委外发料",
+                "委外退料",
+                "委外收货",
+                "委外退货",
+                "受托收料",
+                "受托退料",
+                "销售发货",
+                "销售预出货",
+                "销售退货",
+                "其他入库",
+                "其他出库",
+                "库内移库",
+                "库内转序"
+              ]
+            },
+            {
+              "name": "关联单号",
+              "type": "picker",
+              "required": true,
+              "ctrl": "按关联仓库业务选来源仓储单据"
+            },
+            {
+              "name": "客供信息",
+              "type": "readonly",
+              "ctrl": "自动带入客商名称"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": true
+            },
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "ctrl": "置于关联发货单前，联动过滤发货单"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "ctrl": "按已选运单联动过滤"
+            },
+            {
+              "name": "备注",
+              "type": "input"
+            }
           ]
         },
         {
-          "name": "关联装卸通知单号",
-          "type": "input"
-        },
+          "title": "二、承运与司机信息",
+          "fields": [
+            {
+              "name": "承运商",
+              "type": "readonly",
+              "ctrl": "选定运单/发货单后自动带出"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "ctrl": "有运单只读，无运单可手录"
+            },
+            {
+              "name": "车挂号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "ctrl": "11位手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "ctrl": "18位身份证，详情掩码"
+            }
+          ]
+        }
+      ],
+      "formDialogWidth": "1100px",
+      "detailSections": [
         {
-          "name": "关联仓库业务",
-          "type": "select",
-          "options": [
-            "采购收料",
-            "采购退料",
-            "生产领料",
-            "生产退料",
-            "生产入库",
-            "委外发料",
-            "委外退料",
-            "委外收货",
-            "委外退货",
-            "受托收料",
-            "受托退料",
-            "销售发货",
-            "销售预出货",
-            "销售退货",
-            "其他入库",
-            "其他出库",
-            "库内移库",
-            "库内转序"
+          "title": "一、基础与单据信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "关联仓库业务",
+            "关联单号",
+            "客供信息",
+            "计划执行日期",
+            "关联运单",
+            "关联发货单",
+            "备注"
           ]
         },
         {
-          "name": "关联业务单号",
-          "type": "input"
-        },
-        {
-          "name": "客供信息",
-          "type": "input"
-        },
-        {
-          "name": "关联运单",
-          "type": "input"
-        },
-        {
-          "name": "关联发货单",
-          "type": "input"
-        },
-        {
-          "name": "操作人",
-          "type": "input"
-        },
-        {
-          "name": "操作时间",
-          "type": "date"
-        }
-      ],
-      "queryDefault": [
-        "装卸单号",
-        "单据状态",
-        "关联装卸通知单号",
-        "关联业务单号"
-      ],
-      "queryMore": [
-        "关联仓库业务",
-        "客供信息",
-        "关联运单",
-        "关联发货单",
-        "操作人",
-        "操作时间"
-      ],
-      "toolbar": [
-        {
-          "name": "导出",
-          "type": "default",
-          "desc": "导出当前筛选或勾选行"
-        }
-      ],
-      "columns": [
-        {
-          "field": "单据状态",
-          "title": "单据状态",
-          "width": 100,
-          "slot": "tag"
-        },
-        {
-          "field": "装卸单号",
-          "title": "装卸单号",
-          "width": 160
-        },
-        {
-          "field": "物料信息",
-          "title": "物料信息",
-          "width": 220
-        },
-        {
-          "field": "已完成件数",
-          "title": "已完成件数",
-          "width": 100
-        },
-        {
-          "field": "已完成数量",
-          "title": "已完成数量",
-          "width": 110
-        },
-        {
-          "field": "库存单位",
-          "title": "库存单位",
-          "width": 70
-        },
-        {
-          "field": "关联装卸通知单号",
-          "title": "关联装卸通知单号",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "关联仓库业务",
-          "title": "关联仓库业务",
-          "width": 120
-        },
-        {
-          "field": "关联业务单号",
-          "title": "关联业务单号",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "客供信息",
-          "title": "客供信息",
-          "width": 150
-        },
-        {
-          "field": "关联运单",
-          "title": "关联运单",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "关联发货单",
-          "title": "关联发货单",
-          "width": 160,
-          "slot": "link"
-        },
-        {
-          "field": "承运商",
-          "title": "承运商",
-          "width": 140
-        },
-        {
-          "field": "车牌号",
-          "title": "车牌号",
-          "width": 110
-        },
-        {
-          "field": "车挂号",
-          "title": "车挂号",
-          "width": 110
-        },
-        {
-          "field": "司机姓名",
-          "title": "司机姓名",
-          "width": 100
-        },
-        {
-          "field": "司机电话",
-          "title": "司机电话",
-          "width": 120
-        },
-        {
-          "field": "司机身份证号",
-          "title": "司机身份证号",
-          "width": 160,
-          "slot": "idmask"
-        },
-        {
-          "field": "操作时间",
-          "title": "操作时间",
-          "width": 160
-        },
-        {
-          "field": "操作人",
-          "title": "操作人",
-          "width": 100
-        },
-        {
-          "field": "备注",
-          "title": "备注",
-          "width": 140
-        },
-        {
-          "field": "_actions",
-          "title": "操作",
-          "width": 80,
-          "fixed": "right",
-          "slot": "row_actions"
-        }
-      ],
-      "rowOps": [
-        {
-          "name": "详情",
-          "desc": "只读查看装卸货单头信息"
-        }
-      ]
-    },
-    {
-      "name": "tab3",
-      "label": "装卸流水",
-      "queryFields": [
-        {
-          "name": "流水状态",
-          "type": "select",
-          "options": [
-            "执行中",
-            "已完成",
-            "已关闭"
+          "title": "二、承运与司机信息",
+          "fields": [
+            "承运商",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
           ]
-        },
-        {
-          "name": "条码号",
-          "type": "input"
-        },
-        {
-          "name": "物料批号",
-          "type": "input"
-        },
-        {
-          "name": "物料信息",
-          "type": "input"
-        },
-        {
-          "name": "当前工序",
-          "type": "input"
-        },
-        {
-          "name": "检查结果",
-          "type": "select",
-          "options": [
-            "合格",
-            "不合格"
-          ]
-        },
-        {
-          "name": "装卸通知单号",
-          "type": "input"
-        },
-        {
-          "name": "装卸单号",
-          "type": "input"
-        },
-        {
-          "name": "关联仓库业务",
-          "type": "input"
-        },
-        {
-          "name": "关联业务单号",
-          "type": "input"
-        },
-        {
-          "name": "客供信息",
-          "type": "input"
-        },
-        {
-          "name": "关联运单",
-          "type": "input"
-        },
-        {
-          "name": "关联发货单",
-          "type": "input"
         }
       ],
-      "queryDefault": [
-        "流水状态",
-        "条码号",
-        "物料批号",
-        "物料信息"
-      ],
-      "queryMore": [
-        "当前工序",
-        "检查结果",
-        "装卸通知单号",
-        "装卸单号",
-        "关联仓库业务",
-        "关联业务单号",
-        "客供信息",
-        "关联运单",
-        "关联发货单"
-      ],
-      "toolbar": [
-        {
-          "name": "导出",
-          "type": "default",
-          "desc": "导出当前筛选或勾选行"
-        }
-      ],
-      "columns": [
-        {
-          "field": "流水状态",
-          "title": "流水状态",
-          "width": 100,
-          "slot": "tag"
-        },
-        {
-          "field": "当前工序",
-          "title": "当前工序",
-          "width": 130
-        },
-        {
-          "field": "检查结果",
-          "title": "检查结果",
-          "width": 90,
-          "slot": "tag"
-        },
-        {
-          "field": "档案类型",
-          "title": "档案类型",
-          "width": 100
-        },
-        {
-          "field": "条码号",
-          "title": "条码号",
-          "width": 160
-        },
-        {
-          "field": "储罐编号",
-          "title": "储罐编号",
-          "width": 120
-        },
-        {
-          "field": "外包材编号",
-          "title": "外包材编号",
-          "width": 130
-        },
-        {
-          "field": "物料信息",
-          "title": "物料信息",
-          "width": 200
-        },
-        {
-          "field": "物料批号",
-          "title": "物料批号",
-          "width": 130
-        },
-        {
-          "field": "总数量",
-          "title": "总数量",
-          "width": 100
-        },
-        {
-          "field": "库存单位",
-          "title": "库存单位",
-          "width": 70
-        },
-        {
-          "field": "装卸通知单号",
-          "title": "装卸通知单号",
-          "width": 160
-        },
-        {
-          "field": "装卸单号",
-          "title": "装卸单号",
-          "width": 160
-        },
-        {
-          "field": "关联仓库业务",
-          "title": "关联仓库业务",
-          "width": 120
-        },
-        {
-          "field": "关联业务单号",
-          "title": "关联业务单号",
-          "width": 160
-        },
-        {
-          "field": "客供信息",
-          "title": "客供信息",
-          "width": 150
-        },
-        {
-          "field": "关联运单",
-          "title": "关联运单",
-          "width": 160
-        },
-        {
-          "field": "关联发货单",
-          "title": "关联发货单",
-          "width": 160
-        },
-        {
-          "field": "备注",
-          "title": "备注",
-          "width": 130
-        },
-        {
-          "field": "_actions",
-          "title": "操作",
-          "width": 100,
-          "fixed": "right",
-          "slot": "row_actions"
-        }
-      ],
-      "rowOps": [
-        {
-          "name": "作业详情",
-          "desc": "查看装卸作业工序轨迹与过磅数据"
-        }
-      ]
-    }
-  ],
-  "formSections": [
-    {
-      "title": "一、基础与单据信息",
-      "fields": [
-        {
-          "name": "单号",
-          "type": "readonly",
-          "required": true,
-          "ctrl": "系统自动生成 ZXTT"
-        },
-        {
-          "name": "单据类型",
-          "type": "select",
-          "required": true,
-          "options": [
-            "标准装卸",
-            "紧急装卸",
-            "厂内移库装卸"
-          ]
-        },
-        {
-          "name": "关联仓库业务",
-          "type": "select",
-          "required": true,
-          "options": [
-            "采购收料",
-            "采购退料",
-            "生产领料",
-            "生产退料",
-            "生产入库",
-            "委外发料",
-            "委外退料",
-            "委外收货",
-            "委外退货",
-            "受托收料",
-            "受托退料",
-            "销售发货",
-            "销售预出货",
-            "销售退货",
-            "其他入库",
-            "其他出库",
-            "库内移库",
-            "库内转序"
-          ]
-        },
-        {
-          "name": "关联单号",
-          "type": "picker",
-          "required": true,
-          "ctrl": "按关联仓库业务选来源仓储单据"
-        },
-        {
-          "name": "客供信息",
-          "type": "readonly",
-          "ctrl": "自动带入客商名称"
-        },
-        {
-          "name": "计划执行日期",
-          "type": "date",
-          "required": true
-        },
-        {
-          "name": "关联运单",
-          "type": "picker",
-          "ctrl": "置于关联发货单前，联动过滤发货单"
-        },
-        {
-          "name": "关联发货单",
-          "type": "picker",
-          "ctrl": "按已选运单联动过滤"
-        },
-        {
-          "name": "备注",
-          "type": "input"
-        }
-      ]
-    },
-    {
-      "title": "二、承运与司机信息",
-      "fields": [
-        {
-          "name": "承运商",
-          "type": "readonly",
-          "ctrl": "选定运单/发货单后自动带出"
-        },
-        {
-          "name": "车牌号",
-          "type": "input",
-          "ctrl": "有运单只读，无运单可手录"
-        },
-        {
-          "name": "车挂号",
-          "type": "input"
-        },
-        {
-          "name": "司机姓名",
-          "type": "input"
-        },
-        {
-          "name": "司机电话",
-          "type": "input",
-          "ctrl": "11位手机号"
-        },
-        {
-          "name": "司机身份证号",
-          "type": "input",
-          "ctrl": "18位身份证，详情掩码"
-        }
-      ]
-    }
-  ],
-  "formDialogWidth": "1100px",
-  "detailSections": [
-    {
-      "title": "一、基础与单据信息",
-      "fields": [
-        "单据状态",
-        "单号",
-        "单据类型",
-        "关联仓库业务",
-        "关联单号",
-        "客供信息",
-        "计划执行日期",
-        "关联运单",
-        "关联发货单",
-        "备注"
-      ]
-    },
-    {
-      "title": "二、承运与司机信息",
-      "fields": [
-        "承运商",
-        "车牌号",
-        "车挂号",
-        "司机姓名",
-        "司机电话",
-        "司机身份证号"
-      ]
-    }
-  ],
-  "detailLineFields": [
+      "detailLineFields": [
         {
           "name": "行号"
         },
         {
           "name": "行状态"
         },
-    {
-      "name": "物料信息"
-    },
-    {
-      "name": "库存单位"
-    },
-    {
-      "name": "管理方式"
-    },
-    {
-      "name": "计划件数"
-    },
-    {
-      "name": "计划数量"
-    },
-    {
-      "name": "已完成数量"
-    },
-    {
-      "name": "未完成数量"
-    },
-    {
-      "name": "批号"
-    },
-    {
-      "name": "备注"
-    }
-  ],
-  "formLineFields": [
-    {
-      "name": "物料信息",
-      "type": "picker",
-      "required": false,
-      "ctrl": "弹窗多选物料"
-    },
-    {
-      "name": "库存单位",
-      "type": "readonly",
-      "required": false,
-      "ctrl": "自动带入"
-    },
-    {
-      "name": "管理方式",
-      "type": "readonly",
-      "required": false,
-      "ctrl": "自动带入"
-    },
-    {
-      "name": "计划件数",
-      "type": "input",
-      "required": false,
-      "ctrl": "条码物料录入"
-    },
-    {
-      "name": "计划数量",
-      "type": "input",
-      "required": true,
-      "ctrl": "必须大于0"
-    },
-    {
-      "name": "批号",
-      "type": "readonly",
-      "required": false,
-      "ctrl": "继承来源单据"
-    },
-    {
-      "name": "备注",
-      "type": "input",
-      "required": false,
-      "ctrl": "明细行备注"
-    }
-  ],
-  "formLineActions": [
-    {
-      "name": "新增",
-      "type": "primary",
-      "desc": "增补物料明细行"
-    },
-    {
-      "name": "批量删除",
-      "type": "danger",
-      "desc": "删除勾选明细行"
-    }
-  ],
-  "detailLineSelectable": true,
-  "detailLineActions": [
-    "关闭行"
-  ],
-  "detailLineTitle": "物料明细",
-  "jobDetail": {
-    "procs": [
-      {
-        "name": "到货打卡",
-        "submitTime": "2026-08-28 08:30",
-        "submitter": "王强",
-        "formTitle": "车辆到岗确认",
-        "fields": [
-          [
-            "到岗时间",
-            "2026-08-28 08:30"
-          ],
-          [
-            "车牌号",
-            "川A12345"
-          ],
-          [
-            "检查结果",
-            "合格"
-          ],
-          [
-            "备注",
-            "—"
-          ]
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
+      ],
+      "formLineFields": [
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗多选物料"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "自动带入"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "条码物料录入"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": "必须大于0"
+        },
+        {
+          "name": "批号",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "继承来源单据"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "明细行备注"
+        }
+      ],
+      "formLineActions": [
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "增补物料明细行"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删除勾选明细行"
+        }
+      ],
+      "detailLineSelectable": true,
+      "detailLineActions": [
+        "关闭行"
+      ],
+      "detailLineTitle": "物料明细",
+      "jobDetail": {
+        "procs": [
+          {
+            "name": "到货打卡",
+            "submitTime": "2026-08-28 08:30",
+            "submitter": "王强",
+            "formTitle": "车辆到岗确认",
+            "fields": [
+              [
+                "到岗时间",
+                "2026-08-28 08:30"
+              ],
+              [
+                "车牌号",
+                "川A12345"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          },
+          {
+            "name": "车辆靠桥",
+            "submitTime": "2026-08-28 08:45",
+            "submitter": "王强",
+            "formTitle": "月台靠桥登记",
+            "fields": [
+              [
+                "靠桥时间",
+                "2026-08-28 08:45"
+              ],
+              [
+                "月台号",
+                "2号月台"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          },
+          {
+            "name": "装卸过磅",
+            "submitTime": "2026-08-28 09:20",
+            "submitter": "李敏",
+            "formTitle": "过磅复核",
+            "fields": [
+              [
+                "过磅前重量(吨)",
+                "32.50"
+              ],
+              [
+                "过磅后重量(吨)",
+                "28.20"
+              ],
+              [
+                "净重(吨)",
+                "4.30"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          },
+          {
+            "name": "扫码卸货",
+            "submitTime": "2026-08-28 09:35",
+            "submitter": "李敏",
+            "formTitle": "扫码装卸确认",
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-28 09:35"
+              ],
+              [
+                "扫码件数",
+                "10"
+              ],
+              [
+                "实装数量",
+                "1000 KG"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
+          }
         ]
       },
-      {
-        "name": "车辆靠桥",
-        "submitTime": "2026-08-28 08:45",
-        "submitter": "王强",
-        "formTitle": "月台靠桥登记",
-        "fields": [
-          [
-            "靠桥时间",
-            "2026-08-28 08:45"
-          ],
-          [
-            "月台号",
-            "2号月台"
-          ],
-          [
-            "检查结果",
-            "合格"
-          ],
-          [
-            "备注",
-            "—"
-          ]
-        ]
-      },
-      {
-        "name": "装卸过磅",
-        "submitTime": "2026-08-28 09:20",
-        "submitter": "李敏",
-        "formTitle": "过磅复核",
-        "fields": [
-          [
-            "过磅前重量(吨)",
-            "32.50"
-          ],
-          [
-            "过磅后重量(吨)",
-            "28.20"
-          ],
-          [
-            "净重(吨)",
-            "4.30"
-          ],
-          [
-            "检查结果",
-            "合格"
-          ],
-          [
-            "备注",
-            "—"
-          ]
-        ]
-      },
-      {
-        "name": "扫码卸货",
-        "submitTime": "2026-08-28 09:35",
-        "submitter": "李敏",
-        "formTitle": "扫码装卸确认",
-        "fields": [
-          [
-            "作业时间",
-            "2026-08-28 09:35"
-          ],
-          [
-            "扫码件数",
-            "10"
-          ],
-          [
-            "实装数量",
-            "1000 KG"
-          ],
-          [
-            "检查结果",
-            "合格"
-          ],
-          [
-            "备注",
-            "—"
-          ]
-        ]
-      }
-    ]
-  },
-  "hasEdit": true,
-  "hasDetail": false,
-  "formFlat": false,
-  "stub": false
-},
+      "hasEdit": true,
+      "hasDetail": false,
+      "formFlat": false,
+      "stub": false
+    },
     "wh-direct-xfer": {
       "id": "wh-direct-xfer",
       "title": "直接调拨",
-      "groups": ["仓储管理", "调拨"],
-      "breadcrumb": ["仓储管理", "调拨", "直接调拨"],
+      "groups": [
+        "仓储管理",
+        "调拨"
+      ],
+      "breadcrumb": [
+        "仓储管理",
+        "调拨",
+        "直接调拨"
+      ],
       "tabs": [
-        { "name": "tab1", "label": "直接调拨申请单" },
-        { "name": "tab2", "label": "调拨入库单" },
-        { "name": "tab3", "label": "流水" }
+        {
+          "name": "tab1",
+          "label": "直接调拨申请单"
+        },
+        {
+          "name": "tab2",
+          "label": "调拨入库单"
+        },
+        {
+          "name": "tab3",
+          "label": "流水"
+        }
       ],
       "tabViews": [
         {
           "name": "tab1",
           "label": "直接调拨申请单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
-            { "name": "单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["直接调拨申请单", "直接调拨通知单"] },
-            { "name": "调出仓库", "type": "input" },
-            { "name": "调入仓库", "type": "input" },
-            { "name": "计划执行日期", "type": "daterange" },
-            { "name": "备注", "type": "input" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "直接调拨申请单",
+                "直接调拨通知单"
+              ]
+            },
+            {
+              "name": "调出仓库",
+              "type": "input"
+            },
+            {
+              "name": "调入仓库",
+              "type": "input"
+            },
+            {
+              "name": "计划执行日期",
+              "type": "daterange"
+            },
+            {
+              "name": "备注",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["单据状态", "单号", "单据类型", "调出仓库", "调入仓库"],
-          "queryMore": ["计划执行日期", "备注"],
+          "queryDefault": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "调出仓库",
+            "调入仓库"
+          ],
+          "queryMore": [
+            "计划执行日期",
+            "备注"
+          ],
           "toolbar": [
-            { "name": "新增", "type": "primary", "desc": "打开新增直接调拨申请单" },
-            { "name": "关闭", "type": "default", "desc": "将勾选申请单置为已关闭" },
-            { "name": "批量删除", "type": "danger", "desc": "仅待执行且无下游可删" },
-            { "name": "导出", "type": "default", "desc": "导出" }
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增直接调拨申请单"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选申请单置为已关闭"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅待执行且无下游可删"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "单号", "title": "单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 140 },
-            { "field": "计划执行日期", "title": "计划执行日期", "width": 120 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "调出仓库", "title": "调出仓库", "width": 160 },
-            { "field": "调入仓库", "title": "调入仓库", "width": 160 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "_actions", "title": "操作", "width": 140, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "单号",
+              "title": "单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 140
+            },
+            {
+              "field": "计划执行日期",
+              "title": "计划执行日期",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "调出仓库",
+              "title": "调出仓库",
+              "width": 160
+            },
+            {
+              "field": "调入仓库",
+              "title": "调入仓库",
+              "width": 160
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "详情", "desc": "只读头+明细，可关行" },
-            { "name": "编辑", "desc": "仅待执行" }
+            {
+              "name": "详情",
+              "desc": "只读头+明细，可关行"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅待执行"
+            }
           ]
         },
         {
           "name": "tab2",
           "label": "调拨入库单",
           "queryFields": [
-            { "name": "单据状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "入库单号", "type": "input" },
-            { "name": "关联调拨申请单号", "type": "input" },
-            { "name": "单据类型", "type": "select", "options": ["调拨入库单"] },
-            { "name": "ERP单据号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "操作人", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "入库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联调拨申请单号",
+              "type": "input"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "options": [
+                "调拨入库单"
+              ]
+            },
+            {
+              "name": "ERP单据号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "操作人",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["单据状态", "入库单号", "关联调拨申请单号"],
-          "queryMore": ["单据类型", "ERP单据号", "物料信息", "操作人", "操作时间"],
-          "toolbar": [{ "name": "导出", "type": "default", "desc": "导出" }],
+          "queryDefault": [
+            "单据状态",
+            "入库单号",
+            "关联调拨申请单号"
+          ],
+          "queryMore": [
+            "单据类型",
+            "ERP单据号",
+            "物料信息",
+            "操作人",
+            "操作时间"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出"
+            }
+          ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "入库单号", "title": "入库单号", "width": 160 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "已完成件数", "title": "已完成件数", "width": 100 },
-            { "field": "已完成数量", "title": "已完成数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "关联调拨申请单号", "title": "关联调拨申请单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "ERP单据号", "title": "ERP单据号", "width": 140 },
-            { "field": "操作时间", "title": "操作时间", "width": 160 },
-            { "field": "操作人", "title": "操作人", "width": 100 }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "已完成数量",
+              "title": "已完成数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联调拨申请单号",
+              "title": "关联调拨申请单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "ERP单据号",
+              "title": "ERP单据号",
+              "width": 140
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
           ],
           "rowOps": []
         },
@@ -20975,75 +23525,342 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab3",
           "label": "流水",
           "queryFields": [
-            { "name": "流水状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "条码号", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "检查结果", "type": "select", "options": ["合格", "不合格"] },
-            { "name": "原位置", "type": "input" },
-            { "name": "申请单号", "type": "input" },
-            { "name": "入库单号", "type": "input" }
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "原位置",
+              "type": "input"
+            },
+            {
+              "name": "申请单号",
+              "type": "input"
+            },
+            {
+              "name": "入库单号",
+              "type": "input"
+            },
+            {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "input"
+            }
           ],
-          "queryDefault": ["流水状态", "条码号", "物料批号", "物料信息"],
-          "queryMore": ["检查结果", "原位置", "申请单号", "入库单号"],
-          "toolbar": [{ "name": "导出", "type": "default", "desc": "导出" }],
+          "queryDefault": [
+            "流水状态",
+            "条码号",
+            "物料批号",
+            "物料信息"
+          ],
+          "queryMore": [
+            "检查结果",
+            "原位置",
+            "申请单号",
+            "入库单号",
+            "关联运单",
+            "关联发货单",
+            "包装规格"
+          ],
+          "toolbar": [
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出"
+            }
+          ],
           "columns": [
-            { "field": "流水状态", "title": "流水状态", "width": 100, "slot": "tag" },
-            { "field": "当前工序", "title": "当前工序", "width": 120 },
-            { "field": "检查结果", "title": "检查结果", "width": 90, "slot": "tag" },
-            { "field": "档案类型", "title": "档案类型", "width": 100 },
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "外包材编号", "title": "外包材编号", "width": 120 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "总数量", "title": "总数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "储罐编号", "title": "储罐编号", "width": 120 },
-            { "field": "原位置", "title": "原位置", "width": 120 },
-            { "field": "新位置", "title": "新位置", "width": 120 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "申请单号", "title": "申请单号", "width": 160 },
-            { "field": "入库单号", "title": "入库单号", "width": 160 },
-            { "field": "调出仓库", "title": "调出仓库", "width": 140 },
-            { "field": "调入仓库", "title": "调入仓库", "width": 140 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "_actions", "title": "操作", "width": 100, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 120
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "储罐编号",
+              "title": "储罐编号",
+              "width": 120
+            },
+            {
+              "field": "原位置",
+              "title": "原位置",
+              "width": 120
+            },
+            {
+              "field": "新位置",
+              "title": "新位置",
+              "width": 120
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "申请单号",
+              "title": "申请单号",
+              "width": 160
+            },
+            {
+              "field": "入库单号",
+              "title": "入库单号",
+              "width": 160
+            },
+            {
+              "field": "调出仓库",
+              "title": "调出仓库",
+              "width": 140
+            },
+            {
+              "field": "调入仓库",
+              "title": "调入仓库",
+              "width": 140
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 100,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
-          "rowOps": [{ "name": "作业详情", "desc": "工序填报详情" }]
+          "rowOps": [
+            {
+              "name": "作业详情",
+              "desc": "工序填报详情"
+            }
+          ]
         }
       ],
       "formFields": [
-        { "name": "单号", "type": "readonly", "required": true, "ctrl": "系统自动生成 ZJDBSQ" },
-        { "name": "单据类型", "type": "select", "required": true, "options": ["直接调拨申请单"], "ctrl": "固定" },
-        { "name": "计划执行日期", "type": "date", "required": false, "ctrl": "选填" },
-        { "name": "调出仓库", "type": "picker", "required": true, "ctrl": "弹窗选启用仓库" },
-        { "name": "调入仓库", "type": "picker", "required": true, "ctrl": "弹窗选启用仓库；≠调出" },
-        { "name": "备注", "type": "textarea", "required": false, "ctrl": "选填" }
+        {
+          "name": "单号",
+          "type": "readonly",
+          "required": true,
+          "ctrl": "系统自动生成 ZJDBSQ"
+        },
+        {
+          "name": "单据类型",
+          "type": "select",
+          "required": true,
+          "options": [
+            "直接调拨申请单"
+          ],
+          "ctrl": "固定"
+        },
+        {
+          "name": "计划执行日期",
+          "type": "date",
+          "required": false,
+          "ctrl": "选填"
+        },
+        {
+          "name": "调出仓库",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选启用仓库"
+        },
+        {
+          "name": "调入仓库",
+          "type": "picker",
+          "required": true,
+          "ctrl": "弹窗选启用仓库；≠调出"
+        },
+        {
+          "name": "备注",
+          "type": "textarea",
+          "required": false,
+          "ctrl": "选填"
+        }
       ],
       "formDialogWidth": "1100px",
       "detailFields": [
-        { "name": "单据状态" }, { "name": "单号" }, { "name": "单据类型" },
-        { "name": "计划执行日期" }, { "name": "调出仓库" }, { "name": "调入仓库" }, { "name": "备注" }
+        {
+          "name": "单据状态"
+        },
+        {
+          "name": "单号"
+        },
+        {
+          "name": "单据类型"
+        },
+        {
+          "name": "计划执行日期"
+        },
+        {
+          "name": "调出仓库"
+        },
+        {
+          "name": "调入仓库"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "hasEdit": true,
       "hasDetail": true,
       "formFlat": false,
       "stub": false,
       "formLineFields": [
-        { "name": "物料信息", "type": "picker", "required": true, "ctrl": "多选条码/计数物料" },
-        { "name": "批号", "type": "picker", "required": false, "ctrl": "按管理方式" },
-        { "name": "库存单位", "type": "readonly", "required": false, "ctrl": "只读" },
-        { "name": "管理方式", "type": "readonly", "required": false, "ctrl": "只读" },
-        { "name": "计划件数", "type": "input", "required": false, "ctrl": "选填" },
-        { "name": "计划数量", "type": "input", "required": true, "ctrl": ">0" },
-        { "name": "备注", "type": "input", "required": false, "ctrl": "选填" }
+        {
+          "name": "物料信息",
+          "type": "picker",
+          "required": true,
+          "ctrl": "多选条码/计数物料"
+        },
+        {
+          "name": "库存单位",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读"
+        },
+        {
+          "name": "管理方式",
+          "type": "readonly",
+          "required": false,
+          "ctrl": "只读"
+        },
+        {
+          "name": "计划件数",
+          "type": "input",
+          "required": false,
+          "ctrl": "选填"
+        },
+        {
+          "name": "计划数量",
+          "type": "input",
+          "required": true,
+          "ctrl": ">0"
+        },
+        {
+          "name": "批号",
+          "type": "picker",
+          "required": false,
+          "ctrl": "按管理方式"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "选填"
+        }
       ],
       "formLineActions": [
-        { "name": "新增", "type": "primary", "desc": "多选物料" },
-        { "name": "批量删除", "type": "danger", "desc": "删行" }
+        {
+          "name": "新增",
+          "type": "primary",
+          "desc": "多选物料"
+        },
+        {
+          "name": "批量删除",
+          "type": "danger",
+          "desc": "删行"
+        }
       ],
       "detailLineSelectable": true,
-      "detailLineActions": ["关闭"],
+      "detailLineActions": [
+        "关闭"
+      ],
       "detailLineTitle": "物料明细",
       "detailLineFields": [
         {
@@ -21051,9 +23868,34 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "行状态"
-        }, { "name": "物料信息" }, { "name": "批号" },
-        { "name": "库存单位" }, { "name": "管理方式" }, { "name": "计划件数" },
-        { "name": "计划数量" }, { "name": "已完成数量" }, { "name": "未完成数量" }, { "name": "备注" }
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "管理方式"
+        },
+        {
+          "name": "计划件数"
+        },
+        {
+          "name": "计划数量"
+        },
+        {
+          "name": "已完成数量"
+        },
+        {
+          "name": "未完成数量"
+        },
+        {
+          "name": "批号"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "jobDetail": {
         "procs": [
@@ -21062,14 +23904,48 @@ window.WMS_PAGE_CONFIGS = {
             "submitTime": "2026-08-25 08:30",
             "submitter": "张三",
             "formTitle": "调出复核确认",
-            "fields": [["作业时间", "2026-08-25 08:30"], ["作业人员", "张三"], ["检查结果", "合格"], ["备注", "—"]]
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-25 08:30"
+              ],
+              [
+                "作业人员",
+                "张三"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           },
           {
             "name": "调入上架",
             "submitTime": "2026-08-25 09:20",
             "submitter": "李四",
             "formTitle": "调入上架记录",
-            "fields": [["作业时间", "2026-08-25 09:20"], ["作业人员", "李四"], ["作业结果", "完成"], ["备注", "—"]]
+            "fields": [
+              [
+                "作业时间",
+                "2026-08-25 09:20"
+              ],
+              [
+                "作业人员",
+                "李四"
+              ],
+              [
+                "作业结果",
+                "完成"
+              ],
+              [
+                "备注",
+                "—"
+              ]
+            ]
           }
         ]
       }
@@ -25614,11 +28490,11 @@ window.WMS_PAGE_CONFIGS = {
               "required": false,
               "ctrl": "运输与防护注意事项"
             },
-        {
-          "name": "配送类型",
-          "type": "radio",
-          "required": false,
-          "ctrl": "仅关联仓储业务=销售发货时显示；单选，默认正常业务",
+            {
+              "name": "配送类型",
+              "type": "radio",
+              "required": false,
+              "ctrl": "仅关联仓储业务=销售发货时显示；单选，默认正常业务",
               "options": [
                 "正常业务",
                 "直发业务（贸易）"
