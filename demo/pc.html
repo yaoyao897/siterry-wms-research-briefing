@@ -766,7 +766,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
           <template v-for="m1 in menu" :key="m1.index">
             <el-sub-menu v-if="m1.children" :index="m1.index">
               <template #title>
-                <menu-icon :name="({ '基础数据':'database', '仓储管理':'grid', '物流管理':'truck', '条码管理':'qr' })[m1.title] || 'grid'"></menu-icon>
+                <menu-icon :name="({ '基础数据':'database', '仓储管理':'grid', '物流管理':'truck', '包材管理':'qr' })[m1.title] || 'grid'"></menu-icon>
                 <span class="menu-item-label">{{ m1.title }}</span>
               </template>
               <template v-for="m2 in m1.children" :key="m2.index">
@@ -891,6 +891,9 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
               <demo-vxe-grid :data="pagedData" :columns="vxeColumns" :selected-ids="selectedIds" @update:selected-ids="selectedIds=$event">
                 <template #tag="{ row, column }">
                   <span class="tag" :class="tagClass(displayTagValue(row, column.field))">{{ displayTagValue(row, column.field) }}</span>
+                </template>
+                <template #expire_warn="{ row, column }">
+                  <span :style="isExpireOverdue(row[column.field]) ? 'color:#FF4D4F;font-weight:600' : ''">{{ row[column.field] || '—' }}</span>
                 </template>
                 <template #uom_ratio="{ row, column }">
                   <span>{{ formatMatUomRatioDisplay(row[column.field]) }}</span>
@@ -2425,14 +2428,14 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.3.355"></script>
-<script src="./js/page-configs.js?v=1.3.348"></script>
-<script src="./js/mock-rows.js?v=1.3.352"></script>
+<script src="./js/demo-announcements.js?v=1.4.0"></script>
+<script src="./js/page-configs.js?v=1.4.0"></script>
+<script src="./js/mock-rows.js?v=1.4.0"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/page-prd-notes.js?v=1.3.349"></script>
+<script src="./js/page-prd-notes.js?v=1.4.0"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
-<script src="./js/remarks-mermaid.js"></script>
+<script src="./js/remarks-mermaid.js?v=1.4.0"></script>
 <script src="./js/demo-store.js?v=1.3.347"></script>
 <script>
 const { createApp, ref, computed, reactive, watch, onMounted, onBeforeUnmount, nextTick } = Vue;
@@ -2781,6 +2784,11 @@ const app = createApp({
       nextTick(()=>{
         const fn = window.renderRemarksMermaid;
         if(typeof fn === 'function' && remarksBodyRef.value) fn(remarksBodyRef.value);
+        // CDN 异步加载时再补一次
+        setTimeout(()=>{
+          if(!remarksOpen.value) return;
+          if(typeof fn === 'function' && remarksBodyRef.value) fn(remarksBodyRef.value);
+        }, 400);
       });
     }
     function toggleRemarks(){
@@ -2803,13 +2811,19 @@ const app = createApp({
     watch(pageId, ()=>{
       syncRemarksActiveTabFromPage();
       remarksTocActive.value = '';
-      if(remarksOpen.value) nextTick(()=> jumpRemarksToActiveTab(false));
+      if(remarksOpen.value){
+        nextTick(()=> jumpRemarksToActiveTab(false));
+        scheduleRemarksMermaid();
+      }
     });
     watch(remarksDisplayMarkdown, ()=>{
       if(remarksOpen.value){
         nextTick(()=> jumpRemarksToActiveTab(false));
         scheduleRemarksMermaid();
       }
+    });
+    watch(remarksRenderedHtml, ()=>{
+      if(remarksOpen.value) scheduleRemarksMermaid();
     });
     const formMode = ref('add');
     const formSwitch = reactive({ '启用状态': true });
@@ -3289,6 +3303,35 @@ const app = createApp({
       const c = codeOf(code);
       return ((MOCK['mat-list']||{}).main||[]).find(x=> x['物料编码']===c) || null;
     }
+    /** 待报废清单：由流水码档案动态派生（失效且未报废） */
+    function mapSerialArchToScrapListRow(r, idx){
+      const parts = String(r['物料信息']||'').split(' / ').map(s=> s.trim());
+      const code = parts[0] || '';
+      const m = matListRow(code) || {};
+      return {
+        id: r.id || ('scrap-' + String(idx + 1)),
+        条码号: r['条码号'] || '',
+        使用状态: r['使用状态'] || '',
+        库存状态: r['库存状态'] || '',
+        存储位置: r['存储位置'] || '—',
+        物料编码: code || m['物料编码'] || '',
+        物料名称: parts[1] || m['物料名称'] || '',
+        物料规格: parts[2] || m['物料规格'] || '',
+        物料批号: r['物料批号'] || '',
+        当前数量: r['当前数量'] ?? '',
+        库存单位: r['库存单位'] || m['库存单位'] || '',
+        包装规格: r['包装规格'] || '',
+        供应商名称: r['供应商信息'] || r['供应商名称'] || '',
+        生产厂家: r['生产厂家'] || '',
+        生产日期: r['生产日期'] || '',
+        有效期: r['有效期'] || '',
+        失效日期: r['失效日期'] || '',
+        绑定状态: r['绑定状态'] || '',
+        当前绑定外包材: r['当前绑定外包材'] || '—',
+        最新操作人: r['最新操作人'] || '',
+        最新操作时间: r['最新操作时间'] || ''
+      };
+    }
     function matInfoText(src){
       let code = '', name = '', spec = '', kind = '';
       if(src && typeof src === 'object'){
@@ -3504,7 +3547,7 @@ const app = createApp({
         const map = {
           '报废处理': ['报废处理单'],
           '异常冻结': ['异常冻结单'],
-          '解除冻结': ['冻结解除单'],
+          '冻结解除': ['冻结解除单'],
           '提货单': waybillVehicleTypes,
           '签收单': waybillVehicleTypes
         };
@@ -3582,12 +3625,14 @@ const app = createApp({
         }).filter(Boolean);
         if(names.length) return names;
       }
-      if(f.name==='移入仓库编码' || f.name==='移出仓库编码' || f.name==='盘点仓库'){
+      if(f.name==='移入仓库编码' || f.name==='移出仓库编码' || f.name==='盘点仓库' || f.name==='移出仓库' || f.name==='移入仓库'){
         const names = ((MOCK.warehouse||{}).tab1||[]).filter(w=> w['启用状态']==='启用').map(w=> w['仓库名称']).filter(Boolean);
         if(names.length) return names;
       }
-      if(f.name==='移入库位编码' || f.name==='移出库位编码'){
-        const names = warehouseLocPickerRows().map(r=> r['库位编码'] || r.编码).filter(Boolean);
+      if(f.name==='移入库位编码' || f.name==='移出库位编码' || f.name==='移出库位' || f.name==='移入库位'){
+        const whKey = (f.name==='移出库位' || f.name==='移出库位编码') ? '移出仓库' : '移入仓库';
+        const whName = transferWhName(formModel[whKey] || formModel[whKey+'编码'] || '');
+        const names = transferLocPickerRows(whName).map(r=> r['库位编码'] || r.编码).filter(Boolean);
         if(names.length) return names;
       }
       const fromMock = uniqueMockFieldValues(f.name);
@@ -3635,10 +3680,22 @@ const app = createApp({
         'wh-other-in': ['盘盈入库','样品入库','研发入库'],
         'wh-other-out': ['盘亏出库','样品出库','研发领用'],
         'wh-load': ['标准装卸', '紧急装卸', '厂内移库装卸'],
-        'wh-transfer': ['库内转移'],
+        'wh-transfer': ['标准移库', '货位整理', '呆滞移库', '策略移库'],
         'wh-seq': ['库内转序']
       };
       return m[pageId.value] || [];
+    }
+    function transferWhName(val){
+      const s = String(val||'').trim();
+      if(!s || s==='—') return '';
+      if(s.includes(' - ')) return s.split(' - ').slice(-1)[0].trim();
+      return s;
+    }
+    function transferLocPickerRows(whName){
+      const rows = warehouseLocPickerRows();
+      const wh = String(whName||'').trim();
+      if(!wh) return rows;
+      return rows.filter(r=> String(r['所属仓库']||r['仓库名称']||'')===wh);
     }
     function prodRetBatchOptions(row){
       const outNo = String(formModel['生产领料出库单']||'').trim();
@@ -4565,6 +4622,18 @@ const app = createApp({
           return true;
         });
       }
+      if(pageId.value==='wh-transfer'){
+        const tab = activeTab.value || (tabView.value||{}).name || 'tab1';
+        const st = row?.['单据状态'] || '';
+        const erp = row?.['ERP对接状态'] || '';
+        return ops.filter(op=>{
+          if(op.name==='编辑') return tab==='tab1' && st==='待执行';
+          if(op.name==='详情') return tab==='tab1';
+          if(op.name==='重试对接') return tab==='tab1' && erp==='对接失败';
+          if(op.name==='作业详情') return tab==='tab2';
+          return true;
+        });
+      }
       if(pageId.value==='bc-scrap-proc' || pageId.value==='bc-freeze' || pageId.value==='bc-unfreeze'){
         const tab = activeTab.value || (tabView.value||{}).name || 'tab1';
         if(tab!=='tab1') return ops;
@@ -4574,7 +4643,7 @@ const app = createApp({
       return ops;
     }
     function isDetailTagField(name){
-      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态' || name==='使用状态' || name==='库存状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定';
+      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态' || name==='使用状态' || name==='库存状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定' || name==='ERP对接状态' || name==='流水状态';
     }
     function detailFieldLabel(f){
       const name = f?.name || f || '';
@@ -4593,7 +4662,11 @@ const app = createApp({
         if(row){ openDetail(row); return; }
       }
       if((pageId.value==='bc-serial-split' && field==='拆分单号') || (pageId.value==='bc-serial-merge' && field==='合并单号')){
-        const row = tableData.value.find(r=> r[field]===value) || (((MOCK[pageId.value]||{}).main)||[]).find(r=> r[field]===value);
+        const bag = MOCK[pageId.value] || {};
+        const docs = bag.tab1 || bag.main || [];
+        const row = (activeTab.value==='tab1' ? tableData.value : []).find(r=> r[field]===value)
+          || docs.find(r=> r[field]===value)
+          || tableData.value.find(r=> r[field]===value);
         if(row){ openDetail(row); return; }
       }
       let label = '详情';
@@ -5019,7 +5092,7 @@ const app = createApp({
         '委外退货': { pageId:'wh-os-ret-goods', prefix:'WWTH', noKey:'单号', docType:'委外退货', tab:'tab1' },
         '其他入库': { pageId:'wh-other-in', prefix:'QTST', noKey:'单号', docType:'盘盈入库', tab:'tab1' },
         '直接调拨': { pageId:'wh-direct-xfer', prefix:'ZJDBSQ', noKey:'单号', docType:'直接调拨通知单', tab:'tab1' },
-        '库内转移': { pageId:'wh-transfer', prefix:'YKT', noKey:'移库单号', docType:'库内转移', tab:'tab1' },
+        '库内转移': { pageId:'wh-transfer', prefix:'YKTT', noKey:'移库单号', docType:'标准移库', tab:'tab1' },
         '无': null
       };
       return map[b] || null;
@@ -5204,7 +5277,20 @@ const app = createApp({
           ...carrier
         });
       } else if(meta.pageId==='wh-transfer'){
-        Object.assign(base, { 移入仓库编码:'—', 移入库位编码:'—', 已完成件数:'0', 制单时间: planDate+' 08:00:00', 制单人: ship['申请人']||'张三', 包装规格:'—' });
+        Object.assign(base, {
+          移入仓库: '—',
+          移入库位: '—',
+          计划执行日期: planDate,
+          已完成件数: '0',
+          制单时间: planDate+' 08:00:00',
+          制单人: ship['申请人']||'张三'
+        });
+        delete base['关联运单'];
+        delete base['关联发货单'];
+        delete base['移出仓库'];
+        delete base['移出库位'];
+        delete base['ERP单号'];
+        delete base['ERP对接状态'];
       }
       list.unshift(base);
       if(meta.pageId==='wh-po-in') syncQcLedgerFromPoInNotice(base[meta.noKey], base._lines);
@@ -6230,14 +6316,110 @@ const app = createApp({
       if(pageId.value==='lg-dispatch' && f && f.name==='前置关联单据') return '请选择销售出库单（选填）';
       return '请点击选择';
     }
+    function stocktakeSelectedWarehouses(text){
+      return String(text||'').split(/[、,，]/).map(s=> s.trim()).filter(Boolean);
+    }
+    function stocktakeCodesFromText(text){
+      const out = [];
+      const seen = new Set();
+      String(text||'').split(/[、,，]/).forEach(part=>{
+        const c = codeOf(part);
+        if(!c || seen.has(c)) return;
+        seen.add(c);
+        out.push(c);
+      });
+      return out;
+    }
+    function stocktakeFormMatCodes(codes){
+      if(Array.isArray(codes) && codes.length) return codes.filter(Boolean);
+      if(Array.isArray(formModel._stockMatCodes) && formModel._stockMatCodes.length){
+        return formModel._stockMatCodes.filter(Boolean);
+      }
+      return stocktakeCodesFromText(formModel['物料信息']);
+    }
+    function stocktakeWhTokensOf(row){
+      const loc = String(row['库存位置']||'');
+      const fromLoc = loc.includes('/') ? loc.split('/').map(s=> s.trim()).filter(Boolean) : (loc ? [loc] : []);
+      return [row['仓库名称'], row['仓库编码'], row['所属仓库'], ...fromLoc].map(x=> String(x||'').trim()).filter(Boolean);
+    }
+    function stocktakeWhMatch(row, whNames){
+      if(!whNames || !whNames.length) return true;
+      const tokens = stocktakeWhTokensOf(row);
+      if(!tokens.length) return false;
+      return whNames.some(w=>{
+        const ww = String(w||'').trim();
+        if(!ww) return false;
+        return tokens.some(t=> t===ww || t.includes(ww) || ww.includes(t));
+      });
+    }
+    function normalizeStocktakeInvRow(r, i){
+      const code = codeOf(r['物料编码']||r['物料信息']||'');
+      const m = matListRow(code) || {};
+      return {
+        _i: i + 1,
+        物料编码: code || (r['物料编码']||''),
+        物料名称: r['物料名称'] || m['物料名称'] || '',
+        物料规格: r['物料规格'] || m['物料规格'] || '',
+        物料种类: r['物料种类'] || m['物料种类'] || '',
+        应盘数量: r['应盘数量'] ?? r['数量'] ?? '',
+        库存单位: r['库存单位'] || m['库存单位'] || '',
+        仓库编码: r['仓库编码'] || '',
+        仓库名称: r['仓库名称'] || '',
+        库位编码: r['库位编码'] || ''
+      };
+    }
+    function normalizeStocktakeBarcodeRow(r){
+      const parts = String(r['物料信息']||'').split(' / ').map(s=> s.trim());
+      const code = codeOf(r['物料编码'] || parts[0] || '');
+      const m = matListRow(code) || {};
+      let pkgType = String(r['包材类型'] || r['档案来源'] || '').trim();
+      if(/流水码/.test(pkgType)) pkgType = '流水码';
+      else if(/储罐/.test(pkgType)) pkgType = '储罐';
+      const loc = String(r['库存位置']||'');
+      let whName = String(r['仓库名称']||'').trim();
+      let whCode = String(r['仓库编码']||'').trim();
+      let locCode = String(r['库位编码']||'').trim();
+      if(loc.includes('/')){
+        const segs = loc.split('/').map(s=> s.trim()).filter(Boolean);
+        if(!whName) whName = segs[0] || '';
+        if(!locCode) locCode = segs[1] || '';
+      } else if(loc && !locCode){
+        locCode = loc;
+      }
+      return {
+        包材类型: pkgType || '流水码',
+        物料编码: code || parts[0] || '',
+        物料名称: r['物料名称'] || parts[1] || m['物料名称'] || '',
+        物料规格: r['物料规格'] || parts[2] || m['物料规格'] || '',
+        物料种类: r['物料种类'] || parts[3] || m['物料种类'] || '',
+        条码号: r['条码号'] || '',
+        包材编号: r['包材编号'] || '—',
+        批号: r['批号'] || r['物料批号'] || '',
+        应盘数量: r['应盘数量'] ?? r['当前数量'] ?? '',
+        库存单位: r['库存单位'] || m['库存单位'] || '',
+        仓库编码: whCode || whName || '',
+        仓库名称: whName || whCode || '',
+        库位编码: locCode || '—'
+      };
+    }
     function applyStocktakeMatFilter(codes){
-      const list = (codes||[]).filter(Boolean);
+      const list = stocktakeFormMatCodes(codes);
       formModel._stockMatCodes = list;
       const mode = formModel['盘点方式'] || '';
+      const whs = stocktakeSelectedWarehouses(formModel['盘点仓库']);
+      if(!list.length && !whs.length){
+        formLineRows.value = [];
+        formBarcodeRows.value = [];
+        return;
+      }
       const inv = ((MOCK['wh-stocktake']||{}).stockInvLines || []);
       const bc = ((MOCK['wh-stocktake']||{}).stockBarcodeLines || []);
-      formLineRows.value = inv.filter(r=> stocktakeInvRowVisible(r, list, mode)).map((r,i)=>({_i:i+1, ...r}));
-      formBarcodeRows.value = bc.filter(r=> stocktakeBarcodeRowVisible(r, list, mode)).map(r=>({...r}));
+      formLineRows.value = inv
+        .filter(r=> stocktakeInvRowVisible(r, list, mode, whs))
+        .map((r,i)=> normalizeStocktakeInvRow(r, i));
+      formBarcodeRows.value = bc
+        .filter(r=> stocktakeBarcodeRowVisible(r, list, mode, whs))
+        .map(r=> normalizeStocktakeBarcodeRow(r));
     }
     function stocktakeMatManageMode(code){
       const m = matListRow(code);
@@ -6248,21 +6430,23 @@ const app = createApp({
       if(String(mode||'').includes('条码')) return /条码/.test(mm);
       return /条码|计数/.test(mm);
     }
-    function stocktakeInvRowVisible(row, codes, mode){
+    function stocktakeInvRowVisible(row, codes, mode, whNames){
       const code = codeOf(row['物料编码']||row['物料信息']||row);
       if(!stocktakeMatAllowed(code, mode)) return false;
-      return !codes.length || codes.includes(code);
+      if(Array.isArray(codes) && codes.length && !codes.includes(code)) return false;
+      if(!stocktakeWhMatch(row, whNames||[])) return false;
+      return true;
     }
-    function stocktakeBarcodeRowVisible(row, codes, mode){
+    function stocktakeBarcodeRowVisible(row, codes, mode, whNames){
       const code = codeOf(row['物料编码']||row['物料信息']||row);
-      if(!stocktakeInvRowVisible(row, codes, mode)) return false;
+      if(!stocktakeInvRowVisible(row, codes, mode, whNames)) return false;
       if(!/条码/.test(stocktakeMatManageMode(code))) return false;
       const bc = String(row['条码号']||'').trim();
       return bc && bc!=='—';
     }
     function pruneStocktakeMatsByMode(){
       const mode = formModel['盘点方式'] || '';
-      const codes = formModel._stockMatCodes || [];
+      const codes = stocktakeFormMatCodes();
       if(!codes.length){
         applyStocktakeMatFilter([]);
         return;
@@ -6320,8 +6504,9 @@ const app = createApp({
         }
         formLineRows.value = [];
       }
-      if(pageId.value==='wh-stocktake' && f.name==='物料信息'){
-        applyStocktakeMatFilter([]);
+      if(pageId.value==='wh-stocktake' && (f.name==='物料信息' || f.name==='盘点仓库')){
+        if(f.name==='物料信息') formModel._stockMatCodes = [];
+        applyStocktakeMatFilter(formModel._stockMatCodes || []);
       }
       if(pageId.value==='wh-prod-in' && f.name==='关联生产订单'){
         formLineRows.value = [];
@@ -6495,10 +6680,72 @@ const app = createApp({
         '受托退料': { pageId:'wh-cs-ret', tab:'tab1', noKey:'单号', partyKey:'客户名称', wayBiz:'受托退料', statusKey:'单据状态' },
         '其他入库': { pageId:'wh-other-in', tab:'tab1', noKey:'单号', partyKey:'', wayBiz:'其他入库', statusKey:'单据状态' },
         '其他出库': { pageId:'wh-other-out', tab:'tab1', noKey:'单号', partyKey:'', wayBiz:'其他出库', statusKey:'单据状态' },
-        '库内移库': { pageId:'wh-transfer', tab:'tab1', noKey:'移库单号', partyKey:'', wayBiz:'库内转移', statusKey:'单据状态' },
-        '库内转序': { pageId:'wh-seq', tab:'tab1', noKey:'转序单号', partyKey:'', wayBiz:'', statusKey:'单据状态' },
+        '直接调拨': { pageId:'wh-direct-xfer', tab:'tab1', noKey:'单号', partyKey:'', wayBiz:'', statusKey:'单据状态' },
       };
       return map[b] || null;
+    }
+    /** 出入库/调拨 pageId → 装卸「关联仓库业务」 */
+    const WH_LOAD_PUSH_BIZ = {
+      'wh-po-in': '采购收料', 'wh-po-ret': '采购退料',
+      'wh-prod-issue': '生产领料', 'wh-prod-ret': '生产退料', 'wh-prod-in': '生产入库',
+      'wh-so-ship': '销售发货', 'wh-so-preout': '销售预出货', 'wh-so-ret': '销售退货',
+      'wh-os-issue': '委外发料', 'wh-os-ret-mat': '委外退料', 'wh-os-recv': '委外收货', 'wh-os-ret-goods': '委外退货',
+      'wh-cs-recv': '受托收料', 'wh-cs-ret': '受托退料',
+      'wh-other-in': '其他入库', 'wh-other-out': '其他出库',
+      'wh-direct-xfer': '直接调拨',
+    };
+    /** 新增出入库单且「是否需要装卸货≠否」时，自动下推 ZXTT 装卸通知单 */
+    function appendAutoPushLoadNotice(baseMsg, savedRow, isAdd) {
+      if (!isAdd || !savedRow) return baseMsg;
+      const biz = WH_LOAD_PUSH_BIZ[pageId.value];
+      if (!biz) return baseMsg;
+      const need = String(formModel['是否需要装卸货'] == null ? '是' : formModel['是否需要装卸货']).trim();
+      if (need === '否') return baseMsg;
+      const no = String(savedRow['单号'] || '').trim();
+      if (!no) return baseMsg;
+      const loadBag = ((MOCK['wh-load'] = MOCK['wh-load'] || {}).tab1 = (MOCK['wh-load'].tab1 || []));
+      if (loadBag.some(r => String(r['关联单号'] || '') === no && r['单据状态'] !== '已关闭')) return baseMsg;
+      const dash = (v) => (v && String(v).trim() && String(v).trim() !== '—') ? String(v).trim() : '—';
+      const zxNo = nextBizNo('ZXTT', 'wh-load', '单号');
+      const lines = (Array.isArray(savedRow._lines) ? savedRow._lines : []).map((ln, i) => {
+        const planQty = ln['计划数量'] != null && ln['计划数量'] !== '' ? String(ln['计划数量']) : '0';
+        return {
+          id: zxNo + '-l' + (i + 1),
+          行状态: '待执行',
+          物料信息: ln['物料信息'] || '—',
+          库存单位: ln['库存单位'] || '—',
+          管理方式: ln['管理方式'] || '条码管理',
+          计划件数: ln['计划件数'] != null && ln['计划件数'] !== '' ? String(ln['计划件数']) : '—',
+          计划数量: planQty,
+          已完成数量: '0.000',
+          未完成数量: planQty,
+          批号: ln['批号'] || ln['物料批号'] || '—',
+          包装规格: ln['包装规格'] || savedRow['包装规格'] || '—',
+          备注: ln['备注'] || '—',
+        };
+      });
+      loadBag.unshift({
+        id: 'zxtt-' + Date.now(),
+        单号: zxNo,
+        单据状态: '待执行',
+        单据类型: '标准装卸',
+        关联仓库业务: biz,
+        关联单号: no,
+        客供信息: dash(savedRow['供应商名称'] || savedRow['客户名称'] || savedRow['客供信息'] || '—'),
+        计划执行日期: savedRow['计划执行日期'] || '',
+        物料信息: savedRow['物料信息'] || (lines[0] && lines[0]['物料信息']) || '—',
+        关联运单: dash(savedRow['关联运单']),
+        关联发货单: dash(savedRow['关联发货单']),
+        承运商: dash(savedRow['承运商']),
+        车牌号: dash(savedRow['车牌号']),
+        车挂号: dash(savedRow['车挂号']),
+        司机姓名: dash(savedRow['司机姓名']),
+        司机电话: dash(savedRow['司机电话']),
+        司机身份证号: dash(savedRow['司机身份证号']),
+        备注: '由出入库单自动下推生成',
+        _lines: lines,
+      });
+      return String(baseMsg || '') + '，已同步下推装卸货通知单';
     }
     function loadWhBizWaybillType(biz){
       const m = loadWhBizMeta(biz);
@@ -7789,10 +8036,17 @@ const app = createApp({
         all = cust.concat(supp);
       } else if(t==='盘点仓库'){
         all = wrapPickerModuleRows('warehouse', ((MOCK.warehouse||{}).tab1||[]).filter(w=> w['启用状态']==='启用'), '仓库编码', '仓库名称', 'tab1');
-      } else if(t==='调出仓库' || t==='调入仓库' || t==='移入仓库编码' || t==='移出仓库编码'){
+      } else if(t==='调出仓库' || t==='调入仓库' || t==='移入仓库编码' || t==='移出仓库编码' || t==='移出仓库' || t==='移入仓库'){
         all = wrapPickerModuleRows('warehouse', ((MOCK.warehouse||{}).tab1||[]).filter(w=> w['启用状态']==='启用'), '仓库编码', '仓库名称', 'tab1');
-      } else if(t==='移入库位编码' || t==='移出库位编码'){
-        all = warehouseLocPickerRows();
+      } else if(t==='移入库位编码' || t==='移出库位编码' || t==='移出库位' || t==='移入库位'){
+        const whKey = (t==='移出库位' || t==='移出库位编码') ? '移出仓库' : '移入仓库';
+        const whName = transferWhName(formModel[whKey] || formModel[whKey+'编码'] || '');
+        if((t==='移出库位' || t==='移入库位') && !whName){
+          ElMessage.warning(t==='移出库位' ? '请先选择移出仓库' : '请先选择移入仓库');
+          all = [];
+        } else {
+          all = transferLocPickerRows(whName);
+        }
       } else if((t==='条码号' || t==='条码号（主条码）') && isBcSerialPage()){
         const mainOnly = pageId.value==='bc-serial-merge' && t==='条码号（主条码）';
         all = serialArchPickerRows(r=>{
@@ -7912,6 +8166,13 @@ const app = createApp({
       if(!a || !b) return null;
       return Math.floor((b.getTime() - a.getTime()) / 86400000);
     }
+    function isExpireOverdue(ymd){
+      const exp = parseYmdDate(ymd);
+      if(!exp) return false;
+      const today = parseYmdDate(nowStamp().slice(0,10));
+      const left = daysBetweenDates(today, exp);
+      return left!=null && left < 0;
+    }
     function ageWarnThresholdDays(matCode){
       const code = String(matCode||'').trim();
       if(!code) return null;
@@ -7979,7 +8240,8 @@ const app = createApp({
     const tableData = computed(()=>{
       storeTick.value;
       const rows = (MOCK[pageId.value]||{})[tabView.value.name] || [];
-      let list = pageId.value==='lg-waybill-carrier' ? (((MOCK['lg-waybill']||{}).main)||[]).slice() : rows;
+      let list = pageId.value==='lg-waybill-carrier' ? (((MOCK['lg-waybill']||{}).main)||[]).slice()
+        : (pageId.value==='bc-scrap-list' ? (((MOCK['serial-arch']||{}).main)||[]).map(mapSerialArchToScrapListRow) : rows);
       if(page.value?.layout==='dict-split'){
         if(!isDictLeafType(dictTypeId.value)) return [];
         list = rows.filter(r=> r.typeId===dictTypeId.value);
@@ -8304,13 +8566,32 @@ const app = createApp({
         list = sortByCreateTimeDesc(list);
       }
       if(pageId.value==='bc-scrap-list'){
+        // 只读预警视图：失效日期 < 今天 且 使用状态 ≠ 报废（Mock 已预筛；查询再过滤）
+        list = list.filter(r=>{
+          const st = String(r['使用状态']||'');
+          if(st==='报废') return false;
+          const exp = parseYmdDate(r['失效日期']);
+          if(!exp) return false;
+          const today = parseYmdDate(nowStamp().slice(0,10));
+          const left = daysBetweenDates(today, exp);
+          return left!=null && left < 0;
+        });
         list = applyDateRangeQuery(list, query, '失效日期');
-        list = applyContainsExactQuery(list, query, ['条码号','物料编码','物料名称','物料批号','库存位置'], ['报废状态','使用状态','库存状态','绑定状态']);
-        list = list.slice().sort((a,b)=> String(a['失效日期']||'').localeCompare(String(b['失效日期']||'')));
+        list = applyContainsExactQuery(
+          list,
+          query,
+          ['条码号','物料编码','物料名称','物料批号','存储位置'],
+          ['使用状态','库存状态','绑定状态','包装规格']
+        );
+        list = list.slice().sort((a,b)=>{
+          const d = String(a['失效日期']||'').localeCompare(String(b['失效日期']||''));
+          if(d!==0) return d;
+          return String(a['条码号']||'').localeCompare(String(b['条码号']||''));
+        });
       }
       if(pageId.value==='bc-outer-split'){
         list = applyDateRangeQuery(list, query, '操作时间');
-        list = applyContainsExactQuery(list, query, ['外包材拆装单号','条码号'], ['单据类型','包材类型']);
+        list = applyContainsExactQuery(list, query, ['外包材拆装单号','条码号','包装规格'], ['单据类型']);
         list = sortByCreateTimeDesc(list);
       }
       if(pageId.value==='bc-scrap-proc' || pageId.value==='bc-freeze' || pageId.value==='bc-unfreeze'){
@@ -8318,26 +8599,45 @@ const app = createApp({
         if(tab==='tab1'){
           list = applyDateRangeQuery(list, query, pageId.value==='bc-scrap-proc' ? '创建时间' : '制单时间');
           const exactKeys = pageId.value==='bc-scrap-proc'
-            ? ['单据状态','单据类型','产线名称','车间名称']
-            : (pageId.value==='bc-freeze' ? ['单据状态','创建方式'] : ['单据状态']);
+            ? ['单据状态','单据类型']
+            : ['单据状态'];
           const containsKeys = pageId.value==='bc-scrap-proc'
-            ? ['工单号','报废工艺']
+            ? ['工单号']
             : (pageId.value==='bc-freeze' ? ['冻结单号'] : ['解除单号']);
           list = sortByCreateTimeDesc(applyContainsExactQuery(list, query, containsKeys, exactKeys));
+        } else if(pageId.value==='bc-scrap-proc' || pageId.value==='bc-freeze'){
+          list = applyDateRangeQuery(list, query, '操作时间');
+          const containsKeys = pageId.value==='bc-scrap-proc'
+            ? ['条码号','报废单号']
+            : ['条码号','冻结单号','物料信息'];
+          list = applyContainsExactQuery(list, query, containsKeys, ['流水状态','单据类型']);
+          list = list.slice().sort((a,b)=>{
+            const t = String(b['操作时间']||'').localeCompare(String(a['操作时间']||''));
+            if(t!==0) return t;
+            return String(a['条码号']||'').localeCompare(String(b['条码号']||''));
+          });
         } else {
-          list = applyContainsExactQuery(list, query, ['条码号','钢瓶编号','报废单号','冻结单号','解除单号','当前工序'], ['流水状态','档案来源','空满状态','库存状态','单据类型','产线名称','车间名称','报废工艺','创建方式']);
+          list = applyContainsExactQuery(list, query, ['条码号','钢瓶编号','解除单号','当前工序'], ['流水状态','档案来源','空满状态','库存状态','单据类型','产线名称','车间名称','报废工艺','创建方式']);
         }
       }
       if(pageId.value==='bc-serial-split' || pageId.value==='bc-serial-merge'){
         list = applyDateRangeQuery(list, query, '操作时间');
         const contains = pageId.value==='bc-serial-split'
-          ? ['拆分单号','主条码号','物料名称','物料编码','物料批号']
-          : ['合并单号','合并后条码号','物料名称','被合并条码号','物料编码','物料批号'];
+          ? ['拆分单号','主条码号','物料信息','物料批号','拆分后条码号']
+          : ['合并单号','主条码号','物料信息','物料批号','被合并条码号'];
         list = sortByCreateTimeDesc(applyContainsExactQuery(list, query, contains, []));
       }
       if(pageId.value==='bc-freeze-list'){
-        list = applyContainsExactQuery(list, query, ['条码号','物料编码','物料名称','冻结单号','关联业务单号'], ['档案来源','库存状态','单据类型','创建方式']);
-        list = sortByCreateTimeDesc(list);
+        // 只读状态视图：使用状态=冻结（Mock 已预筛）；查询后按最新操作时间倒序
+        const q2 = Object.assign({}, query, { 最新操作时间: query['操作时间'] });
+        list = applyDateRangeQuery(list, q2, '最新操作时间');
+        list = applyContainsExactQuery(
+          list,
+          query,
+          ['条码号','物料编码','物料名称','物料批号','存储位置'],
+          ['库存状态','包装规格']
+        );
+        list = list.slice().sort((a,b)=> String(b['最新操作时间']||'').localeCompare(String(a['最新操作时间']||'')));
       }
       if(!STORE) return list;
       return list.map(r => STORE.overlayPcRow(pageId.value, r));
@@ -8460,6 +8760,9 @@ const app = createApp({
         } else if(c.slot==='tag'){
           const fitW = fitColWidth(c.field, c.title, sampleRows);
           cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), fixed:c.fixed||null, slots:{ default:'tag' } });
+        } else if(c.slot==='expire_warn'){
+          const fitW = fitColWidth(c.field, c.title, sampleRows);
+          cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), slots:{ default:'expire_warn' } });
         } else if(c.slot==='uom_ratio'){
           const fitW = fitColWidth(c.field, c.title, sampleRows.map(r => Object.assign({}, r, { [c.field]: formatMatUomRatioDisplay(r[c.field]) })));
           cols.push({ field:c.field, title:c.title, width:fitW, minWidth:fitW, maxWidth:colMaxWidth(c.title||c.field), slots:{ default:'uom_ratio' } });
@@ -8692,8 +8995,10 @@ const app = createApp({
       else if(pageId.value==='bc-scrap-proc' || pageId.value==='bc-freeze' || pageId.value==='bc-unfreeze'){
         formLineRows.value = [];
         if((mode||'add')==='add'){
+          if(pageId.value==='bc-scrap-proc'){
+            formModel['单据类型'] = formModel['单据类型'] || '报废处理单';
+          }
           if(pageId.value==='bc-freeze'){
-            formModel['创建方式'] = '手动';
             formModel['单据类型'] = formModel['单据类型'] || '异常冻结单';
           }
           if(pageId.value==='bc-unfreeze'){
@@ -8703,7 +9008,17 @@ const app = createApp({
       }
       else if(pageId.value==='wh-stocktake'){
         if(formMode.value==='add' && !formModel['盘点方式']) formModel['盘点方式'] = '条码盘点';
-        applyStocktakeMatFilter(formModel._stockMatCodes || []);
+        applyStocktakeMatFilter(stocktakeFormMatCodes(formModel._stockMatCodes));
+      }
+      else if(pageId.value==='wh-transfer'){
+        formLineRows.value = [];
+        if((mode||'add')==='add'){
+          const d = new Date();
+          const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          formModel['单据类型'] = formModel['单据类型'] || '标准移库';
+          formModel['移库单号'] = '系统自动生成';
+          formModel['计划执行日期'] = formModel['计划执行日期'] || ymd;
+        }
       }
       else formLineRows.value = lines ? [{_i:1},{_i:2}] : [];
       if(pageId.value!=='wh-stocktake') formBarcodeRows.value = [];
@@ -8917,6 +9232,16 @@ const app = createApp({
           const first = dictFirst(name, 'tab1');
           if(first) formModel[name] = first;
         });
+      }
+      if(formMode.value==='add' || formMode.value==='copy'){
+        const applyDef = (f)=>{
+          if(!f || !f.name || f.defaultValue==null || f.defaultValue==='') return;
+          if(formModel[f.name]!=null && String(formModel[f.name]).trim()!=='') return;
+          formModel[f.name] = f.defaultValue;
+        };
+        (activeFormFields.value||[]).forEach(applyDef);
+        (page.value.formFields||[]).forEach(applyDef);
+        (page.value.formSections||[]).forEach(s=> (s.fields||[]).forEach(applyDef));
       }
       formVisible.value=true;
     }
@@ -9827,6 +10152,12 @@ const app = createApp({
           }
         });
         formModel._editId = row.id;
+        if(pageId.value==='wh-stocktake'){
+          formModel._stockMatCodes = Array.isArray(row._stockMatCodes) && row._stockMatCodes.length
+            ? row._stockMatCodes.slice()
+            : stocktakeCodesFromText(formModel['物料信息'] || row['物料信息']);
+          applyStocktakeMatFilter(formModel._stockMatCodes);
+        }
         if(isWhNoticePage()){
           let lines = Array.isArray(row._lines) ? row._lines.slice() : [];
           if(lines.length && (pageId.value==='wh-po-in' || pageId.value==='wh-po-ret' || isOsFinishedNoticePage())){
@@ -9908,12 +10239,17 @@ const app = createApp({
           formModel['适用单据类型'] = splitDun(row['适用单据类型']);
           formSwitch['启用状态'] = row['启用状态']!=='禁用';
           formLineRows.value = splitDun(row['适用物料']).filter(x=> x && x!=='—').map((label,i)=>{
-            const parts = String(label).split(' / ');
+            const parts = String(label).split(' / ').map(s=> s.trim());
             const code = parts[0] || codeOf(label);
+            const full = matInfoText(code) || label;
+            const fp = String(full).split(' / ').map(s=> s.trim());
             return {
               _i: i+1,
-              物料编码: code,
-              物料信息: matInfoText(code) || label
+              物料编码: fp[0] || code,
+              物料名称: fp[1] || parts[1] || '',
+              物料规格: fp[2] || '—',
+              物料种类: fp[3] || '—',
+              物料信息: full
             };
           });
           if(op.name==='复制'){
@@ -10179,7 +10515,7 @@ const app = createApp({
         const jd = page.value?.jobDetail || {};
         jobTitle.value = (pageId.value==='wh-so-preout' || pageId.value==='wh-stocktake')
           ? '详情'
-          : `${op.name} — ${row['盘点单号']||row['单号']||row['单据号']||row['装卸单号']||row['条码号']||row['转序单号']||row.id||''}`;
+          : `${op.name} — ${row['移库单号']||row['盘点单号']||row['单号']||row['单据号']||row['装卸单号']||row['条码号']||row['转序单号']||row.id||''}`;
         const head = {};
         if(pageId.value==='wh-stocktake'){
           const skip = new Set(['id','_actions','_stockMatCodes','_lines']);
@@ -10201,8 +10537,16 @@ const app = createApp({
           jobBarcodeCols.value = jd.barcodeColumns || [];
           const mock = MOCK[pageId.value] || {};
           const mode = row['盘点方式'] || '';
-          jobInvRows.value = (mock.stockInvLines || []).filter(r=> stocktakeInvRowVisible(r, [], mode));
-          jobBarcodeRows.value = (mock.stockBarcodeLines || []).filter(r=> stocktakeBarcodeRowVisible(r, [], mode));
+          const whs = stocktakeSelectedWarehouses(row['盘点仓库']);
+          const codes = Array.isArray(row._stockMatCodes) && row._stockMatCodes.length
+            ? row._stockMatCodes
+            : stocktakeCodesFromText(row['物料信息']);
+          jobInvRows.value = (mock.stockInvLines || [])
+            .filter(r=> stocktakeInvRowVisible(r, codes, mode, whs))
+            .map((r,i)=> normalizeStocktakeInvRow(r, i));
+          jobBarcodeRows.value = (mock.stockBarcodeLines || [])
+            .filter(r=> stocktakeBarcodeRowVisible(r, codes, mode, whs))
+            .map(r=> normalizeStocktakeBarcodeRow(r));
           jobProcs.value = [];
         } else {
           jobInvTip.value = '';
@@ -10713,7 +11057,7 @@ const app = createApp({
         条码号: bc,
         物料信息: arch['物料信息'] || '—',
         包装规格: arch['包装规格'] || '—',
-        供应商名称: arch['供应商信息'] || arch['供应商名称'] || '—',
+        供应商信息: arch['供应商信息'] || arch['供应商名称'] || '—',
         库存单位: arch['库存单位'] || '—',
         剩余数量: remain,
         物料批号: arch['物料批号'] || '—',
@@ -12805,7 +13149,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '销售发货通知单创建成功' : '销售发货通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '销售发货通知单创建成功' : '销售发货通知单修改成功', payload, isAdd));
         return;
       }
       if(pageId.value==='wh-so-ret'){
@@ -12863,7 +13207,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '销售退货通知单创建成功' : '销售退货通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '销售退货通知单创建成功' : '销售退货通知单修改成功', payload, isAdd));
         return;
       }
       if(pageId.value==='wh-so-preout'){
@@ -12928,7 +13272,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '销售预出货通知单创建成功' : '销售预出货通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '销售预出货通知单创建成功' : '销售预出货通知单修改成功', payload, isAdd));
         return;
       }
       if(pageId.value==='wh-so-prep'){
@@ -13106,7 +13450,7 @@ const app = createApp({
         syncQcLedgerFromPoInNotice(savedNo, payload._lines);
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '采购收料通知单已新增' : '采购收料通知单已保存');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '采购收料通知单已新增' : '采购收料通知单已保存', payload, isAdd));
         return;
       }
       if(pageId.value==='wh-po-ret'){
@@ -13177,7 +13521,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '采购退料通知单创建成功' : '采购退料通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '采购退料通知单创建成功' : '采购退料通知单修改成功', payload, isAdd));
         return;
       }
       if(isOsPoPage() && (activeTab.value==='tab1' || (tabView.value||{}).name==='tab1')){
@@ -13246,7 +13590,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? (meta.label + '创建成功') : (meta.label + '修改成功'));
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? (meta.label + '创建成功') : (meta.label + '修改成功'), payload, isAdd));
         return;
       }
       if(pageId.value==='wh-prod-ret'){
@@ -13337,7 +13681,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success('保存成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? ((meta && meta.label || '通知单') + '创建成功') : '保存成功', payload, isAdd));
         return;
       }
       if(isProdWhPage() && (pageId.value==='wh-prod-issue' || pageId.value==='wh-prod-ret' || pageId.value==='wh-prod-in' || pageId.value==='wh-direct-xfer')){
@@ -13422,7 +13766,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? (meta.label+'创建成功') : (meta.label+'修改成功'));
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? (meta.label+'创建成功') : (meta.label+'修改成功'), payload, isAdd));
         return;
       }
       if(pageId.value==='wh-load'){
@@ -13539,7 +13883,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '其他入库通知单创建成功' : '其他入库通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '其他入库通知单创建成功' : '其他入库通知单修改成功', payload, isAdd));
         return;
       }
       if(pageId.value==='wh-other-out'){
@@ -13601,7 +13945,7 @@ const app = createApp({
         }
         formVisible.value=false;
         bumpStore();
-        ElMessage.success(isAdd ? '其他出库通知单创建成功' : '其他出库通知单修改成功');
+        ElMessage.success(appendAutoPushLoadNotice(isAdd ? '其他出库通知单创建成功' : '其他出库通知单修改成功', payload, isAdd));
         return;
       }
       if((formLineRows.value||[]).length && (activeFormLineFields.value||[]).some(f=> f.name==='计划数量' && f.required)){
@@ -13617,20 +13961,40 @@ const app = createApp({
         if(!formBarcodeRows.value.length){ ElMessage.warning('请先点击生成条码生成拆分条码数据'); return; }
         const remain = Number(formModel['拆分后剩余数量']);
         if(!Number.isFinite(remain) || remain < 0){ ElMessage.warning('拆分总数量不可超过原条码可拆分剩余数量，请调整子条码建档数量'); return; }
-        const list = ((MOCK['bc-serial-split'] = MOCK['bc-serial-split'] || {}).main = (MOCK['bc-serial-split'].main || []));
+        const bag = (MOCK['bc-serial-split'] = MOCK['bc-serial-split'] || {});
+        const list = (bag.tab1 = bag.tab1 || []);
+        const flowList = (bag.tab2 = bag.tab2 || []);
         const archList = ((MOCK['serial-arch'] = MOCK['serial-arch'] || {}).main = (MOCK['serial-arch'].main || []));
         const parentSnap = archList.find(r=> r['条码号']===bc) || formLineRows.value[0] || {};
         const parentUse = String(parentSnap['使用状态'] || '在用');
         const parentStock = String(parentSnap['库存状态'] || '初始化');
         const parentQc = String(parentSnap['检验状态'] || '待检验');
         const parentLoc = String(parentSnap['库存位置'] || parentSnap['存储位置'] || '—');
-        const matParts = String(formLineRows.value[0]?.['物料信息']|| parentSnap['物料信息'] ||'').split(' / ');
+        const matInfo = String(formLineRows.value[0]?.['物料信息'] || parentSnap['物料信息'] || '—').trim() || '—';
+        const supplier = formLineRows.value[0]?.['供应商信息'] || formLineRows.value[0]?.['供应商名称'] || parentSnap['供应商信息'] || parentSnap['供应商名称'] || '—';
+        const packSpec = formLineRows.value[0]?.['包装规格'] || parentSnap['包装规格'] || '—';
+        const unit = formLineRows.value[0]?.['库存单位'] || parentSnap['库存单位'] || 'KG';
+        const lot = formLineRows.value[0]?.['物料批号'] || parentSnap['物料批号'] || '—';
+        const prodDate = formLineRows.value[0]?.['生产日期'] || parentSnap['生产日期'] || '—';
+        const valid = parentSnap['有效期'] || formLineRows.value[0]?.['有效期'] || '—';
+        const expire = parentSnap['失效日期'] || formLineRows.value[0]?.['失效日期'] || '—';
+        const remark = formModel['备注'] || '—';
         const splitNo = nextBizNo('CF', 'bc-serial-split', '拆分单号');
         const stamp = nowStamp();
         const lines = formBarcodeRows.value.map(r=>({
           拆分后条码号: r['条码号'],
+          物料信息: matInfo,
+          包装规格: packSpec,
+          供应商信息: supplier,
+          库存单位: unit,
           建档数量: r['建档数量'],
-          物料批号: formLineRows.value[0]?.['物料批号'] || parentSnap['物料批号'] || '—'
+          物料批号: lot,
+          生产日期: prodDate,
+          有效期: valid,
+          失效日期: expire,
+          备注: remark,
+          操作时间: stamp,
+          操作人: '演示用户'
         }));
         const splitSum = lines.reduce((s,l)=> s + (Number(l['建档数量'])||0), 0);
         const parentRow = archList.find(r=> r['条码号']===bc);
@@ -13651,44 +14015,66 @@ const app = createApp({
             库存位置: parentLoc,
             存储位置: parentLoc,
             条码号: r['条码号'],
-            包装规格: parentSnap['包装规格'] || formLineRows.value[0]?.['包装规格'] || '—',
+            包装规格: packSpec,
             来源单号: splitNo,
             来源条码号: bc,
-            物料信息: parentSnap['物料信息'] || formLineRows.value[0]?.['物料信息'] || '—',
-            物料批号: parentSnap['物料批号'] || formLineRows.value[0]?.['物料批号'] || '—',
+            物料信息: matInfo,
+            物料批号: lot,
             客户批号: parentSnap['客户批号'] || '—',
             建档数量: qty,
             当前数量: qty,
             剩余数量: qty,
-            库存单位: parentSnap['库存单位'] || formLineRows.value[0]?.['库存单位'] || 'KG',
-            供应商信息: parentSnap['供应商信息'] || parentSnap['供应商名称'] || formLineRows.value[0]?.['供应商名称'] || '—',
-            供应商名称: parentSnap['供应商名称'] || formLineRows.value[0]?.['供应商名称'] || '—',
+            库存单位: unit,
+            供应商信息: supplier,
+            供应商名称: supplier,
             生产厂家: parentSnap['生产厂家'] || '—',
-            生产日期: parentSnap['生产日期'] || formLineRows.value[0]?.['生产日期'] || '—',
-            有效期: parentSnap['有效期'] || '—',
-            失效日期: parentSnap['失效日期'] || '—',
+            生产日期: prodDate,
+            有效期: valid,
+            失效日期: expire,
             最新操作人: '演示用户',
             最新操作时间: stamp
           });
         });
+        const docId = 'cfs-' + Date.now();
         list.unshift({
-          id: 'cfs-' + Date.now(),
+          id: docId,
           拆分单号: splitNo,
           主条码号: bc,
-          物料编码: matParts[0] || '—',
-          物料名称: matParts[1] || '—',
-          物料规格: matParts[2] || '—',
-          包装规格: formLineRows.value[0]?.['包装规格'] || '—',
-          供应商名称: formLineRows.value[0]?.['供应商名称'] || '—',
-          物料批号: formLineRows.value[0]?.['物料批号'] || '—',
-          生产日期: formLineRows.value[0]?.['生产日期'] || '—',
-          库存单位: formLineRows.value[0]?.['库存单位'] || '—',
+          物料信息: matInfo,
+          包装规格: packSpec,
+          供应商信息: supplier,
+          物料批号: lot,
+          生产日期: prodDate,
+          有效期: valid,
+          失效日期: expire,
+          库存单位: unit,
           本次拆出数量: String(splitSum),
           本次拆分条码个数: String(lines.length),
           拆出后剩余数量: String(remain),
+          备注: remark,
           操作时间: stamp,
           操作人: '演示用户',
           lines
+        });
+        lines.forEach((ln, idx)=>{
+          flowList.unshift({
+            id: docId + '-f' + (idx + 1),
+            拆分后条码号: ln['拆分后条码号'],
+            物料信息: ln['物料信息'],
+            包装规格: ln['包装规格'],
+            供应商信息: ln['供应商信息'],
+            库存单位: ln['库存单位'],
+            建档数量: String(ln['建档数量']),
+            物料批号: ln['物料批号'],
+            生产日期: ln['生产日期'],
+            有效期: ln['有效期'],
+            失效日期: ln['失效日期'],
+            备注: ln['备注'],
+            拆分单号: splitNo,
+            主条码号: bc,
+            操作时间: stamp,
+            操作人: '演示用户'
+          });
         });
         formVisible.value=false;
         bumpStore();
@@ -13701,29 +14087,100 @@ const app = createApp({
         if(!formBarcodeRows.value.length){ ElMessage.warning('请至少添加一条需要合并的流水码'); return; }
         const mergedQty = Number(formModel['合并后剩余数量']);
         if(!Number.isFinite(mergedQty) || mergedQty <= 0){ ElMessage.warning('合并计算结果异常，合并后余量必须大于0'); return; }
-        const list = ((MOCK['bc-serial-merge'] = MOCK['bc-serial-merge'] || {}).main = (MOCK['bc-serial-merge'].main || []));
-        const matParts = String(formLineRows.value[0]?.['物料信息']||'').split(' / ');
-        const lines = formBarcodeRows.value.map(r=>({
-          被合并条码号: r['条码号'],
-          剩余数量: r['剩余数量'],
-          库存单位: r['库存单位']
-        }));
+        const bag = (MOCK['bc-serial-merge'] = MOCK['bc-serial-merge'] || {});
+        const list = (bag.tab1 = bag.tab1 || []);
+        const flowList = (bag.tab2 = bag.tab2 || []);
+        const archList = ((MOCK['serial-arch'] = MOCK['serial-arch'] || {}).main = (MOCK['serial-arch'].main || []));
+        const parentSnap = archList.find(r=> r['条码号']===mainBc) || formLineRows.value[0] || {};
+        const matInfo = String(formLineRows.value[0]?.['物料信息'] || parentSnap['物料信息'] || '—').trim() || '—';
+        const supplier = formLineRows.value[0]?.['供应商信息'] || formLineRows.value[0]?.['供应商名称'] || parentSnap['供应商信息'] || parentSnap['供应商名称'] || '—';
+        const packSpec = formLineRows.value[0]?.['包装规格'] || parentSnap['包装规格'] || '—';
+        const unit = formLineRows.value[0]?.['库存单位'] || parentSnap['库存单位'] || 'KG';
+        const lot = formLineRows.value[0]?.['物料批号'] || parentSnap['物料批号'] || '—';
+        const prodDate = formLineRows.value[0]?.['生产日期'] || parentSnap['生产日期'] || '—';
+        const valid = parentSnap['有效期'] || formLineRows.value[0]?.['有效期'] || '—';
+        const expire = parentSnap['失效日期'] || formLineRows.value[0]?.['失效日期'] || '—';
+        const remark = formModel['备注'] || '—';
+        const mergeNo = nextBizNo('HB', 'bc-serial-merge', '合并单号');
+        const stamp = nowStamp();
+        const mergeSum = (formBarcodeRows.value||[]).reduce((s,r)=> s + (Number(r['剩余数量'])||0), 0);
+        const lines = formBarcodeRows.value.map(r=>{
+          const child = archList.find(a=> a['条码号']===r['条码号']) || {};
+          return {
+            被合并条码号: r['条码号'],
+            物料信息: child['物料信息'] || matInfo,
+            包装规格: child['包装规格'] || packSpec,
+            供应商信息: child['供应商信息'] || child['供应商名称'] || supplier,
+            库存单位: r['库存单位'] || child['库存单位'] || unit,
+            建档数量: String(r['剩余数量'] || child['当前数量'] || '0'),
+            物料批号: child['物料批号'] || lot,
+            生产日期: child['生产日期'] || prodDate,
+            有效期: child['有效期'] || valid,
+            失效日期: child['失效日期'] || expire,
+            备注: remark,
+            操作时间: stamp,
+            操作人: '演示用户'
+          };
+        });
+        const parentRow = archList.find(r=> r['条码号']===mainBc);
+        if(parentRow){
+          parentRow['当前数量'] = String(mergedQty);
+          parentRow['剩余数量'] = String(mergedQty);
+          parentRow['最新操作人'] = '演示用户';
+          parentRow['最新操作时间'] = stamp;
+          parentRow['来源单号'] = mergeNo;
+        }
+        formBarcodeRows.value.forEach(r=>{
+          const child = archList.find(a=> a['条码号']===r['条码号']);
+          if(child){
+            child['当前数量'] = '0';
+            child['剩余数量'] = '0';
+            child['使用状态'] = '报废';
+            child['最新操作人'] = '演示用户';
+            child['最新操作时间'] = stamp;
+            child['来源单号'] = mergeNo;
+          }
+        });
+        const docId = 'cfm-' + Date.now();
         list.unshift({
-          id: 'cfm-' + Date.now(),
-          合并单号: nextBizNo('HB', 'bc-serial-merge', '合并单号'),
-          合并后条码号: mainBc,
-          物料编码: matParts[0] || '—',
-          物料名称: matParts[1] || '—',
-          物料规格: matParts[2] || '—',
-          包装规格: formLineRows.value[0]?.['包装规格'] || '—',
-          供应商名称: formLineRows.value[0]?.['供应商名称'] || '—',
-          物料批号: formLineRows.value[0]?.['物料批号'] || '—',
-          生产日期: formLineRows.value[0]?.['生产日期'] || '—',
-          库存单位: formLineRows.value[0]?.['库存单位'] || '—',
+          id: docId,
+          合并单号: mergeNo,
+          主条码号: mainBc,
+          物料信息: matInfo,
+          包装规格: packSpec,
+          供应商信息: supplier,
+          物料批号: lot,
+          生产日期: prodDate,
+          有效期: valid,
+          失效日期: expire,
+          库存单位: unit,
+          本次合并数量: String(mergeSum),
+          本次合并条码个数: String(lines.length),
           合并后剩余数量: String(mergedQty),
-          操作时间: nowStamp(),
+          备注: remark,
+          操作时间: stamp,
           操作人: '演示用户',
           lines
+        });
+        lines.forEach((ln, idx)=>{
+          flowList.unshift({
+            id: docId + '-f' + (idx + 1),
+            被合并条码号: ln['被合并条码号'],
+            物料信息: ln['物料信息'],
+            包装规格: ln['包装规格'],
+            供应商信息: ln['供应商信息'],
+            库存单位: ln['库存单位'],
+            建档数量: ln['建档数量'],
+            物料批号: ln['物料批号'],
+            生产日期: ln['生产日期'],
+            有效期: ln['有效期'],
+            失效日期: ln['失效日期'],
+            备注: ln['备注'],
+            合并单号: mergeNo,
+            主条码号: mainBc,
+            操作时间: stamp,
+            操作人: '演示用户'
+          });
         });
         formVisible.value=false;
         bumpStore();
@@ -13732,49 +14189,30 @@ const app = createApp({
       }
       if(pageId.value==='bc-scrap-proc'){
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
-        if(!formModel['产线名称']){ ElMessage.warning('请选择产线名称'); return; }
-        if(!formModel['车间名称']){ ElMessage.warning('请选择车间名称'); return; }
-        if(!formModel['报废工艺']){ ElMessage.warning('请选择报废工艺'); return; }
-        if(!formLineRows.value.length){ ElMessage.warning('请至少新增一行流水明细'); return; }
-        if(formLineRows.value.some(r=> !String(r['条码号']||'').trim())){ ElMessage.warning('请填写流水明细中的条码号'); return; }
         const bag = (MOCK['bc-scrap-proc'] = MOCK['bc-scrap-proc'] || {});
         const list = (bag.tab1 = bag.tab1 || []);
-        const lines = formLineRows.value.map(r=>({
-          条码号: r['条码号'],
-          钢瓶编号: r['钢瓶编号']||'—',
-          当前工序: r['当前工序']||'—'
-        }));
         const isAdd = formMode.value==='add' || formMode.value==='copy';
         if(isAdd){
           list.unshift({
             id: 'bfs-' + Date.now(),
             工单号: nextBizNo('BF', 'bc-scrap-proc', '工单号'),
             单据状态: '待执行',
-            单据类型: formModel['单据类型'],
-            产线名称: formModel['产线名称'],
-            车间名称: formModel['车间名称'],
-            报废工艺: formModel['报废工艺'],
-            计划件数: String(formModel['计划件数']||lines.length),
-            计划开工日期: formModel['计划开工日期']||'',
-            计划完工日期: formModel['计划完工日期']||'',
+            单据类型: formModel['单据类型'] || '报废处理单',
+            计划件数: String(formModel['计划件数']||'').trim() || '0',
+            计划执行日期: formModel['计划执行日期']||'',
             备注: formModel['备注']||'—',
             创建人: '演示用户',
             创建时间: nowStamp(),
-            lines
+            lines: []
           });
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑单据'); return; }
           Object.assign(cur, {
-            单据类型: formModel['单据类型'],
-            产线名称: formModel['产线名称'],
-            车间名称: formModel['车间名称'],
-            报废工艺: formModel['报废工艺'],
-            计划件数: String(formModel['计划件数']||lines.length),
-            计划开工日期: formModel['计划开工日期']||'',
-            计划完工日期: formModel['计划完工日期']||'',
-            备注: formModel['备注']||'—',
-            lines
+            单据类型: formModel['单据类型'] || cur['单据类型'],
+            计划件数: String(formModel['计划件数']||'').trim() || cur['计划件数'] || '0',
+            计划执行日期: formModel['计划执行日期']||'',
+            备注: formModel['备注']||'—'
           });
         }
         formVisible.value=false;
@@ -13784,39 +14222,29 @@ const app = createApp({
       }
       if(pageId.value==='bc-freeze'){
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
-        if(!formLineRows.value.length){ ElMessage.warning('请至少新增一行流水明细'); return; }
-        if(formLineRows.value.some(r=> !String(r['条码号']||'').trim())){ ElMessage.warning('请填写流水明细中的条码号'); return; }
         const bag = (MOCK['bc-freeze'] = MOCK['bc-freeze'] || {});
         const list = (bag.tab1 = bag.tab1 || []);
-        const lines = formLineRows.value.map(r=>({
-          条码号: r['条码号'],
-          钢瓶类型: r['钢瓶类型']||'—',
-          空满状态: r['空满状态']||'—',
-          库存状态: r['库存状态']||'—'
-        }));
         const isAdd = formMode.value==='add' || formMode.value==='copy';
         if(isAdd){
           list.unshift({
             id: 'bfr-' + Date.now(),
             冻结单号: nextBizNo('DJ', 'bc-freeze', '冻结单号'),
             单据状态: '待执行',
-            单据类型: formModel['单据类型'],
-            创建方式: formModel['创建方式']||'手动',
-            计划件数: String(formModel['计划件数']||lines.length),
+            单据类型: formModel['单据类型'] || '异常冻结单',
+            计划件数: String(formModel['计划件数']||'').trim() || '0',
             已完成件数: '0',
             制单时间: nowStamp(),
             制单人: '演示用户',
             备注: formModel['备注']||'—',
-            lines
+            lines: []
           });
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑单据'); return; }
           Object.assign(cur, {
             单据类型: formModel['单据类型'],
-            计划件数: String(formModel['计划件数']||lines.length),
-            备注: formModel['备注']||'—',
-            lines
+            计划件数: String(formModel['计划件数']||'').trim() || cur['计划件数'] || '0',
+            备注: formModel['备注']||'—'
           });
         }
         formVisible.value=false;
@@ -13826,38 +14254,29 @@ const app = createApp({
       }
       if(pageId.value==='bc-unfreeze'){
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
-        if(!formLineRows.value.length){ ElMessage.warning('请至少新增一行流水明细'); return; }
-        if(formLineRows.value.some(r=> !String(r['条码号']||'').trim())){ ElMessage.warning('请选择流水明细中的冻结中条码'); return; }
         const bag = (MOCK['bc-unfreeze'] = MOCK['bc-unfreeze'] || {});
         const list = (bag.tab1 = bag.tab1 || []);
-        const lines = formLineRows.value.map(r=>({
-          条码号: r['条码号'],
-          钢瓶类型: r['钢瓶类型']||'—',
-          空满状态: r['空满状态']||'—',
-          库存状态: r['库存状态']||'—'
-        }));
         const isAdd = formMode.value==='add' || formMode.value==='copy';
         if(isAdd){
           list.unshift({
             id: 'bun-' + Date.now(),
             解除单号: nextBizNo('JC', 'bc-unfreeze', '解除单号'),
             单据状态: '待执行',
-            单据类型: formModel['单据类型'],
-            计划件数: String(formModel['计划件数']||lines.length),
+            单据类型: formModel['单据类型'] || '冻结解除单',
+            计划件数: String(formModel['计划件数']||'').trim() || '0',
             已完成件数: '0',
             制单时间: nowStamp(),
             制单人: '演示用户',
             备注: formModel['备注']||'—',
-            lines
+            lines: []
           });
         } else {
           const cur = list.find(r=> r.id===formModel._editId);
           if(!cur){ ElMessage.warning('未找到待编辑单据'); return; }
           Object.assign(cur, {
             单据类型: formModel['单据类型'],
-            计划件数: String(formModel['计划件数']||lines.length),
-            备注: formModel['备注']||'—',
-            lines
+            计划件数: String(formModel['计划件数']||'').trim() || cur['计划件数'] || '0',
+            备注: formModel['备注']||'—'
           });
         }
         formVisible.value=false;
@@ -13883,6 +14302,9 @@ const app = createApp({
           适用单据类型: joinDun(formModel['适用单据类型']) || '—',
           适用物料: (()=>{
             const labels = (formLineRows.value||[]).map(r=>{
+              const code = String(r['物料编码']||codeOf(r['物料信息'])||'').trim();
+              const name = String(r['物料名称']||'').trim() || String(r['物料信息']||'').split(' / ')[1] || '';
+              if(code && name) return code + ' / ' + name;
               const info = String(r['物料信息']||'').trim();
               if(!info || info==='—') return '';
               const parts = info.split(' / ');
@@ -13907,6 +14329,50 @@ const app = createApp({
         formVisible.value=false;
         bumpStore();
         ElMessage.success(isAdd ? (formMode.value==='copy'?'包材工艺复制新增成功':'包材工艺已新增') : '包材工艺已保存');
+        return;
+      }
+      if(pageId.value==='wh-transfer'){
+        const docType = String(formModel['单据类型']||'').trim();
+        const toWh = transferWhName(formModel['移入仓库']);
+        const toLoc = String(formModel['移入库位']||'').trim();
+        if(!docType){ ElMessage.warning('请选择单据类型'); return; }
+        if(!toWh){ ElMessage.warning('请选择移入仓库'); return; }
+        const list = ((MOCK['wh-transfer'] = MOCK['wh-transfer'] || {}).tab1 = (MOCK['wh-transfer'].tab1 || []));
+        const isAdd = formMode.value==='add' || formMode.value==='copy';
+        const stamp = nowStamp();
+        const payload = {
+          单据类型: docType,
+          移入仓库: toWh,
+          移入库位: toLoc || '—',
+          计划执行日期: String(formModel['计划执行日期']||'').trim() || stamp.slice(0,10),
+          备注: formModel['备注']||'—'
+        };
+        if(isAdd){
+          payload.id = 'yktt-' + Date.now();
+          payload.移库单号 = nextBizNo('YKTT','wh-transfer','移库单号');
+          payload.单据状态 = '待执行';
+          payload.已完成件数 = '0';
+          payload.制单人 = '张三';
+          payload.制单时间 = stamp;
+          list.unshift(payload);
+        } else {
+          const cur = list.find(r=> r.id===formModel._editId || r['移库单号']===formModel['移库单号']);
+          if(!cur){ ElMessage.warning('未找到待编辑移库通知单'); return; }
+          if(cur['单据状态']!=='待执行'){ ElMessage.warning('仅待执行状态的单据可编辑'); return; }
+          Object.assign(cur, payload, {
+            id: cur.id,
+            移库单号: cur['移库单号'],
+            单据状态: cur['单据状态'],
+            已完成件数: cur['已完成件数'] || '0',
+            制单人: cur['制单人'],
+            制单时间: cur['制单时间']
+          });
+          delete cur['ERP单号'];
+          delete cur['ERP对接状态'];
+        }
+        formVisible.value=false;
+        bumpStore();
+        ElMessage.success(isAdd ? '移库通知单已创建' : '移库通知单已保存');
         return;
       }
       formVisible.value=false;
@@ -14652,7 +15118,8 @@ const app = createApp({
         const rows = (pickerSelected.value||[]).length ? pickerSelected.value : (row ? [row] : []);
         if(!rows.length){ ElMessage.warning('请至少选择一个仓库'); return; }
         formModel['盘点仓库'] = rows.map(r=> r['仓库名称'] || r.名称 || r.编码).filter(Boolean).join('、');
-        ElMessage.success('已选择盘点仓库：'+formModel['盘点仓库']);
+        applyStocktakeMatFilter(formModel._stockMatCodes || []);
+        ElMessage.success('已选择盘点仓库：'+formModel['盘点仓库']+'，已按范围刷新库存/条码详情');
       } else if(t==='往来单位' || t==='委托方' || t==='委托方名称'){
         formModel[t] = row.名称 || row['客户名称'] || row['供应商名称'] || label;
         ElMessage.success('已选择'+t+'：'+formModel[t]);
@@ -14666,10 +15133,21 @@ const app = createApp({
           ElMessage.warning('调出仓库与调入仓库不能相同'); return;
         }
         ElMessage.success('已选择'+t+'：'+formModel[t]);
-      } else if(t==='移入仓库编码' || t==='移出仓库编码'){
-        formModel[t] = row['仓库编码'] || row.编码 || '';
-        ElMessage.success('已选择仓库：'+(formModel[t]||'')+' / '+(row['仓库名称']||row.名称||''));
-      } else if(t==='移入库位编码' || t==='移出库位编码'){
+      } else if(t==='移入仓库编码' || t==='移出仓库编码' || t==='移出仓库' || t==='移入仓库'){
+        const name = row['仓库名称'] || row.名称 || '';
+        formModel[t] = name || row['仓库编码'] || row.编码 || '';
+        if(t==='移出仓库'){
+          if(!formModel['移入仓库']) formModel['移入仓库'] = formModel['移出仓库'];
+          formModel['移出库位'] = '';
+        }
+        if(t==='移入仓库') formModel['移入库位'] = '';
+        if(t==='移出仓库编码'){
+          if(!formModel['移入仓库编码']) formModel['移入仓库编码'] = formModel['移出仓库编码'];
+          formModel['移出库位编码'] = '';
+        }
+        if(t==='移入仓库编码') formModel['移入库位编码'] = '';
+        ElMessage.success('已选择仓库：'+(formModel[t]||''));
+      } else if(t==='移入库位编码' || t==='移出库位编码' || t==='移出库位' || t==='移入库位'){
         formModel[t] = row['库位编码'] || row.编码 || '';
         ElMessage.success('已选择库位：'+(formModel[t]||'')+' / '+(row['库位名称']||row.名称||''));
       } else if(t.includes('物料')){
@@ -14682,10 +15160,15 @@ const app = createApp({
             const code = m.编码 || codeOf(m['物料编码']||m['物料信息']||m);
             if(!code || seen.has(code)) return;
             seen.add(code);
+            const info = matInfoText(m);
+            const parts = String(info).split(' / ').map(s=> s.trim());
             formLineRows.value = formLineRows.value.concat([{
               _i: formLineRows.value.length + 1,
-              物料编码: code,
-              物料信息: matInfoText(m)
+              物料编码: parts[0] || code,
+              物料名称: parts[1] || m['物料名称'] || m.名称 || '',
+              物料规格: parts[2] || m['物料规格'] || m.规格 || '—',
+              物料种类: parts[3] || m['物料种类'] || m.种类 || '—',
+              物料信息: info
             }]);
             n++;
           });
@@ -15973,7 +16456,7 @@ const app = createApp({
       prodPickLotVisible, prodPickLotTitle, prodPickLotHead, prodPickLotRows, hasProdPickLotDetails, formatProdPickLotsText, openProdPickLotDetail,
       dictTypeKw, dictTypeId, dictTypeTitle, filteredDictTypeTree, dictTypeCollapsed, dictTypeFormVisible, dictTypeFormMode, dictTypeForm,
       visibleTypeFormFields, dictTypeOptions,
-      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
+      onSelectMenu, onTabChange, onQuery, onResetQuery, onToolbar, onRowOp, onFormLineAction, onFormBarcodeAction, onFormOk, onFormFooter, onQcInspectSave, onSplitOk, onDispatchAuditOk, onAssignOk, onAssignVehicleChange, tagClass, displayTagValue, isExpireOverdue, formatMatUomRatioDisplay, isDateTimeField, colMinWidth, formLineColMinWidth, fitColWidth, colMaxWidth, isFormFieldVisible, isFormFieldRequired, ratioFieldKey, isBatchFieldRequired, dispatchNeedsOrderNo, isFormFieldLocked, isFormLineFieldLocked, isFormPickerDisabled, formPickerPlaceholder, onFormPickerClear, isDetailLineRowActionVisible, visibleRowOps, canEditTankArch, onTankArchDetailEdit, onBizLink, isBizLinkField, isDetailTagField, detailFieldLabel, detailDisplayValue, maskIdCard, removeFormLine, clonePoInFormLineForNewLot, refreshPoInFormLineNos, removeMatMediumPick, matInfoText, formFieldOptions, formLineSelectOptions, prodRetBatchOptions, countWhLotOptions, isProdFormLotField, isCountManageRow, resolveWhBizType, isWaybillPage, usesErpLineNoCol, isPoNoticePage, isProdIssuePage, isDirectXferPage, isProdWhPage, prodAppMeta, isLoadPage, loadPageMeta, loadWhBizMeta, isWhLineClosePage, isOsPoPage, isWhNoticePage, isCsRecvPage, isBcSerialPage, isBcLineFormPage, onBcFormLineBarcodeEnter, syncSerialSplitRemain, syncSerialMergeRemain, isCsRetPage, isCsWhPage, demoCarrierName, demoCarrierDispatcher,
       selectDictType, toggleDictTypeNode, openDictTypeForm, onDictTypeFormOk, removeDictType, addrPopoverField,
       resetDemoStore, storeTick,
       openPicker, onPickerOk, onGenerateBatch, onBatchDeleteLines, onBatchOk, refreshSerialExpire,

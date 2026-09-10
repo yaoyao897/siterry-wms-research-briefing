@@ -84,7 +84,6 @@ window.WMS_DICT = (function () {
     t('d-direct-xfer', 'DOC_DIRECT_XFER', '直接调拨申请单单据类型', 'g-wh-inner', ''),
     t('d-seq', 'DOC_SEQ', '库内转序单单据类型', 'g-wh-inner', ''),
     t('d-load-n', 'DOC_LOAD_NOTICE', '装卸货通知单单据类型', 'g-wh-load', ''),
-    t('d-load-t', 'LOAD_TYPE', '装卸类型', 'g-wh-load', ''),
     t('d-plant', 'LG_PLANT', '物流厂区', 'g-wh-load', ''),
     t('d-st-type', 'ST_TYPE', '盘点类型', 'g-wh-st', ''),
     t('d-st-mode', 'ST_MODE', '盘点方式', 'g-wh-st', ''),
@@ -148,11 +147,10 @@ window.WMS_DICT = (function () {
     .concat(itemsOf('d-oth-out', [['LOSS', '盘亏出库'], ['SMPL', '样品出库'], ['RD', '研发领用']]))
     .concat(itemsOf('d-in-dir', [['OUT', '厂外'], ['LINE', '线边仓'], ['PROD_RET', '生产退料'], ['GAIN', '盘盈入库'], ['XFER', '调拨入库'], ['OTH', '其他入库']]))
     .concat(itemsOf('d-out-dir', [['OUT', '厂外'], ['LINE', '线边仓'], ['PROD', '生产领料'], ['LOSS', '盘亏出库'], ['XFER', '调拨出库'], ['OTH', '其他出库']]))
-    .concat(itemsOf('d-xfer', [['MV', '库内移库'], ['A', '库内转移']]))
+    .concat(itemsOf('d-xfer', [['STD', '标准移库'], ['SLOT', '货位整理'], ['SLOW', '呆滞移库'], ['POL', '策略移库']]))
     .concat(itemsOf('d-direct-xfer', [['N', '直接调拨申请单']]))
     .concat(itemsOf('d-seq', [['CODE', '编码转换'], ['LOT', '批号转换'], ['A', '库内转序']]))
     .concat(itemsOf('d-load-n', [['STD', '标准装卸'], ['URG', '紧急装卸'], ['MV', '厂内移库装卸']]))
-    .concat(itemsOf('d-load-t', [['IN', '装货'], ['OUT', '卸货']]))
     .concat(itemsOf('d-plant', [['HQ', '总厂'], ['A', '分厂A'], ['B', '分厂B']]))
     .concat(itemsOf('d-st-type', [['FULL', '全盘'], ['SAMPLE', '抽盘']]))
     .concat(itemsOf('d-st-mode', [['BC', '条码盘点'], ['CNT', '计数盘点']]))
@@ -182,7 +180,6 @@ window.WMS_DICT = (function () {
     '外包材类型': 'OUTER_TYPE',
     '外包材材质': 'OUTER_MAT',
     '包装规格': 'PKG_SPEC',
-    '装卸类型': 'LOAD_TYPE',
     '入库方向': 'IN_DIR',
     '出库方向': 'OUT_DIR',
     '物流厂区': 'LG_PLANT',
@@ -279,7 +276,6 @@ window.WMS_DICT = (function () {
     });
   });
   binds['stock-take|盘点类型'] = 'ST_TYPE';
-  binds['wh-load|装卸类型'] = 'LOAD_TYPE';
   ['prod-pick-serial', 'prod-pick-count', 'prod-pick-tank'].forEach(function (fid) {
     binds[fid + '|领料类型'] = 'PROD_ISSUE_PICK_TYPE';
   });
