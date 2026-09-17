@@ -542,7 +542,7 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-nav">
                 <button class="m-nav__back" @click="goHome">←</button>
                 <div class="m-nav__title">{{ flowTitle }}</div>
-                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isProdInDoc ? openProdInForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）'))))))">新增</button>
+                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isProdInDoc ? openProdInForm('add') : ((isXferSerialDoc || isXferCountDoc) ? openXferForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）')))))))">新增</button>
               </div>
               <div class="m-scroll">
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
@@ -743,6 +743,24 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div class="full"><span class="doc-label">计划执行日期</span>{{ n.planDate || '—' }}</div>
                       <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
                     </div>
+                    <div class="doc-grid" v-else-if="flowMode==='inner' && flowMeta.innerType==='xfer'">
+                      <div><span class="doc-label">单据类型</span>{{ n.seqType || n.docType || '编码转换' }}</div>
+                      <div><span class="doc-label">已完成件数</span>{{ n.donePcs != null ? n.donePcs : 0 }}</div>
+                      <div class="full"><span class="doc-label">新物料信息</span>{{ n.newMaterial || n.partner || '—' }}</div>
+                      <div><span class="doc-label">新批号</span>{{ n.newLot || n.refNo || '—' }}</div>
+                      <div><span class="doc-label">新生产日期</span>{{ n.newProdDate || '—' }}</div>
+                      <div><span class="doc-label">新有效期</span>{{ n.newValidPeriod || '—' }}</div>
+                      <div><span class="doc-label">新失效日期</span>{{ n.newExpireDate || '—' }}</div>
+                      <div class="full"><span class="doc-label">转序说明</span>{{ n.seqRemark || n.remark || '—' }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="flowMode==='inner'">
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">移出仓库</span>{{ n.fromWh || n.partner || '—' }}</div>
+                      <div><span class="doc-label">移出库位</span>{{ n.fromLoc || '—' }}</div>
+                      <div><span class="doc-label">移入仓库</span>{{ n.toWh || n.refNo || '—' }}</div>
+                      <div><span class="doc-label">移入库位</span>{{ n.toLoc || '—' }}</div>
+                      <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                    </div>
                     <div class="doc-grid" v-else-if="flowMode==='pkg-doc'">
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
                       <div><span class="doc-label">{{ flowMeta.partnerLabel || '产线名称' }}</span>{{ n.partner }}</div>
@@ -818,10 +836,11 @@ body.remarks-open .demo-scope-tip{display:none}
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <template v-else-if="isSoRmaDoc || isSoShipDoc || isSoPreoutDoc">
-                      <button v-if="n.status==='待执行'" class="btn-sm" @click.stop="toast('Demo：待执行可核对单据头')">编辑</button>
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openPoInNoticeForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <template v-else-if="isXferSerialDoc || isXferCountDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openXferForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <template v-else-if="isPoNoticeDoc">
@@ -949,19 +968,82 @@ body.remarks-open .demo-scope-tip{display:none}
             <template v-else-if="view==='po-in-form'">
               <div class="m-nav">
                 <button class="m-nav__back" @click="backPoInNoticeForm">←</button>
-                <div class="m-nav__title">{{ (poInFormMode==='edit' ? '编辑' : '新增') + (isTrustRetCount ? '受托退料通知单-计数' : (isTrustRetSerial ? '受托退料通知单' : (isTrustRecvTank ? '受托收料通知单-罐区' : (isTrustRecvCount ? '受托收料通知单-计数' : (isTrustRecvSerial ? '受托收料通知单' : (isOsRmaCount ? '委外退货通知单-计数' : (isOsRmaSerial ? '委外退货通知单' : (isOsRecvTank ? '委外收货通知单-罐区' : (isOsRecvCount ? '委外收货通知单-计数' : (isOsRecvSerial ? '委外收货通知单' : (isOsRetCount ? '委外退料通知单-计数' : (isOsRetSerial ? '委外退料通知单' : (isOsIssueCount ? '委外发料通知单-计数' : (isOsIssueSerial ? '委外发料通知单' : (isPoRetCount ? '退料通知单-计数' : (isPoRetSerial ? '退料通知单' : (isPoInTank ? '收料通知单-罐区' : (isPoInCount ? '收料通知单-计数' : '收料通知单')))))))))))))))))) }}</div>
+                <div class="m-nav__title">{{ (poInFormMode==='edit' ? '编辑' : '新增') + (isSoShipCount ? '销售发货通知单-计数' : (isSoShipSerial ? '销售发货通知单' : (isSoPreoutCount ? '销售预出货通知单-计数' : (isSoPreoutSerial ? '销售预出货通知单' : (isSoRmaCount ? '销售退货通知单-计数' : (isSoRmaSerial ? '销售退货通知单' : (isTrustRetCount ? '受托退料通知单-计数' : (isTrustRetSerial ? '受托退料通知单' : (isTrustRecvTank ? '受托收料通知单-罐区' : (isTrustRecvCount ? '受托收料通知单-计数' : (isTrustRecvSerial ? '受托收料通知单' : (isOsRmaCount ? '委外退货通知单-计数' : (isOsRmaSerial ? '委外退货通知单' : (isOsRecvTank ? '委外收货通知单-罐区' : (isOsRecvCount ? '委外收货通知单-计数' : (isOsRecvSerial ? '委外收货通知单' : (isOsRetCount ? '委外退料通知单-计数' : (isOsRetSerial ? '委外退料通知单' : (isOsIssueCount ? '委外发料通知单-计数' : (isOsIssueSerial ? '委外发料通知单' : (isPoRetCount ? '退料通知单-计数' : (isPoRetSerial ? '退料通知单' : (isPoInTank ? '收料通知单-罐区' : (isPoInCount ? '收料通知单-计数' : '收料通知单')))))))))))))))))))))))) }}</div>
               </div>
               <div class="m-scroll">
                 <div class="sec">
                   <div class="sec__title">基本信息</div>
+                  <!-- 销售预出货/发货/退货：字段顺序与交互对齐 PC 新增编辑页 -->
+                  <template v-if="isSoPcAlignedForm">
+                    <div class="field">
+                      <label><span class="req">*</span>单据类型</label>
+                      <select v-model="poInForm.docType">
+                        <option v-for="o in noticeDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>是否需要装卸货 <span class="req">*</span></label>
+                      <div class="radio-group" style="display:flex;gap:16px;align-items:center;padding:6px 0;">
+                        <label style="display:flex;align-items:center;gap:4px;font-weight:normal;">
+                          <input type="radio" value="是" v-model="poInForm.isLoadingRequired" /> 是（下推装卸单）
+                        </label>
+                        <label style="display:flex;align-items:center;gap:4px;font-weight:normal;">
+                          <input type="radio" value="否" v-model="poInForm.isLoadingRequired" /> 否
+                        </label>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label><span class="req">*</span>关联销售订单</label>
+                      <select v-model="poInForm.poNo" @change="onPoInPoChange">
+                        <option value="">请选择销售订单</option>
+                        <option v-for="p in poInSelectablePos" :key="p.code" :value="p.code">{{ p.code }} · {{ p.supplier || p.name }}</option>
+                      </select>
+                    </div>
+                    <div class="field"><label><span class="req">*</span>客户名称</label><input v-model="poInForm.supplier" readonly /></div>
+                    <div class="field"><label>计划执行日期</label><input type="date" v-model="poInForm.planDate" /></div>
+                    <div class="field" v-if="isSoShipDoc">
+                      <label>关联销售预出货单</label>
+                      <select v-model="poInForm.preoutNo" @change="onPoInPreoutOutChange">
+                        <option value="">请选择已完成预出货出库单（选填）</option>
+                        <option v-for="p in poInPreoutOutOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.customer || p.soNo || '' }}</option>
+                      </select>
+                    </div>
+                    <div class="field" v-if="isSoPreoutDoc || isSoShipDoc">
+                      <label>{{ isSoShipDoc ? '关联销售备货单' : '关联备货通知单' }}</label>
+                      <select v-model="poInForm.stockNo" @change="onPoInPrepChange">
+                        <option value="">请选择备货单（选填）</option>
+                        <option v-for="p in poInPrepOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.customer || p.soNo || '' }}</option>
+                      </select>
+                    </div>
+                    <div class="field" v-if="isSoRmaDoc">
+                      <label>关联销售出库单</label>
+                      <select v-model="poInForm.shipOutNo" @change="onPoInShipOutChange">
+                        <option value="">请选择已完成出库单 CKFH/CKYC（选填）</option>
+                        <option v-for="p in poInShipOutOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.customer || p.soNo || '' }}</option>
+                      </select>
+                    </div>
+                    <div class="field" v-if="isSoRmaDoc">
+                      <label>退货原因</label>
+                      <select v-model="poInForm.returnReason">
+                        <option value="">请选择（选填）</option>
+                        <option value="质量问题退货">质量问题退货</option>
+                        <option value="规格不符">规格不符</option>
+                        <option value="客户拒收">客户拒收</option>
+                        <option value="其他">其他</option>
+                      </select>
+                    </div>
+                    <div class="field"><label>ERP单据号</label><input v-model="poInForm.erpNo" maxlength="50" placeholder="选填，最多50字" /></div>
+                    <div class="field"><label>备注</label><input v-model="poInForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                  </template>
+                  <template v-else>
                   <div class="field">
-                    <label><span class="req">*</span>{{ isTrustPartyDoc ? '关联销售订单' : (isOsWwpoDoc ? '关联委外加工单' : '关联采购订单') }}</label>
+                    <label><span class="req">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '关联销售订单' : (isOsWwpoDoc ? '关联委外加工单' : '关联采购订单') }}</label>
                     <select v-model="poInForm.poNo" @change="onPoInPoChange">
-                      <option value="">{{ isTrustPartyDoc ? '请选择销售订单' : (isOsWwpoDoc ? '请选择委外加工单' : '请选择采购订单') }}</option>
+                      <option value="">{{ (isTrustPartyDoc || isSoSalesDoc) ? '请选择销售订单' : (isOsWwpoDoc ? '请选择委外加工单' : '请选择采购订单') }}</option>
                       <option v-for="p in poInSelectablePos" :key="p.code" :value="p.code">{{ p.code }} · {{ p.supplier || p.name }}</option>
                     </select>
                   </div>
-                  <div class="field"><label><span class="req">*</span>{{ isTrustPartyDoc ? '客户名称' : '供应商名称' }}</label><input v-model="poInForm.supplier" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '客户名称' : '供应商名称' }}</label><input v-model="poInForm.supplier" readonly /></div>
                   <div class="field">
                     <label><span class="req">*</span>单据类型</label>
                     <select v-model="poInForm.docType">
@@ -980,30 +1062,36 @@ body.remarks-open .demo-scope-tip{display:none}
                     </div>
                   </div>
                   <div class="field"><label><span class="req">*</span>计划执行日期</label><input type="date" v-model="poInForm.planDate" /></div>
-                  <div class="field" v-if="isTrustPartyDoc"><label>ERP单据号</label><input v-model="poInForm.erpNo" maxlength="64" placeholder="选填，输入ERP单号" /></div>
+                  <div class="field" v-if="isTrustPartyDoc || isSoSalesDoc"><label>ERP单据号</label><input v-model="poInForm.erpNo" maxlength="64" placeholder="选填，输入ERP单号" /></div>
                   <div class="field"><label>备注</label><input v-model="poInForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                  </template>
                 </div>
                 <div class="sec">
                   <div class="sec__title">派车与承运信息</div>
                   <div class="field">
                     <label>关联运单</label>
                     <select v-model="poInForm.waybillNo" :disabled="!poInForm.poNo" @change="onPoInWaybillChange">
-                      <option value="">{{ poInForm.poNo ? '请选择运单（选填）' : (isTrustPartyDoc ? '请先选择销售订单' : (isOsWwpoDoc ? '请先选择委外加工单' : '请先选择采购订单')) }}</option>
+                      <option value="">{{ poInForm.poNo ? '请选择运单（选填）' : ((isTrustPartyDoc || isSoSalesDoc) ? '请先选择销售订单' : (isOsWwpoDoc ? '请先选择委外加工单' : '请先选择采购订单')) }}</option>
                       <option v-for="w in poInWaybillOpts" :key="w.code" :value="w.code">{{ w.code }}</option>
                     </select>
                   </div>
                   <div class="field">
                     <label>关联发货单</label>
-                    <select v-model="poInForm.logisticsNo" :disabled="!poInForm.waybillNo">
+                    <select v-model="poInForm.logisticsNo" :disabled="!poInForm.waybillNo" @change="onPoInLogisticsChange">
                       <option value="">{{ poInForm.waybillNo ? '请选择发货单' : '请先选择运单' }}</option>
                       <option v-for="s in poInShipOpts" :key="s" :value="s">{{ s }}</option>
                     </select>
                   </div>
-                  <div class="field"><label>车牌号</label><input v-model="poInForm.plate" :readonly="!!poInForm.waybillNo" placeholder="未选运单时可手录" /></div>
-                  <div class="field"><label>车挂号</label><input v-model="poInForm.trailer" :readonly="!!poInForm.waybillNo" placeholder="无挂车填 —" /></div>
-                  <div class="field"><label>司机姓名</label><input v-model="poInForm.driver" :readonly="!!poInForm.waybillNo" /></div>
-                  <div class="field"><label>司机电话</label><input v-model="poInForm.phone" :readonly="!!poInForm.waybillNo" placeholder="11位手机号" /></div>
-                  <div class="field"><label>司机身份证号</label><input v-model="poInForm.driverId" :readonly="!!poInForm.waybillNo" placeholder="18位身份证" /></div>
+                  <div class="field" v-if="isSoPcAlignedForm" style="padding-bottom:8px">
+                    <button type="button" class="btn-sm" :disabled="!!poInForm.waybillNo" @click="openPoInVehiclePicker">选择车辆与司机</button>
+                    <button type="button" class="btn-sm" style="margin-left:8px" v-if="!poInForm.waybillNo && poInForm.plate" @click="clearPoInVehicle">清空</button>
+                    <p class="hint" style="margin:6px 0 0">承运信息只读带入；有运单时由运单带出，无运单时点选车辆与司机</p>
+                  </div>
+                  <div class="field"><label>车牌号</label><input v-model="poInForm.plate" :readonly="isSoPcAlignedForm || !!poInForm.waybillNo" :placeholder="isSoPcAlignedForm ? '运单或选择车辆带入' : (poInForm.waybillNo ? '' : '未选运单时可手录')" /></div>
+                  <div class="field"><label>车挂号</label><input v-model="poInForm.trailer" :readonly="isSoPcAlignedForm || !!poInForm.waybillNo" :placeholder="isSoPcAlignedForm ? '无挂车显示 —' : '无挂车填 —'" /></div>
+                  <div class="field"><label>司机姓名</label><input v-model="poInForm.driver" :readonly="isSoPcAlignedForm || !!poInForm.waybillNo" /></div>
+                  <div class="field"><label>司机电话</label><input v-model="poInForm.phone" :readonly="isSoPcAlignedForm || !!poInForm.waybillNo" placeholder="11位手机号" /></div>
+                  <div class="field"><label>司机身份证号</label><input v-model="poInForm.driverId" :readonly="isSoPcAlignedForm || !!poInForm.waybillNo" placeholder="18位身份证" /></div>
                 </div>
                 <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
                   <span>物料明细（{{ (poInForm.lines||[]).length }} 行）</span>
@@ -1015,19 +1103,29 @@ body.remarks-open .demo-scope-tip{display:none}
                     <div><span class="k">物料编码：</span>{{ ln.code }}</div>
                     <div><span class="k">物料名称：</span>{{ ln.name }}</div>
                     <div><span class="k">规格/单位：</span>{{ ln.spec }} / {{ ln.unit }}</div>
+                    <div v-if="isSoPcAlignedForm"><span class="k">管理方式：</span>{{ ln.manageMode || ((isSoPreoutCount || isSoShipCount || isSoRmaCount) ? '计数管理' : '条码管理') }}</div>
                   </div>
-                  <div class="field" style="padding:0 0 8px" v-if="isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank"><label>计划件数</label><input value="—" readonly /></div>
+                  <div class="field" style="padding:0 0 8px" v-if="isOsIssueCount || isOsRetCount || isOsRecvCount || isOsRmaCount || isTrustRecvCount || isTrustRetCount || isTrustRecvTank || isPoInTank || isOsRecvTank || isSoShipCount || isSoPreoutCount || isSoRmaCount"><label>计划件数</label><input value="—" readonly /></div>
+                  <div class="field" style="padding:0 0 8px" v-else-if="isSoPreoutSerial || isSoShipSerial || isSoRmaSerial"><label>计划件数</label><input v-model.number="ln.planPcs" type="number" min="0" placeholder="选填" /></div>
                   <div class="field" style="padding:0 0 8px" v-else><label><span class="req">*</span>计划件数</label><input v-model.number="ln.planPcs" type="number" min="1" /></div>
-                  <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>计划数量</label><input v-model.number="ln.planQty" type="number" min="0.01" step="0.01" /></div>
-                  <div class="field" style="padding:0 0 8px"><label><span class="req" v-if="showNoticeLineExtra">*</span>批号</label><input v-model="ln.lot" /></div>
-                  <template v-if="showNoticeLineExtra">
+                  <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>计划数量</label><input v-model.number="ln.planQty" type="number" min="0.01" step="0.001" /></div>
+                  <div class="field" style="padding:0 0 8px" v-if="isSoPcAlignedForm">
+                    <label>批号</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input :value="ln.lot || ''" readonly placeholder="选填，点击选择合格批次" style="flex:1" @click="openPoInLotPicker(idx)" />
+                      <button type="button" class="btn-sm" @click="openPoInLotPicker(idx)">选择</button>
+                      <button type="button" class="btn-sm" v-if="ln.lot" @click="clearPoInLineLot(idx)">清空</button>
+                    </div>
+                  </div>
+                  <div class="field" style="padding:0 0 8px" v-else><label><span class="req" v-if="showNoticeLineExtra">*</span>批号</label><input v-model="ln.lot" /></div>
+                  <template v-if="showNoticeLineExtra && !isSoPcAlignedForm">
                     <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>生产日期</label><input type="date" v-model="ln.prodDate" /></div>
                     <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>有效期(月)</label><input v-model.number="ln.validMonths" type="number" min="1" /></div>
                     <div class="field" style="padding:0 0 8px"><label>生产厂家</label><input v-model="ln.maker" /></div>
                   </template>
                   <div class="field" style="padding:0"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
                 </div>
-                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ isTrustPartyDoc ? '请选择销售订单或添加物料' : ((isOsIssueDoc || isOsRetDoc) ? '请选择委外加工单后点击新增挑选原料物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料')) }}</p>
+                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ (isTrustPartyDoc || isSoSalesDoc) ? '请选择销售订单或添加物料' : ((isOsIssueDoc || isOsRetDoc) ? '请选择委外加工单后点击新增挑选原料物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料')) }}</p>
               </div>
               <div class="m-footer" style="display:flex;gap:10px">
                 <button type="button" class="btn-ghost" style="flex:1" @click="backPoInNoticeForm">取消</button>
@@ -1061,6 +1159,185 @@ body.remarks-open .demo-scope-tip{display:none}
                       </div>
                     </div>
                     <p v-if="!(filteredPoInMatOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可选物料</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 销售预出货 · 选择车辆与司机 -->
+              <div v-if="poInVehiclePickerVisible" class="m-sheet-mask" @click.self="poInVehiclePickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>选择车辆与司机</span>
+                    <button type="button" class="m-sheet__close" @click="poInVehiclePickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="poInVehiclePickerKw" placeholder="搜索车牌号 / 司机姓名" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="v in filteredPoInVehicleOptions"
+                      :key="v.plate"
+                      class="line-card m-sheet__item"
+                      @click="selectPoInVehicle(v)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">车牌号：</span>{{ v.plate }}</div>
+                        <div><span class="k">车挂号：</span>{{ v.trailer || '—' }}</div>
+                        <div><span class="k">司机：</span>{{ v.driver }}　<span class="k">电话：</span>{{ v.phone }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredPoInVehicleOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可用车辆</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 销售预出货 · 选择批号 -->
+              <div v-if="poInLotPickerVisible" class="m-sheet-mask" @click.self="poInLotPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>选择合格批次</span>
+                    <button type="button" class="m-sheet__close" @click="poInLotPickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="poInLotPickerKw" placeholder="搜索批号" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="row in filteredPoInLotOptions"
+                      :key="row.lot + '-' + row.loc"
+                      class="line-card m-sheet__item"
+                      @click="selectPoInLot(row)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">批号：</span>{{ row.lot }}</div>
+                        <div><span class="k">库位：</span>{{ row.loc || '—' }}　<span class="k">可用量：</span>{{ row.qty }} {{ row.unit || '' }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredPoInLotOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无合格可用批次</p>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- ===== 直接调拨 · 新增/编辑申请单 ===== -->
+            <template v-else-if="view==='xfer-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backXferForm">←</button>
+                <div class="m-nav__title">{{ (xferFormMode==='edit' ? '编辑' : '新增') + (isXferCountDoc ? '直接调拨申请单-计数' : '直接调拨申请单') }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field"><label><span class="req">*</span>单据类型</label>
+                    <select v-model="xferForm.docType">
+                      <option v-for="o in xferDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>是否需要装卸货 <span class="req">*</span></label>
+                    <div class="radio-group" style="display:flex;gap:16px;align-items:center;padding:6px 0;">
+                      <label style="display:flex;align-items:center;gap:4px;font-weight:normal;">
+                        <input type="radio" value="是" v-model="xferForm.isLoadingRequired" /> 是（下推装卸单）
+                      </label>
+                      <label style="display:flex;align-items:center;gap:4px;font-weight:normal;">
+                        <input type="radio" value="否" v-model="xferForm.isLoadingRequired" /> 否
+                      </label>
+                    </div>
+                  </div>
+                  <div class="field"><label>计划执行日期</label><input type="date" v-model="xferForm.planDate" /></div>
+                  <div class="field"><label><span class="req">*</span>调出仓库</label>
+                    <select v-model="xferForm.fromWh">
+                      <option value="">请选择调出仓库</option>
+                      <option v-for="w in warehouseOptions" :key="'from-'+w.code" :value="w.label">{{ w.label }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label><span class="req">*</span>调入仓库</label>
+                    <select v-model="xferForm.toWh">
+                      <option value="">请选择调入仓库</option>
+                      <option v-for="w in warehouseOptions" :key="'to-'+w.code" :value="w.label">{{ w.label }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>备注</label><input v-model="xferForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                </div>
+                <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
+                  <span>物料明细（{{ (xferForm.lines||[]).length }} 行）</span>
+                  <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openXferMatPicker">+ 添加物料</button>
+                </div>
+                <div v-for="(ln, idx) in xferForm.lines" :key="'xf-ln-'+idx" class="line-card" style="cursor:default">
+                  <button type="button" class="scan-op-del" style="position:absolute;right:12px;top:10px" @click="removeXferFormLine(idx)">删除</button>
+                  <div class="line-fields" style="padding-right:48px">
+                    <div><span class="k">物料编码：</span>{{ ln.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ ln.name }}</div>
+                    <div><span class="k">规格/单位：</span>{{ ln.spec }} / {{ ln.unit }}</div>
+                    <div><span class="k">管理方式：</span>{{ ln.manageMode || (isXferCountDoc ? '计数管理' : '条码管理') }}</div>
+                  </div>
+                  <div class="field" style="padding:0 0 8px" v-if="isXferCountDoc"><label>计划件数</label><input value="—" readonly /></div>
+                  <div class="field" style="padding:0 0 8px" v-else><label>计划件数</label><input v-model.number="ln.planPcs" type="number" min="0" placeholder="选填" /></div>
+                  <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>计划数量</label><input v-model.number="ln.planQty" type="number" min="0.01" step="0.001" /></div>
+                  <div class="field" style="padding:0 0 8px">
+                    <label>批号</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input :value="ln.lot || ''" readonly placeholder="选填，点击选择合格批次" style="flex:1" @click="openXferLotPicker(idx)" />
+                      <button type="button" class="btn-sm" @click="openXferLotPicker(idx)">选择</button>
+                      <button type="button" class="btn-sm" v-if="ln.lot" @click="clearXferLineLot(idx)">清空</button>
+                    </div>
+                  </div>
+                  <div class="field" style="padding:0"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
+                </div>
+                <p v-if="!(xferForm.lines||[]).length" class="hint" style="text-align:center">请添加{{ isXferCountDoc ? '计数' : '条码' }}物料明细</p>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backXferForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveXferNotice">确认保存</button>
+              </div>
+              <div v-if="xferMatPickerVisible" class="m-sheet-mask" @click.self="xferMatPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>{{ isXferCountDoc ? '选择计数物料' : '选择物料（条码管理）' }}</span>
+                    <button type="button" class="m-sheet__close" @click="xferMatPickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="xferMatPickerKw" placeholder="搜索编码 / 名称 / 规格" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="m in filteredXferMatOptions"
+                      :key="m.code"
+                      class="line-card m-sheet__item"
+                      @click="selectXferMat(m)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">物料编码：</span>{{ m.code }}</div>
+                        <div><span class="k">物料名称：</span>{{ m.name }}</div>
+                        <div><span class="k">规格/单位：</span>{{ m.spec }} / {{ m.unit }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredXferMatOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可选物料</p>
+                  </div>
+                </div>
+              </div>
+              <div v-if="xferLotPickerVisible" class="m-sheet-mask" @click.self="xferLotPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>{{ isXferCountDoc ? '选择调出仓库存批号' : '选择合格批次' }}</span>
+                    <button type="button" class="m-sheet__close" @click="xferLotPickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="xferLotPickerKw" placeholder="搜索批号" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="row in filteredXferLotOptions"
+                      :key="row.lot + '-' + (row.loc || '')"
+                      class="line-card m-sheet__item"
+                      @click="selectXferLot(row)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">批号：</span>{{ row.lot }}</div>
+                        <div><span class="k">库位：</span>{{ row.loc || '—' }}　<span class="k">可用量：</span>{{ row.qty }} {{ row.unit || '' }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredXferLotOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">{{ xferForm.fromWh ? '暂无可用批次' : '请先选择调出仓库' }}</p>
                   </div>
                 </div>
               </div>
@@ -2823,20 +3100,68 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-footer"><button class="btn-primary" @click="submitExec">{{ isLoadFlow ? '提交' : (isXferCountExec ? '提交 (调拨入库)' : (isSoRmaCount ? '提交 (退货入库)' : (isTrustRecvCount ? '提交 (收料上架)' : (isProdRetCount ? '提交 (退料入库)' : (isOsRecvCount ? '提交 (收料入库)' : (isOsRetCount ? '提交 (退料入库)' : (isPoInCount ? '提交 (入库)' : (isOutCountDoc ? ('提交 (' + outActionWord + ')') : '提交')))))))) }}</button></div>
             </template>
 
-            <!-- ===== 执行页 · 库内移库/转序 ===== -->
+            <!-- ===== 执行页 · 物料转序（编码/批号转换） ===== -->
+            <template v-else-if="view==='exec' && activeExecMode==='inner' && flowMeta.innerType==='xfer'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backFromExec">←</button>
+                <div class="m-nav__title">执行</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field"><label>单据类型</label><input :value="(currentNotice.seqType || '编码转换') + '（物料转序）'" readonly /></div>
+                  <div class="field"><label>新物料信息</label><input :value="currentNotice.newMaterial || currentNotice.partner || '—'" readonly /></div>
+                  <div class="field"><label>新批号</label><input :value="currentNotice.newLot || currentNotice.refNo || '—'" readonly /></div>
+                  <div class="field"><label>新生产日期</label><input :value="currentNotice.newProdDate || '—'" readonly /></div>
+                  <div class="field"><label>新有效期</label><input :value="currentNotice.newValidPeriod || '—'" readonly /></div>
+                  <div class="field"><label>新失效日期</label><input :value="currentNotice.newExpireDate || '—'" readonly /></div>
+                  <div class="field"><label>转序说明</label><input :value="currentNotice.seqRemark || currentNotice.remark || '—'" readonly /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">添加物料</div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，回车确认" @keyup.enter="addInnerScan" /></div>
+                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="手动输入，回车确认" @keyup.enter="addInnerScan" /></div>
+                </div>
+                <div class="stat-bar"><span>扫码件数：{{ innerRows.length }}</span><span>扫码数量：{{ innerQtySum }}</span></div>
+                <div class="sec" style="padding:0;overflow:hidden">
+                  <div class="table-scroll">
+                    <table class="scan-table">
+                      <thead><tr><th>条码号</th><th>包材编号</th><th>原物料</th><th>原批号</th><th>数量</th><th class="col-op">操作</th></tr></thead>
+                      <tbody>
+                        <tr v-for="(r,i) in innerRows" :key="'xfer-'+i">
+                          <td>{{ r.barcode }}</td>
+                          <td>{{ r.pkgNo }}</td>
+                          <td>{{ r.code || r.material || '—' }}</td>
+                          <td>{{ r.lot || '—' }}</td>
+                          <td>{{ r.qty }}</td>
+                          <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('inner', i)">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="sec">
+                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
+                </div>
+              </div>
+              <div class="m-footer"><button class="btn-primary" @click="submitExec">提交</button></div>
+            </template>
+
+            <!-- ===== 执行页 · 货物移库 ===== -->
             <template v-else-if="view==='exec' && activeExecMode==='inner'">
               <div class="m-nav">
-                <button class="m-nav__back" @click="view='docs'">←</button>
+                <button class="m-nav__back" @click="backFromExec">←</button>
                 <div class="m-nav__title">执行</div>
               </div>
               <div class="m-scroll">
                 <div class="sec">
                   <div class="sec__title">基本信息</div>
                   <div class="field"><label>单据类型</label><input :value="currentNotice.docType" readonly /></div>
-                  <div class="field"><label>移出/转出仓库</label><input :value="currentNotice.fromWh || currentNotice.partner" readonly /></div>
-                  <div class="field"><label>移出/转出库位</label><input :value="currentNotice.fromLoc || '—'" readonly /></div>
-                  <div class="field"><label>移入/转入仓库</label><input :value="currentNotice.toWh || currentNotice.refNo" readonly /></div>
-                  <div class="field"><label>移入/转入库位</label><input :value="currentNotice.toLoc || '—'" readonly /></div>
+                  <div class="field"><label>移出仓库</label><input :value="currentNotice.fromWh || currentNotice.partner" readonly /></div>
+                  <div class="field"><label>移出库位</label><input :value="currentNotice.fromLoc || '—'" readonly /></div>
+                  <div class="field"><label>移入仓库</label><input :value="currentNotice.toWh || currentNotice.refNo" readonly /></div>
+                  <div class="field"><label>移入库位</label><input :value="currentNotice.toLoc || '—'" readonly /></div>
                   <div class="field"><label>备注</label><input :value="currentNotice.remark || '—'" readonly /></div>
                 </div>
                 <div class="sec">
@@ -3280,7 +3605,7 @@ body.remarks-open .demo-scope-tip{display:none}
                     <input v-model="form.barcode" placeholder="请扫描流水码条码（TM…）" @keyup.enter="addPkgDocScan" />
                   </div>
                 </div>
-                <div class="stat-bar"><span>已扫明细</span></div>
+                <div class="stat-bar"><span>扫码件数：{{ pkgRows.length }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
                   <div class="table-scroll">
                     <table class="scan-table">
@@ -3716,7 +4041,7 @@ body.remarks-open .demo-scope-tip{display:none}
             <!-- ===== 包材建档 · 新增表单 ===== -->
             <template v-else-if="view==='pkg-create'">
               <div class="m-nav">
-                <button class="m-nav__back" @click="view='pkg-arch'">← 返回</button>
+                <button class="m-nav__back" @click="backPkgCreate">← 返回</button>
                 <div class="m-nav__title">新增档案</div>
               </div>
               <div class="m-scroll">
@@ -3748,7 +4073,7 @@ body.remarks-open .demo-scope-tip{display:none}
                 </div>
               </div>
               <div class="m-footer" style="display:flex;gap:8px;padding:10px 12px">
-                <button class="btn-sm" style="flex:1;height:40px;background:#fff;color:#595959;border:1px solid #D9D9D9" @click="view='pkg-arch'">取消</button>
+                <button class="btn-sm" style="flex:1;height:40px;background:#fff;color:#595959;border:1px solid #D9D9D9" @click="backPkgCreate">取消</button>
                 <button class="btn-primary" style="flex:1" @click="savePkgCreate">确认</button>
               </div>
               <div v-if="pkgMatPickerVisible" class="m-sheet-mask" @click.self="pkgMatPickerVisible=false">
@@ -3775,16 +4100,16 @@ body.remarks-open .demo-scope-tip{display:none}
               </div>
               <div class="m-scroll">
                 <div class="sec">
-                  <div class="sec__title">条码查询</div>
+                  <div class="sec__title">档案信息搜索</div>
                   <div class="field"><label><span class="req">*</span>条码号</label>
                     <div style="display:flex;gap:8px">
-                      <input v-model="pkgSearch.barcode" placeholder="扫码/输入" style="flex:1" @keyup.enter="queryPkgInfo" />
+                      <input v-model="pkgSearch.barcode" placeholder="扫码/输入，回车查询" style="flex:1" @keyup.enter="queryPkgInfo" />
                       <button class="btn-sm" @click="queryPkgInfo">查询</button>
                     </div>
                   </div>
                 </div>
                 <div class="sec" v-if="pkgDetail">
-                  <div class="sec__title">档案信息</div>
+                  <div class="sec__title">信息详情（只读）</div>
                   <div class="field" v-for="pair in pkgQueryPairs" :key="pair[0]"><label>{{ pair[0] }}</label><input :value="pair[1]" readonly /></div>
                 </div>
                 <div class="empty" v-else style="padding:32px 16px">扫描或输入条码号查询流水码档案</div>
@@ -4470,6 +4795,7 @@ createApp({
     const REMARKS_VIEW_KEYS = {
       docs: ['单据页', '页面 1：单据页', '页面结构'],
       'po-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'xfer-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'gen-doc-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'prod-pick-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'prod-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
@@ -4503,6 +4829,7 @@ createApp({
       const hintMap = {
         docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页',
         'po-in-form': '新增编辑页',
+        'xfer-form': '新增编辑页',
         'prod-in-form': '新增编辑页',
       };
       return hintMap[v] ? [hintMap[v]] : [];
@@ -4640,6 +4967,9 @@ createApp({
     const isSoShipSerial = computed(() => flowId.value === 'so-ship-serial');
     const isSoShipCount = computed(() => flowId.value === 'so-ship-count');
     const isSoShipDoc = computed(() => isSoShipSerial.value || isSoShipCount.value);
+    const isSoSalesDoc = computed(() => isSoShipDoc.value || isSoPreoutDoc.value || isSoRmaDoc.value);
+    /** 销售预出货/发货/退货：APP 建单交互对齐 PC（关联单级联、承运禁手输、批号弹窗） */
+    const isSoPcAlignedForm = computed(() => isSoPreoutDoc.value || isSoShipDoc.value || isSoRmaDoc.value);
     const isSoRmaSerial = computed(() => flowId.value === 'so-rma-serial');
     const isSoRmaCount = computed(() => flowId.value === 'so-rma-count');
     const isSoRmaDoc = computed(() => isSoRmaSerial.value || isSoRmaCount.value);
@@ -4691,8 +5021,11 @@ createApp({
       return /^(trust-|so-ship-|so-rma-|oth-|stock-take$|wh-load$|pkg-scrap$|pkg-freeze$|pkg-unfreeze$)/.test(id);
     });
     const isPoNoticeSerial = computed(() => isPoInSerial.value || isPoRetSerial.value || isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value || isSoRmaSerial.value);
-    /** 收货类明细需维护批号/生产日期/有效期/厂家（采购入库、委外收货）；发料/退料/退货不维护 */
-    const showNoticeLineExtra = computed(() => isOsRecvDoc.value || !isOsWwpoDoc.value);
+    /** 收货类明细需维护批号/生产日期/有效期/厂家；销售预出货/发货对齐 PC 不含产日效期厂家 */
+    const showNoticeLineExtra = computed(() => {
+      if (isSoPcAlignedForm.value) return false;
+      return isOsRecvDoc.value || !isOsWwpoDoc.value;
+    });
     const outQtyLabel = computed(() => flowMeta.value.qtyLabel || '出库数量');
     const outActionWord = computed(() => (
       (isSoShipSerial.value || isSoShipCount.value) ? '发货出库'
@@ -4829,9 +5162,9 @@ createApp({
     const wwpoOptions = CFG.wwpoOptions || [];
     const liquidMatOptions = CFG.liquidMatOptions || [];
     const countMatOptions = CFG.countMatOptions || [];
-    /** 新增/编辑通知单表头「关联上游单据」候选源：委外取加工单；受托收料取销售订单；其余取采购订单 */
+    /** 新增/编辑通知单表头「关联上游单据」候选源：委外取加工单；受托/销售取销售订单；其余取采购订单 */
     const soOptions = CFG.soOptions || [];
-    const refOrderOptions = computed(() => (isOsWwpoDoc.value ? wwpoOptions : (isTrustPartyDoc.value ? soOptions : poOptions)));
+    const refOrderOptions = computed(() => (isOsWwpoDoc.value ? wwpoOptions : ((isTrustPartyDoc.value || isSoSalesDoc.value) ? soOptions : poOptions)));
     const countMatCodes = computed(() => new Set((countMatOptions || []).map(m => m.code).concat(['SP-BRG-6205', 'PK-BOX-A4', 'SP-SEAL-NBR'])));
     const liquidMatCodes = computed(() => new Set((liquidMatOptions || []).map(m => m.code)));
     function isLiquidMatLine(ln) {
@@ -4905,6 +5238,12 @@ createApp({
     const poInSelectablePos = computed(() => {
       const poBarcode = (p) => (p.lines || []).some((l) => isBarcodeManageLine({ code: l.code, manageMode: l.manageMode }));
       const poCount = (p) => (p.lines || []).some((l) => isCountManageLine({ code: l.code, manageMode: l.manageMode }));
+      if (isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value) {
+        return soOptions.filter(poCount);
+      }
+      if (isSoShipSerial.value || isSoPreoutSerial.value || isSoRmaSerial.value) {
+        return soOptions.filter(poBarcode);
+      }
       if (isTrustRecvCount.value || isTrustRetCount.value) {
         return soOptions.filter(poCount);
       }
@@ -4970,9 +5309,18 @@ createApp({
     const noticeDocTypeOptions = computed(() => {
       storeTick.value;
       const D = window.WMS_DICT;
-      if (!D || typeof D.optionsFor !== 'function') return [];
+      if (!D || typeof D.optionsFor !== 'function') {
+        if (isSoPreoutDoc.value) return ['标准预出货', '紧急预出货', '样品预出货'];
+        if (isSoShipDoc.value) return ['标准发货', '紧急发货', '样品发货'];
+        if (isSoRmaDoc.value) return ['标准退货', '拒收退货', '换货退货'];
+        return [];
+      }
       const field = String(flowId.value || '') === 'stock-take' ? '盘点类型' : '单据类型';
       const opts = D.optionsFor(flowId.value, field, '', liveAppDict()) || [];
+      if (opts.length) return opts;
+      if (isSoPreoutDoc.value) return ['标准预出货', '紧急预出货', '样品预出货'];
+      if (isSoShipDoc.value) return ['标准发货', '紧急发货', '样品发货'];
+      if (isSoRmaDoc.value) return ['标准退货', '拒收退货', '换货退货'];
       return opts;
     });
     function firstNoticeDocType() {
@@ -5042,6 +5390,7 @@ createApp({
       id: '', poNo: '', supplier: '', docType: '标准采购入库', planDate: '', erpNo: '', remark: '',
       waybillNo: '', logisticsNo: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
       isLoadingRequired: '是',
+      stockNo: '', preoutNo: '', shipOutNo: '', returnReason: '',
       lines: [],
     });
     const poInWaybillOpts = computed(() => {
@@ -5049,7 +5398,10 @@ createApp({
       if (!poInForm.poNo) return [];
       const wantBiz = isTrustRetDoc.value ? '受托退料'
         : (isTrustRecvDoc.value ? '受托收料'
-        : (isOsIssueDoc.value ? '委外发料' : (isOsRmaDoc.value ? '委外退货' : (isOsRetDoc.value ? '委外退料' : (isOsRecvDoc.value ? '委外收货' : (isPoRetDoc.value ? '采购退料' : (isPoInDoc.value ? '采购入库' : '')))))));
+        : (isSoShipDoc.value ? '销售发货'
+        : (isSoPreoutDoc.value ? '销售预出货'
+        : (isSoRmaDoc.value ? '销售退货'
+        : (isOsIssueDoc.value ? '委外发料' : (isOsRmaDoc.value ? '委外退货' : (isOsRetDoc.value ? '委外退料' : (isOsRecvDoc.value ? '委外收货' : (isPoRetDoc.value ? '采购退料' : (isPoInDoc.value ? '采购入库' : ''))))))))));
       return all.filter(w => {
         if (w.poHint !== poInForm.poNo) return false;
         if (wantBiz && w.bizType && w.bizType !== wantBiz) return false;
@@ -5060,6 +5412,424 @@ createApp({
       const w = (CFG.waybillOptions || []).find(x => x.code === poInForm.waybillNo);
       return (w && w.ships) || [];
     });
+    /** 销售预出货/发货 · 备货候选（预出货：非已完成/已关闭；发货：执行中/已完成） */
+    const poInPrepOptions = computed(() => {
+      storeTick.value;
+      const main = ((window.WMS_MOCK_ROWS || {})['wh-so-prep'] || {}).main || [];
+      let rows = main.filter((r) => {
+        const st = String(r['备货状态'] || '');
+        if (isSoShipDoc.value) return st === '执行中' || st === '已完成';
+        return !['已完成', '已关闭'].includes(st);
+      });
+      if (poInForm.poNo) {
+        const filtered = rows.filter((r) => String(r['关联销售订单'] || '') === poInForm.poNo);
+        if (filtered.length) rows = filtered;
+      }
+      return rows.map((r) => ({
+        code: r['备货通知单号'],
+        customer: r['客户名称'] || '',
+        soNo: r['关联销售订单'] || '',
+        matInfo: r['物料信息'] || '',
+        unit: r['单位'] || '吨',
+        qty: r['备货数量'] || r['已备数量'] || '10',
+        manageMode: '条码管理',
+        pickLines: r._pickLines || [],
+      })).filter((x) => x.code);
+    });
+    /** 销售发货 · 已完成预出货出库单 CKYC */
+    const poInPreoutOutOptions = computed(() => {
+      storeTick.value;
+      if (!isSoShipDoc.value) return [];
+      const tab2 = ((window.WMS_MOCK_ROWS || {})['wh-so-preout'] || {}).tab2 || [];
+      let rows = tab2.filter((r) => String(r['单据状态'] || '') === '已完成');
+      const soCode = (v) => String(v || '').split(/\s*\/\s*/)[0].trim();
+      if (poInForm.poNo) {
+        const filtered = rows.filter((r) => soCode(r['关联销售订单']) === poInForm.poNo);
+        if (filtered.length) rows = filtered;
+      }
+      return rows.map((r) => ({
+        code: r['出库单号'],
+        customer: r['客户名称'] || '',
+        soNo: soCode(r['关联销售订单']),
+        noticeNo: r['关联通知单号'] || '',
+        matInfo: r['物料信息'] || '',
+        qty: r['已完成数量'] || '0',
+        pcs: r['已完成件数'] || '0',
+        unit: r['库存单位'] || 'KG',
+        waybillNo: r['关联运单'] || '',
+        logisticsNo: r['关联发货单'] || '',
+        stockNo: '',
+      })).filter((x) => x.code);
+    });
+    /** 销售退货 · 已完成销售发货/预出货出库单 CKFH/CKYC */
+    const poInShipOutOptions = computed(() => {
+      storeTick.value;
+      if (!isSoRmaDoc.value) return [];
+      const soCode = (v) => String(v || '').split(/\s*\/\s*/)[0].trim();
+      const mapRow = (r, src) => ({
+        code: r['出库单号'],
+        customer: r['客户名称'] || '',
+        soNo: soCode(r['关联销售订单']),
+        noticeNo: r['关联通知单号'] || '',
+        matInfo: r['物料信息'] || '',
+        qty: r['已完成数量'] || '0',
+        pcs: r['已完成件数'] || '0',
+        unit: r['库存单位'] || 'KG',
+        waybillNo: r['关联运单'] || '',
+        logisticsNo: r['关联发货单'] || '',
+        src,
+      });
+      let rows = [];
+      (((window.WMS_MOCK_ROWS || {})['wh-so-ship'] || {}).tab2 || [])
+        .filter((r) => String(r['单据状态'] || '') === '已完成')
+        .forEach((r) => rows.push(mapRow(r, 'ship')));
+      (((window.WMS_MOCK_ROWS || {})['wh-so-preout'] || {}).tab2 || [])
+        .filter((r) => String(r['单据状态'] || '') === '已完成')
+        .forEach((r) => rows.push(mapRow(r, 'preout')));
+      if (poInForm.poNo) {
+        const filtered = rows.filter((r) => r.soNo === poInForm.poNo);
+        if (filtered.length) rows = filtered;
+      }
+      return rows.filter((x) => x.code);
+    });
+    const poInVehiclePickerVisible = ref(false);
+    const poInVehiclePickerKw = ref('');
+    const filteredPoInVehicleOptions = computed(() => {
+      const kw = String(poInVehiclePickerKw.value || '').trim().toLowerCase();
+      const list = (CFG.carrierVehicles || []).slice();
+      if (!kw) return list;
+      return list.filter((v) => [v.plate, v.trailer, v.driver, v.phone].join(' ').toLowerCase().includes(kw));
+    });
+    const poInLotPickerVisible = ref(false);
+    const poInLotPickerKw = ref('');
+    const poInLotLineIdx = ref(-1);
+    const filteredPoInLotOptions = computed(() => {
+      storeTick.value;
+      const idx = poInLotLineIdx.value;
+      const ln = (poInForm.lines || [])[idx];
+      if (!ln || !ln.code) return [];
+      const kw = String(poInLotPickerKw.value || '').trim().toLowerCase();
+      return filteredPoInLotOptionsForCode(ln.code).filter((x) => {
+        if (!kw) return true;
+        return String(x.lot).toLowerCase().includes(kw) || String(x.loc || '').toLowerCase().includes(kw);
+      });
+    });
+    function archRowMatCode(r) {
+      if (r && r.code) return String(r.code);
+      const mat = String((r && (r.material || r.物料信息)) || '');
+      return mat.split(/\s*\/\s*/)[0].trim();
+    }
+    function filteredPoInLotOptionsForCode(code) {
+      const c = String(code || '');
+      if (!c) return [];
+      const map = new Map();
+      (CFG.serialArchRows || []).forEach((r) => {
+        if (archRowMatCode(r) !== c) return;
+        if (r.useStatus && r.useStatus !== '在用') return;
+        const lot = String(r.lot || r.batchNo || '').trim();
+        if (!lot || lot === '—') return;
+        const qty = Number(r.qty != null ? r.qty : (r.archiveQty != null ? r.archiveQty : r.currentQty)) || 0;
+        if (!(qty > 0)) return;
+        const prev = map.get(lot);
+        if (!prev) map.set(lot, { lot, loc: r.loc || r.wh || '', qty, unit: r.unit || '' });
+        else prev.qty += qty;
+      });
+      (CFG.countInvRows || []).forEach((r) => {
+        if (String(r.code || '') !== c) return;
+        const lot = String(r.lot || '').trim();
+        if (!lot || lot === '—') return;
+        const qty = Number(r.qty) || 0;
+        if (!(qty > 0)) return;
+        const prev = map.get(lot);
+        if (!prev) map.set(lot, { lot, loc: String(r.loc || '').split(/\s*\/\s*/)[0] || '', qty, unit: r.unit || '' });
+        else prev.qty += qty;
+      });
+      return Array.from(map.values());
+    }
+    function clearPoInCarrierFields() {
+      poInForm.waybillNo = '';
+      poInForm.logisticsNo = '';
+      poInForm.plate = '';
+      poInForm.trailer = '';
+      poInForm.driver = '';
+      poInForm.phone = '';
+      poInForm.driverId = '';
+    }
+    function openPoInVehiclePicker() {
+      if (poInForm.waybillNo) {
+        ElementPlus.ElMessage.warning('已关联运单，承运信息由运单带入');
+        return;
+      }
+      poInVehiclePickerKw.value = '';
+      poInVehiclePickerVisible.value = true;
+    }
+    function selectPoInVehicle(v) {
+      if (!v) return;
+      poInForm.plate = v.plate || '';
+      poInForm.trailer = v.trailer || '—';
+      poInForm.driver = v.driver || '';
+      poInForm.phone = v.phone || '';
+      poInForm.driverId = v.licenseNo || v.driverId || '';
+      poInVehiclePickerVisible.value = false;
+      ElementPlus.ElMessage.success('已选择车辆与司机：' + (v.plate || '') + ' / ' + (v.driver || ''));
+    }
+    function clearPoInVehicle() {
+      if (poInForm.waybillNo) return;
+      poInForm.plate = '';
+      poInForm.trailer = '';
+      poInForm.driver = '';
+      poInForm.phone = '';
+      poInForm.driverId = '';
+    }
+    function openPoInLotPicker(idx) {
+      poInLotLineIdx.value = idx;
+      poInLotPickerKw.value = '';
+      poInLotPickerVisible.value = true;
+    }
+    function selectPoInLot(row) {
+      const idx = poInLotLineIdx.value;
+      const ln = (poInForm.lines || [])[idx];
+      if (!ln || !row) return;
+      const lot = String(row.lot || '').trim();
+      const dup = (poInForm.lines || []).some((x, i) => i !== idx && x.code === ln.code && String(x.lot || '').trim() === lot);
+      if (dup) {
+        ElementPlus.ElMessage.error('同一单据中【物料+批号】不可重复');
+        return;
+      }
+      ln.lot = lot;
+      poInLotPickerVisible.value = false;
+      ElementPlus.ElMessage.success('已选择批号：' + lot);
+    }
+    function clearPoInLineLot(idx) {
+      const ln = (poInForm.lines || [])[idx];
+      if (ln) ln.lot = '';
+    }
+    function onPoInPrepChange() {
+      if (!isSoPcAlignedForm.value) return;
+      const prep = (poInPrepOptions.value || []).find((p) => p.code === poInForm.stockNo);
+      if (!prep) return;
+      clearPoInCarrierFields();
+      if (isSoShipDoc.value) poInForm.preoutNo = '';
+      if (prep.soNo) {
+        poInForm.poNo = prep.soNo;
+        const so = (soOptions || []).find((p) => p.code === prep.soNo);
+        poInForm.supplier = prep.customer || (so && (so.supplier || so.name)) || poInForm.supplier;
+        if (so && !(poInForm.lines || []).length) {
+          fillPoInLinesFromSo(so);
+        }
+      } else if (prep.customer) {
+        poInForm.supplier = prep.customer;
+      }
+      // 发货：优先用备货明细批号带入
+      if (isSoShipDoc.value && (prep.pickLines || []).length) {
+        const zeroPcs = isSoShipCount.value;
+        const byLot = new Map();
+        prep.pickLines.forEach((pl) => {
+          const parts = parseMatInfoParts(pl['物料信息'] || prep.matInfo);
+          const lot = String(pl['物料批号'] || '').trim() || '';
+          const key = parts.code + '|' + lot;
+          const qty = Number(pl['当前数量']) || 0;
+          if (!byLot.has(key)) {
+            byLot.set(key, {
+              code: parts.code, name: parts.name || pl.name, spec: parts.spec, kind: parts.kind,
+              unit: pl['库存单位'] || prep.unit || '吨',
+              planPcs: zeroPcs ? 0 : 1, planQty: qty, lot,
+              manageMode: zeroPcs ? '计数管理' : '条码管理',
+              remark: '', status: '待执行', doneQty: 0, remainQty: qty, remainPcs: zeroPcs ? 0 : 1,
+            });
+          } else {
+            const hit = byLot.get(key);
+            hit.planQty += qty;
+            hit.remainQty = hit.planQty;
+            if (!zeroPcs) { hit.planPcs += 1; hit.remainPcs = hit.planPcs; }
+          }
+        });
+        poInForm.lines = Array.from(byLot.values());
+      } else if (!(poInForm.lines || []).length && prep.matInfo) {
+        const parts = parseMatInfoParts(prep.matInfo);
+        const zeroPcs = isSoPreoutCount.value || isSoShipCount.value;
+        const qty = Number(prep.qty) || 10;
+        poInForm.lines = [{
+          code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind, unit: prep.unit || '吨',
+          planPcs: zeroPcs ? 0 : 10, planQty: qty, lot: '',
+          manageMode: zeroPcs ? '计数管理' : '条码管理',
+          remark: '', status: '待执行', doneQty: 0, remainQty: qty, remainPcs: zeroPcs ? 0 : 10,
+        }];
+      }
+      ElementPlus.ElMessage.success('已选择备货单：' + prep.code);
+    }
+    function fillPoInLinesFromSo(so) {
+      if (!so) return;
+      const zeroPcs = isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value;
+      let srcLines = (so.lines || []).slice();
+      if (zeroPcs) {
+        const codes = countMatCodes.value;
+        srcLines = srcLines.filter((l) => codes.has(l.code) || !(Number(l.planPcs) > 0));
+      } else if (isSoShipSerial.value || isSoPreoutSerial.value || isSoRmaSerial.value) {
+        srcLines = srcLines.filter((l) => !countMatCodes.value.has(l.code) || Number(l.planPcs) > 0);
+      }
+      poInForm.lines = srcLines.map((ln) => ({
+        code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+        planPcs: zeroPcs ? 0 : ln.planPcs, planQty: ln.planQty,
+        lot: '', manageMode: zeroPcs ? '计数管理' : '条码管理',
+        remark: '', status: '待执行', doneQty: 0, remainQty: ln.planQty,
+        remainPcs: zeroPcs ? 0 : ln.planPcs,
+      }));
+    }
+    function onPoInPreoutOutChange() {
+      if (!isSoShipDoc.value) return;
+      const out = (poInPreoutOutOptions.value || []).find((p) => p.code === poInForm.preoutNo);
+      if (!out) return;
+      if (out.soNo) {
+        poInForm.poNo = out.soNo;
+        poInForm.supplier = out.customer || poInForm.supplier;
+      } else if (out.customer) {
+        poInForm.supplier = out.customer;
+      }
+      // 继承运力
+      poInForm.waybillNo = out.waybillNo || '';
+      poInForm.logisticsNo = out.logisticsNo || '';
+      if (out.waybillNo) {
+        const w = (CFG.waybillOptions || []).find((x) => x.code === out.waybillNo);
+        if (w) {
+          poInForm.plate = w.plate || '';
+          poInForm.trailer = w.trailer || '—';
+          poInForm.driver = w.driver || '';
+          poInForm.phone = w.phone || '';
+          poInForm.driverId = w.driverId || '';
+        }
+      }
+      // 从预出货通知单带备货
+      const noticeNo = out.noticeNo;
+      if (noticeNo) {
+        const tab1 = ((window.WMS_MOCK_ROWS || {})['wh-so-preout'] || {}).tab1 || [];
+        const notice = tab1.find((r) => String(r['单号'] || '') === noticeNo);
+        if (notice) {
+          const stock = notice['关联备货通知单'] || notice['关联销售备货单'];
+          if (stock && stock !== '—') poInForm.stockNo = stock;
+          if (notice['车牌号']) {
+            poInForm.plate = notice['车牌号'] || poInForm.plate;
+            poInForm.trailer = notice['车挂号'] || poInForm.trailer;
+            poInForm.driver = notice['司机姓名'] || poInForm.driver;
+            poInForm.phone = notice['司机电话'] || poInForm.phone;
+            poInForm.driverId = notice['司机身份证号'] || poInForm.driverId;
+          }
+          // 优先用通知单明细（含批号）
+          if (Array.isArray(notice._lines) && notice._lines.length) {
+            const zeroPcs = isSoShipCount.value;
+            poInForm.lines = notice._lines.map((ln) => {
+              const parts = parseMatInfoParts(ln['物料信息']);
+              const qty = Number(ln['已完成数量'] != null ? ln['已完成数量'] : ln['计划数量']) || Number(out.qty) || 0;
+              const pcs = zeroPcs ? 0 : (Number(ln['计划件数']) || Number(out.pcs) || 0);
+              return {
+                code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+                unit: ln['库存单位'] || out.unit || 'KG',
+                planPcs: pcs, planQty: qty || Number(out.qty) || 1,
+                lot: String(ln['批号'] || '').trim() === '—' ? '' : String(ln['批号'] || '').trim(),
+                manageMode: ln['管理方式'] || (zeroPcs ? '计数管理' : '条码管理'),
+                remark: '', status: '待执行', doneQty: 0,
+                remainQty: qty || Number(out.qty) || 1, remainPcs: pcs,
+              };
+            });
+            ElementPlus.ElMessage.success('已选择预出货出库单并带入明细：' + out.code);
+            return;
+          }
+        }
+      }
+      // 回退：出库单头物料汇总
+      if (out.matInfo) {
+        const parts = parseMatInfoParts(out.matInfo);
+        const zeroPcs = isSoShipCount.value;
+        const qty = Number(out.qty) || 1;
+        const pcs = zeroPcs ? 0 : (Number(out.pcs) || 0);
+        poInForm.lines = [{
+          code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+          unit: out.unit || 'KG', planPcs: pcs, planQty: qty, lot: '',
+          manageMode: zeroPcs ? '计数管理' : '条码管理',
+          remark: '', status: '待执行', doneQty: 0, remainQty: qty, remainPcs: pcs,
+        }];
+      }
+      ElementPlus.ElMessage.success('已选择预出货出库单：' + out.code);
+    }
+    function onPoInLogisticsChange() {
+      if (!isSoShipDoc.value || !poInForm.logisticsNo) return;
+      // 发货：选定发货单后按订单重载明细、批号留空（无发货单物料明细 Mock 时的对齐口径）
+      const so = (soOptions || []).find((p) => p.code === poInForm.poNo);
+      if (so) {
+        fillPoInLinesFromSo(so);
+        ElementPlus.ElMessage.success('已按发货单关联订单带入物料（批号留空）');
+      }
+    }
+    function onPoInShipOutChange() {
+      if (!isSoRmaDoc.value) return;
+      const out = (poInShipOutOptions.value || []).find((p) => p.code === poInForm.shipOutNo);
+      if (!out) return;
+      if (out.soNo) {
+        poInForm.poNo = out.soNo;
+        poInForm.supplier = out.customer || poInForm.supplier;
+      } else if (out.customer) {
+        poInForm.supplier = out.customer;
+      }
+      poInForm.waybillNo = out.waybillNo || '';
+      poInForm.logisticsNo = out.logisticsNo || '';
+      if (out.waybillNo) {
+        const w = (CFG.waybillOptions || []).find((x) => x.code === out.waybillNo);
+        if (w) {
+          poInForm.plate = w.plate || '';
+          poInForm.trailer = w.trailer || '—';
+          poInForm.driver = w.driver || '';
+          poInForm.phone = w.phone || '';
+          poInForm.driverId = w.driverId || '';
+        }
+      }
+      const pageKey = out.src === 'preout' ? 'wh-so-preout' : 'wh-so-ship';
+      const noticeNo = out.noticeNo;
+      if (noticeNo) {
+        const tab1 = ((window.WMS_MOCK_ROWS || {})[pageKey] || {}).tab1 || [];
+        const notice = tab1.find((r) => String(r['单号'] || '') === noticeNo);
+        if (notice) {
+          if (notice['车牌号']) {
+            poInForm.plate = notice['车牌号'] || poInForm.plate;
+            poInForm.trailer = notice['车挂号'] || poInForm.trailer;
+            poInForm.driver = notice['司机姓名'] || poInForm.driver;
+            poInForm.phone = notice['司机电话'] || poInForm.phone;
+            poInForm.driverId = notice['司机身份证号'] || poInForm.driverId;
+          }
+          if (Array.isArray(notice._lines) && notice._lines.length) {
+            const zeroPcs = isSoRmaCount.value;
+            poInForm.lines = notice._lines.map((ln) => {
+              const parts = parseMatInfoParts(ln['物料信息']);
+              const qty = Number(ln['已完成数量'] != null ? ln['已完成数量'] : ln['计划数量']) || Number(out.qty) || 0;
+              const pcs = zeroPcs ? 0 : (Number(ln['计划件数']) || Number(out.pcs) || 0);
+              return {
+                code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+                unit: ln['库存单位'] || out.unit || 'KG',
+                planPcs: pcs, planQty: qty || Number(out.qty) || 1,
+                lot: String(ln['批号'] || '').trim() === '—' ? '' : String(ln['批号'] || '').trim(),
+                manageMode: ln['管理方式'] || (zeroPcs ? '计数管理' : '条码管理'),
+                remark: '', status: '待执行', doneQty: 0,
+                remainQty: qty || Number(out.qty) || 1, remainPcs: pcs,
+              };
+            });
+            ElementPlus.ElMessage.success('已选择出库单并带入退货明细：' + out.code);
+            return;
+          }
+        }
+      }
+      if (out.matInfo) {
+        const parts = parseMatInfoParts(out.matInfo);
+        const zeroPcs = isSoRmaCount.value;
+        const qty = Number(out.qty) || 1;
+        const pcs = zeroPcs ? 0 : (Number(out.pcs) || 0);
+        poInForm.lines = [{
+          code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+          unit: out.unit || 'KG', planPcs: pcs, planQty: qty, lot: '',
+          manageMode: zeroPcs ? '计数管理' : '条码管理',
+          remark: '', status: '待执行', doneQty: 0, remainQty: qty, remainPcs: pcs,
+        }];
+      }
+      ElementPlus.ElMessage.success('已选择销售出库单：' + out.code);
+    }
     function maskIdCardApp(id) {
       const s = String(id || '').trim();
       if (s.length < 8) return s || '—';
@@ -5097,18 +5867,20 @@ createApp({
     const pkgQueryPairs = computed(() => {
       const d = pkgDetail.value;
       if (!d) return [];
+      const dash = (v) => (v === 0 || v === false) ? v : (v == null || v === '' ? '—' : v);
+      const valid = [d.validPeriod, d.validUnit].filter((x) => x != null && x !== '').join(' ') || '—';
       return [
-        ['条码号', d.barcode], ['包装规格', d.packSpec], ['物料信息', d.material], ['物料批号', d.lot],
-        ['库存单位', d.unit], ['当前数量', d.qty], ['生产厂家', d.maker], ['供应商信息', d.supplier],
-        ['生产日期', d.prodDate], ['有效期', `${d.validPeriod || '—'} ${d.validUnit || ''}`.trim()],
-        ['失效日期', d.expireDate], ['使用状态', d.useStatus], ['库存状态', d.stockStatus],
-        ['存储位置', d.loc], ['绑定状态', d.bindStatus], ['当前绑定外包材', d.bindOuter],
-        ['当前步骤', d.step], ['来源单号', d.sourceNo], ['备注', d.remark || '—'],
+        ['条码号', dash(d.barcode)], ['包装规格', dash(d.packSpec)], ['物料信息', dash(d.material)], ['物料批号', dash(d.lot)],
+        ['库存单位', dash(d.unit)], ['当前数量', dash(d.qty)], ['生产厂家', dash(d.maker)], ['供应商信息', dash(d.supplier)],
+        ['生产日期', dash(d.prodDate)], ['有效期', valid],
+        ['失效日期', dash(d.expireDate)], ['使用状态', dash(d.useStatus)], ['库存状态', dash(d.stockStatus)],
+        ['存储位置', dash(d.loc)], ['绑定状态', dash(d.bindStatus)], ['当前绑定外包材', dash(d.bindOuter)],
+        ['当前步骤', dash(d.step)], ['来源单号', dash(d.sourceNo)], ['备注', dash(d.remark)],
       ];
     });
     const headerHint = computed(() => {
       if (view.value === 'home') return 'APP 首页 · 仓储 / 包材 / 物流可点通';
-      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', msg: '消息中心', mine: '个人中心', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-form': '新增运单', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息', 'carrier-assign': '派车执行', 'carrier-secondary': '二次派车', 'po-in-form': '新增编辑通知单' };
+      const map = { docs: '单据页', materials: '物料明细页', exec: '执行页', process: '工序页', stub: '占位', msg: '消息中心', mine: '个人中心', 'pkg-arch': '包材建档', 'pkg-create': '新增档案', 'pkg-query': '信息查询', 'waybill-exec': '运单执行', 'waybill-form': '新增运单', 'waybill-pickup': '提货确认', 'waybill-sign': '签收确认', 'waybill-enroute': '在途信息', 'carrier-assign': '派车执行', 'carrier-secondary': '二次派车', 'po-in-form': '新增编辑通知单', 'xfer-form': '新增编辑调拨申请单' };
       return `${flowTitle.value} · ${map[view.value] || view.value}`;
     });
 
@@ -5472,7 +6244,15 @@ createApp({
       currentNotice.value = n;
       if (flowMode.value === 'inner') {
         resetExecForm();
-        innerRows.value = [...CFG.innerScanRows];
+        const draft = n && n._innerDraft;
+        if (draft && Array.isArray(draft.rows) && draft.rows.length) {
+          innerRows.value = JSON.parse(JSON.stringify(draft.rows));
+          form.remark = draft.remark || '';
+        } else if (flowMeta.value.innerType === 'xfer') {
+          innerRows.value = [];
+        } else {
+          innerRows.value = [...CFG.innerScanRows];
+        }
         currentLine.value = {};
         view.value = 'exec';
         return;
@@ -5834,8 +6614,8 @@ createApp({
       if (id === 'stock-take') return 'PDJH';
       if (id === 'wh-load') return 'ZXTT';
       if (id === 'pkg-scrap') return 'BF';
-      if (id === 'pkg-freeze') return 'ZXDJ';
-      if (id === 'pkg-unfreeze') return 'JCDJ';
+      if (id === 'pkg-freeze') return 'DJ';
+      if (id === 'pkg-unfreeze') return 'JC';
       return 'WHDOC';
     }
     function appWhBizLabelForLoadPush() {
@@ -6029,7 +6809,9 @@ createApp({
       if (id.startsWith('trust-recv')) return '受托收料通知单';
       if (id.startsWith('trust-ret')) return '受托退料通知单';
       if (id.startsWith('so-ship')) return '标准发货';
+      if (id.startsWith('so-preout')) return '标准预出货';
       if (id.startsWith('so-rma')) return '标准退货';
+      if (id.startsWith('xfer-')) return '直接调拨申请单';
       if (id.startsWith('oth-in')) return '其他入库通知单';
       if (id.startsWith('oth-out')) return '其他出库通知单';
       if (id === 'stock-take') return '全盘';
@@ -6439,16 +7221,109 @@ createApp({
         ElementPlus.ElMessage.error('仅「在用 + 厂外」的流水码可更新');
         return;
       }
+      hydrateSerialArchFromPcMock();
+      if (!CFG.serialArchRows) CFG.serialArchRows = [];
+      const d = pkgDetail.value;
+      const idx = CFG.serialArchRows.findIndex((r) => r && r.barcode === d.barcode);
+      if (idx < 0) {
+        ElementPlus.ElMessage.error('档案不存在或已被删除');
+        return;
+      }
+      const next = {
+        ...CFG.serialArchRows[idx],
+        packSpec: d.packSpec,
+        material: d.material,
+        lot: d.lot,
+        archiveQty: d.archiveQty,
+        qty: d.qty,
+        maker: d.maker,
+        supplier: d.supplier,
+        prodDate: d.prodDate,
+        validPeriod: d.validPeriod,
+        validUnit: d.validUnit,
+        expireDate: d.expireDate,
+        remark: d.remark,
+      };
+      CFG.serialArchRows.splice(idx, 1, next);
+      pkgDetail.value = { ...next };
+      bumpStore();
       toast('档案信息更新成功');
+    }
+    function pkgCreateDirty() {
+      return !!(pkgForm.material || pkgForm.lot || pkgForm.archiveQty || pkgForm.qty
+        || pkgForm.maker || pkgForm.supplier || pkgForm.prodDate || pkgForm.validPeriod
+        || pkgForm.packSpec || pkgForm.remark);
+    }
+    async function backPkgCreate() {
+      if (pkgCreateDirty()) {
+        try {
+          await ElementPlus.ElMessageBox.confirm('当前录入尚未保存，确认放弃并返回？', '提示', {
+            confirmButtonText: '确认放弃', cancelButtonText: '继续编辑', type: 'warning',
+          });
+        } catch (_) {
+          return;
+        }
+      }
+      view.value = 'pkg-arch';
     }
     function savePkgCreate() {
       if (!pkgForm.barcode.trim()) {
         ElementPlus.ElMessage.error('请填写或扫描条码号');
         return;
       }
+      if (pkgForm.material) {
+        const miss = [];
+        if (!String(pkgForm.lot || '').trim()) miss.push('物料批号');
+        if (!String(pkgForm.archiveQty || '').trim()) miss.push('建档数量');
+        if (!String(pkgForm.qty || '').trim()) miss.push('当前数量');
+        if (!String(pkgForm.maker || '').trim()) miss.push('生产厂家');
+        if (!String(pkgForm.supplier || '').trim()) miss.push('供应商信息');
+        if (!String(pkgForm.prodDate || '').trim()) miss.push('生产日期');
+        if (miss.length) {
+          ElementPlus.ElMessage.error(miss[0] + '为必填项，请完善表单信息');
+          return;
+        }
+      }
+      hydrateSerialArchFromPcMock();
+      if (!CFG.serialArchRows) CFG.serialArchRows = [];
+      const code = pkgForm.barcode.trim();
+      if (CFG.serialArchRows.some((r) => r && r.barcode === code)) {
+        ElementPlus.ElMessage.error('该条码号已建档，请勿重复添加');
+        return;
+      }
+      const pkgNo = 'BK-NEW-' + String(CFG.serialArchRows.length + 1).padStart(3, '0');
+      const row = {
+        barcode: code,
+        pkgNo,
+        packType: '流水码',
+        packSpec: pkgForm.packSpec || '—',
+        material: pkgForm.material || '—',
+        lot: pkgForm.lot || '—',
+        unit: pkgForm.unit || 'KG',
+        archiveQty: pkgForm.archiveQty || '',
+        qty: pkgForm.qty || '',
+        maker: pkgForm.maker || '—',
+        supplier: pkgForm.supplier || '—',
+        prodDate: pkgForm.prodDate || '',
+        validPeriod: pkgForm.validPeriod || '',
+        validUnit: pkgForm.validUnit || '天',
+        expireDate: pkgForm.expireDate || '',
+        useStatus: '在用',
+        inspectStatus: '合格',
+        stockStatus: '厂外',
+        loc: '—',
+        bindStatus: '未绑定',
+        bindOuter: '—',
+        step: '',
+        sourceNo: '—',
+        remark: pkgForm.remark || '',
+      };
+      CFG.serialArchRows.unshift(row);
+      bumpStore();
       toast('新增流水码成功');
-      pkgSearch.pkgNo = 'BK-NEW';
-      pkgSearch.barcode = pkgForm.barcode;
+      pkgSearch.pkgNo = pkgNo;
+      pkgSearch.barcode = code;
+      pkgDetail.value = { ...row };
       view.value = 'pkg-arch';
     }
     function queryPkgInfo() {
@@ -6457,6 +7332,7 @@ createApp({
         ElementPlus.ElMessage.error('请输入条码号');
         return;
       }
+      hydrateSerialArchFromPcMock();
       const hit = findSerialArch(code);
       if (!hit) {
         pkgDetail.value = null;
@@ -6464,6 +7340,7 @@ createApp({
         return;
       }
       pkgDetail.value = { ...hit };
+      toast('已加载档案信息');
     }
     function openMaterials(n) { openDocAction(n); }
     function resetExecForm() {
@@ -7147,6 +8024,20 @@ createApp({
       if (isXferSerialPick.value) return autoSaveXferExec();
       if (isXferCountExec.value) return autoSaveXferCountExec();
       if (isLoadFlow.value) { if (!opts.silent) showFlowAutosaveToast(true); return true; }
+      if (flowMode.value === 'inner') {
+        const n = currentNotice.value;
+        if (!n) return false;
+        const hasProgress = (innerRows.value && innerRows.value.length) || !!String(form.remark || '').trim();
+        if (!hasProgress) return false;
+        n._innerDraft = {
+          rows: JSON.parse(JSON.stringify(innerRows.value || [])),
+          remark: form.remark || '',
+        };
+        n.status = '执行中';
+        syncDocToStore(n.id, '执行中', { action: 'inner-autosave', flowId: flowId.value });
+        if (!opts.silent) showFlowAutosaveToast(true);
+        return true;
+      }
       if (flowMode.value === 'stocktake') return saveStockDraft(opts);
       return false;
     }
@@ -10122,17 +11013,62 @@ createApp({
       lotDetailVisible.value = true;
     }
     function addInnerScan() {
-      const code = form.barcode.trim() || form.pkgNo.trim();
+      const bc = form.barcode.trim();
+      const pkg = form.pkgNo.trim();
+      if (!bc && !pkg) {
+        ElementPlus.ElMessage.error('请扫码或输入条码号/包材编号');
+        return;
+      }
+      if (flowMeta.value.innerType === 'xfer') {
+        hydrateSerialArchFromPcMock();
+        const hit = (CFG.serialArchRows || []).find((r) =>
+          r && ((bc && r.barcode === bc) || (pkg && r.pkgNo === pkg))
+        );
+        if (!hit) {
+          ElementPlus.ElMessage.error('该条码/包材当前档案状态不允许进行物料转序扫码');
+          return;
+        }
+        if (hit.useStatus !== '在用' || (hit.stockStatus !== '仓库' && hit.stockStatus !== '库内')) {
+          ElementPlus.ElMessage.error('该条码/包材当前档案状态不允许进行物料转序扫码');
+          return;
+        }
+        if (hit.step) {
+          ElementPlus.ElMessage.error('该条码/包材当前档案状态不允许进行物料转序扫码');
+          return;
+        }
+        if (innerRows.value.some((r) => (bc && r.barcode === bc) || (pkg && r.pkgNo === pkg) || r.barcode === hit.barcode)) {
+          ElementPlus.ElMessage.error('当前条码/包材编号已存在，不可重复录入');
+          return;
+        }
+        const matCode = (hit.material || '').split('/')[0].trim() || hit.material || '—';
+        innerRows.value.push({
+          barcode: hit.barcode,
+          pkgNo: hit.pkgNo || pkg || '—',
+          code: matCode,
+          material: hit.material || matCode,
+          lot: hit.lot || '—',
+          qty: Number(hit.qty || hit.archiveQty || 0) || 0,
+        });
+        form.barcode = '';
+        form.pkgNo = '';
+        toast('扫码录入成功，流水已生成，扫码件数与扫码数量已更新');
+        return;
+      }
+      const code = bc || pkg;
       if (!code) return;
+      if (innerRows.value.some((r) => r.barcode === bc || (pkg && r.pkgNo === pkg))) {
+        ElementPlus.ElMessage.error('当前条码/包材编号已存在，不可重复录入');
+        return;
+      }
       innerRows.value.push({
-        barcode: form.barcode.trim() || ('SC' + String(100 + innerRows.value.length)),
-        pkgNo: form.pkgNo.trim() || '—',
+        barcode: bc || ('SC' + String(100 + innerRows.value.length)),
+        pkgNo: pkg || '—',
         code: 'RM-DEMO',
         qty: 10,
       });
       form.barcode = '';
       form.pkgNo = '';
-      toast('已添加移库/转序明细');
+      toast('已添加移库明细');
     }
     function openProcess(row) {
       if (isPoNoticeSerial.value || isLineSidePick.value || isXferSerialPick.value) {
@@ -10823,8 +11759,11 @@ createApp({
         const isUnfreeze = fid === 'pkg-unfreeze';
         const verb = isUnfreeze ? '解冻' : '冻结';
         const targetStatus = isUnfreeze ? '在用' : '冻结';
+        const confirmText = isUnfreeze
+          ? ('本次将解冻处置 ' + n + ' 件条码，提交后条码使用状态将更新为「在用」，确认提交？')
+          : ('本次将冻结处置 ' + n + ' 件条码，提交后条码使用状态将更新为「冻结」，确认提交？');
         ElementPlus.ElMessageBox.confirm(
-          '本次将' + verb + ' ' + n + ' 件条码，提交后使用状态将更新为「' + targetStatus + '」，确认提交？',
+          confirmText,
           (isUnfreeze ? '冻结解除' : '异常冻结') + '确认',
           { confirmButtonText: '确认提交', cancelButtonText: '返回检查', type: 'warning' }
         ).then(() => {
@@ -12228,6 +13167,9 @@ createApp({
     function defaultNoticeDocType() {
       const opts = noticeDocTypeOptions.value || [];
       if (opts.length) return opts[0];
+      if (isSoShipDoc.value) return '标准发货';
+      if (isSoPreoutDoc.value) return '标准预出货';
+      if (isSoRmaDoc.value) return '标准退货';
       if (isTrustRetDoc.value) return '受托退料通知单';
       if (isTrustRecvDoc.value) return '受托收料通知单';
       if (isOsIssueDoc.value) return '标准委外发料';
@@ -12255,6 +13197,10 @@ createApp({
           phone: n.phone || '',
           driverId: n.driverId || '',
           isLoadingRequired: n.isLoadingRequired || '是',
+          stockNo: n.stockNo || '',
+          preoutNo: n.preoutNo || '',
+          shipOutNo: n.shipOutNo || '',
+          returnReason: n.returnReason || '',
           lines: JSON.parse(JSON.stringify((n.lines || []).map(ln => ({
             code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
             planPcs: ln.planPcs, planQty: ln.planQty, lot: ln.lot,
@@ -12267,7 +13213,8 @@ createApp({
         Object.assign(poInForm, {
           id: '', poNo: '', supplier: '', docType: defaultNoticeDocType(), planDate: todayYmd(),
           erpNo: '', remark: '', waybillNo: '', logisticsNo: '', plate: '', trailer: '',
-          driver: '', phone: '', driverId: '', isLoadingRequired: '是', lines: [],
+          driver: '', phone: '', driverId: '', isLoadingRequired: '是',
+          stockNo: '', preoutNo: '', shipOutNo: '', returnReason: '', lines: [],
         });
       }
       view.value = 'po-in-form';
@@ -12279,39 +13226,51 @@ createApp({
     }
     function onPoInPoChange() {
       const po = (refOrderOptions.value || []).find(p => p.code === poInForm.poNo);
-      poInForm.waybillNo = '';
-      poInForm.logisticsNo = '';
-      poInForm.plate = '';
-      poInForm.trailer = '';
-      poInForm.driver = '';
-      poInForm.phone = '';
-      poInForm.driverId = '';
+      clearPoInCarrierFields();
+      if (isSoPcAlignedForm.value) {
+        if (isSoShipDoc.value) poInForm.preoutNo = '';
+        if (isSoRmaDoc.value) poInForm.shipOutNo = '';
+        if (poInForm.stockNo) {
+          const main = ((window.WMS_MOCK_ROWS || {})['wh-so-prep'] || {}).main || [];
+          const prepRow = main.find((r) => r['备货通知单号'] === poInForm.stockNo);
+          if (prepRow && prepRow['关联销售订单'] && String(prepRow['关联销售订单']) !== String(poInForm.poNo || '')) {
+            poInForm.stockNo = '';
+          }
+        }
+      }
       if (!po) {
         poInForm.supplier = '';
         poInForm.lines = [];
         return;
       }
       poInForm.supplier = po.supplier || po.name || '';
-      poInForm.planDate = po.planDate || todayYmd();
+      if (!isSoPcAlignedForm.value || !poInForm.planDate) {
+        poInForm.planDate = po.planDate || todayYmd();
+      }
       if (isOsIssueDoc.value || isOsRetDoc.value) {
         poInForm.lines = [];
         return;
       }
       const makerName = poInForm.supplier;
       let srcLines = (po.lines || []).slice();
-      if (isTrustRecvCount.value || isTrustRetCount.value) {
+      if (isTrustRecvCount.value || isTrustRetCount.value || isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value) {
         const codes = countMatCodes.value;
         srcLines = srcLines.filter(l => codes.has(l.code) || !(Number(l.planPcs) > 0));
       }
       if (isTrustRecvTank.value || isPoInTank.value || isOsRecvTank.value) {
         srcLines = srcLines.filter(l => l.medium || ['MAT-L001', 'MAT-L002', 'RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code));
       }
-      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value;
+      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value || isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value;
+      const leaveLotEmpty = isSoPcAlignedForm.value || isOsIssueCount.value || isOsRetCount.value || isOsRmaCount.value || isTrustRetCount.value || isSoRmaCount.value;
       poInForm.lines = srcLines.map((ln, i) => ({
         code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
         planPcs: zeroPcs ? 0 : ln.planPcs, planQty: ln.planQty,
-        lot: (isOsIssueCount.value || isOsRetCount.value || isOsRmaCount.value || isTrustRetCount.value) ? (ln.lot || '') : genLotNo(i + 1), prodDate: todayYmd(), validMonths: ln.validMonths || 12,
-        maker: makerName, remark: '', medium: ln.medium || '',
+        lot: leaveLotEmpty ? (ln.lot || '') : genLotNo(i + 1),
+        manageMode: zeroPcs ? '计数管理' : (ln.manageMode || '条码管理'),
+        prodDate: isSoPcAlignedForm.value ? '' : todayYmd(),
+        validMonths: isSoPcAlignedForm.value ? '' : (ln.validMonths || 12),
+        maker: isSoPcAlignedForm.value ? '' : makerName,
+        remark: '', medium: ln.medium || '',
         status: '待执行', doneQty: 0, remainQty: ln.planQty,
         remainPcs: zeroPcs ? 0 : ln.planPcs,
       }));
@@ -12347,7 +13306,7 @@ createApp({
         list = (liquidMatOptions || []).slice();
       } else if (isInCountDoc.value || isOutCountDoc.value) {
         list = (countMatOptions || []).slice();
-      } else if (isPoInSerial.value) {
+      } else if (isPoNoticeSerial.value || isPoInSerial.value) {
         list = (barcodeMatOptions || []).filter((m) => !liquidMatCodes.value.has(m.code));
       } else {
         list = (barcodeMatOptions || []).slice();
@@ -12377,6 +13336,8 @@ createApp({
       return list.filter(m => [m.code, m.name, m.spec, m.kind].join(' ').toLowerCase().includes(kw));
     });
     function isPoInMatAlreadyAdded(code) {
+      // 销售预出货/发货允许同物料不同批号；唯一性按【物料+批号】在保存时校验
+      if (isSoPcAlignedForm.value) return false;
       return (poInForm.lines || []).some(ln => ln.code === code);
     }
     function openPoInMatPicker() {
@@ -12392,7 +13353,8 @@ createApp({
       const i = (poInForm.lines || []).length + 1;
       const pcs = Number(m.planPcs) > 0 ? Number(m.planPcs) : 1;
       const qty = Number(m.planQty) > 0 ? Number(m.planQty) : 1000;
-      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value;
+      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value || isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value;
+      const leaveLotEmpty = isSoPcAlignedForm.value || isOsIssueCount.value || isOsRetCount.value || isOsRmaCount.value || isTrustRetCount.value || isSoRmaCount.value;
       poInForm.lines.push({
         code: m.code,
         name: m.name || '',
@@ -12401,10 +13363,11 @@ createApp({
         unit: m.unit || 'KG',
         planPcs: zeroPcs ? 0 : pcs,
         planQty: qty,
-        lot: (isOsIssueCount.value || isOsRetCount.value || isOsRmaCount.value || isTrustRetCount.value) ? '' : genLotNo(i),
-        prodDate: todayYmd(),
-        validMonths: Number(m.validMonths) > 0 ? Number(m.validMonths) : 12,
-        maker: poInForm.supplier || '',
+        lot: leaveLotEmpty ? '' : genLotNo(i),
+        manageMode: zeroPcs ? '计数管理' : (m.manageMode || '条码管理'),
+        prodDate: isSoPcAlignedForm.value ? '' : todayYmd(),
+        validMonths: isSoPcAlignedForm.value ? '' : (Number(m.validMonths) > 0 ? Number(m.validMonths) : 12),
+        maker: isSoPcAlignedForm.value ? '' : (poInForm.supplier || ''),
         remark: '',
         medium: m.medium || '',
         status: '待执行',
@@ -12425,13 +13388,24 @@ createApp({
       }).then(() => { poInForm.lines.splice(idx, 1); }).catch(() => {});
     }
     function savePoInNotice() {
-      if (!poInForm.poNo) {
-        ElementPlus.ElMessage.error(isTrustPartyDoc.value ? '请选择关联销售订单' : (isOsWwpoDoc.value ? '请选择关联委外加工单' : '请选择关联采购订单'));
+      if (!poInForm.docType && isSoPcAlignedForm.value) {
+        ElementPlus.ElMessage.error('请选择单据类型');
         return;
       }
-      if (!poInForm.planDate) { ElementPlus.ElMessage.error('请选择计划执行日期'); return; }
+      if (!poInForm.poNo) {
+        ElementPlus.ElMessage.error((isTrustPartyDoc.value || isSoSalesDoc.value) ? '请选择关联销售订单' : (isOsWwpoDoc.value ? '请选择关联委外加工单' : '请选择关联采购订单'));
+        return;
+      }
+      // 销售预出货/发货：计划执行日期选填（对齐 PC）；其他通知单仍必填
+      if (!poInForm.planDate && !isSoPcAlignedForm.value) { ElementPlus.ElMessage.error('请选择计划执行日期'); return; }
       if (!(poInForm.lines || []).length) { ElementPlus.ElMessage.error('请至少添加一行物料明细'); return; }
-      if (isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isTrustRecvCount.value) {
+      if ((poInForm.lines || []).some(ln => !ln.code)) {
+        ElementPlus.ElMessage.error('请完善物料明细中的物料信息');
+        return;
+      }
+      const salesCount = isSoShipCount.value || isSoPreoutCount.value || isSoRmaCount.value;
+      // 预出货/发货：仅校验计划数量>0（计划件数选填）；计数流同理
+      if (isSoPcAlignedForm.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isTrustRecvCount.value || salesCount) {
         if ((poInForm.lines || []).some(ln => !(Number(ln.planQty) > 0))) {
           ElementPlus.ElMessage.error('计划数量必须为大于 0 的正数');
           return;
@@ -12440,25 +13414,45 @@ createApp({
         ElementPlus.ElMessage.error('计划件数与计划数量必须为大于 0 的正数');
         return;
       }
-      if (poInForm.phone && !/^1\d{10}$/.test(String(poInForm.phone).trim())) {
+      if (isSoPcAlignedForm.value) {
+        const seen = new Set();
+        for (const ln of (poInForm.lines || [])) {
+          const key = String(ln.code || '') + '|' + String(ln.lot || '').trim();
+          if (seen.has(key)) {
+            ElementPlus.ElMessage.error('同一单据中【物料编码+批号】不可重复');
+            return;
+          }
+          seen.add(key);
+          const lot = String(ln.lot || '').trim();
+          if (lot && lot !== '—') {
+            const avail = (filteredPoInLotOptionsForCode(ln.code) || []).find((r) => r.lot === lot);
+            if (avail && Number(ln.planQty) > Number(avail.qty)) {
+              ElementPlus.ElMessage.error('计划数量不可大于批号库内可用数量（' + ln.code + ' / ' + lot + '）');
+              return;
+            }
+          }
+        }
+      }
+      if (!isSoPcAlignedForm.value && poInForm.phone && !/^1\d{10}$/.test(String(poInForm.phone).trim())) {
         ElementPlus.ElMessage.error('请输入有效的 11 位司机手机号码');
         return;
       }
-      if (poInForm.driverId && !/^\d{17}[\dXx]$/.test(String(poInForm.driverId).trim())) {
+      if (!isSoPcAlignedForm.value && poInForm.driverId && !/^\d{17}[\dXx]$/.test(String(poInForm.driverId).trim())) {
         ElementPlus.ElMessage.error('请输入有效的 18 位司机身份证号码');
         return;
       }
-      const docsKey = isTrustRetCount.value ? 'trust-ret-count'
+      const docsKey = flowMeta.value.docsKey
+        || (isTrustRetCount.value ? 'trust-ret-count'
         : (isTrustRetSerial.value ? 'trust-ret-serial'
         : (isTrustRecvTank.value ? 'trust-recv-tank'
         : (isTrustRecvCount.value ? 'trust-recv-count'
         : (isTrustRecvSerial.value ? 'trust-recv'
-        : (isOsRmaCount.value ? 'os-rma-count' : (isOsRmaSerial.value ? 'os-rma-serial' : (isOsRecvTank.value ? 'os-recv-tank' : (isOsRecvCount.value ? 'os-recv-count' : (isOsRecvSerial.value ? 'os-recv-serial' : (isOsRetCount.value ? 'os-ret-count' : (isOsRetSerial.value ? 'os-ret-serial' : (isOsIssueCount.value ? 'os-issue-count' : (isOsIssueSerial.value ? 'os-issue-serial' : (isPoRetSerial.value ? 'po-ret-serial' : (isPoRetCount.value ? 'po-ret-count' : (isPoInTank.value ? 'po-in-tank' : (isPoInCount.value ? 'po-in-count' : 'po-in-serial')))))))))))))))));
+        : (isOsRmaCount.value ? 'os-rma-count' : (isOsRmaSerial.value ? 'os-rma-serial' : (isOsRecvTank.value ? 'os-recv-tank' : (isOsRecvCount.value ? 'os-recv-count' : (isOsRecvSerial.value ? 'os-recv-serial' : (isOsRetCount.value ? 'os-ret-count' : (isOsRetSerial.value ? 'os-ret-serial' : (isOsIssueCount.value ? 'os-issue-count' : (isOsIssueSerial.value ? 'os-issue-serial' : (isPoRetSerial.value ? 'po-ret-serial' : (isPoRetCount.value ? 'po-ret-count' : (isPoInTank.value ? 'po-in-tank' : (isPoInCount.value ? 'po-in-count' : 'po-in-serial'))))))))))))))))));
       const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
       const summary = (poInForm.lines || []).map(ln => `${ln.code} / ${ln.name} / ${ln.spec} / ${ln.kind}`).join('；');
-      const manageModeDefault = (isPoNoticeSerial.value || isOsRecvTank.value || isInTankDoc.value) ? '条码管理' : '计数管理';
-      const isCountFlow = isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value;
-      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value;
+      const manageModeDefault = (isPoNoticeSerial.value || isOsRecvTank.value || isInTankDoc.value || isSoShipSerial.value || isSoPreoutSerial.value || isSoRmaSerial.value) ? '条码管理' : '计数管理';
+      const isCountFlow = isPoInCount.value || isOutCountDoc.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || salesCount;
+      const zeroPcs = isOsIssueCount.value || isOsRetCount.value || isOsRecvCount.value || isOsRmaCount.value || isTrustRecvCount.value || isTrustRetCount.value || isInTankDoc.value || salesCount;
       const payload = {
         status: '待执行',
         partner: poInForm.supplier,
@@ -12476,6 +13470,12 @@ createApp({
         driverId: poInForm.driverId || '',
         erpNo: poInForm.erpNo || '',
         remark: poInForm.remark || '',
+        isLoadingRequired: poInForm.isLoadingRequired || '是',
+        stockNo: poInForm.stockNo || '',
+        prepNoticeNo: poInForm.stockNo || '',
+        preoutNo: poInForm.preoutNo || '',
+        shipOutNo: poInForm.shipOutNo || '',
+        returnReason: poInForm.returnReason || '',
         materialSummary: summary,
         packSpec: isInTankDoc.value ? '槽车散装/储罐' : (isCountFlow ? '计数/无包材' : '吨袋+托架'),
         lines: (poInForm.lines || []).map((ln, i) => ({
@@ -12492,17 +13492,29 @@ createApp({
           prodDate: ln.prodDate, validMonths: ln.validMonths, maker: ln.maker,
         })),
       };
-      const successEdit = isTrustRetDoc.value ? '受托退料通知单修改成功'
+      const successEdit = isSoShipDoc.value ? '销售发货通知单修改成功'
+        : (isSoPreoutDoc.value ? '销售预出货通知单修改成功'
+        : (isSoRmaDoc.value ? '销售退货通知单修改成功'
+        : (isTrustRetDoc.value ? '受托退料通知单修改成功'
         : (isTrustRecvDoc.value ? '受托收料通知单修改成功'
-        : (isOsIssueDoc.value ? '委外发料通知单修改成功' : (isOsRmaDoc.value ? '委外退货通知单修改成功' : (isOsRecvDoc.value ? '委外收货通知单修改成功' : (isOsRetDoc.value ? '委外退料通知单修改成功' : (isPoRetDoc.value ? '采购退料通知单修改成功' : '采购收料通知单修改成功'))))));
-      const successAdd = isTrustRetDoc.value ? '受托退料通知单创建成功'
+        : (isOsIssueDoc.value ? '委外发料通知单修改成功' : (isOsRmaDoc.value ? '委外退货通知单修改成功' : (isOsRecvDoc.value ? '委外收货通知单修改成功' : (isOsRetDoc.value ? '委外退料通知单修改成功' : (isPoRetDoc.value ? '采购退料通知单修改成功' : '采购收料通知单修改成功')))))))));
+      const successAdd = isSoShipDoc.value ? '销售发货通知单创建成功'
+        : (isSoPreoutDoc.value ? '销售预出货通知单创建成功'
+        : (isSoRmaDoc.value ? '销售退货通知单创建成功'
+        : (isTrustRetDoc.value ? '受托退料通知单创建成功'
         : (isTrustRecvDoc.value ? '受托收料通知单创建成功'
-        : (isOsIssueDoc.value ? '委外发料通知单创建成功' : (isOsRmaDoc.value ? '委外退货通知单创建成功' : (isOsRecvDoc.value ? '委外收货通知单创建成功' : (isOsRetDoc.value ? '委外退料通知单创建成功' : (isPoRetDoc.value ? '采购退料通知单创建成功' : '采购收料通知单创建成功'))))));
+        : (isOsIssueDoc.value ? '委外发料通知单创建成功' : (isOsRmaDoc.value ? '委外退货通知单创建成功' : (isOsRecvDoc.value ? '委外收货通知单创建成功' : (isOsRetDoc.value ? '委外退料通知单创建成功' : (isPoRetDoc.value ? '采购退料通知单创建成功' : '采购收料通知单创建成功')))))))));
+      const syncSalesNotice = (hit) => {
+        if (isSoShipDoc.value) syncSoShipNoticeToPc(hit);
+        else if (isSoPreoutDoc.value) syncSoPreoutNoticeToPc(hit);
+        else if (isSoRmaDoc.value) syncSoRmaNoticeToPc(hit);
+      };
       if (poInFormMode.value === 'edit' && poInForm.id) {
         const hit = list.find(x => x.id === poInForm.id) || currentNotice.value;
         if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
         Object.assign(hit, payload, { id: poInForm.id, status: hit.status || '待执行' });
-        if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
+        if (isSoSalesDoc.value) syncSalesNotice(hit);
+        else if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
         else if (isOsIssueDoc.value) syncOsIssueNoticeToPc(hit);
         else if (isOsRmaDoc.value) syncOsRmaNoticeToPc(hit);
         else if (isOsRecvDoc.value) syncOsRecvNoticeToPc(hit);
@@ -12511,14 +13523,18 @@ createApp({
         else syncPoInNoticeToPc(hit);
         ElementPlus.ElMessage.success(successEdit);
       } else {
-        const prefix = isTrustRecvDoc.value ? 'STST'
-          : (isOsIssueDoc.value ? 'WWFT' : (isOsRmaDoc.value ? 'WWTH' : (isOsRecvDoc.value ? 'WWST' : (isOsRetDoc.value ? 'WWTT' : (isPoRetDoc.value ? 'CGTT' : 'CGST')))));
+        const prefix = isSoShipDoc.value ? 'XSFH'
+          : (isSoPreoutDoc.value ? 'XSYC'
+          : (isSoRmaDoc.value ? 'XSTH'
+          : (isTrustRecvDoc.value ? 'STST'
+          : (isOsIssueDoc.value ? 'WWFT' : (isOsRmaDoc.value ? 'WWTH' : (isOsRecvDoc.value ? 'WWST' : (isOsRetDoc.value ? 'WWTT' : (isPoRetDoc.value ? 'CGTT' : 'CGST'))))))));
         const id = prefix + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
         const created = Object.assign({ id, createTime: appNowStr() }, payload);
         created.lines = (created.lines || []).map((ln) => Object.assign(ln, { id: id + '-l' + ln.lineNo }));
         list.unshift(created);
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
-        if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
+        if (isSoSalesDoc.value) syncSalesNotice(created);
+        else if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
         else if (isOsIssueDoc.value) syncOsIssueNoticeToPc(created);
         else if (isOsRmaDoc.value) syncOsRmaNoticeToPc(created);
         else if (isOsRecvDoc.value) syncOsRecvNoticeToPc(created);
@@ -12527,6 +13543,379 @@ createApp({
         else syncPoInNoticeToPc(created);
         const pushed = maybePushAppLoadNotice(Object.assign({}, created, { isLoadingRequired: poInForm.isLoadingRequired || '是' }), true);
         ElementPlus.ElMessage.success(pushed ? (successAdd + '，已同步下推装卸货通知单') : successAdd);
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+    function buildSoNoticePcRow(n, extras) {
+      extras = extras || {};
+      return Object.assign({
+        单号: n.id,
+        单据状态: n.status || '待执行',
+        单据类型: n.docType || '—',
+        计划执行日期: n.planDate || '',
+        物料信息: n.materialSummary || '—',
+        备注: n.remark || '—',
+        ERP单据号: n.erpNo || '—',
+        关联销售订单: n.refNo || n.poNo || '—',
+        客户名称: n.partner || n.supplier || '—',
+        关联运单: n.waybillNo || '—',
+        关联发货单: n.logisticsNo || '—',
+        包装规格: n.packSpec || '—',
+        车牌号: n.plate || '—',
+        车挂号: n.trailer || '—',
+        司机姓名: n.driver || '—',
+        司机电话: n.phone || '—',
+        司机身份证号: n.driverId || '—',
+        _lines: (n.lines || []).map((ln) => ({
+          id: n.id + '-l' + ln.lineNo,
+          行状态: ln.status || '待执行',
+          物料信息: [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / '),
+          库存单位: ln.unit || 'KG',
+          管理方式: ln.manageMode || '条码管理',
+          计划件数: String(ln.planPcs || 0),
+          计划数量: Number(ln.planQty || 0).toFixed(3),
+          已完成数量: Number(ln.doneQty || 0).toFixed(3),
+          未完成数量: Number(ln.remainQty || 0).toFixed(3),
+          批号: ln.lot || '—',
+          备注: ln.remark || '—',
+        })),
+      }, extras);
+    }
+    function syncSoShipNoticeToPc(n) {
+      if (!n || !STORE || !STORE.upsertWhSoShipFromApp) return;
+      STORE.upsertWhSoShipFromApp({
+        action: 'create-notice',
+        noticeId: n.id,
+        noticeStatus: n.status || '待执行',
+        noticeRow: buildSoNoticePcRow(n, {
+          关联销售备货单: n.stockNo || '—',
+          关联销售预出货单: n.preoutNo || '—',
+        }),
+        noticeLines: (n.lines || []).map((ln) => ({
+          lineNo: ln.lineNo, id: n.id + '-l' + ln.lineNo, code: ln.code,
+          status: ln.status, doneQty: ln.doneQty, remainQty: ln.remainQty, remainPcs: ln.remainPcs,
+        })),
+      });
+    }
+    function syncSoPreoutNoticeToPc(n) {
+      if (!n || !STORE || !STORE.upsertWhSoPreoutFromApp) return;
+      STORE.upsertWhSoPreoutFromApp({
+        action: 'create-notice',
+        noticeId: n.id,
+        noticeStatus: n.status || '待执行',
+        noticeRow: buildSoNoticePcRow(n, {
+          关联备货通知单: n.stockNo || n.prepNoticeNo || '—',
+        }),
+        noticeLines: (n.lines || []).map((ln) => ({
+          lineNo: ln.lineNo, id: n.id + '-l' + ln.lineNo, code: ln.code,
+          status: ln.status, doneQty: ln.doneQty, remainQty: ln.remainQty, remainPcs: ln.remainPcs,
+        })),
+      });
+    }
+    function syncSoRmaNoticeToPc(n) {
+      if (!n || !STORE || !STORE.upsertWhSoRetFromApp) return;
+      STORE.upsertWhSoRetFromApp({
+        action: 'create-notice',
+        noticeId: n.id,
+        noticeStatus: n.status || '待执行',
+        noticeRow: buildSoNoticePcRow(n, {
+          关联销售出库单: n.shipOutNo || '—',
+          退货原因: n.returnReason || '—',
+        }),
+        noticeLines: (n.lines || []).map((ln) => ({
+          lineNo: ln.lineNo, id: n.id + '-l' + ln.lineNo, code: ln.code,
+          status: ln.status, doneQty: ln.doneQty, remainQty: ln.remainQty, remainPcs: ln.remainPcs,
+        })),
+      });
+    }
+    const warehouseOptions = CFG.warehouseOptions || [
+      { code: 'WH-RAW', name: '原料仓', label: 'WH-RAW - 原料仓' },
+      { code: 'WH-FG', name: '成品仓', label: 'WH-FG - 成品仓' },
+      { code: 'WH-PKG', name: '包材仓', label: 'WH-PKG - 包材仓' },
+    ];
+    const xferFormMode = ref('add');
+    const xferForm = reactive({
+      id: '', docType: '直接调拨申请单', planDate: '', fromWh: '', toWh: '', remark: '', isLoadingRequired: '是', lines: [],
+    });
+    const xferMatPickerVisible = ref(false);
+    const xferMatPickerKw = ref('');
+    const xferLotPickerVisible = ref(false);
+    const xferLotPickerKw = ref('');
+    const xferLotLineIdx = ref(-1);
+    const xferDocTypeOptions = computed(() => {
+      storeTick.value;
+      const D = window.WMS_DICT;
+      if (!D || typeof D.optionsFor !== 'function') return ['直接调拨申请单'];
+      const opts = D.optionsFor(flowId.value, '单据类型', '', liveAppDict()) || [];
+      return opts.length ? opts : ['直接调拨申请单'];
+    });
+    function firstXferDocType() {
+      const opts = xferDocTypeOptions.value || [];
+      return opts[0] || '直接调拨申请单';
+    }
+    const filteredXferMatOptions = computed(() => {
+      const kw = String(xferMatPickerKw.value || '').trim().toLowerCase();
+      let list = isXferCountDoc.value
+        ? (countMatOptions || []).slice()
+        : (barcodeMatOptions || []).filter((m) => !liquidMatCodes.value.has(m.code));
+      if (!kw) return list;
+      return list.filter(m => [m.code, m.name, m.spec, m.kind].join(' ').toLowerCase().includes(kw));
+    });
+    function filteredXferLotOptionsForCode(code) {
+      const c = String(code || '');
+      if (!c) return [];
+      const fromWhLabel = String(xferForm.fromWh || '').trim();
+      const fromWhName = parseXferWhName(fromWhLabel);
+      const map = new Map();
+      if (isXferCountDoc.value) {
+        (CFG.countInvRows || []).forEach((r) => {
+          if (String(r.code || '') !== c) return;
+          const lot = String(r.lot || '').trim();
+          if (!lot || lot === '—') return;
+          const qty = Number(r.qty) || 0;
+          if (!(qty > 0)) return;
+          const rowLoc = parseCountInvLoc(r.loc);
+          if (fromWhName && !locBelongsToWh(rowLoc, fromWhName)) return;
+          const prev = map.get(lot);
+          if (!prev) map.set(lot, { lot, loc: rowLoc || '', qty, unit: r.unit || '' });
+          else prev.qty += qty;
+        });
+      } else {
+        (filteredPoInLotOptionsForCode(c) || []).forEach((row) => {
+          const lot = String(row.lot || '').trim();
+          if (!lot) return;
+          if (fromWhName && row.loc && !locBelongsToWh(row.loc, fromWhName)) return;
+          const prev = map.get(lot);
+          if (!prev) map.set(lot, { lot, loc: row.loc || '', qty: Number(row.qty) || 0, unit: row.unit || '' });
+          else prev.qty += Number(row.qty) || 0;
+        });
+      }
+      return Array.from(map.values());
+    }
+    const filteredXferLotOptions = computed(() => {
+      storeTick.value;
+      const idx = xferLotLineIdx.value;
+      const ln = (xferForm.lines || [])[idx];
+      if (!ln || !ln.code) return [];
+      const kw = String(xferLotPickerKw.value || '').trim().toLowerCase();
+      return filteredXferLotOptionsForCode(ln.code).filter((x) => {
+        if (!kw) return true;
+        return String(x.lot).toLowerCase().includes(kw) || String(x.loc || '').toLowerCase().includes(kw);
+      });
+    });
+    function openXferForm(mode, n) {
+      xferFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      if (mode === 'edit' && n) {
+        Object.assign(xferForm, {
+          id: n.id,
+          docType: n.docType || firstXferDocType(),
+          planDate: n.planDate || '',
+          fromWh: n.fromWh || n.partner || '',
+          toWh: n.toWh || n.refNo || '',
+          remark: (n.remark && n.remark !== '—') ? n.remark : '',
+          isLoadingRequired: n.isLoadingRequired || '是',
+          lines: JSON.parse(JSON.stringify((n.lines || []).map(ln => ({
+            code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+            planPcs: ln.planPcs, planQty: ln.planQty, lot: ln.lot === '—' ? '' : (ln.lot || ''),
+            remark: ln.remark === '—' ? '' : (ln.remark || ''),
+            manageMode: ln.manageMode || (isXferCountDoc.value ? '计数管理' : '条码管理'),
+            status: ln.status || '待执行',
+            doneQty: ln.doneQty || 0,
+            remainQty: ln.remainQty,
+            remainPcs: ln.remainPcs,
+          })))),
+        });
+      } else {
+        Object.assign(xferForm, {
+          id: '', docType: firstXferDocType(), planDate: todayYmd(), fromWh: '', toWh: '', remark: '', isLoadingRequired: '是', lines: [],
+        });
+      }
+      view.value = 'xfer-form';
+    }
+    function backXferForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function openXferMatPicker() {
+      xferMatPickerKw.value = '';
+      xferMatPickerVisible.value = true;
+    }
+    function isXferMatAlreadyAdded() {
+      // 允许同物料不同批号；唯一性按【物料+批号】在保存/选批时校验
+      return false;
+    }
+    function selectXferMat(m) {
+      if (!m || !m.code) return;
+      const isCount = isXferCountDoc.value;
+      const qty = isCount ? 100 : 1000;
+      xferForm.lines.push({
+        code: m.code,
+        name: m.name || '',
+        spec: m.spec || '',
+        kind: m.kind || '',
+        unit: m.unit || 'KG',
+        planPcs: isCount ? 0 : '',
+        planQty: qty,
+        lot: '',
+        remark: '',
+        manageMode: isCount ? '计数管理' : '条码管理',
+        status: '待执行',
+        doneQty: 0,
+        remainQty: qty,
+        remainPcs: isCount ? 0 : '',
+      });
+      xferMatPickerVisible.value = false;
+      ElementPlus.ElMessage.success('已添加：' + m.code);
+    }
+    function removeXferFormLine(idx) {
+      xferForm.lines.splice(idx, 1);
+    }
+    function openXferLotPicker(idx) {
+      if (!xferForm.fromWh) {
+        ElementPlus.ElMessage.warning('请先选择调出仓库');
+        return;
+      }
+      xferLotLineIdx.value = idx;
+      xferLotPickerKw.value = '';
+      xferLotPickerVisible.value = true;
+    }
+    function selectXferLot(row) {
+      const idx = xferLotLineIdx.value;
+      const ln = (xferForm.lines || [])[idx];
+      if (!ln || !row) return;
+      const lot = String(row.lot || '').trim();
+      const dup = (xferForm.lines || []).some((x, i) => i !== idx && x.code === ln.code && String(x.lot || '').trim() === lot);
+      if (dup) {
+        ElementPlus.ElMessage.error('同一单据中【物料编码+批号】不可重复');
+        return;
+      }
+      ln.lot = lot;
+      xferLotPickerVisible.value = false;
+      ElementPlus.ElMessage.success('已选择批号：' + lot);
+    }
+    function clearXferLineLot(idx) {
+      const ln = (xferForm.lines || [])[idx];
+      if (ln) ln.lot = '';
+    }
+    function syncXferNoticeToPc(n) {
+      if (!n || !STORE || !STORE.loadMock || !STORE.saveMock) return;
+      const mock = STORE.loadMock();
+      if (!mock || !mock['wh-direct-xfer']) return;
+      const bag = mock['wh-direct-xfer'];
+      const tab1 = (bag.tab1 = bag.tab1 || []);
+      const noticeRow = {
+        id: String(tab1.length + 1),
+        单号: n.id,
+        单据状态: n.status || '待执行',
+        单据类型: n.docType || '直接调拨申请单',
+        计划执行日期: n.planDate || '',
+        调出仓库: n.fromWh || '—',
+        调入仓库: n.toWh || '—',
+        是否需要装卸货: n.isLoadingRequired || '是',
+        物料信息: n.materialSummary || '—',
+        备注: n.remark || '—',
+        _lines: (n.lines || []).map((ln) => ({
+          id: n.id + '-l' + ln.lineNo,
+          行状态: ln.status || '待执行',
+          物料信息: [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / '),
+          库存单位: ln.unit || 'KG',
+          管理方式: ln.manageMode || (isXferCountDoc.value ? '计数管理' : '条码管理'),
+          计划件数: isXferCountDoc.value ? '—' : (ln.planPcs != null && ln.planPcs !== '' ? String(ln.planPcs) : '—'),
+          计划数量: Number(ln.planQty || 0).toFixed(3),
+          已完成数量: Number(ln.doneQty || 0).toFixed(3),
+          未完成数量: Number(ln.remainQty || 0).toFixed(3),
+          批号: ln.lot || '—',
+          备注: ln.remark || '—',
+        })),
+      };
+      const hit = tab1.find((r) => String(r['单号'] || '') === String(n.id));
+      if (hit) Object.assign(hit, noticeRow, { id: hit.id });
+      else tab1.unshift(noticeRow);
+      STORE.saveMock(mock);
+      if (STORE.setDocStatus) STORE.setDocStatus(n.id, n.status || '待执行', { source: 'APP', action: 'create-xfer' });
+    }
+    function saveXferNotice() {
+      if (!xferForm.docType) { ElementPlus.ElMessage.error('请选择单据类型'); return; }
+      if (!xferForm.fromWh) { ElementPlus.ElMessage.error('请选择调出仓库'); return; }
+      if (!xferForm.toWh) { ElementPlus.ElMessage.error('请选择调入仓库'); return; }
+      if (xferForm.fromWh === xferForm.toWh) { ElementPlus.ElMessage.error('调出仓库与调入仓库不能相同'); return; }
+      if (!(xferForm.lines || []).length) { ElementPlus.ElMessage.error('请至少添加一行物料明细'); return; }
+      if ((xferForm.lines || []).some(ln => !ln.code)) {
+        ElementPlus.ElMessage.error('请完善物料明细中的物料信息');
+        return;
+      }
+      if ((xferForm.lines || []).some(ln => !(Number(ln.planQty) > 0))) {
+        ElementPlus.ElMessage.error('计划数量必须为大于 0 的正数');
+        return;
+      }
+      const seen = new Set();
+      for (const ln of (xferForm.lines || [])) {
+        const lot = String(ln.lot || '').trim();
+        const key = String(ln.code || '') + '|' + lot;
+        if (seen.has(key)) {
+          ElementPlus.ElMessage.error('同一单据中【物料编码+批号】不可重复');
+          return;
+        }
+        seen.add(key);
+        if (lot && lot !== '—') {
+          const avail = (filteredXferLotOptionsForCode(ln.code) || []).find((r) => r.lot === lot);
+          if (avail && Number(ln.planQty) > Number(avail.qty)) {
+            ElementPlus.ElMessage.error('计划数量不可大于批号库内可用数量（' + ln.code + ' / ' + lot + '）');
+            return;
+          }
+        }
+      }
+      const docsKey = isXferCountDoc.value ? 'xfer-count' : 'xfer-serial';
+      const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
+      const summary = (xferForm.lines || []).map(ln => `${ln.code} / ${ln.name} / ${ln.spec} / ${ln.kind}`).join('；');
+      const manageMode = isXferCountDoc.value ? '计数管理' : '条码管理';
+      const payload = {
+        status: '待执行',
+        partner: xferForm.fromWh,
+        fromWh: xferForm.fromWh,
+        toWh: xferForm.toWh,
+        refNo: xferForm.toWh,
+        planDate: xferForm.planDate || '',
+        docType: xferForm.docType || firstXferDocType(),
+        remark: xferForm.remark || '—',
+        isLoadingRequired: xferForm.isLoadingRequired || '是',
+        materialSummary: summary,
+        packSpec: isXferCountDoc.value ? '计数/无包材' : '吨袋+托架',
+        lines: (xferForm.lines || []).map((ln, i) => ({
+          lineNo: i + 1,
+          status: ln.status || '待执行',
+          code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+          lot: ln.lot || '—',
+          remark: ln.remark || '—',
+          manageMode: ln.manageMode || manageMode,
+          planPcs: isXferCountDoc.value ? 0 : (Number(ln.planPcs) > 0 ? Number(ln.planPcs) : 0),
+          planQty: Number(ln.planQty),
+          doneQty: Number(ln.doneQty || 0),
+          remainQty: Number(ln.remainQty != null ? ln.remainQty : ln.planQty),
+          remainPcs: isXferCountDoc.value ? 0 : (Number(ln.remainPcs) > 0 ? Number(ln.remainPcs) : (Number(ln.planPcs) > 0 ? Number(ln.planPcs) : 0)),
+        })),
+      };
+      if (xferFormMode.value === 'edit' && xferForm.id) {
+        const hit = list.find(x => x.id === xferForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        Object.assign(hit, payload, { id: xferForm.id, status: hit.status || '待执行' });
+        hit.lines = (hit.lines || []).map((ln, i) => Object.assign(ln, { id: hit.id + '-l' + (i + 1), lineNo: i + 1 }));
+        syncXferNoticeToPc(hit);
+        ElementPlus.ElMessage.success('直接调拨申请单修改成功');
+      } else {
+        const id = 'ZJDBSQ' + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
+        created.lines = (created.lines || []).map((ln) => Object.assign(ln, { id: id + '-l' + ln.lineNo }));
+        list.unshift(created);
+        syncXferNoticeToPc(created);
+        const pushed = maybePushAppLoadNotice(Object.assign({}, created, {
+          isLoadingRequired: xferForm.isLoadingRequired || '是',
+          whBiz: '直接调拨',
+          refNo: created.id,
+        }), true);
+        ElementPlus.ElMessage.success(pushed ? '直接调拨申请单创建成功，已同步下推装卸货通知单' : '直接调拨申请单创建成功');
       }
       bumpStore();
       view.value = 'docs';
@@ -16101,6 +17490,69 @@ createApp({
     }
     function submitExec() {
       const mode = activeExecMode.value;
+      if (flowMode.value === 'inner' && flowMeta.value.innerType === 'xfer') {
+        if (!innerRows.value.length) {
+          ElementPlus.ElMessage.error('请先扫码录入明细后再提交');
+          return;
+        }
+        ElementPlus.ElMessageBox.confirm('确认提交本次物料转序执行单据？提交后将更新物料档案信息并完结流水', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(() => {
+          const n = currentNotice.value;
+          hydrateSerialArchFromPcMock();
+          const rows = CFG.serialArchRows || [];
+          innerRows.value.forEach((line) => {
+            const idx = rows.findIndex((r) => r && r.barcode === line.barcode);
+            if (idx < 0) return;
+            const arch = { ...rows[idx] };
+            if (n.newMaterial && n.newMaterial !== '—') arch.material = n.newMaterial;
+            if (n.newLot && n.newLot !== '—') arch.lot = n.newLot;
+            if (n.newProdDate) arch.prodDate = n.newProdDate;
+            if (n.newValidPeriod) {
+              const m = String(n.newValidPeriod).match(/^(\d+)\s*(.*)$/);
+              if (m) {
+                arch.validPeriod = m[1];
+                if (m[2]) arch.validUnit = m[2].replace(/月/, '月').trim() || arch.validUnit;
+              }
+            }
+            if (n.newExpireDate) arch.expireDate = n.newExpireDate;
+            arch.step = '';
+            rows.splice(idx, 1, arch);
+          });
+          if (n) {
+            n.donePcs = Number(n.donePcs || 0) + innerRows.value.length;
+            n.status = '已完成';
+            delete n._innerDraft;
+            syncDocToStore(n.id, '已完成', { action: 'inner-xfer-submit', flowId: flowId.value });
+          }
+          bumpStore();
+          innerRows.value = [];
+          form.remark = '';
+          ElementPlus.ElMessage.success('物料转序提交完成，物料及条码档案信息已更新，流水已完结');
+          view.value = 'docs';
+        }).catch(() => {});
+        return;
+      }
+      if (flowMode.value === 'inner') {
+        if (!innerRows.value.length) {
+          ElementPlus.ElMessage.error('请先扫码录入明细后再提交');
+          return;
+        }
+        ElementPlus.ElMessageBox.confirm('是否确认提交当前移库作业？', '提交确认', {
+          confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
+        }).then(() => {
+          const n = currentNotice.value;
+          if (n) {
+            n.status = '已完成';
+            delete n._innerDraft;
+            syncDocToStore(n.id, '已完成', { action: 'inner-move-submit', flowId: flowId.value });
+          }
+          innerRows.value = [];
+          ElementPlus.ElMessage.success('移库提交成功（已同步 PC）');
+          view.value = 'docs';
+        }).catch(() => {});
+        return;
+      }
       if (flowMode.value === 'stocktake') {
         ElementPlus.ElMessageBox.confirm('确认提交本次库存盘点？提交后未盘条目将自动转为盘亏，并生成盘点结论', '提交确认', {
           confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
@@ -17649,7 +19101,7 @@ createApp({
       recommendVisible, lotDetailVisible, lotDetailRows, lotDetailMode, lotDetailTitle, lotDetailSumLabel, lotDetailQtyHeader, lotDetailEmptyText, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, outerDocNo, outerCtx, outerCtxDisplay, pkgRows, wayPoint, wayBackView,
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute, canWaybillEnroute, toDatetimeLocal, fromDatetimeLocal,
-      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
+      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoSalesDoc, isSoPcAlignedForm, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
@@ -17666,7 +19118,14 @@ createApp({
       openProdRetForm, backProdRetForm, onProdRetSclckChange, removeProdRetFormLine, saveProdRetNotice,
       prodPickFormMode, prodPickForm, prodPickMatPickerVisible, prodPickMatPickerKw, moOptions, filteredProdPickMatOptions, prodPickMatPickerTitle, isProdPickMatAlreadyAdded,
       prodRetFormMode, prodRetForm, sclckOptions,
-      openPoInNoticeForm, backPoInNoticeForm, onPoInPoChange, onPoInWaybillChange,
+      openPoInNoticeForm, backPoInNoticeForm, onPoInPoChange, onPoInWaybillChange, onPoInPrepChange, onPoInPreoutOutChange, onPoInLogisticsChange, onPoInShipOutChange,
+      openPoInVehiclePicker, selectPoInVehicle, clearPoInVehicle, openPoInLotPicker, selectPoInLot, clearPoInLineLot,
+      poInPrepOptions, poInPreoutOutOptions, poInShipOutOptions, poInVehiclePickerVisible, poInVehiclePickerKw, filteredPoInVehicleOptions,
+      poInLotPickerVisible, poInLotPickerKw, filteredPoInLotOptions, isSoPcAlignedForm,
+      openXferForm, backXferForm, openXferMatPicker, selectXferMat, removeXferFormLine, saveXferNotice,
+      openXferLotPicker, selectXferLot, clearXferLineLot,
+      xferForm, xferFormMode, xferMatPickerVisible, xferMatPickerKw, filteredXferMatOptions, isXferMatAlreadyAdded, warehouseOptions,
+      xferDocTypeOptions, xferLotPickerVisible, xferLotPickerKw, filteredXferLotOptions,
       openGenDocForm, backGenDocForm, openGenPicker, selectGenPicker, saveGenDocForm,
       genDocForm, genDocFormMode, genPickerVisible, genPickerTitle, genPickerRows, pkgMatPickerVisible, selectPkgMat,
       openPoInMatPicker, selectPoInMat, isPoInMatAlreadyAdded, addPoInFormLine, removePoInFormLine, savePoInNotice,
@@ -17674,7 +19133,7 @@ createApp({
       openMaterials, openDocAction, openStockExec, openStockAbnormal, removeStockRow, openInspExec, openExec, backFromExec,
       addSerialScan, addPickScan, addXferScan, onXferQtyChange, onXferToLocChange, confirmXferFromLoc, confirmXferToLoc, onXferCountLocChange, onXferCountLotChange, autoSaveXferCountExec, addTankRow, addTankPkgScan, addInnerScan, openProcess, removeScanRow, openLoadProc, goProcessBatch, openLotDetail, tankPickLotLabel, onTankPickQtyChange, onTankOutQtyChange,
       addStockScan, onStockQtyChange, scanInspWh, mockInspPhoto, mockInspSign, inspForm,
-      openPkgCreateForm, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
+      openPkgCreateForm, backPkgCreate, searchPkgArch, updatePkgArch, savePkgCreate, queryPkgInfo,
       openRecommend, useRecommend,
       loadSplitSrc, genSplitRows, refreshSplitCode, submitPkgSplit,
       loadMergeMain, addMergeRow, removeMergeRow, submitPkgMerge,

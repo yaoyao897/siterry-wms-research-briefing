@@ -2429,10 +2429,10 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.4.0"></script>
-<script src="./js/page-configs.js?v=1.4.0"></script>
-<script src="./js/mock-rows.js?v=1.4.0"></script>
+<script src="./js/page-configs.js?v=1.4.5"></script>
+<script src="./js/mock-rows.js?v=1.4.5"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/page-prd-notes.js?v=1.4.0"></script>
+<script src="./js/page-prd-notes.js?v=1.4.5"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -2581,7 +2581,7 @@ const app = createApp({
     const pageId = ref(firstId);
     const page = computed(()=> CFG.pages[pageId.value]);
     const storeTick = ref(0);
-    function bumpStore(){ syncAllPoReceivedQty(); storeTick.value += 1; if(STORE) STORE.saveMock(MOCK); }
+    function bumpStore(){ syncAllPoReceivedQty(); syncAllWwpoReceivedQty(); storeTick.value += 1; if(STORE) STORE.saveMock(MOCK); }
     function resetDemoStore(){
       if(!STORE) return;
       ElementPlus.ElMessageBox.confirm('确认清空 PC/APP 联动缓存？两侧状态将恢复为初始 Mock。','重置联动数据',{
@@ -4312,6 +4312,38 @@ const app = createApp({
     function syncAllPoReceivedQty(){
       ((MOCK.po||{}).main||[]).forEach(o=> syncPoReceivedQtyFromNotices(o['采购订单号']));
     }
+    /** 按订单行号汇总委外收货通知已完成数量，回写 WWPO「已入库数量」（仅委外收货，不含发料） */
+    function syncWwpoReceivedQtyFromNotices(wwCode){
+      const c = codeOf(wwCode);
+      if(!c) return;
+      const ww = ((MOCK.wwpo||{}).main||[]).find(r=> codeOf(r['委外订单号'])===c);
+      if(!ww || !Array.isArray(ww._lines)) return;
+      const qtyByLine = new Map();
+      ((MOCK['wh-os-recv']||{}).tab1||[]).forEach(notice=>{
+        if(codeOf(notice['关联委外加工单']) !== c) return;
+        (notice._lines||[]).forEach(ln=>{
+          const base = orderLineNoBase(ln);
+          if(!base) return;
+          const done = Number(String(ln['已完成数量']||'').replace(/[^\d.]/g,''))||0;
+          qtyByLine.set(base, (qtyByLine.get(base)||0) + done);
+        });
+      });
+      ww._lines.forEach(ln=>{
+        const base = orderLineNoBase(ln);
+        const plan = Number(ln['计划数量'])||0;
+        const inQty = qtyByLine.get(base)||0;
+        ln['已入库数量'] = String(inQty);
+        ln['未入库数量'] = String(Math.max(0, plan - inQty));
+        if(ln['行状态']==='已关闭') return;
+        if(plan > 0 && inQty >= plan) ln['行状态'] = '已完成';
+        else if(inQty > 0) ln['行状态'] = '执行中';
+        else if(!ln['行状态'] || ln['行状态']==='已完成') ln['行状态'] = '待执行';
+      });
+      syncWwpoStatusFromLines(ww);
+    }
+    function syncAllWwpoReceivedQty(){
+      ((MOCK.wwpo||{}).main||[]).forEach(o=> syncWwpoReceivedQtyFromNotices(o['委外订单号']));
+    }
     /** 采购收料通知单：物料编码 + 批号在单内唯一 */
     function assertPoInLineMatLotUnique(lines){
       const seen = new Set();
@@ -4930,7 +4962,7 @@ const app = createApp({
     function normWwpoDetailLine(r, i){
       const idx = i != null ? i : 0;
       const plan = Number(r['计划数量'])||0;
-      const done = Number(r['已出/入库数量'] ?? r['已出/收数量'])||0;
+      const done = Number(r['已入库数量'] ?? r['已出/入库数量'] ?? r['已出/收数量'])||0;
       const pcs = String(r['计划件数'] ?? '').trim();
       let lineSt = r['行状态'] || '待执行';
       if(!r['行状态']){
@@ -4946,8 +4978,8 @@ const app = createApp({
         单位: r['单位'] || r['采购单位'] || matUnit(r,'po'),
         计划件数: pcs || '—',
         计划数量: String(r['计划数量']||''),
-        '已出/入库数量': String(done),
-        '未出/入库数量': String(Math.max(0, plan-done)),
+        已入库数量: String(done),
+        未入库数量: String(Math.max(0, plan-done)),
         行状态: lineSt,
         备注: r['备注']||'—'
       };
@@ -6924,13 +6956,13 @@ const app = createApp({
           库存单位: m['采购单位'] || m['单位'] || (mr && (mr['库存单位']||mr['基本单位'])) || 'KG',
           管理方式: mode,
           计划件数: isCount ? '—' : String(m['计划件数'] || '10'),
-          计划数量: String(m['未出/入库数量'] != null && m['未出/入库数量'] !== '' ? m['未出/入库数量'] : (m['计划数量'] || '')),
+          计划数量: String(m['未入库数量'] != null && m['未入库数量'] !== '' ? m['未入库数量'] : (m['未出/入库数量'] != null && m['未出/入库数量'] !== '' ? m['未出/入库数量'] : (m['计划数量'] || ''))),
           批号: lot || '',
           生产日期: pageId.value==='wh-os-recv' ? today : '',
           有效期: pageId.value==='wh-os-recv' ? String((mr && mr['有效期']) || '12') : '',
           生产厂家: pageId.value==='wh-os-recv' ? (vendor || '') : '',
           已完成数量: '0.00',
-          未完成数量: String(m['未出/入库数量'] != null && m['未出/入库数量'] !== '' ? m['未出/入库数量'] : (m['计划数量'] || '')),
+          未完成数量: String(m['未入库数量'] != null && m['未入库数量'] !== '' ? m['未入库数量'] : (m['未出/入库数量'] != null && m['未出/入库数量'] !== '' ? m['未出/入库数量'] : (m['计划数量'] || ''))),
           备注: m['备注'] || '',
         };
       });
@@ -12916,7 +12948,7 @@ const app = createApp({
         const lines = formLineRows.value.map((r,i)=>{
           const plan = Number(r['计划数量'])||0;
           const old = (formMode.value==='edit' && formModel._editId) ? ((list.find(x=> x.id===formModel._editId)||{})._lines||[])[i] : null;
-          const doneQty = old ? (Number(old['已出/入库数量'] ?? old['已出/收数量'])||0) : 0;
+          const doneQty = old ? (Number(old['已入库数量'] ?? old['已出/入库数量'] ?? old['已出/收数量'])||0) : 0;
           let lineSt = '待执行';
           if(old && old['行状态']==='已关闭') lineSt = '已关闭';
           else if(doneQty>0 && doneQty<plan) lineSt = '执行中';
@@ -12929,8 +12961,8 @@ const app = createApp({
             采购单位: r['采购单位']||matUnit(r['物料信息'],'po'),
             计划件数: (!pcsRaw || pcsRaw==='—') ? '' : pcsRaw,
             计划数量: String(plan),
-            '已出/入库数量': String(doneQty),
-            '未出/入库数量': String(Math.max(0, plan - doneQty)),
+            已入库数量: String(doneQty),
+            未入库数量: String(Math.max(0, plan - doneQty)),
             行状态: lineSt,
             备注: r['备注']||'—'
           };
@@ -16002,15 +16034,14 @@ const app = createApp({
       } else if(pageId.value==='wwpo'){
         cur._lines = detailLineRows.value.map((r,i)=>{
           const plan = Number(r['计划数量'])||0;
-          const doneQty = Number(r['已出/入库数量'] ?? r['已出/收数量'])||0;
+          const doneQty = Number(r['已入库数量'] ?? r['已出/入库数量'] ?? r['已出/收数量'])||0;
           return {
             物料编码: codeOf(r['物料信息']),
             物料信息: r['物料信息'],
-            '发料/产出类型': r['发料/产出类型']||'',
             采购单位: r['单位'] || r['采购单位'] || matUnit(r['物料信息'],'po'),
             计划数量: String(plan),
-            '已出/入库数量': String(doneQty),
-            '未出/入库数量': String(Math.max(0, plan - doneQty)),
+            已入库数量: String(doneQty),
+            未入库数量: String(Math.max(0, plan - doneQty)),
             行状态: r['行状态']||'待执行',
             备注: r['备注']||'—'
           };
@@ -16113,7 +16144,7 @@ const app = createApp({
             } else if(noticeLike){
               next['未完成数量'] = '0.00';
             } else {
-              next['未出/入库数量'] = '0';
+              next['未入库数量'] = '0';
             }
             return next;
           });
@@ -16373,6 +16404,7 @@ const app = createApp({
     const SYNC_TOAST_SKIP = { storage: 1, 'mock-storage': 1, 'mock-save': 1 };
     onMounted(()=> {
       syncAllPoReceivedQty();
+      syncAllWwpoReceivedQty();
       loadPage(firstId);
       if(STORE){
         unsubStore = STORE.subscribe((msg)=>{
@@ -16381,6 +16413,7 @@ const app = createApp({
           try {
           if (STORE.applyWhPoInToMock) STORE.applyWhPoInToMock(MOCK);
           syncAllPoReceivedQty();
+          syncAllWwpoReceivedQty();
           if (STORE.applyWhPoRetToMock) STORE.applyWhPoRetToMock(MOCK);
           if (STORE.applyWhOsIssueToMock) STORE.applyWhOsIssueToMock(MOCK);
           if (STORE.applyWhProdIssueToMock) STORE.applyWhProdIssueToMock(MOCK);

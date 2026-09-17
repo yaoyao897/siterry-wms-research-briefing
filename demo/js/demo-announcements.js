@@ -1,9 +1,44 @@
 /** Demo 公告（铃铛弹窗）：使用说明 + 更新记录 + 原型进度；字段增量对比上次共享链接版本 */
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
-    updatedAt: "2026-09-10",
-    latestVersion: "v1.4.0",
+    updatedAt: "2026-09-17",
+    latestVersion: "v1.4.10",
     notes: [
+    {
+    "id": "app-xfer-pc-align-v1410",
+    "title": "v1.4.10 · 直接调拨 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-17",
+    "body": "APP 直接调拨（流水码+计数）新增/编辑：计划日期与件数选填、批号弹窗（按调出仓过滤）、物料+批号唯一、单据类型字典绑定，交互对齐 PC。详见变更日志。"
+    },
+    {
+    "id": "app-so-rma-pc-align-v149",
+    "title": "v1.4.9 · 销售退货 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-17",
+    "body": "APP 销售退货新增/编辑：已完成出库单级联、退货原因、承运禁手输+选车、批号弹窗，交互对齐 PC。详见变更日志。"
+    },
+    {
+    "id": "app-so-ship-pc-align-v148",
+    "title": "v1.4.8 · 销售发货 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-17",
+    "body": "APP 销售发货新增/编辑：预出货出库单与备货级联、承运禁手输+选车、批号弹窗，交互对齐 PC。详见变更日志。"
+    },
+    {
+    "id": "app-so-preout-pc-align-v147",
+    "title": "v1.4.7 · 销售预出货 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-17",
+    "body": "APP 销售预出货新增/编辑：备货通知单级联、承运禁手输+选择车辆与司机、批号弹窗与物料+批号唯一，交互对齐 PC。详见变更日志。"
+    },
+    {
+    "id": "app-so-xfer-add-v146",
+    "title": "v1.4.6 · 销售/调拨 APP 开放新增建单",
+    "level": "info",
+    "date": "2026-09-17",
+    "body": "APP 销售发货/退货/预出货（流水码+计数）与直接调拨（流水码+计数）补齐【新增】/【编辑】建单；保存同步 PC 通知单 Tab1。详见变更日志。"
+    },
     {
     "id": "dev-ready-all-v14",
     "title": "v1.4.0 · 全模块更新完善，全部开放开发",
@@ -1711,6 +1746,46 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.4.10",
+    "date": "2026-09-17",
+    "terminal": "APP/PRD",
+    "module": "直接调拨 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 调拨建单对齐 PC：计划日期/件数选填、批号弹窗、物料+批号唯一、单据类型字典"
+  },
+  {
+    "version": "v1.4.9",
+    "date": "2026-09-17",
+    "terminal": "APP/PRD",
+    "module": "销售退货 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 退货建单对齐 PC：已完成出库单级联、退货原因、承运禁手输+选车、批号弹窗"
+  },
+  {
+    "version": "v1.4.8",
+    "date": "2026-09-17",
+    "terminal": "APP/PRD",
+    "module": "销售发货 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 发货建单对齐 PC：预出货出库单/备货级联、承运禁手输+选车、批号弹窗与发货单带料"
+  },
+  {
+    "version": "v1.4.7",
+    "date": "2026-09-17",
+    "terminal": "APP/PRD",
+    "module": "销售预出货 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 预出货建单对齐 PC：备货级联、承运禁手输+选车、批号弹窗与物料+批号唯一"
+  },
+  {
+    "version": "v1.4.6",
+    "date": "2026-09-17",
+    "terminal": "APP/PRD",
+    "module": "销售·调拨 · APP 新增建单",
+    "type": "[Feat]",
+    "summary": "销售发货/退货/预出货与直接调拨开放 APP【新增】/【编辑】；po-in-form 销售分支 + xfer-form；同步 PC 通知单与页面 PRD"
+  },
   {
     "version": "v1.4.0",
     "date": "2026-09-10",

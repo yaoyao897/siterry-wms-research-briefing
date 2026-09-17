@@ -4940,10 +4940,10 @@ window.WMS_PAGE_CONFIGS = {
           "name": "计划数量"
         },
         {
-          "name": "已出/入库数量"
+          "name": "已入库数量"
         },
         {
-          "name": "未出/入库数量"
+          "name": "未入库数量"
         },
         {
           "name": "备注"
