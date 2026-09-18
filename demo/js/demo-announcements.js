@@ -1,9 +1,65 @@
 /** Demo 公告（铃铛弹窗）：使用说明 + 更新记录 + 原型进度；字段增量对比上次共享链接版本 */
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
-    updatedAt: "2026-09-17",
-    latestVersion: "v1.4.10",
+    updatedAt: "2026-09-18",
+    latestVersion: "v1.4.18",
     notes: [
+    {
+    "id": "oth-transport-app-v1418",
+    "title": "v1.4.18 · 其他出入库 APP 运输字段对齐销售",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "其他入/出库单据页、物料明细页展示运单/发货单与承运信息；新增编辑「派车与承运」口径对齐销售（运单带出 / 无运单选车，禁手输）。"
+    },
+    {
+    "id": "xfer-transport-v1417",
+    "title": "v1.4.17 · 直接调拨补齐派车与承运信息",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "直接调拨申请单对齐采购入库：可关联运单/发货单；无运单时可手动填写车牌、车挂、司机姓名/电话/身份证。详见变更日志。"
+    },
+    {
+    "id": "app-stock-no-add-v1416",
+    "title": "v1.4.16 · 库存盘点关闭 APP 新增",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "APP 库存盘点不再提供【新增】；盘点单仅由 PC 下发，手持端只执行扫码/计数盘点。详见变更日志。"
+    },
+    {
+    "id": "app-insp-pc-align-v1415",
+    "title": "v1.4.15 · 仓库巡检 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "APP 仓库巡检开放新增/编辑：巡检方案→目标仓库联动、计划时间、是否影响后续；保存同步 PC 巡检计划。详见变更日志。"
+    },
+    {
+    "id": "app-move-pc-align-v1414",
+    "title": "v1.4.14 · 货物移库 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "APP 货物移库开放新增/编辑：移入仓与库位级联、无移出仓位；执行页扫码带出原库位与外包材。详见变更日志。"
+    },
+    {
+    "id": "app-oth-pc-align-v1413",
+    "title": "v1.4.13 · 其他出入库 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "APP 其他入/出库（流水码+计数+罐区）开放完整新增/编辑：方向与线边仓、受益人/部门/项目、生产相关、运单→发货单承运级联与选车、装卸下推、明细无批号；保存同步 PC。详见变更日志。"
+    },
+    {
+    "id": "app-seq-pc-align-v1412",
+    "title": "v1.4.12 · 物料转序 APP 建单对齐 PC",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "APP 物料转序开放新增/编辑：编码/批号转换、新物料弹窗、有效期与失效日期联动，保存同步 PC。详见变更日志。"
+    },
+    {
+    "id": "app-oth-edit-restore-v1411",
+    "title": "v1.4.11 · 恢复其他出入库编辑",
+    "level": "warn",
+    "date": "2026-09-18",
+    "body": "修复销售/调拨编辑分支插入后，其他出入库待执行卡片丢失【编辑】；同时补齐通用建单表单的编辑回填与保存。详见变更日志。"
+    },
     {
     "id": "app-xfer-pc-align-v1410",
     "title": "v1.4.10 · 直接调拨 APP 建单对齐 PC",
@@ -1746,6 +1802,70 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.4.18",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "其他出入库 · 运输字段",
+    "type": "[Opt]",
+    "summary": "APP 其他出入库运输字段展示与销售出入库口径一致"
+  },
+  {
+    "version": "v1.4.17",
+    "date": "2026-09-18",
+    "terminal": "PC/APP/PRD",
+    "module": "直接调拨 · 派车与承运信息",
+    "type": "[Refactor]",
+    "summary": "调拨运输字段对齐采购入库，支持无运单手录承运信息"
+  },
+  {
+    "version": "v1.4.16",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "库存盘点 · 关闭 APP 新增",
+    "type": "[Refactor]",
+    "summary": "APP 盘点不开放建单，仅执行 PC 下发单据；PRD/备注同步"
+  },
+  {
+    "version": "v1.4.15",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "仓库巡检 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 巡检建单对齐 PC：方案→仓库联动、计划时间、是否影响后续；同步 wh-insp-plan"
+  },
+  {
+    "version": "v1.4.14",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "货物移库 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 移库建单对齐 PC：移入仓/库位级联；执行页原库位与外包材；同步 wh-transfer"
+  },
+  {
+    "version": "v1.4.13",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "其他出入库 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 其他入/出库建单对齐 PC：受益/运单承运/装卸/明细无批号，六入口分流选料"
+  },
+  {
+    "version": "v1.4.12",
+    "date": "2026-09-18",
+    "terminal": "APP/PRD",
+    "module": "物料转序 · 新增编辑对齐 PC",
+    "type": "[Feat]",
+    "summary": "APP 转序建单对齐 PC：编码/批号转换、新物料弹窗、有效期与失效日期联动"
+  },
+  {
+    "version": "v1.4.11",
+    "date": "2026-09-18",
+    "terminal": "APP",
+    "module": "其他出入库 · 恢复编辑",
+    "type": "[Fix]",
+    "summary": "恢复其他出入库待执行【编辑】；补齐 gen-doc-form 编辑回填与保存"
+  },
   {
     "version": "v1.4.10",
     "date": "2026-09-17",

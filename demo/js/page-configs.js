@@ -23479,6 +23479,22 @@ window.WMS_PAGE_CONFIGS = {
               "type": "daterange"
             },
             {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
               "name": "备注",
               "type": "input"
             }
@@ -23492,6 +23508,10 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "queryMore": [
             "计划执行日期",
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "司机姓名",
             "备注"
           ],
           "toolbar": [
@@ -23554,6 +23574,28 @@ window.WMS_PAGE_CONFIGS = {
               "width": 160
             },
             {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
+            },
+            {
               "field": "备注",
               "title": "备注",
               "width": 140
@@ -23614,6 +23656,22 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
+              "name": "关联运单",
+              "type": "input"
+            },
+            {
+              "name": "关联发货单",
+              "type": "input"
+            },
+            {
+              "name": "车牌号",
+              "type": "input"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input"
+            },
+            {
               "name": "操作人",
               "type": "input"
             },
@@ -23631,6 +23689,10 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "ERP单据号",
             "物料信息",
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "司机姓名",
             "操作人",
             "操作时间"
           ],
@@ -23682,6 +23744,28 @@ window.WMS_PAGE_CONFIGS = {
               "field": "关联调拨申请单号",
               "title": "关联调拨申请单号",
               "width": 160
+            },
+            {
+              "field": "关联运单",
+              "title": "关联运单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "关联发货单",
+              "title": "关联发货单",
+              "width": 160,
+              "slot": "link"
+            },
+            {
+              "field": "车牌号",
+              "title": "车牌号",
+              "width": 120
+            },
+            {
+              "field": "司机姓名",
+              "title": "司机姓名",
+              "width": 100
             },
             {
               "field": "单据类型",
@@ -23917,22 +24001,25 @@ window.WMS_PAGE_CONFIGS = {
           ]
         }
       ],
-      "formFields": [
+      "formSections": [
         {
-          "name": "单号",
-          "type": "readonly",
-          "required": true,
-          "ctrl": "系统自动生成 ZJDBSQ"
-        },
-        {
-          "name": "单据类型",
-          "type": "select",
-          "required": true,
-          "options": [
-            "直接调拨申请单"
-          ],
-          "ctrl": "固定"
-        },
+          "title": "基础信息",
+          "fields": [
+            {
+              "name": "单号",
+              "type": "readonly",
+              "required": true,
+              "ctrl": "系统自动生成 ZJDBSQ"
+            },
+            {
+              "name": "单据类型",
+              "type": "select",
+              "required": true,
+              "options": [
+                "直接调拨申请单"
+              ],
+              "ctrl": "固定"
+            },
             {
               "name": "是否需要装卸货",
               "type": "select",
@@ -23943,53 +24030,106 @@ window.WMS_PAGE_CONFIGS = {
               "defaultValue": "是",
               "required": true
             },
-        {
-          "name": "计划执行日期",
-          "type": "date",
-          "required": false,
-          "ctrl": "选填"
+            {
+              "name": "计划执行日期",
+              "type": "date",
+              "required": false,
+              "ctrl": "选填"
+            },
+            {
+              "name": "调出仓库",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选启用仓库"
+            },
+            {
+              "name": "调入仓库",
+              "type": "picker",
+              "required": true,
+              "ctrl": "弹窗选启用仓库；≠调出"
+            },
+            {
+              "name": "备注",
+              "type": "textarea",
+              "required": false,
+              "ctrl": "选填"
+            }
+          ]
         },
         {
-          "name": "调出仓库",
-          "type": "picker",
-          "required": true,
-          "ctrl": "弹窗选启用仓库"
-        },
-        {
-          "name": "调入仓库",
-          "type": "picker",
-          "required": true,
-          "ctrl": "弹窗选启用仓库；≠调出"
-        },
-        {
-          "name": "备注",
-          "type": "textarea",
-          "required": false,
-          "ctrl": "选填"
+          "title": "派车与承运信息",
+          "fields": [
+            {
+              "name": "关联运单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "按仓库业务类型=直接调拨过滤；选定带出车辆与司机；置于发货单前"
+            },
+            {
+              "name": "关联发货单",
+              "type": "picker",
+              "required": false,
+              "ctrl": "未选运单置灰；选择运单后过滤；运单仅1张时自动带入"
+            },
+            {
+              "name": "车牌号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "车挂号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机姓名",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
+            },
+            {
+              "name": "司机电话",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
+            },
+            {
+              "name": "司机身份证号",
+              "type": "input",
+              "required": false,
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
+            }
+          ]
         }
       ],
       "formDialogWidth": "1100px",
-      "detailFields": [
+      "detailSections": [
         {
-          "name": "单据状态"
+          "title": "基础信息",
+          "fields": [
+            "单据状态",
+            "单号",
+            "单据类型",
+            "是否需要装卸货",
+            "计划执行日期",
+            "调出仓库",
+            "调入仓库",
+            "备注"
+          ]
         },
         {
-          "name": "单号"
-        },
-        {
-          "name": "单据类型"
-        },
-        {
-          "name": "计划执行日期"
-        },
-        {
-          "name": "调出仓库"
-        },
-        {
-          "name": "调入仓库"
-        },
-        {
-          "name": "备注"
+          "title": "派车与承运信息",
+          "fields": [
+            "关联运单",
+            "关联发货单",
+            "车牌号",
+            "车挂号",
+            "司机姓名",
+            "司机电话",
+            "司机身份证号"
+          ]
         }
       ],
       "hasEdit": true,

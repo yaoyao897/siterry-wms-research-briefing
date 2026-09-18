@@ -907,12 +907,12 @@ window.APP_CFG = (function () {
     }),
 
     // 其他
-    'oth-in-serial': flow('其他入库-流水码', 'serial', { partnerLabel: '往来单位', refLabel: '关联单据', docsKey: 'oth-in-serial', showDocAdd: true }),
-    'oth-in-count': flow('其他入库-计数', 'count', { hasProcess: false, partnerLabel: '往来单位', refLabel: '关联单据', qtyLabel: '入库数量', docsKey: 'oth-in-count', showDocAdd: true }),
-    'oth-in-tank': flow('其他入库-罐区', 'tank', { partnerLabel: '往来单位', refLabel: '关联单据', execVariant: 'tank-in', addMatTitle: '添加厂外物料', docsKey: 'oth-in-tank', showDocAdd: true }),
-    'oth-out-serial': flow('其他出库-流水码', 'serial', { isOut: true, partnerLabel: '往来单位', refLabel: '关联单据', serialScanTitle: '添加出库扫码', docsKey: 'oth-out-serial', showDocAdd: true }),
-    'oth-out-count': flow('其他出库-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '往来单位', refLabel: '关联单据', qtyLabel: '出库数量', docsKey: 'oth-out-count', showDocAdd: true }),
-    'oth-out-tank': flow('其他出库-罐区', 'tank', { isOut: true, partnerLabel: '往来单位', refLabel: '关联单据', execVariant: 'tank-out', docsKey: 'oth-out-tank', showDocAdd: true }),
+    'oth-in-serial': flow('其他入库-流水码', 'serial', { partnerLabel: '往来单位', refLabel: '关联单据', docsKey: 'oth-in-serial', showDocAdd: true, showDocEdit: true }),
+    'oth-in-count': flow('其他入库-计数', 'count', { hasProcess: false, partnerLabel: '往来单位', refLabel: '关联单据', qtyLabel: '入库数量', docsKey: 'oth-in-count', showDocAdd: true, showDocEdit: true }),
+    'oth-in-tank': flow('其他入库-罐区', 'tank', { partnerLabel: '往来单位', refLabel: '关联单据', execVariant: 'tank-in', addMatTitle: '添加厂外物料', docsKey: 'oth-in-tank', showDocAdd: true, showDocEdit: true }),
+    'oth-out-serial': flow('其他出库-流水码', 'serial', { isOut: true, partnerLabel: '往来单位', refLabel: '关联单据', serialScanTitle: '添加出库扫码', docsKey: 'oth-out-serial', showDocAdd: true, showDocEdit: true }),
+    'oth-out-count': flow('其他出库-计数', 'count', { isOut: true, hasProcess: false, partnerLabel: '往来单位', refLabel: '关联单据', qtyLabel: '出库数量', docsKey: 'oth-out-count', showDocAdd: true, showDocEdit: true }),
+    'oth-out-tank': flow('其他出库-罐区', 'tank', { isOut: true, partnerLabel: '往来单位', refLabel: '关联单据', execVariant: 'tank-out', docsKey: 'oth-out-tank', showDocAdd: true, showDocEdit: true }),
 
     // 库内 / 盘点
     'inner-xfer': {
@@ -927,7 +927,8 @@ window.APP_CFG = (function () {
       emptyDocs: '暂无待执行的转序通知单',
       emptySearch: '未找到匹配的转序单据',
       innerType: 'xfer',
-      showDocAdd: false,
+      showDocAdd: true,
+      showDocEdit: true,
     },
     'inner-move': {
       title: '货物移库',
@@ -935,12 +936,14 @@ window.APP_CFG = (function () {
       hasProcess: false,
       hasMaterials: false,
       docsKey: 'inner',
-      partnerLabel: '移出仓库',
-      refLabel: '移入仓库',
-      searchHint: '模糊搜索移库单号/仓库…',
-      emptyDocs: '暂无移库单',
+      partnerLabel: '移入仓库',
+      refLabel: '移入库位',
+      searchHint: '模糊搜索移库单号/仓库/库位/备注…',
+      emptyDocs: '暂无待执行的货物移库单',
+      emptySearch: '未找到匹配的移库单据',
       innerType: 'move',
-      showDocAdd: false,
+      showDocAdd: true,
+      showDocEdit: true,
     },
     'stock-take': {
       title: '库存盘点',
@@ -953,7 +956,8 @@ window.APP_CFG = (function () {
       searchHint: '模糊搜索盘点单号/仓库/类型/制单人…',
       emptyDocs: '暂无待执行的盘点单',
       emptySearch: '未找到匹配的盘点单据',
-      showDocAdd: true,
+      showDocAdd: false,
+      showDocEdit: false,
     },
     'app-pkg-create': {
       title: '包材建档',
@@ -1055,7 +1059,9 @@ window.APP_CFG = (function () {
       docsKey: 'insp',
       searchHint: '模糊搜索计划单号/仓库/方案/负责人…',
       emptyDocs: '暂无待执行的巡检任务',
-      showDocAdd: false,
+      emptySearch: '未找到匹配的巡检任务',
+      showDocAdd: true,
+      showDocEdit: true,
     },
     'lg-waybill': {
       title: '运单',
@@ -2429,7 +2435,16 @@ window.APP_CFG = (function () {
       refNo: refNo,
       planDate: extra.planDate || '2026-08-20',
       docType: extra.docType || '标准业务',
-      logisticsNo: extra.logisticsNo || 'FHD202608121201',
+      direction: extra.direction || '',
+      lineSideLoc: extra.lineSideLoc || '',
+      waybillNo: extra.waybillNo || '',
+      logisticsNo: extra.logisticsNo || '',
+      carrier: extra.carrier || '',
+      plate: extra.plate || '',
+      trailer: extra.trailer || '',
+      driver: extra.driver || '',
+      phone: extra.phone || '',
+      driverId: extra.driverId || '',
       materialSummary: extra.materialSummary || 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       remark: extra.remark || '—',
       lines: extra.lines || cloneLines(),
@@ -3034,6 +3049,10 @@ window.APP_CFG = (function () {
   const noticesOthInSerial = [
     restNotice('QTST202608120001', '天齐锂业股份', 'QTSQ202608120001', {
       docType: '其他入库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608180001', logisticsNo: 'FHD202608180001',
+      carrier: '思特瑞承运', plate: '川A·77777', trailer: '—',
+      driver: '周九', phone: '13900000006', driverId: '511402198812200067',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
         {
@@ -3046,6 +3065,10 @@ window.APP_CFG = (function () {
     }),
     restNotice('QTST202608120002', '赣锋锂业集团', 'QTSQ202608120002', {
       status: '执行中', docType: '其他入库', planDate: '2026-08-16',
+      direction: '厂外',
+      waybillNo: 'YD202608180002', logisticsNo: 'FHD202608180002',
+      carrier: '思特瑞承运', plate: '川B·55555', trailer: '川B·002挂',
+      driver: '钱七', phone: '13900000002', driverId: '510107199203150023',
       materialSummary: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
       lines: [
         {
@@ -3061,6 +3084,10 @@ window.APP_CFG = (function () {
   const noticesOthInCount = [
     restNotice('QTST202608120010', '成都某某机电制造', 'QTSQ202608120010', {
       docType: '其他入库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608180001', logisticsNo: 'FHD202608180001',
+      carrier: '思特瑞承运', plate: '川A·77777', trailer: '—',
+      driver: '周九', phone: '13900000006', driverId: '511402198812200067',
       materialSummary: 'SP-BRG-6205 / 轴承（6205） / P5级 / 备品备件',
       lines: [
         {
@@ -3073,6 +3100,10 @@ window.APP_CFG = (function () {
     }),
     restNotice('QTST202608150011', '绵阳某某包装材料', 'QTSQ202608150011', {
       status: '执行中', docType: '其他入库', planDate: '2026-08-15',
+      direction: '厂外',
+      waybillNo: 'YD202608180002', logisticsNo: 'FHD202608180002',
+      carrier: '思特瑞承运', plate: '川B·55555', trailer: '川B·002挂',
+      driver: '钱七', phone: '13900000002', driverId: '510107199203150023',
       materialSummary: 'PK-BOX-A4 / A4纸箱 / 双瓦 / 包装材料',
       lines: [
         {
@@ -3088,6 +3119,10 @@ window.APP_CFG = (function () {
   const noticesOthInTank = [
     restNotice('QTST202608120020', '天齐锂业股份', 'QTSQ202608120020', {
       docType: '其他入库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608180001', logisticsNo: 'FHD202608180001',
+      carrier: '思特瑞承运', plate: '川A·77777', trailer: '—',
+      driver: '周九', phone: '13900000006', driverId: '511402198812200067',
       materialSummary: 'RM-H2SO4 / 工业浓硫酸 / 98% / 危化原料',
       lines: [
         {
@@ -3099,6 +3134,10 @@ window.APP_CFG = (function () {
       ],
     }),
     restNotice('QTST202608170021', '赣锋锂业集团', 'QTSQ202608170021', {
+      direction: '厂外',
+      waybillNo: 'YD202608180002', logisticsNo: 'FHD202608180002',
+      carrier: '思特瑞承运', plate: '川B·55555', trailer: '川B·002挂',
+      driver: '钱七', phone: '13900000002', driverId: '510107199203150023',
       status: '执行中', docType: '其他入库', planDate: '2026-08-17',
       materialSummary: 'RM-NaOH / 液碱 / 32% / 危化原料',
       lines: [
@@ -3115,6 +3154,10 @@ window.APP_CFG = (function () {
   const noticesOthOutSerial = [
     restNotice('QTCK202608120101', '宁德时代新能源', 'QTSQ202608120101', {
       docType: '其他出库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
         {
@@ -3127,6 +3170,10 @@ window.APP_CFG = (function () {
     }),
     restNotice('QTCK202608160102', '比亚迪锂电', 'QTSQ202608160102', {
       status: '执行中', docType: '其他出库', planDate: '2026-08-16',
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       materialSummary: 'RM-LiOH-BG / 电池级氢氧化锂 / LiOH·H2O / 锂盐原料',
       lines: [
         {
@@ -3142,6 +3189,10 @@ window.APP_CFG = (function () {
   const noticesOthOutCount = [
     restNotice('QTCK202608120110', '生产一部', 'QTSQ202608120110', {
       docType: '其他出库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       materialSummary: 'SP-BRG-6205 / 轴承（6205） / P5级 / 备品备件',
       lines: [
         {
@@ -3154,6 +3205,10 @@ window.APP_CFG = (function () {
     }),
     restNotice('QTCK202608150111', '仓储部', 'QTSQ202608150111', {
       status: '执行中', docType: '其他出库', planDate: '2026-08-15',
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       materialSummary: 'PK-BOX-A4 / A4纸箱 / 双瓦 / 包装材料',
       lines: [
         {
@@ -3169,6 +3224,10 @@ window.APP_CFG = (function () {
   const noticesOthOutTank = [
     restNotice('QTCK202608120001', '宁德时代新能源', 'QTSQ202608120011', {
       docType: '其他出库', planDate: '2026-08-12',
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       remark: '多批号 FIFO：碳酸锂样品/盘亏出库',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
@@ -3181,6 +3240,10 @@ window.APP_CFG = (function () {
       ],
     }),
     restNotice('QTCK202608120002', '比亚迪锂电', 'QTSQ202608120012', {
+      direction: '厂外',
+      waybillNo: 'YD202608190001', logisticsNo: 'FHD202608190001',
+      carrier: '思特瑞承运', plate: '川C·33333', trailer: '—',
+      driver: '孙八', phone: '13900000004', driverId: '51010419880512001X',
       status: '执行中', docType: '其他出库', planDate: '2026-08-17',
       remark: '多批号 FIFO：浓硫酸研发领用',
       materialSummary: 'RM-H2SO4 / 工业浓硫酸 / 98% / 危化原料',
@@ -3210,20 +3273,43 @@ window.APP_CFG = (function () {
 
   const noticesInner = [
     {
-      id: 'YKT202508010001',
+      id: 'YKTT202608010001',
       status: '待执行',
-      partner: '原料仓 A01',
-      refNo: '成品仓 B02',
-      planDate: '2025-08-05',
+      partner: '原料仓',
+      refNo: 'WH-RAW-02',
+      planDate: '2026-08-10',
       docType: '货物移库',
+      moveType: '标准移库',
       logisticsNo: '',
-      materialSummary: '库内移库 · 原料→成品',
-      fromWh: 'CK001',
-      fromLoc: 'KW001',
-      toWh: 'CK002',
-      toLoc: 'KW010',
-      remark: '按计划移库',
+      materialSummary: '库内移库 · 货架动碰理货',
+      toWh: '原料仓',
+      toWhCode: 'WH-RAW',
+      toLoc: 'WH-RAW-02',
+      donePcs: 0,
+      remark: '货架动碰理货',
+      createTime: '2026-08-01 08:30:00',
+      creator: '张三',
       lines: [],
+    },
+    {
+      id: 'YKTT202608020002',
+      status: '执行中',
+      partner: '成品仓',
+      refNo: 'WH-FG-02',
+      planDate: '2026-08-06',
+      docType: '货物移库',
+      moveType: '货位整理',
+      logisticsNo: '',
+      materialSummary: '库内移库 · 同仓移位整理',
+      toWh: '成品仓',
+      toWhCode: 'WH-FG',
+      toLoc: 'WH-FG-02',
+      donePcs: 2,
+      remark: '同仓移位整理',
+      createTime: '2026-08-02 09:15:00',
+      creator: '李四',
+      lines: [],
+      _innerDraft: null,
     },
     {
       id: 'ZXSQ202508010001',
@@ -3282,6 +3368,8 @@ window.APP_CFG = (function () {
       planDate: '2026-08-28 09:00',
       overdueText: '10分钟',
       overdueLate: true,
+      affectNext: '临时计划，不更新',
+      remark: '—',
       draft: null,
     },
     {
@@ -3296,6 +3384,8 @@ window.APP_CFG = (function () {
       planDate: '2026-08-28 14:00',
       overdueText: '剩余2小时',
       overdueLate: false,
+      affectNext: '循环计划，更新',
+      remark: '—',
       draft: {
         temp: '22.5',
         humidity: '52.0',
@@ -3318,6 +3408,8 @@ window.APP_CFG = (function () {
       planDate: '2026-08-28 11:00',
       overdueText: '剩余45分钟',
       overdueLate: false,
+      affectNext: '临时计划，不更新',
+      remark: '—',
       draft: null,
     },
   ];
@@ -6602,10 +6694,15 @@ window.APP_CFG = (function () {
     { code: 'YD202608250002', ships: ['FHD202608250002'], plate: '川A12345', trailer: '川A888挂', driver: '赵六', phone: '13900000001', driverId: '51010419880512001X', poHint: 'WWDD202608020002', bizType: '委外退货' },
     { code: 'YD202608250010', ships: ['FHD202608250010'], plate: '川A11223', trailer: '—', driver: '王五', phone: '13800138001', driverId: '510101199001011111', poHint: 'WWDD202608120010', bizType: '委外退货' },
     { code: 'YD202608250011', ships: ['FHD202608250011'], plate: '川B33445', trailer: '川B001挂', driver: '赵六', phone: '13900139002', driverId: '510107199203150023', poHint: 'WWDD202608150011', bizType: '委外退货' },
+    { code: 'YD202608180001', ships: ['FHD202608180001'], plate: '川A·77777', trailer: '—', driver: '周九', phone: '13900000006', driverId: '511402198812200067', poHint: '', bizType: '其他入库' },
+    { code: 'YD202608180002', ships: ['FHD202608180002', 'FHD202608180003'], plate: '川B·55555', trailer: '川B·002挂', driver: '钱七', phone: '13900000002', driverId: '510107199203150023', poHint: '', bizType: '其他入库' },
+    { code: 'YD202608190001', ships: ['FHD202608190001'], plate: '川C·33333', trailer: '—', driver: '孙八', phone: '13900000004', driverId: '51010419880512001X', poHint: '', bizType: '其他出库' },
     { code: 'YD202608280001', ships: ['FHD202608280001'], plate: '川A·88888', trailer: '川A·9999挂', driver: '张三', phone: '13800138000', driverId: '510101199001011234', poHint: 'XSDD202608120001', bizType: '销售发货' },
     { code: 'YD202608280002', ships: ['FHD202608280002'], plate: '川B·66666', trailer: '—', driver: '李四', phone: '13900139000', driverId: '510107199203150023', poHint: 'XSDD202608120002', bizType: '销售发货' },
     { code: 'YD202608280010', ships: ['FHD202608280010'], plate: '川A·88888', trailer: '川A·9999挂', driver: '张三', phone: '13800138000', driverId: '510101199001011234', poHint: 'XSDD202608120001', bizType: '销售预出货' },
     { code: 'YD202608280020', ships: ['FHD202608280020'], plate: '川B·66666', trailer: '—', driver: '李四', phone: '13900139000', driverId: '510107199203150023', poHint: 'XSDD202608120001', bizType: '销售退货' },
+    { code: 'YD202609180001', ships: ['FHD202609180001'], plate: '川A·DB001', trailer: '川A·DB挂', driver: '调拨司机', phone: '13800138088', driverId: '510101199001018888', poHint: '', bizType: '直接调拨' },
+    { code: 'YD202609180002', ships: ['FHD202609180002', 'FHD202609180003'], plate: '川B·DB002', trailer: '—', driver: '短驳司机', phone: '13900139088', driverId: '510107199203158888', poHint: '', bizType: '直接调拨' },
   ];
 
   /** APP 库位主数据：运行时由 demo-store 从 PC warehouse.tab2 同步，禁止维护私有库位码 */
@@ -6651,6 +6748,33 @@ window.APP_CFG = (function () {
     waybillShipOptions: waybillShipOptions,
     soOptions: soOptions,
     partnerOptions: partnerOptions,
+    inspSchemeOptions: [
+      {
+        name: '每日危化品仓库巡检',
+        desc: '检查库房温湿度、通风设施、泄露报警器',
+        enabled: true,
+        warehouses: [
+          { code: 'WH-FG', name: '成品仓', type: '危化品库', owner: '李敏' },
+          { code: 'WH-RAW', name: '原料仓', type: '危化品库', owner: '王强' },
+        ],
+      },
+      {
+        name: '仓库消防巡检',
+        desc: '检查灭火器压力、消防栓、应急通道',
+        enabled: true,
+        warehouses: [
+          { code: 'WH-PM', name: '包材仓', type: '常温库', owner: '陈伟' },
+        ],
+      },
+      {
+        name: '罐区周检',
+        desc: '罐体液位、阀门密封与围堰完好',
+        enabled: false,
+        warehouses: [
+          { code: 'WH-QC', name: '待检仓', type: '常温库', owner: '周杰' },
+        ],
+      },
+    ],
     warehouseOptions: [
       { code: 'WH-RAW', name: '原料仓', label: 'WH-RAW - 原料仓' },
       { code: 'WH-FG', name: '成品仓', label: 'WH-FG - 成品仓' },

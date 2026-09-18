@@ -542,7 +542,7 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-nav">
                 <button class="m-nav__back" @click="goHome">←</button>
                 <div class="m-nav__title">{{ flowTitle }}</div>
-                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isProdInDoc ? openProdInForm('add') : ((isXferSerialDoc || isXferCountDoc) ? openXferForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）')))))))">新增</button>
+                <button v-if="flowMeta.showDocAdd !== false && !(flowMode==='waybill' && isCarrierUser)" class="m-nav__right" @click="isOthDoc ? openOthForm('add') : (isInspDoc ? openInspForm('add') : (isInnerMoveDoc ? openMoveForm('add') : (isInnerXferDoc ? openSeqForm('add') : (isProdRetDoc ? openProdRetForm('add') : (isProdPickDoc ? openProdPickForm('add') : (isProdInDoc ? openProdInForm('add') : ((isXferSerialDoc || isXferCountDoc) ? openXferForm('add') : (isPoNoticeDoc ? openPoInNoticeForm('add') : (flowMode==='waybill' ? openWaybillAdd() : (isRestAppDoc ? openGenDocForm('add') : toast('新增单据（Demo）')))))))))))">新增</button>
               </div>
               <div class="m-scroll">
                 <div class="m-search"><input v-model="docKw" :placeholder="flowMeta.searchHint || '模糊搜索…'" /></div>
@@ -679,6 +679,32 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">调入仓库</span>{{ n.toWh || '—' }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
+                      <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ n.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
+                      <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
+                      <template v-if="isExpanded('doc', n.id)">
+                        <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      </template>
+                    </div>
+                    <div class="doc-grid" v-else-if="isOthDoc">
+                      <div><span class="doc-label">往来单位</span>{{ n.partner || n.supplier || '—' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ n.planDate }}</div>
+                      <div v-if="isOthInDoc"><span class="doc-label">入库方向</span>{{ n.direction || '—' }}</div>
+                      <div v-if="isOthInDoc && n.direction==='线边仓'"><span class="doc-label">领至线边仓</span>{{ n.lineSideLoc || '—' }}</div>
+                      <div v-if="isOthOutDoc"><span class="doc-label">出库方向</span>{{ n.direction || '—' }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
+                      <div><span class="doc-label">关联运单</span>{{ n.waybillNo || '—' }}</div>
+                      <div><span class="doc-label">关联发货单</span>{{ n.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ n.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ n.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ n.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ n.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(n.driverId) }}</div>
                       <div class="full"><span class="doc-label">物料信息</span>{{ n.materialSummary }}</div>
                       <template v-if="isExpanded('doc', n.id)">
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
@@ -725,6 +751,7 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div class="full"><span class="doc-label">计划时间</span>{{ n.planDate || '—' }}</div>
                       <div class="full"><span class="doc-label">逾期时长</span><span :style="{ color: n.overdueLate ? '#FF4D4F' : '#52C41A' }">{{ n.overdueText || '—' }}</span></div>
                       <template v-if="isExpanded('doc', n.id)">
+                        <div class="full"><span class="doc-label">是否影响后续</span>{{ n.affectNext || '—' }}</div>
                         <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
                       </template>
                     </div>
@@ -754,12 +781,16 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div class="full"><span class="doc-label">转序说明</span>{{ n.seqRemark || n.remark || '—' }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="flowMode==='inner'">
-                      <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
-                      <div><span class="doc-label">移出仓库</span>{{ n.fromWh || n.partner || '—' }}</div>
-                      <div><span class="doc-label">移出库位</span>{{ n.fromLoc || '—' }}</div>
-                      <div><span class="doc-label">移入仓库</span>{{ n.toWh || n.refNo || '—' }}</div>
-                      <div><span class="doc-label">移入库位</span>{{ n.toLoc || '—' }}</div>
-                      <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ n.moveType || n.docType || '标准移库' }}</div>
+                      <div><span class="doc-label">已完成件数</span>{{ n.donePcs != null ? n.donePcs : 0 }} 件</div>
+                      <div><span class="doc-label">移入仓库编码</span>{{ n.toWhCode || n.toWh || n.partner || '—' }}</div>
+                      <div><span class="doc-label">移入库位编码</span>{{ n.toLoc || n.refNo || '—' }}</div>
+                      <template v-if="isExpanded('doc', n.id)">
+                        <div><span class="doc-label">计划执行日期</span>{{ n.planDate || '—' }}</div>
+                        <div><span class="doc-label">制单人</span>{{ n.creator || '—' }}</div>
+                        <div class="full"><span class="doc-label">制单时间</span>{{ n.createTime || '—' }}</div>
+                        <div class="full"><span class="doc-label">备注</span>{{ n.remark || '—' }}</div>
+                      </template>
                     </div>
                     <div class="doc-grid" v-else-if="flowMode==='pkg-doc'">
                       <div><span class="doc-label">单据类型</span>{{ n.docType }}</div>
@@ -822,7 +853,10 @@ body.remarks-open .demo-scope-tip{display:none}
                     <button v-if="flowMode==='waybill' && ['待运输','运输中','待发运','发运中'].includes(n.status)" class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     <button v-else-if="flowMode==='gatepass'" class="btn-sm" style="font-weight:600" @click.stop="openGatepassDetail(n)">执行</button>
                     <button v-else-if="flowMode==='stocktake'" class="btn-sm" @click="openStockExec(n)">执行 ›</button>
-                    <button v-else-if="flowMode==='insp'" class="btn-sm" style="font-weight:600" @click.stop="openInspExec(n)">执行</button>
+                    <template v-else-if="isInspDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openInspForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openInspExec(n)">执行</button>
+                    </template>
                     <template v-else-if="isProdRetDoc">
                       <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openProdRetForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
@@ -847,8 +881,24 @@ body.remarks-open .demo-scope-tip{display:none}
                       <button v-if="n.status==='待执行'" class="btn-sm" @click.stop="openPoInNoticeForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
+                    <template v-else-if="isOthDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openOthForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
+                    <template v-else-if="isInnerMoveDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openMoveForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
+                    <template v-else-if="isInnerXferDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openSeqForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
                     <template v-else-if="isLoadFlow">
                       <button v-if="n.status==='待执行'" class="btn-sm" @click.stop="openGenDocForm('edit', n)">编辑</button>
+                      <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
+                    </template>
+                    <template v-else-if="isRestAppDoc">
+                      <button v-if="n.status==='待执行' && flowMeta.showDocEdit !== false" class="btn-sm" @click.stop="openGenDocForm('edit', n)">编辑</button>
                       <button class="btn-sm" style="font-weight:600" @click.stop="openDocAction(n)">执行</button>
                     </template>
                     <button v-else class="btn-sm" @click="openDocAction(n)">执行</button>
@@ -1259,6 +1309,29 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                   <div class="field"><label>备注</label><input v-model="xferForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
                 </div>
+                <div class="sec">
+                  <div class="sec__title">派车与承运信息</div>
+                  <div class="field">
+                    <label>关联运单</label>
+                    <select v-model="xferForm.waybillNo" @change="onXferWaybillChange">
+                      <option value="">请选择运单（选填）</option>
+                      <option v-for="w in xferWaybillOpts" :key="w.code" :value="w.code">{{ w.code }}</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>关联发货单</label>
+                    <select v-model="xferForm.logisticsNo" :disabled="!xferForm.waybillNo">
+                      <option value="">{{ xferForm.waybillNo ? '请选择发货单（选填）' : '请先选择运单' }}</option>
+                      <option v-for="s in xferShipOpts" :key="s" :value="s">{{ s }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>车牌号</label><input v-model="xferForm.plate" :readonly="!!xferForm.waybillNo" :placeholder="xferForm.waybillNo ? '' : '未选运单时可手录'" /></div>
+                  <div class="field"><label>车挂号</label><input v-model="xferForm.trailer" :readonly="!!xferForm.waybillNo" placeholder="无挂车填 —" /></div>
+                  <div class="field"><label>司机姓名</label><input v-model="xferForm.driver" :readonly="!!xferForm.waybillNo" /></div>
+                  <div class="field"><label>司机电话</label><input v-model="xferForm.phone" :readonly="!!xferForm.waybillNo" placeholder="11位手机号" /></div>
+                  <div class="field"><label>司机身份证号</label><input v-model="xferForm.driverId" :readonly="!!xferForm.waybillNo" placeholder="18位身份证" /></div>
+                  <p class="hint" style="margin:0 0 8px">有运单时承运信息只读带出；无运单时可手动填写（对齐采购入库）</p>
+                </div>
                 <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
                   <span>物料明细（{{ (xferForm.lines||[]).length }} 行）</span>
                   <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openXferMatPicker">+ 添加物料</button>
@@ -1338,6 +1411,295 @@ body.remarks-open .demo-scope-tip{display:none}
                       </div>
                     </div>
                     <p v-if="!(filteredXferLotOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">{{ xferForm.fromWh ? '暂无可用批次' : '请先选择调出仓库' }}</p>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- ===== 物料转序 · 新增/编辑转序通知单（对齐 PC） ===== -->
+            <template v-else-if="view==='seq-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backSeqForm">←</button>
+                <div class="m-nav__title">{{ seqFormMode==='edit' ? '编辑转序通知单' : '新增转序通知单' }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field"><label>转序单号</label><input :value="seqForm.id || '保存后系统生成'" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>单据类型</label>
+                    <select v-model="seqForm.seqType" @change="onSeqTypeChange">
+                      <option v-for="o in seqDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label><span v-if="seqForm.seqType==='编码转换'" class="req">*</span>新物料编码</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input :value="seqForm.newMatCode || ''" readonly :placeholder="seqForm.seqType==='编码转换' ? '点击选择新物料' : '选填，点击选择'" style="flex:1" @click="openSeqMatPicker" />
+                      <button type="button" class="btn-sm" @click="openSeqMatPicker">选择</button>
+                      <button type="button" class="btn-sm" v-if="seqForm.newMatCode" @click="clearSeqMat">清空</button>
+                    </div>
+                  </div>
+                  <div class="field"><label>新物料名称</label><input :value="seqForm.newMatName || '—'" readonly /></div>
+                  <div class="field"><label>新物料规格</label><input :value="seqForm.newMatSpec || '—'" readonly /></div>
+                  <div class="field"><label>新物料种类</label><input :value="seqForm.newMatKind || '—'" readonly /></div>
+                  <div class="field"><label>新批号</label><input v-model="seqForm.newLot" maxlength="50" placeholder="选填" /></div>
+                  <div class="field"><label>新生产日期</label><input type="date" v-model="seqForm.newProdDate" @change="recalcSeqExpire" /></div>
+                  <div class="field"><label>新有效期</label><input :value="seqForm.newValidPeriod || '—'" readonly /></div>
+                  <div class="field"><label>新失效日期</label><input :value="seqForm.newExpireDate || '—'" readonly /></div>
+                  <div class="field"><label>转序说明</label><input v-model="seqForm.seqRemark" maxlength="200" placeholder="选填" /></div>
+                  <div class="field"><label>备注</label><input v-model="seqForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backSeqForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveSeqNotice">确认保存</button>
+              </div>
+              <div v-if="seqMatPickerVisible" class="m-sheet-mask" @click.self="seqMatPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd">
+                    <span>选择新物料</span>
+                    <button type="button" class="m-sheet__close" @click="seqMatPickerVisible=false">×</button>
+                  </div>
+                  <div class="m-search" style="margin:10px 12px 0">
+                    <input v-model="seqMatPickerKw" placeholder="搜索编码 / 名称 / 规格" />
+                  </div>
+                  <div class="m-sheet__body">
+                    <div
+                      v-for="m in filteredSeqMatOptions"
+                      :key="m.code"
+                      class="line-card m-sheet__item"
+                      @click="selectSeqMat(m)"
+                    >
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">物料编码：</span>{{ m.code }}</div>
+                        <div><span class="k">物料名称：</span>{{ m.name }}</div>
+                        <div><span class="k">规格/种类：</span>{{ m.spec }} / {{ m.kind }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredSeqMatOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可选物料</p>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+
+            <!-- ===== 其他出入库 · 新增/编辑通知单（对齐 PC） ===== -->
+            <template v-else-if="view==='move-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backMoveForm">←</button>
+                <div class="m-nav__title">{{ moveFormMode==='edit' ? '编辑移库通知单' : '新增移库通知单' }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field"><label>移库单号</label><input :value="moveForm.id || '保存后系统生成'" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>单据类型</label>
+                    <select v-model="moveForm.moveType">
+                      <option v-for="o in moveDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label><span class="req">*</span>移入仓库</label>
+                    <select v-model="moveForm.toWhCode" @change="onMoveWhChange">
+                      <option value="">请选择移入仓库</option>
+                      <option v-for="w in warehouseOptions" :key="'mv-'+w.code" :value="w.code">{{ w.label || (w.code + ' - ' + w.name) }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>移入库位</label>
+                    <select v-model="moveForm.toLoc" :disabled="!moveForm.toWhCode">
+                      <option value="">{{ moveForm.toWhCode ? '请选择（选填）' : '请先选择移入仓库' }}</option>
+                      <option v-for="loc in moveLocOptions" :key="'mv-loc-'+loc" :value="loc">{{ loc }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>计划执行日期</label><input type="date" v-model="moveForm.planDate" /></div>
+                  <div class="field"><label>备注</label><input v-model="moveForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backMoveForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveMoveNotice">确认保存</button>
+              </div>
+            </template>
+
+            <template v-else-if="view==='insp-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backInspForm">←</button>
+                <div class="m-nav__title">{{ inspFormMode==='edit' ? '编辑巡检计划' : '新增巡检计划' }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基本信息</div>
+                  <div class="field" v-if="inspFormMode==='edit'"><label>计划单号</label><input :value="inspPlanForm.id" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>巡检方案名称</label>
+                    <select v-model="inspPlanForm.schemeName" :disabled="inspFormMode==='edit'" @change="onInspSchemeChange">
+                      <option value="">请选择巡检方案</option>
+                      <option v-for="s in inspEnabledSchemes" :key="s.name" :value="s.name">{{ s.name }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>内容描述</label><input :value="inspPlanForm.contentDesc || '—'" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>目标仓库</label>
+                    <select v-model="inspPlanForm.whCode" :disabled="inspFormMode==='edit' || !inspPlanForm.schemeName" @change="onInspWhChange">
+                      <option value="">{{ inspPlanForm.schemeName ? '请选择目标仓库' : '请先选择巡检方案' }}</option>
+                      <option v-for="w in inspSchemeWhOptions" :key="w.code" :value="w.code">{{ w.code }} - {{ w.name }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>仓库编号</label><input :value="inspPlanForm.whCode || '—'" readonly /></div>
+                  <div class="field"><label>仓库类型</label><input :value="inspPlanForm.whType || '—'" readonly /></div>
+                  <div class="field"><label>负责人</label><input :value="inspPlanForm.owner || '—'" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>计划时间</label><input type="datetime-local" v-model="inspPlanForm.planDateLocal" /></div>
+                  <div class="field">
+                    <label><span class="req">*</span>该计划是否影响后续巡检方案执行</label>
+                    <div class="radio-group" style="display:flex;flex-direction:column;gap:8px;padding:6px 0;">
+                      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;"><input type="radio" value="临时计划，不更新" v-model="inspPlanForm.affectNext" /> 临时计划，不更新（默认）</label>
+                      <label style="display:flex;align-items:center;gap:6px;font-weight:normal;"><input type="radio" value="循环计划，更新" v-model="inspPlanForm.affectNext" /> 循环计划，更新</label>
+                    </div>
+                  </div>
+                  <div class="field"><label>备注</label><input v-model="inspPlanForm.remark" maxlength="200" placeholder="选填" /></div>
+                </div>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backInspForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveInspPlan">确认保存</button>
+              </div>
+            </template>
+
+            <template v-else-if="view==='oth-form'">
+              <div class="m-nav">
+                <button class="m-nav__back" @click="backOthForm">←</button>
+                <div class="m-nav__title">{{ (othFormMode==='edit' ? '编辑' : '新增') + (isOthOutDoc ? '其他出库通知单' : '其他入库通知单') + (flowId.includes('count') ? '-计数' : (flowId.includes('tank') ? '-罐区' : '')) }}</div>
+              </div>
+              <div class="m-scroll">
+                <div class="sec">
+                  <div class="sec__title">基础信息</div>
+                  <div class="field"><label>单号</label><input :value="othForm.id || '保存后系统生成'" readonly /></div>
+                  <div class="field"><label><span class="req">*</span>单据类型</label>
+                    <select v-model="othForm.docType">
+                      <option v-for="o in othDocTypeOptions" :key="o" :value="o">{{ o }}</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>是否需要装卸货 <span class="req">*</span></label>
+                    <div class="radio-group" style="display:flex;gap:16px;align-items:center;padding:6px 0;">
+                      <label style="display:flex;align-items:center;gap:4px;font-weight:normal;"><input type="radio" value="是" v-model="othForm.isLoadingRequired" /> 是（下推装卸单）</label>
+                      <label style="display:flex;align-items:center;gap:4px;font-weight:normal;"><input type="radio" value="否" v-model="othForm.isLoadingRequired" /> 否</label>
+                    </div>
+                  </div>
+                  <div class="field"><label><span class="req">*</span>{{ isOthOutDoc ? '出库方向' : '入库方向' }}</label>
+                    <select v-model="othForm.direction" @change="onOthDirectionChange">
+                      <option value="厂外">厂外</option>
+                      <option value="线边仓">线边仓</option>
+                    </select>
+                  </div>
+                  <div class="field" v-if="othForm.direction==='线边仓'"><label>领至线边仓</label>
+                    <select v-model="othForm.lineSideLoc">
+                      <option value="">请选择线边仓</option>
+                      <option v-for="w in lineSideWhOptions" :key="'oth-ls-'+w" :value="w">{{ w }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>计划执行日期</label><input type="date" v-model="othForm.planDate" /></div>
+                  <div class="field"><label>受益人</label>
+                    <select v-model="othForm.beneficiary" @change="onOthBeneficiaryChange">
+                      <option v-for="p in othPeopleOptions" :key="p.name" :value="p.name">{{ p.name }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>受益部门</label>
+                    <select v-model="othForm.beneficiaryDept">
+                      <option v-for="d in othDeptOptions" :key="d" :value="d">{{ d }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>受益项目</label>
+                    <select v-model="othForm.beneficiaryProject">
+                      <option value="">请选择（选填）</option>
+                      <option v-for="p in othProjectOptions" :key="p" :value="p">{{ p }}</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>生产相关</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-weight:normal;padding:6px 0;">
+                      <input type="checkbox" v-model="othForm.prodRelated" /> 是（与生产制造关联）
+                    </label>
+                  </div>
+                  <div class="field"><label>备注</label><input v-model="othForm.remark" maxlength="200" placeholder="选填，最多200字" /></div>
+                </div>
+                <div class="sec">
+                  <div class="sec__title">派车与承运信息</div>
+                  <div class="field"><label>关联运单</label>
+                    <select v-model="othForm.waybillNo" @change="onOthWaybillChange">
+                      <option value="">请选择（选填）</option>
+                      <option v-for="w in othWaybillOpts" :key="w.code" :value="w.code">{{ w.code }}</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>关联发货单</label>
+                    <select v-model="othForm.logisticsNo" :disabled="!othForm.waybillNo">
+                      <option value="">{{ othForm.waybillNo ? '请选择（选填）' : '请先选择关联运单' }}</option>
+                      <option v-for="s in othShipOpts" :key="s" :value="s">{{ s }}</option>
+                    </select>
+                  </div>
+                  <div class="field" v-if="!othForm.waybillNo">
+                    <label>车辆与司机</label>
+                    <div style="display:flex;gap:8px;">
+                      <button type="button" class="btn-sm" @click="openOthVehiclePicker">选择车辆与司机</button>
+                      <button type="button" class="btn-sm" v-if="othForm.plate" @click="clearOthVehicle">清空</button>
+                    </div>
+                    <p class="hint" style="margin:6px 0 0">承运信息只读带入；有运单时由运单带出，无运单时点选车辆与司机（对齐销售出入库）</p>
+                  </div>
+                  <div class="field"><label>承运商</label><input :value="othForm.carrier || '—'" readonly /></div>
+                  <div class="field"><label>车牌号</label><input :value="othForm.plate || '—'" readonly /></div>
+                  <div class="field"><label>车挂号</label><input :value="othForm.trailer || '—'" readonly /></div>
+                  <div class="field"><label>司机姓名</label><input :value="othForm.driver || '—'" readonly /></div>
+                  <div class="field"><label>司机电话</label><input :value="othForm.phone || '—'" readonly /></div>
+                  <div class="field"><label>司机身份证号</label><input :value="maskIdCardApp(othForm.driverId) || '—'" readonly /></div>
+                </div>
+                <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
+                  <span>物料明细（{{ (othForm.lines||[]).length }} 行）</span>
+                  <button type="button" class="m-nav__right" style="position:static;transform:none;margin:0;padding:0;height:auto" @click="openOthMatPicker">+ 添加物料</button>
+                </div>
+                <div v-for="(ln, idx) in othForm.lines" :key="'oth-ln-'+idx" class="line-card" style="cursor:default">
+                  <button type="button" class="scan-op-del" style="position:absolute;right:12px;top:10px" @click="removeOthFormLine(idx)">删除</button>
+                  <div class="line-fields" style="padding-right:48px">
+                    <div><span class="k">物料编码：</span>{{ ln.code }}</div>
+                    <div><span class="k">物料名称：</span>{{ ln.name }}</div>
+                    <div><span class="k">规格/单位：</span>{{ ln.spec }} / {{ ln.unit }}</div>
+                    <div><span class="k">管理方式：</span>{{ ln.manageMode }}</div>
+                  </div>
+                  <div class="field" style="padding:0 0 8px" v-if="flowId.includes('count')"><label>计划件数</label><input value="—" readonly /></div>
+                  <div class="field" style="padding:0 0 8px" v-else><label>计划件数</label><input v-model.number="ln.planPcs" type="number" min="0" placeholder="选填" /></div>
+                  <div class="field" style="padding:0 0 8px"><label><span class="req">*</span>计划数量</label><input v-model.number="ln.planQty" type="number" min="0.01" step="0.001" /></div>
+                  <div class="field" style="padding:0"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
+                </div>
+                <p v-if="!(othForm.lines||[]).length" class="hint" style="text-align:center">请至少添加一行物料明细</p>
+              </div>
+              <div class="m-footer" style="display:flex;gap:10px">
+                <button type="button" class="btn-ghost" style="flex:1" @click="backOthForm">取消</button>
+                <button type="button" class="btn-primary" style="flex:1" @click="saveOthNotice">确认保存</button>
+              </div>
+              <div v-if="othMatPickerVisible" class="m-sheet-mask" @click.self="othMatPickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd"><span>选择物料</span><button type="button" class="m-sheet__close" @click="othMatPickerVisible=false">×</button></div>
+                  <div class="m-search" style="margin:10px 12px 0"><input v-model="othMatPickerKw" placeholder="搜索编码 / 名称 / 规格" /></div>
+                  <div class="m-sheet__body">
+                    <div v-for="m in filteredOthMatOptions" :key="m.code" class="line-card m-sheet__item" :class="{ 'is-disabled': isOthMatAlreadyAdded(m.code) }" @click="selectOthMat(m)">
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">物料编码：</span>{{ m.code }}</div>
+                        <div><span class="k">物料名称：</span>{{ m.name }}</div>
+                        <div><span class="k">规格/单位：</span>{{ m.spec }} / {{ m.unit }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredOthMatOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无可选物料</p>
+                  </div>
+                </div>
+              </div>
+              <div v-if="othVehiclePickerVisible" class="m-sheet-mask" @click.self="othVehiclePickerVisible=false">
+                <div class="m-sheet" @click.stop>
+                  <div class="m-sheet__hd"><span>选择车辆与司机</span><button type="button" class="m-sheet__close" @click="othVehiclePickerVisible=false">×</button></div>
+                  <div class="m-search" style="margin:10px 12px 0"><input v-model="othVehiclePickerKw" placeholder="搜索车牌 / 司机" /></div>
+                  <div class="m-sheet__body">
+                    <div v-for="v in filteredOthVehicleOptions" :key="v.plate" class="line-card m-sheet__item" @click="selectOthVehicle(v)">
+                      <div class="line-fields" style="padding-right:0">
+                        <div><span class="k">车牌：</span>{{ v.plate }}　<span class="k">挂车：</span>{{ v.trailer || '—' }}</div>
+                        <div><span class="k">司机：</span>{{ v.driver }} / {{ v.phone }}</div>
+                      </div>
+                    </div>
+                    <p v-if="!(filteredOthVehicleOptions||[]).length" class="hint" style="text-align:center;padding:24px 8px">暂无车辆</p>
                   </div>
                 </div>
               </div>
@@ -1889,6 +2251,29 @@ body.remarks-open .demo-scope-tip{display:none}
                       <div><span class="doc-label">调入仓库</span>{{ currentNotice.toWh || '—' }}</div>
                       <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
                       <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div><span class="doc-label">关联运单</span>{{ currentNotice.waybillNo || '—' }}</div>
+                      <div><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ currentNotice.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
+                      <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
+                    </div>
+                    <div class="doc-grid" v-else-if="isOthDoc">
+                      <div><span class="doc-label">往来单位</span>{{ currentNotice.partner || currentNotice.supplier || '—' }}</div>
+                      <div><span class="doc-label">计划执行日期</span>{{ currentNotice.planDate }}</div>
+                      <div v-if="isOthInDoc"><span class="doc-label">入库方向</span>{{ currentNotice.direction || '—' }}</div>
+                      <div v-if="isOthInDoc && currentNotice.direction==='线边仓'"><span class="doc-label">领至线边仓</span>{{ currentNotice.lineSideLoc || '—' }}</div>
+                      <div v-if="isOthOutDoc"><span class="doc-label">出库方向</span>{{ currentNotice.direction || '—' }}</div>
+                      <div><span class="doc-label">单据类型</span>{{ currentNotice.docType }}</div>
+                      <div><span class="doc-label">关联运单</span>{{ currentNotice.waybillNo || '—' }}</div>
+                      <div><span class="doc-label">关联发货单</span>{{ currentNotice.logisticsNo || '—' }}</div>
+                      <div><span class="doc-label">车牌号</span>{{ currentNotice.plate || '—' }}</div>
+                      <div><span class="doc-label">车挂号</span>{{ currentNotice.trailer || '—' }}</div>
+                      <div><span class="doc-label">司机姓名</span>{{ currentNotice.driver || '—' }}</div>
+                      <div><span class="doc-label">司机电话</span>{{ currentNotice.phone || '—' }}</div>
+                      <div class="full"><span class="doc-label">司机身份证号</span>{{ maskIdCardApp(currentNotice.driverId) }}</div>
                       <div class="full"><span class="doc-label">备注</span>{{ currentNotice.remark || '—' }}</div>
                     </div>
                     <div class="doc-grid" v-else-if="isProdPickDoc">
@@ -3157,29 +3542,27 @@ body.remarks-open .demo-scope-tip{display:none}
               <div class="m-scroll">
                 <div class="sec">
                   <div class="sec__title">基本信息</div>
-                  <div class="field"><label>单据类型</label><input :value="currentNotice.docType" readonly /></div>
-                  <div class="field"><label>移出仓库</label><input :value="currentNotice.fromWh || currentNotice.partner" readonly /></div>
-                  <div class="field"><label>移出库位</label><input :value="currentNotice.fromLoc || '—'" readonly /></div>
-                  <div class="field"><label>移入仓库</label><input :value="currentNotice.toWh || currentNotice.refNo" readonly /></div>
-                  <div class="field"><label>移入库位</label><input :value="currentNotice.toLoc || '—'" readonly /></div>
+                  <div class="field"><label>单据类型</label><input :value="currentNotice.moveType || currentNotice.docType || '标准移库'" readonly /></div>
+                  <div class="field"><label>移入仓库编码</label><input :value="currentNotice.toWhCode || currentNotice.toWh || currentNotice.partner || '—'" readonly /></div>
+                  <div class="field"><label>移入库位编码</label><input :value="currentNotice.toLoc || currentNotice.refNo || '—'" readonly /></div>
                   <div class="field"><label>备注</label><input :value="currentNotice.remark || '—'" readonly /></div>
                 </div>
                 <div class="sec">
                   <div class="sec__title">添加物料</div>
-                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，回车确认" @keyup.enter="addInnerScan" /></div>
-                  <div class="field"><label>包材编号</label><input v-model="form.pkgNo" placeholder="手动输入，回车确认" @keyup.enter="addInnerScan" /></div>
+                  <div class="field"><label>条码号</label><input v-model="form.barcode" placeholder="扫码/输入，扫码自动对焦，回车" @keyup.enter="addInnerScan" /></div>
                 </div>
                 <div class="stat-bar"><span>扫码件数：{{ innerRows.length }}</span><span>扫码数量：{{ innerQtySum }}</span></div>
                 <div class="sec" style="padding:0;overflow:hidden">
                   <div class="table-scroll">
                     <table class="scan-table">
-                      <thead><tr><th>条码号</th><th>包材编号</th><th>物料编码</th><th>数量</th><th class="col-op">操作</th></tr></thead>
+                      <thead><tr><th>条码号</th><th>物料编码</th><th>数量</th><th>原库位</th><th>外包材编号</th><th class="col-op">操作</th></tr></thead>
                       <tbody>
                         <tr v-for="(r,i) in innerRows" :key="'inner-'+i">
                           <td>{{ r.barcode }}</td>
-                          <td>{{ r.pkgNo }}</td>
                           <td>{{ r.code }}</td>
                           <td>{{ r.qty }}</td>
+                          <td>{{ r.fromLoc || '—' }}</td>
+                          <td>{{ r.pkgNo || '—' }}</td>
                           <td class="col-op"><button type="button" class="scan-op-del" @click.stop="removeScanRow('inner', i)">删除</button></td>
                         </tr>
                       </tbody>
@@ -3187,7 +3570,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   </div>
                 </div>
                 <div class="sec">
-                  <div class="field"><label>备注</label><input v-model="form.remark" /></div>
+                  <div class="field"><label>备注</label><input v-model="form.remark" placeholder="输入" /></div>
                   <div class="field"><label><span class="req">*</span>操作人</label><input :value="operator" readonly /></div>
                 </div>
               </div>
@@ -4796,6 +5179,10 @@ createApp({
       docs: ['单据页', '页面 1：单据页', '页面结构'],
       'po-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'xfer-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'seq-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'move-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'insp-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
+      'oth-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'gen-doc-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'prod-pick-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
       'prod-in-form': ['新增编辑页', '新增编辑', '页面 2：新增编辑页'],
@@ -4977,6 +5364,13 @@ createApp({
     const isXferCount = computed(() => flowId.value === 'xfer-count');
     const isXferSerialDoc = computed(() => isXferSerial.value);
     const isXferCountDoc = computed(() => isXferCount.value);
+    const isInnerXferDoc = computed(() => flowId.value === 'inner-xfer');
+    const isInnerMoveDoc = computed(() => flowId.value === 'inner-move');
+    const isInspDoc = computed(() => flowId.value === 'wh-insp' || flowMode.value === 'insp');
+    const isOthInDoc = computed(() => String(flowId.value || '').startsWith('oth-in'));
+    const isOthOutDoc = computed(() => String(flowId.value || '').startsWith('oth-out'));
+    const isOthDoc = computed(() => isOthInDoc.value || isOthOutDoc.value);
+
     const isXferSerialPick = computed(() => flowMeta.value.execVariant === 'xfer-serial');
     const isXferCountExec = computed(() => flowMeta.value.execVariant === 'xfer-count');
     /** 出库类流水码（退料出库 / 委外发料 / 委外退货 / 受托退料 / 销售预出货 / 销售发货 / 其他出库）共用扫码执行逻辑；委外退货源库位由条码档案带出 */
@@ -5016,9 +5410,12 @@ createApp({
     }
     const isRestAppDoc = computed(() => {
       const id = String(flowId.value || '');
-      // 受托收/退、销售预出货/发货/退货等已并入通知单路径，不再走 gen-doc-form
-      if (id === 'trust-recv-serial' || id === 'trust-recv-count' || id === 'trust-recv-tank' || id === 'trust-ret-serial' || id === 'trust-ret-count' || id === 'so-preout-serial' || id === 'so-preout-count' || id === 'so-ship-serial' || id === 'so-ship-count' || id === 'so-rma-serial' || id === 'so-rma-count' || id === 'xfer-serial') return false;
-      return /^(trust-|so-ship-|so-rma-|oth-|stock-take$|wh-load$|pkg-scrap$|pkg-freeze$|pkg-unfreeze$)/.test(id);
+      // 受托收/退、销售预出货/发货/退货、直接调拨等已并入专用表单路径，不再走 gen-doc-form
+      if (id === 'trust-recv-serial' || id === 'trust-recv-count' || id === 'trust-recv-tank' || id === 'trust-ret-serial' || id === 'trust-ret-count' || id === 'so-preout-serial' || id === 'so-preout-count' || id === 'so-ship-serial' || id === 'so-ship-count' || id === 'so-rma-serial' || id === 'so-rma-count' || id === 'xfer-serial' || id === 'xfer-count') return false;
+      if (id.startsWith('oth-')) return false;
+      // 库存盘点仅执行 PC 下发单据，不走 APP 通用建单
+      if (id === 'stock-take') return false;
+      return /^(trust-|so-ship-|so-rma-|wh-load$|pkg-scrap$|pkg-freeze$|pkg-unfreeze$)/.test(id);
     });
     const isPoNoticeSerial = computed(() => isPoInSerial.value || isPoRetSerial.value || isOsIssueSerial.value || isOsRetSerial.value || isOsRecvSerial.value || isOsRmaSerial.value || flowId.value === 'prod-ret-serial' || isTrustRecvSerial.value || isTrustRetSerial.value || isSoPreoutSerial.value || isSoShipSerial.value || isSoRmaSerial.value);
     /** 收货类明细需维护批号/生产日期/有效期/厂家；销售预出货/发货对齐 PC 不含产日效期厂家 */
@@ -5933,7 +6330,7 @@ createApp({
         list = list.filter(n => n.docType === want);
       }
       if (flowMode.value === 'waybill') hydrateWaybillsFromPcMock();
-      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isLoadFlow.value) {
+      if (isPoNoticeDoc.value || isProdPickDoc.value || isProdRetDoc.value || isXferSerialDoc.value || isXferCountDoc.value || isOthDoc.value || isLoadFlow.value) {
         const mergeKeys = whMergeKeysForDocsKey(key);
         mergeKeys.forEach((k) => hydrateWhNoticesFromPcMock(k));
         if (mergeKeys.length > 1) list = mergeWhNoticesById(mergeKeys);
@@ -6248,10 +6645,9 @@ createApp({
         if (draft && Array.isArray(draft.rows) && draft.rows.length) {
           innerRows.value = JSON.parse(JSON.stringify(draft.rows));
           form.remark = draft.remark || '';
-        } else if (flowMeta.value.innerType === 'xfer') {
-          innerRows.value = [];
         } else {
-          innerRows.value = [...CFG.innerScanRows];
+          // 转序 / 移库：无草稿时从空表明细起扫
+          innerRows.value = [];
         }
         currentLine.value = {};
         view.value = 'exec';
@@ -6957,11 +7353,39 @@ createApp({
           carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '', isLoadingRequired: '否', lines: [],
         });
       } else {
-        Object.assign(genDocForm, {
-          id: '', partner: '', refNo: '', logisticsNo: '', planDate: ymd, planStart: ymd + 'T08:00', planEnd: '', planPcs: null,
-          remark: '', docType: firstNoticeDocType(), takeMode: '条码盘点', whBiz: '', waybillNo: '',
-          carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '', isLoadingRequired: '是', lines: [],
-        });
+        if (mode === 'edit' && n) {
+          if (n.status && n.status !== '待执行') {
+            ElementPlus.ElMessage.warning('仅待执行单据可编辑');
+            return;
+          }
+          const planStartSrc = String(n.planStart || n.planDate || '').trim();
+          Object.assign(genDocForm, {
+            id: n.id || '',
+            partner: n.partner || n.supplier || '',
+            refNo: (n.refNo && n.refNo !== '—') ? n.refNo : '',
+            logisticsNo: (n.logisticsNo && n.logisticsNo !== '—') ? n.logisticsNo : '',
+            planDate: n.planDate || ymd,
+            planStart: planStartSrc
+              ? planStartSrc.replace(' ', 'T').slice(0, 16)
+              : (ymd + 'T08:00'),
+            planEnd: '',
+            planPcs: n.planPcs != null ? n.planPcs : null,
+            remark: (n.remark && n.remark !== '—') ? n.remark : '',
+            docType: n.docType || firstNoticeDocType(),
+            takeMode: n.takeMode || '条码盘点',
+            whBiz: '',
+            waybillNo: '',
+            carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
+            isLoadingRequired: n.isLoadingRequired || '是',
+            lines: n.lines ? JSON.parse(JSON.stringify(n.lines)) : [],
+          });
+        } else {
+          Object.assign(genDocForm, {
+            id: '', partner: '', refNo: '', logisticsNo: '', planDate: ymd, planStart: ymd + 'T08:00', planEnd: '', planPcs: null,
+            remark: '', docType: firstNoticeDocType(), takeMode: '条码盘点', whBiz: '', waybillNo: '',
+            carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '', isLoadingRequired: '是', lines: [],
+          });
+        }
       }
       genPickerVisible.value = false;
       view.value = 'gen-doc-form';
@@ -7135,19 +7559,20 @@ createApp({
       }
       const key = flowMeta.value.docsKey || 'default';
       const list = (CFG.docsMap && CFG.docsMap[key]) || [];
-      const seq = String(list.length + 1).padStart(4, '0');
+      const isEdit = genDocFormMode.value === 'edit' && genDocForm.id;
       const d = new Date();
       const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-      const id = restDocPrefix() + ymd + seq;
+      const id = isEdit ? genDocForm.id : (restDocPrefix() + ymd + String(list.length + 1).padStart(4, '0'));
       if (String(flowId.value || '') === 'stock-take') {
         const planStartRaw = String(genDocForm.planStart || '').trim();
         const planStart = planStartRaw
           ? planStartRaw.replace('T', ' ').slice(0, 16)
           : (ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8) + ' 08:00');
+        const existing = isEdit ? list.find(x => x.id === id) : null;
         const row = {
           id,
-          status: '待执行',
-          createTime: appNowStr(),
+          status: (existing && existing.status) || '待执行',
+          createTime: (existing && existing.createTime) || appNowStr(),
           partner: genDocForm.partner,
           supplier: genDocForm.partner,
           refNo: genDocForm.docType || firstNoticeDocType() || '全盘',
@@ -7158,44 +7583,70 @@ createApp({
           logisticsNo: '',
           materialSummary: (genDocForm.partner || '') + ' · ' + (genDocForm.takeMode || '条码盘点'),
           remark: genDocForm.remark || '—',
-          creator: operator.value || '张三',
-          planPcs: 0,
-          donePcs: 0,
-          pendingPcs: 0,
-          stockRows: [],
-          lines: [],
+          creator: (existing && existing.creator) || operator.value || '张三',
+          planPcs: (existing && existing.planPcs) || 0,
+          donePcs: (existing && existing.donePcs) || 0,
+          pendingPcs: (existing && existing.pendingPcs) || 0,
+          stockRows: (existing && existing.stockRows) || [],
+          lines: (existing && existing.lines) || [],
         };
-        list.unshift(row);
+        if (isEdit) {
+          const idx = list.findIndex(x => x.id === id);
+          if (idx >= 0) list.splice(idx, 1, row);
+          else list.unshift(row);
+        } else {
+          list.unshift(row);
+        }
         if (CFG.docsMap) CFG.docsMap[key] = list;
         bumpStore();
         view.value = 'docs';
-        ElementPlus.ElMessage.success('库存盘点单创建成功');
+        ElementPlus.ElMessage.success(isEdit ? '库存盘点单修改成功' : '库存盘点单创建成功');
         return;
       }
+      const existing = isEdit ? list.find(x => x.id === id) : null;
       const row = {
         id,
-        status: '待执行',
-        createTime: appNowStr(),
+        status: (existing && existing.status) || '待执行',
+        createTime: (existing && existing.createTime) || appNowStr(),
         partner: genDocForm.partner,
         supplier: genDocForm.partner,
         refNo: genDocForm.refNo || '—',
         planDate: genDocForm.planDate || ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8),
         docType: genDocForm.docType || restDocType(),
         logisticsNo: genDocForm.logisticsNo || '',
-        materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
+        materialSummary: (existing && existing.materialSummary) || 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
         remark: genDocForm.remark || '—',
-        lines: [],
+        isLoadingRequired: genDocForm.isLoadingRequired || '是',
+        lines: (existing && existing.lines)
+          ? existing.lines
+          : ((genDocForm.lines && genDocForm.lines.length)
+            ? JSON.parse(JSON.stringify(genDocForm.lines))
+            : []),
       };
-      const sample = list[0];
-      if (sample && sample.lines) {
-        row.lines = JSON.parse(JSON.stringify(sample.lines)).map(ln => ({ ...ln, status: '待执行', doneQty: 0, remainQty: ln.planQty || ln.remainQty || 0 }));
+      if (!(row.lines || []).length) {
+        const sample = list.find(x => x.id !== id) || list[0];
+        if (sample && sample.lines) {
+          row.lines = JSON.parse(JSON.stringify(sample.lines)).map(ln => ({ ...ln, status: '待执行', doneQty: 0, remainQty: ln.planQty || ln.remainQty || 0 }));
+        }
       }
-      list.unshift(row);
+      if (existing && existing.materialSummary) row.materialSummary = existing.materialSummary;
+      else if ((row.lines || []).length) {
+        row.materialSummary = row.lines.map(ln => [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / ')).join('；');
+      }
+      if (isEdit) {
+        const idx = list.findIndex(x => x.id === id);
+        if (idx >= 0) list.splice(idx, 1, row);
+        else list.unshift(row);
+      } else {
+        list.unshift(row);
+      }
       if (CFG.docsMap) CFG.docsMap[key] = list;
-      const pushed = maybePushAppLoadNotice(Object.assign({}, row, { isLoadingRequired: genDocForm.isLoadingRequired || '是' }), true);
+      const pushed = !isEdit && maybePushAppLoadNotice(Object.assign({}, row, { isLoadingRequired: genDocForm.isLoadingRequired || '是' }), true);
       bumpStore();
       view.value = 'docs';
-      ElementPlus.ElMessage.success(pushed ? ('已保存单据 ' + id + '，已同步下推装卸货通知单') : ('已保存单据 ' + id));
+      ElementPlus.ElMessage.success(isEdit
+        ? ('单据修改成功：' + id)
+        : (pushed ? ('已保存单据 ' + id + '，已同步下推装卸货通知单') : ('已保存单据 ' + id)));
     }
     function searchPkgArch() {
       if (!pkgSearch.pkgNo.trim()) {
@@ -11054,21 +11505,45 @@ createApp({
         toast('扫码录入成功，流水已生成，扫码件数与扫码数量已更新');
         return;
       }
-      const code = bc || pkg;
-      if (!code) return;
-      if (innerRows.value.some((r) => r.barcode === bc || (pkg && r.pkgNo === pkg))) {
-        ElementPlus.ElMessage.error('当前条码/包材编号已存在，不可重复录入');
+      // 货物移库：仅流水码档案；原库位由档案带出
+      hydrateSerialArchFromPcMock();
+      const hit = (CFG.serialArchRows || []).find((r) => r && bc && r.barcode === bc);
+      if (!hit) {
+        // 储罐拦截（Demo：编码含 CG- / 储罐）
+        const looksTank = /^CG-/i.test(bc) || /储罐/.test(bc);
+        ElementPlus.ElMessage.error(looksTank ? '储罐不支持货物移库，请扫描流水码档案条码' : '未找到流水码档案');
         return;
       }
+      if (hit.useStatus !== '在用' || (hit.stockStatus !== '仓库' && hit.stockStatus !== '库内')) {
+        ElementPlus.ElMessage.error('该条码当前档案状态不允许移库扫码');
+        return;
+      }
+      if (hit.step) {
+        ElementPlus.ElMessage.error('该条码已被其他作业占用，不可移库');
+        return;
+      }
+      const toLoc = (currentNotice.value && (currentNotice.value.toLoc || currentNotice.value.refNo)) || '';
+      const fromLoc = hit.loc || hit.storageLoc || hit.location || '—';
+      if (toLoc && fromLoc && fromLoc !== '—' && String(fromLoc) === String(toLoc)) {
+        ElementPlus.ElMessage.error('该条码已在目标库位，无需移库');
+        return;
+      }
+      if (innerRows.value.some((r) => r.barcode === hit.barcode)) {
+        ElementPlus.ElMessage.error('当前条码已存在，不可重复录入');
+        return;
+      }
+      const matCode = (hit.material || '').split('/')[0].trim() || hit.material || '—';
       innerRows.value.push({
-        barcode: bc || ('SC' + String(100 + innerRows.value.length)),
-        pkgNo: pkg || '—',
-        code: 'RM-DEMO',
-        qty: 10,
+        barcode: hit.barcode,
+        pkgNo: hit.pkgNo || hit.outerPkg || '—',
+        code: matCode,
+        material: hit.material || matCode,
+        qty: Number(hit.qty || hit.archiveQty || 0) || 0,
+        fromLoc: fromLoc,
       });
       form.barcode = '';
       form.pkgNo = '';
-      toast('已添加移库明细');
+      toast('扫码录入成功');
     }
     function openProcess(row) {
       if (isPoNoticeSerial.value || isLineSidePick.value || isXferSerialPick.value) {
@@ -13636,8 +14111,36 @@ createApp({
     ];
     const xferFormMode = ref('add');
     const xferForm = reactive({
-      id: '', docType: '直接调拨申请单', planDate: '', fromWh: '', toWh: '', remark: '', isLoadingRequired: '是', lines: [],
+      id: '', docType: '直接调拨申请单', planDate: '', fromWh: '', toWh: '', remark: '', isLoadingRequired: '是',
+      waybillNo: '', logisticsNo: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
+      lines: [],
     });
+    const xferWaybillOpts = computed(() => {
+      return (CFG.waybillOptions || []).filter((w) => !w.bizType || w.bizType === '直接调拨');
+    });
+    const xferShipOpts = computed(() => {
+      const w = (CFG.waybillOptions || []).find((x) => x.code === xferForm.waybillNo);
+      return (w && w.ships) || [];
+    });
+    function onXferWaybillChange() {
+      const w = (CFG.waybillOptions || []).find((x) => x.code === xferForm.waybillNo);
+      if (!w) {
+        xferForm.logisticsNo = '';
+        xferForm.plate = '';
+        xferForm.trailer = '';
+        xferForm.driver = '';
+        xferForm.phone = '';
+        xferForm.driverId = '';
+        return;
+      }
+      xferForm.plate = w.plate || '';
+      xferForm.trailer = w.trailer || '';
+      xferForm.driver = w.driver || '';
+      xferForm.phone = w.phone || '';
+      xferForm.driverId = w.driverId || '';
+      const ships = w.ships || [];
+      xferForm.logisticsNo = ships.length === 1 ? ships[0] : '';
+    }
     const xferMatPickerVisible = ref(false);
     const xferMatPickerKw = ref('');
     const xferLotPickerVisible = ref(false);
@@ -13715,6 +14218,13 @@ createApp({
           toWh: n.toWh || n.refNo || '',
           remark: (n.remark && n.remark !== '—') ? n.remark : '',
           isLoadingRequired: n.isLoadingRequired || '是',
+          waybillNo: (n.waybillNo && n.waybillNo !== '—') ? n.waybillNo : '',
+          logisticsNo: (n.logisticsNo && n.logisticsNo !== '—') ? n.logisticsNo : '',
+          plate: (n.plate && n.plate !== '—') ? n.plate : '',
+          trailer: (n.trailer && n.trailer !== '—') ? n.trailer : '',
+          driver: (n.driver && n.driver !== '—') ? n.driver : '',
+          phone: (n.phone && n.phone !== '—') ? n.phone : '',
+          driverId: (n.driverId && n.driverId !== '—') ? n.driverId : '',
           lines: JSON.parse(JSON.stringify((n.lines || []).map(ln => ({
             code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
             planPcs: ln.planPcs, planQty: ln.planQty, lot: ln.lot === '—' ? '' : (ln.lot || ''),
@@ -13728,7 +14238,9 @@ createApp({
         });
       } else {
         Object.assign(xferForm, {
-          id: '', docType: firstXferDocType(), planDate: todayYmd(), fromWh: '', toWh: '', remark: '', isLoadingRequired: '是', lines: [],
+          id: '', docType: firstXferDocType(), planDate: todayYmd(), fromWh: '', toWh: '', remark: '', isLoadingRequired: '是',
+          waybillNo: '', logisticsNo: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
+          lines: [],
         });
       }
       view.value = 'xfer-form';
@@ -13814,6 +14326,13 @@ createApp({
         调出仓库: n.fromWh || '—',
         调入仓库: n.toWh || '—',
         是否需要装卸货: n.isLoadingRequired || '是',
+        关联运单: n.waybillNo || '—',
+        关联发货单: n.logisticsNo || '—',
+        车牌号: n.plate || '—',
+        车挂号: n.trailer || '—',
+        司机姓名: n.driver || '—',
+        司机电话: n.phone || '—',
+        司机身份证号: n.driverId || '—',
         物料信息: n.materialSummary || '—',
         备注: n.remark || '—',
         _lines: (n.lines || []).map((ln) => ({
@@ -13850,6 +14369,18 @@ createApp({
         ElementPlus.ElMessage.error('计划数量必须为大于 0 的正数');
         return;
       }
+      if (!xferForm.waybillNo) {
+        const phone = String(xferForm.phone || '').trim();
+        if (phone && !/^1\d{10}$/.test(phone)) {
+          ElementPlus.ElMessage.error('请输入正确的 11 位手机号码');
+          return;
+        }
+        const idCard = String(xferForm.driverId || '').trim();
+        if (idCard && !/^\d{17}[\dXx]$/.test(idCard)) {
+          ElementPlus.ElMessage.error('请输入正确的 18 位身份证号');
+          return;
+        }
+      }
       const seen = new Set();
       for (const ln of (xferForm.lines || [])) {
         const lot = String(ln.lot || '').trim();
@@ -13881,6 +14412,13 @@ createApp({
         docType: xferForm.docType || firstXferDocType(),
         remark: xferForm.remark || '—',
         isLoadingRequired: xferForm.isLoadingRequired || '是',
+        waybillNo: xferForm.waybillNo || '—',
+        logisticsNo: xferForm.logisticsNo || '—',
+        plate: xferForm.plate || '—',
+        trailer: xferForm.trailer || '—',
+        driver: xferForm.driver || '—',
+        phone: xferForm.phone || '—',
+        driverId: xferForm.driverId || '—',
         materialSummary: summary,
         packSpec: isXferCountDoc.value ? '计数/无包材' : '吨袋+托架',
         lines: (xferForm.lines || []).map((ln, i) => ({
@@ -13920,6 +14458,882 @@ createApp({
       bumpStore();
       view.value = 'docs';
     }
+    const seqFormMode = ref('add');
+    const seqForm = reactive({
+      id: '', seqType: '编码转换',
+      newMatCode: '', newMatName: '', newMatSpec: '', newMatKind: '',
+      newLot: '', newProdDate: '', newValidMonths: '', newValidPeriod: '', newExpireDate: '',
+      seqRemark: '', remark: '',
+    });
+    const seqMatPickerVisible = ref(false);
+    const seqMatPickerKw = ref('');
+    const seqDocTypeOptions = computed(() => {
+      storeTick.value;
+      const D = window.WMS_DICT;
+      let opts = [];
+      if (D && typeof D.optionsFor === 'function') {
+        opts = D.optionsFor('inner-xfer', '单据类型', '', liveAppDict()) || [];
+      }
+      opts = (opts || []).filter((o) => o === '编码转换' || o === '批号转换');
+      return opts.length ? opts : ['编码转换', '批号转换'];
+    });
+    function firstSeqDocType() {
+      return (seqDocTypeOptions.value || [])[0] || '编码转换';
+    }
+    const filteredSeqMatOptions = computed(() => {
+      const kw = String(seqMatPickerKw.value || '').trim().toLowerCase();
+      const map = new Map();
+      [].concat(CFG.barcodeMatOptions || [], CFG.countMatOptions || []).forEach((m) => {
+        if (!m || !m.code || map.has(m.code)) return;
+        map.set(m.code, m);
+      });
+      let list = Array.from(map.values());
+      if (!kw) return list;
+      return list.filter((m) => [m.code, m.name, m.spec, m.kind].join(' ').toLowerCase().includes(kw));
+    });
+    function formatSeqValidPeriod(months) {
+      const n = Number(months);
+      if (!(n > 0)) return '';
+      return n + '月';
+    }
+    function calcSeqExpireDate(prodDate, months) {
+      const m = Number(months);
+      if (!prodDate || !(m > 0)) return '';
+      const d = new Date(String(prodDate) + 'T00:00:00');
+      if (Number.isNaN(d.getTime())) return '';
+      d.setMonth(d.getMonth() + m);
+      d.setDate(d.getDate() - 1);
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${mo}-${day}`;
+    }
+    function recalcSeqExpire() {
+      seqForm.newExpireDate = calcSeqExpireDate(seqForm.newProdDate, seqForm.newValidMonths);
+    }
+    function parseSeqMaterial(text) {
+      const parts = String(text || '').split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
+      if (!parts.length || parts[0] === '—') return { code: '', name: '', spec: '', kind: '' };
+      return { code: parts[0] || '', name: parts[1] || '', spec: parts[2] || '', kind: parts[3] || '' };
+    }
+    function parseSeqValidMonths(period) {
+      const m = String(period || '').match(/(\d+)/);
+      return m ? Number(m[1]) : '';
+    }
+    function openSeqForm(mode, n) {
+      seqFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      if (mode === 'edit' && n) {
+        if (n.status && n.status !== '待执行') {
+          ElementPlus.ElMessage.warning('仅待执行单据可编辑');
+          return;
+        }
+        const mat = parseSeqMaterial(n.newMaterial || n.partner || '');
+        const months = parseSeqValidMonths(n.newValidPeriod);
+        Object.assign(seqForm, {
+          id: n.id || '',
+          seqType: n.seqType || firstSeqDocType(),
+          newMatCode: mat.code,
+          newMatName: mat.name,
+          newMatSpec: mat.spec,
+          newMatKind: mat.kind,
+          newLot: (n.newLot && n.newLot !== '—') ? n.newLot : ((n.refNo && n.refNo !== '—') ? n.refNo : ''),
+          newProdDate: n.newProdDate || '',
+          newValidMonths: months,
+          newValidPeriod: n.newValidPeriod || formatSeqValidPeriod(months),
+          newExpireDate: n.newExpireDate || calcSeqExpireDate(n.newProdDate, months),
+          seqRemark: (n.seqRemark && n.seqRemark !== '—') ? n.seqRemark : '',
+          remark: (n.remark && n.remark !== '—') ? n.remark : '',
+        });
+      } else {
+        Object.assign(seqForm, {
+          id: '', seqType: firstSeqDocType(),
+          newMatCode: '', newMatName: '', newMatSpec: '', newMatKind: '',
+          newLot: '', newProdDate: '', newValidMonths: '', newValidPeriod: '', newExpireDate: '',
+          seqRemark: '', remark: '',
+        });
+      }
+      view.value = 'seq-form';
+    }
+    function backSeqForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function onSeqTypeChange() {
+      // 切换类型不强制清物料；编码转换保存时再校验必填
+    }
+    function openSeqMatPicker() {
+      seqMatPickerKw.value = '';
+      seqMatPickerVisible.value = true;
+    }
+    function selectSeqMat(m) {
+      if (!m || !m.code) return;
+      seqForm.newMatCode = m.code;
+      seqForm.newMatName = m.name || '';
+      seqForm.newMatSpec = m.spec || '';
+      seqForm.newMatKind = m.kind || '';
+      const months = Number(m.validMonths) > 0 ? Number(m.validMonths) : 12;
+      seqForm.newValidMonths = months;
+      seqForm.newValidPeriod = formatSeqValidPeriod(months);
+      recalcSeqExpire();
+      seqMatPickerVisible.value = false;
+      ElementPlus.ElMessage.success('已选择新物料：' + m.code);
+    }
+    function clearSeqMat() {
+      seqForm.newMatCode = '';
+      seqForm.newMatName = '';
+      seqForm.newMatSpec = '';
+      seqForm.newMatKind = '';
+      seqForm.newValidMonths = '';
+      seqForm.newValidPeriod = '';
+      recalcSeqExpire();
+    }
+    function syncSeqNoticeToPc(n) {
+      if (!n || !STORE || !STORE.loadMock || !STORE.saveMock) return;
+      const mock = STORE.loadMock();
+      if (!mock || !mock['wh-seq']) return;
+      const bag = mock['wh-seq'];
+      const tab1 = (bag.tab1 = bag.tab1 || []);
+      const matParts = parseSeqMaterial(n.newMaterial || '');
+      const noticeRow = {
+        id: String(tab1.length + 1),
+        单据状态: n.status || '待执行',
+        转序单号: n.id,
+        单据类型: n.seqType || '编码转换',
+        新物料编码: matParts.code || '—',
+        新物料名称: matParts.name || '—',
+        新物料规格: matParts.spec || '—',
+        新物料种类: matParts.kind || '—',
+        新批号: n.newLot || '—',
+        新生产日期: n.newProdDate || '',
+        新有效期: n.newValidPeriod || '—',
+        新失效日期: n.newExpireDate || '',
+        转序说明: n.seqRemark || '—',
+        已完成件数: String(n.donePcs != null ? n.donePcs : 0),
+        制单时间: n.createTime || appNowStr(),
+        制单人: n.creator || operator.value || '张三',
+        备注: n.remark || '—',
+      };
+      const hit = tab1.find((r) => String(r['转序单号'] || '') === String(n.id));
+      if (hit) Object.assign(hit, noticeRow, { id: hit.id });
+      else tab1.unshift(noticeRow);
+      STORE.saveMock(mock);
+      if (STORE.setDocStatus) STORE.setDocStatus(n.id, n.status || '待执行', { source: 'APP', action: 'create-seq' });
+    }
+    function saveSeqNotice() {
+      if (!seqForm.seqType) { ElementPlus.ElMessage.error('请选择单据类型'); return; }
+      if (seqForm.seqType === '编码转换' && !String(seqForm.newMatCode || '').trim()) {
+        ElementPlus.ElMessage.error('请选择新物料');
+        return;
+      }
+      if (seqForm.newProdDate && seqForm.newExpireDate && seqForm.newExpireDate < seqForm.newProdDate) {
+        ElementPlus.ElMessage.error('失效日期必须晚于生产日期');
+        return;
+      }
+      const list = (CFG.docsMap && CFG.docsMap.inner) || [];
+      const newMaterial = seqForm.newMatCode
+        ? [seqForm.newMatCode, seqForm.newMatName, seqForm.newMatSpec, seqForm.newMatKind].filter(Boolean).join(' / ')
+        : '—';
+      const payload = {
+        status: '待执行',
+        docType: '物料转序',
+        seqType: seqForm.seqType,
+        partner: newMaterial,
+        newMaterial,
+        refNo: seqForm.newLot || '—',
+        newLot: seqForm.newLot || '—',
+        newProdDate: seqForm.newProdDate || '',
+        newValidPeriod: seqForm.newValidPeriod || '—',
+        newExpireDate: seqForm.newExpireDate || '',
+        seqRemark: seqForm.seqRemark || '—',
+        remark: seqForm.remark || '—',
+        planDate: todayYmd(),
+        donePcs: 0,
+        materialSummary: (seqForm.seqType || '编码转换') + ' · ' + (seqForm.newMatCode || seqForm.newLot || '转序'),
+        logisticsNo: '',
+        lines: [],
+        _innerDraft: null,
+      };
+      if (seqFormMode.value === 'edit' && seqForm.id) {
+        const hit = list.find((x) => x.id === seqForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        if (hit.status && hit.status !== '待执行') {
+          ElementPlus.ElMessage.error('仅待执行单据可编辑');
+          return;
+        }
+        Object.assign(hit, payload, {
+          id: seqForm.id,
+          status: hit.status || '待执行',
+          donePcs: hit.donePcs || 0,
+          createTime: hit.createTime || appNowStr(),
+          creator: hit.creator || operator.value || '张三',
+        });
+        syncSeqNoticeToPc(hit);
+        ElementPlus.ElMessage.success('保存成功');
+      } else {
+        const id = 'ZXSQ' + todayYmd().replace(/-/g, '') + String(list.filter((x) => x.docType === '物料转序').length + 1).padStart(4, '0');
+        const created = Object.assign({
+          id,
+          createTime: appNowStr(),
+          creator: operator.value || '张三',
+        }, payload);
+        list.unshift(created);
+        if (CFG.docsMap) CFG.docsMap.inner = list;
+        syncSeqNoticeToPc(created);
+        ElementPlus.ElMessage.success('保存成功');
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+
+
+    const moveFormMode = ref('add');
+    const moveForm = reactive({
+      id: '', moveType: '标准移库', toWhCode: '', toWh: '', toLoc: '', planDate: '', remark: '',
+    });
+    const moveDocTypeOptions = computed(() => {
+      storeTick.value;
+      const D = window.WMS_DICT;
+      const fallback = ['标准移库', '货位整理', '呆滞移库', '策略移库'];
+      if (!D || typeof D.optionsFor !== 'function') return fallback;
+      const opts = D.optionsFor('inner-move', '单据类型', '', liveAppDict()) || [];
+      return opts.length ? opts : fallback;
+    });
+    const moveLocMap = {
+      'WH-RAW': ['WH-RAW-01', 'WH-RAW-02', 'WH-RAW-03'],
+      'WH-FG': ['WH-FG-01', 'WH-FG-02', 'WH-FG-03'],
+      'WH-PKG': ['WH-PKG-01', 'WH-PKG-02'],
+      'WH-PM': ['WH-PM-01', 'WH-PM-02', 'WH-PM-03'],
+    };
+    const moveLocOptions = computed(() => moveLocMap[moveForm.toWhCode] || []);
+    function firstMoveDocType() {
+      return (moveDocTypeOptions.value || [])[0] || '标准移库';
+    }
+    function onMoveWhChange() {
+      moveForm.toLoc = '';
+      const w = (warehouseOptions || []).find((x) => x.code === moveForm.toWhCode);
+      moveForm.toWh = w ? (w.name || w.code) : '';
+    }
+    function openMoveForm(mode, n) {
+      moveFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      if (mode === 'edit' && n) {
+        if (n.status && n.status !== '待执行') {
+          ElementPlus.ElMessage.warning('仅待执行单据可编辑');
+          return;
+        }
+        Object.assign(moveForm, {
+          id: n.id || '',
+          moveType: n.moveType || firstMoveDocType(),
+          toWhCode: n.toWhCode || '',
+          toWh: n.toWh || n.partner || '',
+          toLoc: n.toLoc || n.refNo || '',
+          planDate: n.planDate || '',
+          remark: (n.remark && n.remark !== '—') ? n.remark : '',
+        });
+        if (!moveForm.toWhCode && moveForm.toWh) {
+          const w = (warehouseOptions || []).find((x) => x.name === moveForm.toWh || x.code === moveForm.toWh);
+          if (w) moveForm.toWhCode = w.code;
+        }
+      } else {
+        Object.assign(moveForm, {
+          id: '', moveType: firstMoveDocType(), toWhCode: '', toWh: '', toLoc: '',
+          planDate: todayYmd(), remark: '',
+        });
+      }
+      view.value = 'move-form';
+    }
+    function backMoveForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function syncMoveNoticeToPc(n) {
+      if (!n || !STORE || !STORE.loadMock || !STORE.saveMock) return;
+      const mock = STORE.loadMock();
+      if (!mock || !mock['wh-transfer']) return;
+      const bag = mock['wh-transfer'];
+      const tab1 = (bag.tab1 = bag.tab1 || []);
+      const noticeRow = {
+        id: String(tab1.length + 1),
+        单据状态: n.status || '待执行',
+        移库单号: n.id,
+        单据类型: n.moveType || '标准移库',
+        移入仓库: n.toWh || n.partner || '—',
+        移入库位: n.toLoc || n.refNo || '—',
+        已完成件数: String(n.donePcs != null ? n.donePcs : 0),
+        计划执行日期: n.planDate || '',
+        制单时间: n.createTime || appNowStr(),
+        制单人: n.creator || operator.value || '张三',
+        备注: n.remark || '—',
+      };
+      const hit = tab1.find((r) => String(r['移库单号'] || '') === String(n.id));
+      if (hit) Object.assign(hit, noticeRow, { id: hit.id });
+      else tab1.unshift(noticeRow);
+      STORE.saveMock(mock);
+      if (STORE.setDocStatus) STORE.setDocStatus(n.id, n.status || '待执行', { source: 'APP', action: 'create-move' });
+    }
+    function saveMoveNotice() {
+      if (!moveForm.moveType) { ElementPlus.ElMessage.error('请选择单据类型'); return; }
+      if (!moveForm.toWhCode) { ElementPlus.ElMessage.error('请选择移入仓库'); return; }
+      const w = (warehouseOptions || []).find((x) => x.code === moveForm.toWhCode);
+      const toWhName = w ? (w.name || w.code) : moveForm.toWh;
+      const docsKey = flowMeta.value.docsKey || 'inner';
+      const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
+      const payload = {
+        status: '待执行',
+        docType: '货物移库',
+        moveType: moveForm.moveType,
+        partner: toWhName,
+        toWh: toWhName,
+        toWhCode: moveForm.toWhCode,
+        toLoc: moveForm.toLoc || '',
+        refNo: moveForm.toLoc || '—',
+        planDate: moveForm.planDate || '',
+        remark: moveForm.remark || '—',
+        donePcs: 0,
+        materialSummary: (moveForm.moveType || '标准移库') + ' · ' + toWhName + (moveForm.toLoc ? (' / ' + moveForm.toLoc) : ''),
+        lines: [],
+      };
+      if (moveFormMode.value === 'edit' && moveForm.id) {
+        const hit = list.find((x) => x.id === moveForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        Object.assign(hit, payload, {
+          id: moveForm.id,
+          status: hit.status || '待执行',
+          createTime: hit.createTime || appNowStr(),
+          creator: hit.creator || operator.value || '张三',
+          donePcs: hit.donePcs != null ? hit.donePcs : 0,
+        });
+        syncMoveNoticeToPc(hit);
+        ElementPlus.ElMessage.success('移库通知单已保存');
+      } else {
+        const id = 'YKTT' + todayYmd().replace(/-/g, '') + String(list.filter((x) => x.docType === '货物移库').length + 1).padStart(4, '0');
+        const created = Object.assign({
+          id,
+          createTime: appNowStr(),
+          creator: operator.value || '张三',
+        }, payload);
+        list.unshift(created);
+        if (CFG.docsMap) CFG.docsMap[docsKey] = list;
+        syncMoveNoticeToPc(created);
+        ElementPlus.ElMessage.success('移库通知单已创建');
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+
+
+
+    const inspFormMode = ref('add');
+    const inspPlanForm = reactive({
+      id: '', schemeName: '', contentDesc: '', whCode: '', whName: '', whType: '', owner: '',
+      planDateLocal: '', affectNext: '临时计划，不更新', remark: '',
+    });
+    const inspEnabledSchemes = computed(() => {
+      storeTick.value;
+      let list = (CFG.inspSchemeOptions || []).filter((s) => s && s.enabled !== false);
+      // 优先从 PC mock 合并启用方案
+      try {
+        if (STORE && STORE.loadMock) {
+          const mock = STORE.loadMock();
+          const rows = (mock && mock['wh-insp-scheme'] && mock['wh-insp-scheme'].main) || [];
+          const fromPc = rows.filter((r) => r['启用状态'] === '启用').map((r) => ({
+            name: r['巡检方案名称'],
+            desc: r['内容描述'] || '',
+            enabled: true,
+            warehouses: (r._locs || []).map((loc) => ({
+              code: loc['仓库编号'], name: loc['仓库名称'], type: loc['仓库类型'], owner: loc['责任人'],
+            })),
+          }));
+          if (fromPc.length) {
+            const map = new Map();
+            fromPc.concat(list).forEach((s) => { if (s && s.name && !map.has(s.name)) map.set(s.name, s); });
+            list = Array.from(map.values());
+          }
+        }
+      } catch (e) { /* ignore */ }
+      return list;
+    });
+    const inspSchemeWhOptions = computed(() => {
+      const s = (inspEnabledSchemes.value || []).find((x) => x.name === inspPlanForm.schemeName);
+      return (s && s.warehouses) || [];
+    });
+    function toInspLocal(dt) {
+      const s = String(dt || '').trim();
+      if (!s) return '';
+      if (s.includes('T')) return s.slice(0, 16);
+      return s.replace(' ', 'T').slice(0, 16);
+    }
+    function fromInspLocal(local) {
+      const s = String(local || '').trim();
+      if (!s) return '';
+      return s.replace('T', ' ').slice(0, 16);
+    }
+    function calcInspOverdue(planDate) {
+      if (!planDate) return { text: '—', late: false };
+      const t = new Date(String(planDate).replace(' ', 'T') + ':00');
+      if (Number.isNaN(t.getTime())) return { text: '—', late: false };
+      const diff = Date.now() - t.getTime();
+      const abs = Math.abs(diff);
+      const mins = Math.floor(abs / 60000);
+      const hours = Math.floor(mins / 60);
+      const days = Math.floor(hours / 24);
+      let text;
+      if (days > 0) text = days + '天' + (hours % 24) + '小时' + (mins % 60) + '分钟';
+      else if (hours > 0) text = hours + '小时' + (mins % 60) + '分钟';
+      else text = Math.max(1, mins) + '分钟';
+      if (diff > 0) return { text: text, late: true };
+      return { text: '剩余' + text, late: false };
+    }
+    function onInspSchemeChange() {
+      const s = (inspEnabledSchemes.value || []).find((x) => x.name === inspPlanForm.schemeName);
+      inspPlanForm.contentDesc = (s && s.desc) || '';
+      inspPlanForm.whCode = '';
+      inspPlanForm.whName = '';
+      inspPlanForm.whType = '';
+      inspPlanForm.owner = '';
+    }
+    function onInspWhChange() {
+      const w = (inspSchemeWhOptions.value || []).find((x) => x.code === inspPlanForm.whCode);
+      if (!w) {
+        inspPlanForm.whName = '';
+        inspPlanForm.whType = '';
+        inspPlanForm.owner = '';
+        return;
+      }
+      inspPlanForm.whName = w.name || '';
+      inspPlanForm.whType = w.type || '';
+      inspPlanForm.owner = w.owner || '';
+    }
+    function openInspForm(mode, n) {
+      inspFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      if (mode === 'edit' && n) {
+        if (n.status && n.status !== '待执行') {
+          ElementPlus.ElMessage.warning('仅待执行单据可编辑');
+          return;
+        }
+        Object.assign(inspPlanForm, {
+          id: n.id || '',
+          schemeName: n.schemeName || '',
+          contentDesc: n.contentDesc || '',
+          whCode: n.whCode || '',
+          whName: n.whName || '',
+          whType: n.whType || '',
+          owner: n.owner || '',
+          planDateLocal: toInspLocal(n.planDate),
+          affectNext: n.affectNext || '临时计划，不更新',
+          remark: (n.remark && n.remark !== '—') ? n.remark : '',
+        });
+      } else {
+        const now = new Date();
+        const pad = (x) => String(x).padStart(2, '0');
+        const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        Object.assign(inspPlanForm, {
+          id: '', schemeName: '', contentDesc: '', whCode: '', whName: '', whType: '', owner: '',
+          planDateLocal: local, affectNext: '临时计划，不更新', remark: '',
+        });
+      }
+      view.value = 'insp-form';
+    }
+    function backInspForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function syncInspPlanToPc(n) {
+      if (!n || !STORE || !STORE.loadMock || !STORE.saveMock) return;
+      const mock = STORE.loadMock();
+      if (!mock || !mock['wh-insp-plan']) return;
+      const bag = mock['wh-insp-plan'];
+      const tab1 = (bag.tab1 = bag.tab1 || []);
+      const overdue = calcInspOverdue(n.planDate);
+      const noticeRow = {
+        id: String(tab1.length + 1),
+        计划状态: n.status || '待执行',
+        计划单号: n.id,
+        巡检方案名称: n.schemeName || '',
+        巡检方案描述: n.contentDesc || '',
+        仓库编号: n.whCode || '',
+        仓库名称: n.whName || '',
+        仓库类型: n.whType || '',
+        '存放位置/库区': '—',
+        计划时间: n.planDate || '',
+        逾期时长: overdue.text,
+        逾期状态: overdue.late ? '逾期' : '正常',
+        是否影响后续: n.affectNext || '临时计划，不更新',
+        备注: n.remark || '—',
+      };
+      const hit = tab1.find((r) => String(r['计划单号'] || '') === String(n.id));
+      if (hit) Object.assign(hit, noticeRow, { id: hit.id });
+      else tab1.unshift(noticeRow);
+      STORE.saveMock(mock);
+      if (STORE.setDocStatus) STORE.setDocStatus(n.id, n.status || '待执行', { source: 'APP', action: 'create-insp' });
+    }
+    function saveInspPlan() {
+      if (!inspPlanForm.schemeName) { ElementPlus.ElMessage.error('请选择巡检方案'); return; }
+      if (!inspPlanForm.whCode) { ElementPlus.ElMessage.error('请选择目标仓库'); return; }
+      if (!inspPlanForm.planDateLocal) { ElementPlus.ElMessage.error('请选择计划时间'); return; }
+      if (!inspPlanForm.affectNext) { ElementPlus.ElMessage.error('请选择是否影响后续巡检方案执行'); return; }
+      const planDate = fromInspLocal(inspPlanForm.planDateLocal);
+      const overdue = calcInspOverdue(planDate);
+      const docsKey = flowMeta.value.docsKey || 'insp';
+      const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
+      const payload = {
+        status: '待执行',
+        schemeName: inspPlanForm.schemeName,
+        contentDesc: inspPlanForm.contentDesc || '—',
+        whCode: inspPlanForm.whCode,
+        whName: inspPlanForm.whName || '',
+        whType: inspPlanForm.whType || '',
+        owner: inspPlanForm.owner || '',
+        planDate: planDate,
+        overdueText: overdue.text,
+        overdueLate: overdue.late,
+        affectNext: inspPlanForm.affectNext,
+        remark: inspPlanForm.remark || '—',
+        draft: null,
+      };
+      if (inspFormMode.value === 'edit' && inspPlanForm.id) {
+        const hit = list.find((x) => x.id === inspPlanForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        Object.assign(hit, payload, {
+          id: inspPlanForm.id,
+          status: hit.status || '待执行',
+          draft: hit.draft || null,
+        });
+        syncInspPlanToPc(hit);
+        ElementPlus.ElMessage.success('巡检计划修改成功');
+      } else {
+        const ymd = todayYmd().replace(/-/g, '');
+        const seq = String(list.length + 1).padStart(3, '0');
+        const id = 'XJJH' + ymd + seq;
+        const created = Object.assign({ id }, payload);
+        list.unshift(created);
+        if (CFG.docsMap) CFG.docsMap[docsKey] = list;
+        syncInspPlanToPc(created);
+        ElementPlus.ElMessage.success('巡检计划创建成功');
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+
+
+    const othFormMode = ref('add');
+    const othForm = reactive({
+      id: '', docType: '', isLoadingRequired: '是', direction: '厂外', lineSideLoc: '',
+      planDate: '', beneficiary: '', beneficiaryDept: '', beneficiaryProject: '', prodRelated: false,
+      remark: '', waybillNo: '', logisticsNo: '', carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
+      lines: [],
+    });
+    const othMatPickerVisible = ref(false);
+    const othMatPickerKw = ref('');
+    const othVehiclePickerVisible = ref(false);
+    const othVehiclePickerKw = ref('');
+    const othDeptOptions = ['研发部', '生产部', '仓储部', '质量部'];
+    const othProjectOptions = ['研发试剂项目', '固定资产改良', '样品送检', '其他'];
+    const othPeopleOptions = [
+      { name: '张三', dept: '仓储部' },
+      { name: '李敏', dept: '生产部' },
+      { name: '王强', dept: '研发部' },
+      { name: '陈伟', dept: '质量部' },
+    ];
+    const othDocTypeOptions = computed(() => {
+      storeTick.value;
+      const D = window.WMS_DICT;
+      const fallback = isOthOutDoc.value ? ['盘亏出库', '样品出库', '研发领用'] : ['盘盈入库', '样品入库', '研发入库'];
+      if (!D || typeof D.optionsFor !== 'function') return fallback;
+      const opts = D.optionsFor(flowId.value, '单据类型', '', liveAppDict()) || [];
+      return opts.length ? opts : fallback;
+    });
+    function firstOthDocType() {
+      return (othDocTypeOptions.value || [])[0] || (isOthOutDoc.value ? '盘亏出库' : '盘盈入库');
+    }
+    const othWaybillOpts = computed(() => {
+      const want = isOthOutDoc.value ? '其他出库' : '其他入库';
+      return (CFG.waybillOptions || []).filter((w) => !w.bizType || w.bizType === want);
+    });
+    const othShipOpts = computed(() => {
+      const w = (CFG.waybillOptions || []).find((x) => x.code === othForm.waybillNo);
+      return (w && w.ships) || [];
+    });
+    const filteredOthMatOptions = computed(() => {
+      const kw = String(othMatPickerKw.value || '').trim().toLowerCase();
+      const id = String(flowId.value || '');
+      let list;
+      if (id.includes('tank')) list = (CFG.barcodeMatOptions || []).filter((m) => liquidMatCodes.value.has(m.code));
+      else if (id.includes('count')) list = (CFG.countMatOptions || []).slice();
+      else list = (CFG.barcodeMatOptions || []).filter((m) => !liquidMatCodes.value.has(m.code));
+      if (!kw) return list;
+      return list.filter((m) => [m.code, m.name, m.spec, m.kind].join(' ').toLowerCase().includes(kw));
+    });
+    const filteredOthVehicleOptions = computed(() => {
+      const kw = String(othVehiclePickerKw.value || '').trim().toLowerCase();
+      const list = (CFG.carrierVehicles || []).slice();
+      if (!kw) return list;
+      return list.filter((v) => [v.plate, v.trailer, v.driver, v.phone].join(' ').toLowerCase().includes(kw));
+    });
+    function clearOthCarrierFields() {
+      othForm.carrier = '';
+      othForm.plate = '';
+      othForm.trailer = '';
+      othForm.driver = '';
+      othForm.phone = '';
+      othForm.driverId = '';
+    }
+    function onOthDirectionChange() {
+      if (othForm.direction !== '线边仓') othForm.lineSideLoc = '';
+    }
+    function onOthBeneficiaryChange() {
+      const p = othPeopleOptions.find((x) => x.name === othForm.beneficiary);
+      if (p && p.dept) othForm.beneficiaryDept = p.dept;
+    }
+    function onOthWaybillChange() {
+      othForm.logisticsNo = '';
+      clearOthCarrierFields();
+      const w = (CFG.waybillOptions || []).find((x) => x.code === othForm.waybillNo);
+      if (!w) return;
+      othForm.carrier = w.carrier || '演示承运商';
+      othForm.plate = w.plate || '';
+      othForm.trailer = w.trailer || '—';
+      othForm.driver = w.driver || '';
+      othForm.phone = w.phone || '';
+      othForm.driverId = w.driverId || '';
+      if (w.ships && w.ships.length === 1) othForm.logisticsNo = w.ships[0];
+    }
+    function openOthVehiclePicker() {
+      if (othForm.waybillNo) {
+        ElementPlus.ElMessage.warning('已关联运单，承运信息由运单带入');
+        return;
+      }
+      othVehiclePickerKw.value = '';
+      othVehiclePickerVisible.value = true;
+    }
+    function selectOthVehicle(v) {
+      if (!v) return;
+      othForm.carrier = v.carrier || '演示承运商';
+      othForm.plate = v.plate || '';
+      othForm.trailer = v.trailer || '—';
+      othForm.driver = v.driver || '';
+      othForm.phone = v.phone || '';
+      othForm.driverId = v.licenseNo || v.driverId || '';
+      othVehiclePickerVisible.value = false;
+      ElementPlus.ElMessage.success('已选择车辆与司机：' + (v.plate || '') + ' / ' + (v.driver || ''));
+    }
+    function clearOthVehicle() {
+      if (othForm.waybillNo) return;
+      clearOthCarrierFields();
+    }
+    function openOthMatPicker() {
+      othMatPickerKw.value = '';
+      othMatPickerVisible.value = true;
+    }
+    function isOthMatAlreadyAdded(code) {
+      return (othForm.lines || []).some((ln) => ln.code === code);
+    }
+    function selectOthMat(m) {
+      if (!m || !m.code) return;
+      if (isOthMatAlreadyAdded(m.code)) {
+        ElementPlus.ElMessage.warning('该物料已在明细中');
+        return;
+      }
+      const isCount = String(flowId.value || '').includes('count');
+      const isTank = String(flowId.value || '').includes('tank');
+      const qty = isCount ? 100 : (isTank ? 10000 : 1000);
+      othForm.lines.push({
+        code: m.code, name: m.name || '', spec: m.spec || '', kind: m.kind || '', unit: m.unit || 'KG',
+        manageMode: isCount ? '计数管理' : '条码管理',
+        planPcs: isCount ? 0 : '',
+        planQty: qty,
+        remark: '',
+        medium: m.medium || '',
+        status: '待执行', doneQty: 0, remainQty: qty, remainPcs: isCount ? 0 : '',
+      });
+      othMatPickerVisible.value = false;
+      ElementPlus.ElMessage.success('已添加：' + m.code);
+    }
+    function removeOthFormLine(idx) {
+      othForm.lines.splice(idx, 1);
+    }
+    function openOthForm(mode, n) {
+      othFormMode.value = mode === 'edit' ? 'edit' : 'add';
+      const me = operator.value || '张三';
+      const meDept = (othPeopleOptions.find((p) => p.name === me) || {}).dept || '仓储部';
+      if (mode === 'edit' && n) {
+        if (n.status && n.status !== '待执行') {
+          ElementPlus.ElMessage.warning('仅待执行单据可编辑');
+          return;
+        }
+        Object.assign(othForm, {
+          id: n.id || '',
+          docType: n.docType || firstOthDocType(),
+          isLoadingRequired: n.isLoadingRequired || '是',
+          direction: n.direction || '厂外',
+          lineSideLoc: n.lineSideLoc || '',
+          planDate: n.planDate || '',
+          beneficiary: n.beneficiary || n.partner || me,
+          beneficiaryDept: n.beneficiaryDept || meDept,
+          beneficiaryProject: n.beneficiaryProject || '',
+          prodRelated: n.prodRelated === true || n.prodRelated === '是',
+          remark: (n.remark && n.remark !== '—') ? n.remark : '',
+          waybillNo: (n.waybillNo && n.waybillNo !== '—') ? n.waybillNo : '',
+          logisticsNo: (n.logisticsNo && n.logisticsNo !== '—') ? n.logisticsNo : '',
+          carrier: n.carrier || '',
+          plate: n.plate || '',
+          trailer: (n.trailer && n.trailer !== '—') ? n.trailer : '',
+          driver: n.driver || '',
+          phone: n.phone || '',
+          driverId: n.driverId || '',
+          lines: JSON.parse(JSON.stringify((n.lines || []).map((ln) => ({
+            code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+            manageMode: ln.manageMode || (String(flowId.value || '').includes('count') ? '计数管理' : '条码管理'),
+            planPcs: ln.planPcs, planQty: ln.planQty, remark: ln.remark === '—' ? '' : (ln.remark || ''),
+            medium: ln.medium || '', status: ln.status || '待执行',
+            doneQty: ln.doneQty || 0, remainQty: ln.remainQty, remainPcs: ln.remainPcs,
+          })))),
+        });
+      } else {
+        Object.assign(othForm, {
+          id: '', docType: firstOthDocType(), isLoadingRequired: '是', direction: '厂外', lineSideLoc: '',
+          planDate: todayYmd(), beneficiary: me, beneficiaryDept: meDept, beneficiaryProject: '', prodRelated: false,
+          remark: '', waybillNo: '', logisticsNo: '', carrier: '', plate: '', trailer: '', driver: '', phone: '', driverId: '',
+          lines: [],
+        });
+      }
+      view.value = 'oth-form';
+    }
+    function backOthForm() {
+      ElementPlus.ElMessageBox.confirm('当前内容尚未保存，确定离开吗？', '离开确认', {
+        confirmButtonText: '确定离开', cancelButtonText: '继续编辑', type: 'warning',
+      }).then(() => { view.value = 'docs'; }).catch(() => {});
+    }
+    function syncOthNoticeToPc(n) {
+      if (!n || !STORE || !STORE.loadMock || !STORE.saveMock) return;
+      const pageId = isOthOutDoc.value ? 'wh-other-out' : 'wh-other-in';
+      const mock = STORE.loadMock();
+      if (!mock || !mock[pageId]) return;
+      const bag = mock[pageId];
+      const tab1 = (bag.tab1 = bag.tab1 || []);
+      const dirKey = isOthOutDoc.value ? '出库方向' : '入库方向';
+      const noticeRow = {
+        id: String(tab1.length + 1),
+        单号: n.id,
+        单据状态: n.status || '待执行',
+        单据类型: n.docType || '',
+        是否需要装卸货: n.isLoadingRequired || '是',
+        [dirKey]: n.direction || '厂外',
+        计划执行日期: n.planDate || '',
+        领至线边仓: n.lineSideLoc || '—',
+        受益人: n.beneficiary || '—',
+        受益部门: n.beneficiaryDept || '—',
+        受益项目: n.beneficiaryProject || '—',
+        生产相关: n.prodRelated ? '是' : '否',
+        关联运单: n.waybillNo || '—',
+        关联发货单: n.logisticsNo || '—',
+        承运商: n.carrier || '—',
+        车牌号: n.plate || '—',
+        车挂号: n.trailer || '—',
+        司机姓名: n.driver || '—',
+        司机电话: n.phone || '—',
+        司机身份证号: n.driverId || '—',
+        物料信息: n.materialSummary || '—',
+        备注: n.remark || '—',
+        _lines: (n.lines || []).map((ln) => ({
+          id: n.id + '-l' + ln.lineNo,
+          行状态: ln.status || '待执行',
+          物料信息: [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / '),
+          库存单位: ln.unit || 'KG',
+          管理方式: ln.manageMode || '条码管理',
+          计划件数: String(flowId.value || '').includes('count') ? '—' : (ln.planPcs != null && ln.planPcs !== '' ? String(ln.planPcs) : '—'),
+          计划数量: Number(ln.planQty || 0).toFixed(3),
+          已完成数量: Number(ln.doneQty || 0).toFixed(3),
+          未完成数量: Number(ln.remainQty || 0).toFixed(3),
+          备注: ln.remark || '—',
+        })),
+      };
+      const hit = tab1.find((r) => String(r['单号'] || '') === String(n.id));
+      if (hit) Object.assign(hit, noticeRow, { id: hit.id });
+      else tab1.unshift(noticeRow);
+      STORE.saveMock(mock);
+      if (STORE.setDocStatus) STORE.setDocStatus(n.id, n.status || '待执行', { source: 'APP', action: 'create-oth' });
+    }
+    function saveOthNotice() {
+      if (!othForm.docType) { ElementPlus.ElMessage.error('请选择单据类型'); return; }
+      if (!othForm.isLoadingRequired) { ElementPlus.ElMessage.error('请选择是否需要装卸货'); return; }
+      if (!othForm.direction) { ElementPlus.ElMessage.error(isOthOutDoc.value ? '请选择出库方向' : '请选择入库方向'); return; }
+      if (!(othForm.lines || []).length) { ElementPlus.ElMessage.error('请至少保留一条物料明细'); return; }
+      if ((othForm.lines || []).some((ln) => !ln.code)) { ElementPlus.ElMessage.error('请选择物料'); return; }
+      if ((othForm.lines || []).some((ln) => !(Number(ln.planQty) > 0))) {
+        ElementPlus.ElMessage.error('请正确填写计划数量');
+        return;
+      }
+      const docsKey = flowMeta.value.docsKey || flowId.value;
+      const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];
+      const isCount = String(flowId.value || '').includes('count');
+      const summary = (othForm.lines || []).map((ln) => `${ln.code} / ${ln.name} / ${ln.spec} / ${ln.kind}`).join('；');
+      const payload = {
+        status: '待执行',
+        partner: othForm.beneficiary || '—',
+        beneficiary: othForm.beneficiary || '—',
+        beneficiaryDept: othForm.beneficiaryDept || '—',
+        beneficiaryProject: othForm.beneficiaryProject || '—',
+        prodRelated: !!othForm.prodRelated,
+        direction: othForm.direction,
+        lineSideLoc: othForm.direction === '线边仓' ? (othForm.lineSideLoc || '') : '',
+        refNo: othForm.logisticsNo || othForm.waybillNo || '—',
+        planDate: othForm.planDate || '',
+        docType: othForm.docType,
+        remark: othForm.remark || '—',
+        isLoadingRequired: othForm.isLoadingRequired || '是',
+        waybillNo: othForm.waybillNo || '—',
+        logisticsNo: othForm.logisticsNo || '—',
+        carrier: othForm.carrier || '—',
+        plate: othForm.plate || '—',
+        trailer: othForm.trailer || '—',
+        driver: othForm.driver || '—',
+        phone: othForm.phone || '',
+        driverId: othForm.driverId || '',
+        materialSummary: summary,
+        packSpec: isCount ? '计数/无包材' : '吨袋+托架',
+        lines: (othForm.lines || []).map((ln, i) => ({
+          lineNo: i + 1,
+          status: ln.status || '待执行',
+          code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+          lot: ln.lot || '—',
+          remark: ln.remark || '—',
+          manageMode: ln.manageMode || (isCount ? '计数管理' : '条码管理'),
+          medium: ln.medium || '',
+          planPcs: isCount ? 0 : (Number(ln.planPcs) > 0 ? Number(ln.planPcs) : 0),
+          planQty: Number(ln.planQty),
+          doneQty: Number(ln.doneQty || 0),
+          remainQty: Number(ln.remainQty != null ? ln.remainQty : ln.planQty),
+          remainPcs: isCount ? 0 : (Number(ln.remainPcs) > 0 ? Number(ln.remainPcs) : (Number(ln.planPcs) > 0 ? Number(ln.planPcs) : 0)),
+        })),
+      };
+      if (othFormMode.value === 'edit' && othForm.id) {
+        const hit = list.find((x) => x.id === othForm.id) || currentNotice.value;
+        if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
+        Object.assign(hit, payload, { id: othForm.id, status: hit.status || '待执行', createTime: hit.createTime || appNowStr() });
+        hit.lines = (hit.lines || []).map((ln, i) => Object.assign(ln, { id: hit.id + '-l' + (i + 1), lineNo: i + 1 }));
+        syncOthNoticeToPc(hit);
+        ElementPlus.ElMessage.success('保存成功');
+      } else {
+        const id = restDocPrefix() + todayYmd().replace(/-/g, '') + String(list.length + 1).padStart(4, '0');
+        const created = Object.assign({ id, createTime: appNowStr() }, payload);
+        created.lines = (created.lines || []).map((ln) => Object.assign(ln, { id: id + '-l' + ln.lineNo }));
+        list.unshift(created);
+        if (CFG.docsMap) CFG.docsMap[docsKey] = list;
+        syncOthNoticeToPc(created);
+        const pushed = maybePushAppLoadNotice(Object.assign({}, created, {
+          isLoadingRequired: othForm.isLoadingRequired || '是',
+          whBiz: isOthOutDoc.value ? '其他出库' : '其他入库',
+          refNo: created.id,
+        }), true);
+        ElementPlus.ElMessage.success(pushed ? '保存成功，已同步下推装卸货通知单' : '保存成功');
+      }
+      bumpStore();
+      view.value = 'docs';
+    }
+
     function syncPoInNoticeToPc(n) {
       if (!n || !STORE || !STORE.upsertWhPoInFromApp) return;
       const noticeRow = {
@@ -17542,13 +18956,35 @@ createApp({
           confirmButtonText: '确认提交', cancelButtonText: '返回编辑', type: 'warning',
         }).then(() => {
           const n = currentNotice.value;
+          hydrateSerialArchFromPcMock();
+          const rows = CFG.serialArchRows || [];
+          const toLoc = (n && (n.toLoc || n.refNo)) || '';
+          const toWh = (n && (n.toWhCode || n.toWh || n.partner)) || '';
+          innerRows.value.forEach((line) => {
+            const idx = rows.findIndex((r) => r && r.barcode === line.barcode);
+            if (idx < 0) return;
+            const arch = { ...rows[idx] };
+            if (toLoc) {
+              arch.loc = toLoc;
+              arch.storageLoc = toLoc;
+              arch.location = toLoc;
+            }
+            if (toWh) arch.warehouse = toWh;
+            arch.step = '';
+            arch.docNo = '';
+            rows.splice(idx, 1, arch);
+          });
           if (n) {
+            n.donePcs = Number(n.donePcs || 0) + innerRows.value.length;
             n.status = '已完成';
             delete n._innerDraft;
+            syncMoveNoticeToPc(n);
             syncDocToStore(n.id, '已完成', { action: 'inner-move-submit', flowId: flowId.value });
           }
+          bumpStore();
           innerRows.value = [];
-          ElementPlus.ElMessage.success('移库提交成功（已同步 PC）');
+          form.remark = '';
+          ElementPlus.ElMessage.success('移库提交成功，条码储位已更新（已同步 PC）');
           view.value = 'docs';
         }).catch(() => {});
         return;
@@ -19101,7 +20537,7 @@ createApp({
       recommendVisible, lotDetailVisible, lotDetailRows, lotDetailMode, lotDetailTitle, lotDetailSumLabel, lotDetailQtyHeader, lotDetailEmptyText, lineSideWhOptions, recommendBarcodes,
       pkgSrc, splitRows, mergeRows, outerRows, outerDocNo, outerCtx, outerCtxDisplay, pkgRows, wayPoint, wayBackView,
       signForm, enrouteForm, enrouteHistory, enrouteProcs, wayPhotos, wayProcFields, recentEnroute, canWaybillEnroute, toDatetimeLocal, fromDatetimeLocal,
-      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoSalesDoc, isSoPcAlignedForm, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
+      flowMeta, flowTitle, flowMode, activeExecMode, isPoInSerial, isPoRetSerial, isPoRetCount, isPoInTank, isPoInCount, isPoInDoc, isPoRetDoc, isOsIssueSerial, isOsIssueCount, isOsIssueDoc, isOsRetSerial, isOsRetCount, isOsRetDoc, isOsRecvSerial, isOsRecvCount, isOsRecvTank, isOsRecvDoc, isOsRmaSerial, isOsRmaCount, isOsRmaDoc, isOsWwpoDoc, isOutSerialDoc, isInSerialDoc, isInCountDoc, isInTankDoc, isOutCountDoc, outCountLotLocked, inCountLotLocked, outQtyLabel, outActionWord, inCountQtyLabel, showNoticeLineExtra, isPoNoticeDoc, isTrustRecvSerial, isTrustRecvCount, isTrustRecvTank, isTrustRecvDoc, isTrustRetSerial, isTrustRetCount, isTrustRetDoc, isTrustPartyDoc, isSoPreoutSerial, isSoPreoutCount, isSoPreoutDoc, isSoShipSerial, isSoShipCount, isSoShipDoc, isSoSalesDoc, isSoPcAlignedForm, isSoRmaSerial, isSoRmaCount, isSoRmaDoc, isXferSerial, isXferCount, isXferSerialDoc, isXferCountDoc, isInnerXferDoc, isInnerMoveDoc, isInspDoc, isOthInDoc, isOthOutDoc, isOthDoc, isXferSerialPick, isXferCountExec, xferToLocOptions, xferFromLocOptions, xferCountLotOptions, xferCountLotLocked, xferCountAvailQty, isRestAppDoc, isPkgDocFlow, isPoNoticeSerial, poInHasCraft, poInCraftTabs, poInCraftGraph, poInTabUnlocked, poInTabAllDone, countProcDone, countProcUnlocked, displayedLines, isProdPickSerial, isProdPickCount, isProdPickTank, isProdPickDoc, isProdInSerial, isProdInCount, isProdInDoc, isProdRetSerial, isProdRetCount, isProdRetTank, isProdRetDoc, isLineSidePick, filteredRecommendBarcodes, recommendKw, recommendSelected, recommendSelectedCount, recommendSelectedQty, recommendAllChecked, toggleRecommend, toggleRecommendAll, backFromRecommend, confirmRecommendBring, focusRecommendScan, prepTab, prepKw, prepSelected, soPrepList, soPrepBoundCount, soPrepAvailCount, soPreoutPrepList, soPreoutPrepBoundCount, soPreoutPrepAvailCount, prepSelectedCount, prepSelectedQty, openSoPreoutPrep, openSoShipPrep, toggleSoPrep, toggleSoPreoutPrep, selectAllSoPrepBound, selectAllSoPreoutPrepBound, confirmSoPrep, confirmSoPreoutPrep, autoSaveSoPreoutExec, autoSaveSoShipExec, autoSaveSoShipCountExec, autoSaveSoPreoutCountExec, autoSaveSoRmaExec, autoSaveSoRmaCountExec, soPreoutCkId, soShipCkId, soRmaRkId, syncSoPreoutPcDocs, syncSoShipPcDocs, syncSoRmaPcDocs, onPickQtyChange, onTankPickQtyChange, isLoadFlow, tankExec, loadProcs, headerHint, filteredHome, filteredNotices,
       remarksOpen, remarksTitle, remarksBodyRef, remarksRenderedHtml, remarksToc, remarksTocActive, onRemarksTocClick, toggleRemarks, closeRemarks,
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
@@ -19123,9 +20559,17 @@ createApp({
       poInPrepOptions, poInPreoutOutOptions, poInShipOutOptions, poInVehiclePickerVisible, poInVehiclePickerKw, filteredPoInVehicleOptions,
       poInLotPickerVisible, poInLotPickerKw, filteredPoInLotOptions, isSoPcAlignedForm,
       openXferForm, backXferForm, openXferMatPicker, selectXferMat, removeXferFormLine, saveXferNotice,
-      openXferLotPicker, selectXferLot, clearXferLineLot,
+      openXferLotPicker, selectXferLot, clearXferLineLot, onXferWaybillChange, xferWaybillOpts, xferShipOpts,
       xferForm, xferFormMode, xferMatPickerVisible, xferMatPickerKw, filteredXferMatOptions, isXferMatAlreadyAdded, warehouseOptions,
       xferDocTypeOptions, xferLotPickerVisible, xferLotPickerKw, filteredXferLotOptions,
+      openSeqForm, backSeqForm, openSeqMatPicker, selectSeqMat, clearSeqMat, onSeqTypeChange, recalcSeqExpire, saveSeqNotice,
+      openMoveForm, backMoveForm, saveMoveNotice, onMoveWhChange,
+      openInspForm, backInspForm, saveInspPlan, onInspSchemeChange, onInspWhChange,
+      seqForm, seqFormMode, seqMatPickerVisible, seqMatPickerKw, filteredSeqMatOptions, seqDocTypeOptions,
+      moveForm, moveFormMode, moveDocTypeOptions, moveLocOptions,
+      inspPlanForm, inspFormMode, inspEnabledSchemes, inspSchemeWhOptions,
+      openOthForm, backOthForm, openOthMatPicker, selectOthMat, removeOthFormLine, saveOthNotice, onOthDirectionChange, onOthBeneficiaryChange, onOthWaybillChange, openOthVehiclePicker, selectOthVehicle, clearOthVehicle, isOthMatAlreadyAdded,
+      othForm, othFormMode, othMatPickerVisible, othMatPickerKw, filteredOthMatOptions, othDocTypeOptions, othWaybillOpts, othShipOpts, othPeopleOptions, othDeptOptions, othProjectOptions, othVehiclePickerVisible, othVehiclePickerKw, filteredOthVehicleOptions,
       openGenDocForm, backGenDocForm, openGenPicker, selectGenPicker, saveGenDocForm,
       genDocForm, genDocFormMode, genPickerVisible, genPickerTitle, genPickerRows, pkgMatPickerVisible, selectPkgMat,
       openPoInMatPicker, selectPoInMat, isPoInMatAlreadyAdded, addPoInFormLine, removePoInFormLine, savePoInNotice,
