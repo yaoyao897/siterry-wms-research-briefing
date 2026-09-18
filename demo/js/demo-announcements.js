@@ -2,8 +2,29 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-18",
-    latestVersion: "v1.4.18",
+    latestVersion: "v1.4.22",
     notes: [
+    {
+    "id": "oth-transport-xfer-align-v1422",
+    "title": "v1.4.22 · 其他出入库运输口径对齐直接调拨",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "其他入/出库派车与承运改为与直接调拨一致：有运单只读带出，无运单可手录（不再禁手输/强制选车）。强制刷新后生效。"
+    },
+    {
+    "id": "xfer-transport-po-align-v1420",
+    "title": "v1.4.20 · 直接调拨运输口径对齐采购入库",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "直接调拨列表补齐车挂/电话/身份证；选运单按「直接调拨」过滤并带出承运；有运单只读、无运单可手录；保存落库。强制刷新后生效。"
+    },
+    {
+    "id": "vxe-cdn-pin-v1419",
+    "title": "v1.4.19 · 修复列表表格空白",
+    "level": "info",
+    "date": "2026-09-18",
+    "body": "CDN xe-utils 最新版异常导致 VXE 未注册、分页有数表格空白；已锁定依赖版本。强制刷新即可。"
+    },
     {
     "id": "oth-transport-app-v1418",
     "title": "v1.4.18 · 其他出入库 APP 运输字段对齐销售",
@@ -1802,6 +1823,30 @@
       ]
     },
     updates: [
+  {
+    "version": "v1.4.22",
+    "date": "2026-09-18",
+    "terminal": "PC/APP/PRD",
+    "module": "其他出入库 · 运输口径对齐直接调拨",
+    "type": "[Fix]",
+    "summary": "有运单只读带出 / 无运单可手录；PC 表单字段改为可编辑；PRD 同步"
+  },
+  {
+    "version": "v1.4.20",
+    "date": "2026-09-18",
+    "terminal": "PC/APP/PRD",
+    "module": "直接调拨 · 运输口径对齐采购入库",
+    "type": "[Fix]",
+    "summary": "列表/Mock/选运单带出与手录/保存落库对齐采购入库"
+  },
+  {
+    "version": "v1.4.19",
+    "date": "2026-09-18",
+    "terminal": "PC",
+    "module": "列表表格空白",
+    "type": "[Fix]",
+    "summary": "锁定 xe-utils/vxe 依赖，修复分页有数表格空白"
+  },
   {
     "version": "v1.4.18",
     "date": "2026-09-18",

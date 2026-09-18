@@ -10233,16 +10233,16 @@ window.WMS_PAGE_CONFIGS = {
           "name": "单据类型",
           "spec": "文本"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
@@ -11176,16 +11176,16 @@ window.WMS_PAGE_CONFIGS = {
           "required": true,
           "ctrl": "下拉选择（字典表，单选）"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "type": "date",
@@ -12194,16 +12194,16 @@ window.WMS_PAGE_CONFIGS = {
           "name": "单据类型",
           "spec": "文本"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
@@ -13173,16 +13173,16 @@ window.WMS_PAGE_CONFIGS = {
           "required": true,
           "ctrl": "下拉选择（字典表，单选）"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "type": "date",
@@ -13997,16 +13997,16 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "ctrl": "下拉选择（字典表，单选）"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "领料类型",
           "type": "select",
@@ -14712,16 +14712,16 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "ctrl": "下拉选择（字典表，单选）"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "type": "date",
@@ -15425,16 +15425,16 @@ window.WMS_PAGE_CONFIGS = {
           ],
           "ctrl": "下拉选择（字典表，单选）"
         },
-            {
-              "name": "是否需要装卸货",
-              "type": "select",
-              "options": [
-                "是",
-                "否"
-              ],
-              "defaultValue": "是",
-              "required": true
-            },
+        {
+          "name": "是否需要装卸货",
+          "type": "select",
+          "options": [
+            "是",
+            "否"
+          ],
+          "defaultValue": "是",
+          "required": true
+        },
         {
           "name": "计划执行日期",
           "type": "date",
@@ -21183,39 +21183,39 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "承运商",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车牌号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车挂号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机姓名",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机电话",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
             },
             {
               "name": "司机身份证号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，脱敏只读"
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
             }
           ]
         }
@@ -22140,39 +22140,39 @@ window.WMS_PAGE_CONFIGS = {
             },
             {
               "name": "承运商",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车牌号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "车挂号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机姓名",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选支持手动录入"
             },
             {
               "name": "司机电话",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，只读"
+              "ctrl": "选运单自动带入只读，未选手动录入失焦校验手机号"
             },
             {
               "name": "司机身份证号",
-              "type": "readonly",
+              "type": "input",
               "required": false,
-              "ctrl": "运单/发货单带入，脱敏只读"
+              "ctrl": "选运单自动带入只读（掩码），未选手动录入校验身份证"
             }
           ]
         }
@@ -23436,7 +23436,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "tab3",
-          "label": "流水"
+          "label": "调拨流水"
         }
       ],
       "tabViews": [
@@ -23591,9 +23591,25 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
               "field": "司机姓名",
               "title": "司机姓名",
               "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "备注",
@@ -23763,9 +23779,25 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
+              "field": "车挂号",
+              "title": "车挂号",
+              "width": 120
+            },
+            {
               "field": "司机姓名",
               "title": "司机姓名",
               "width": 100
+            },
+            {
+              "field": "司机电话",
+              "title": "司机电话",
+              "width": 120
+            },
+            {
+              "field": "司机身份证号",
+              "title": "司机身份证号",
+              "width": 170,
+              "slot": "idmask"
             },
             {
               "field": "单据类型",
@@ -23792,7 +23824,7 @@ window.WMS_PAGE_CONFIGS = {
         },
         {
           "name": "tab3",
-          "label": "流水",
+          "label": "调拨流水",
           "queryFields": [
             {
               "name": "流水状态",
@@ -24312,101 +24344,389 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab1",
           "label": "移库通知单",
           "queryFields": [
-            { "name": "移库单号", "type": "input" },
-            { "name": "单据状态", "type": "select", "options": ["待执行", "执行中", "已完成", "已关闭"] },
-            { "name": "移入仓库", "type": "picker" },
-            { "name": "单据类型", "type": "select" },
-            { "name": "移入库位", "type": "picker" }
+            {
+              "name": "移库单号",
+              "type": "input"
+            },
+            {
+              "name": "单据状态",
+              "type": "select",
+              "options": [
+                "待执行",
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "移入仓库",
+              "type": "picker"
+            },
+            {
+              "name": "单据类型",
+              "type": "select"
+            },
+            {
+              "name": "移入库位",
+              "type": "picker"
+            }
           ],
-          "queryDefault": ["移库单号", "单据状态", "移入仓库", "单据类型"],
-          "queryMore": ["移入库位"],
+          "queryDefault": [
+            "移库单号",
+            "单据状态",
+            "移入仓库",
+            "单据类型"
+          ],
+          "queryMore": [
+            "移入库位"
+          ],
           "toolbar": [
-            { "name": "新增", "type": "primary", "desc": "打开新增移库通知单弹窗" },
-            { "name": "关闭", "type": "default", "desc": "将勾选通知单置为已关闭" },
-            { "name": "批量删除", "type": "danger", "desc": "仅允许删除待执行单据" },
-            { "name": "导出", "type": "default", "desc": "导出数据弹窗" }
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": "打开新增移库通知单弹窗"
+            },
+            {
+              "name": "关闭",
+              "type": "default",
+              "desc": "将勾选通知单置为已关闭"
+            },
+            {
+              "name": "批量删除",
+              "type": "danger",
+              "desc": "仅允许删除待执行单据"
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出数据弹窗"
+            }
           ],
           "columns": [
-            { "field": "单据状态", "title": "单据状态", "width": 100, "slot": "tag" },
-            { "field": "移库单号", "title": "移库单号", "width": 160 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "移入仓库", "title": "移入仓库", "width": 120 },
-            { "field": "移入库位", "title": "移入库位", "width": 120 },
-            { "field": "已完成件数", "title": "已完成件数", "width": 100 },
-            { "field": "制单时间", "title": "制单时间", "width": 160 },
-            { "field": "制单人", "title": "制单人", "width": 100 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "_actions", "title": "操作", "width": 140, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "单据状态",
+              "title": "单据状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "移库单号",
+              "title": "移库单号",
+              "width": 160
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "移入仓库",
+              "title": "移入仓库",
+              "width": 120
+            },
+            {
+              "field": "移入库位",
+              "title": "移入库位",
+              "width": 120
+            },
+            {
+              "field": "已完成件数",
+              "title": "已完成件数",
+              "width": 100
+            },
+            {
+              "field": "制单时间",
+              "title": "制单时间",
+              "width": 160
+            },
+            {
+              "field": "制单人",
+              "title": "制单人",
+              "width": 100
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 140,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "详情", "desc": "只读查看移库通知单头信息" },
-            { "name": "编辑", "desc": "仅待执行可编辑" }
+            {
+              "name": "详情",
+              "desc": "只读查看移库通知单头信息"
+            },
+            {
+              "name": "编辑",
+              "desc": "仅待执行可编辑"
+            }
           ]
         },
         {
           "name": "tab2",
           "label": "移库流水",
           "queryFields": [
-            { "name": "条码号", "type": "input" },
-            { "name": "流水状态", "type": "select", "options": ["执行中", "已完成", "已关闭"] },
-            { "name": "移库单号", "type": "input" },
-            { "name": "检查结果", "type": "select", "options": ["合格", "不合格"] },
-            { "name": "档案类型", "type": "select", "options": ["流水码", "固定包材", "常规计数"] },
-            { "name": "单据类型", "type": "select" },
-            { "name": "移入仓库", "type": "picker" }
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "流水状态",
+              "type": "select",
+              "options": [
+                "执行中",
+                "已完成",
+                "已关闭"
+              ]
+            },
+            {
+              "name": "移库单号",
+              "type": "input"
+            },
+            {
+              "name": "检查结果",
+              "type": "select",
+              "options": [
+                "合格",
+                "不合格"
+              ]
+            },
+            {
+              "name": "档案类型",
+              "type": "select",
+              "options": [
+                "流水码",
+                "固定包材",
+                "常规计数"
+              ]
+            },
+            {
+              "name": "单据类型",
+              "type": "select"
+            },
+            {
+              "name": "移入仓库",
+              "type": "picker"
+            }
           ],
-          "queryDefault": ["条码号", "流水状态", "移库单号", "检查结果"],
-          "queryMore": ["档案类型", "单据类型", "移入仓库"],
+          "queryDefault": [
+            "条码号",
+            "流水状态",
+            "移库单号",
+            "检查结果"
+          ],
+          "queryMore": [
+            "档案类型",
+            "单据类型",
+            "移入仓库"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出数据弹窗" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出数据弹窗"
+            }
           ],
           "columns": [
-            { "field": "流水状态", "title": "流水状态", "width": 100, "slot": "tag" },
-            { "field": "当前工序", "title": "当前工序", "width": 120 },
-            { "field": "检查结果", "title": "检查结果", "width": 100, "slot": "tag" },
-            { "field": "档案类型", "title": "档案类型", "width": 100 },
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "外包材编号", "title": "外包材编号", "width": 120 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "总数量", "title": "总数量", "width": 100 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "原仓库", "title": "原仓库", "width": 120 },
-            { "field": "原库位", "title": "原库位", "width": 120 },
-            { "field": "移入仓库", "title": "移入仓库", "width": 120 },
-            { "field": "移入库位", "title": "移入库位", "width": 120 },
-            { "field": "单据类型", "title": "单据类型", "width": 120 },
-            { "field": "移库单号", "title": "移库单号", "width": 160 },
-            { "field": "操作时间", "title": "操作时间", "width": 140 },
-            { "field": "操作人", "title": "操作人", "width": 100 },
-            { "field": "备注", "title": "备注", "width": 140 },
-            { "field": "包装规格", "title": "包装规格", "width": 120 },
-            { "field": "_actions", "title": "操作", "width": 80, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "流水状态",
+              "title": "流水状态",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "当前工序",
+              "title": "当前工序",
+              "width": 120
+            },
+            {
+              "field": "检查结果",
+              "title": "检查结果",
+              "width": 100,
+              "slot": "tag"
+            },
+            {
+              "field": "档案类型",
+              "title": "档案类型",
+              "width": 100
+            },
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "外包材编号",
+              "title": "外包材编号",
+              "width": 120
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "总数量",
+              "title": "总数量",
+              "width": 100
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "原仓库",
+              "title": "原仓库",
+              "width": 120
+            },
+            {
+              "field": "原库位",
+              "title": "原库位",
+              "width": 120
+            },
+            {
+              "field": "移入仓库",
+              "title": "移入仓库",
+              "width": 120
+            },
+            {
+              "field": "移入库位",
+              "title": "移入库位",
+              "width": 120
+            },
+            {
+              "field": "单据类型",
+              "title": "单据类型",
+              "width": 120
+            },
+            {
+              "field": "移库单号",
+              "title": "移库单号",
+              "width": 160
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 140
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 140
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 80,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "作业详情", "desc": "查看条码工序填报详情，支持表单PDF导出" }
+            {
+              "name": "作业详情",
+              "desc": "查看条码工序填报详情，支持表单PDF导出"
+            }
           ]
         }
       ],
       "formFields": [
-        { "name": "移库单号", "type": "readonly", "required": true, "ctrl": "系统自动生成 YKTT 前缀" },
-        { "name": "单据类型", "type": "select", "required": true, "ctrl": "下拉选择；默认标准移库", "options": ["标准移库", "货位整理", "呆滞移库", "策略移库"] },
-        { "name": "移入仓库", "type": "picker", "required": true, "ctrl": "下拉/弹窗选择目标仓库；不指定移出仓/位，原库位由 APP 扫码从档案带出" },
-        { "name": "移入库位", "type": "picker", "required": false, "ctrl": "按移入仓库级联过滤储位" },
-        { "name": "计划执行日期", "type": "date", "required": false, "ctrl": "日期选择器 YYYY-MM-DD，默认当天" },
-        { "name": "备注", "type": "input", "required": false, "ctrl": "手动输入文本" }
+        {
+          "name": "移库单号",
+          "type": "readonly",
+          "required": true,
+          "ctrl": "系统自动生成 YKTT 前缀"
+        },
+        {
+          "name": "单据类型",
+          "type": "select",
+          "required": true,
+          "ctrl": "下拉选择；默认标准移库",
+          "options": [
+            "标准移库",
+            "货位整理",
+            "呆滞移库",
+            "策略移库"
+          ]
+        },
+        {
+          "name": "移入仓库",
+          "type": "picker",
+          "required": true,
+          "ctrl": "下拉/弹窗选择目标仓库；不指定移出仓/位，原库位由 APP 扫码从档案带出"
+        },
+        {
+          "name": "移入库位",
+          "type": "picker",
+          "required": false,
+          "ctrl": "按移入仓库级联过滤储位"
+        },
+        {
+          "name": "计划执行日期",
+          "type": "date",
+          "required": false,
+          "ctrl": "日期选择器 YYYY-MM-DD，默认当天"
+        },
+        {
+          "name": "备注",
+          "type": "input",
+          "required": false,
+          "ctrl": "手动输入文本"
+        }
       ],
       "detailFields": [
-        { "name": "单据状态" },
-        { "name": "移库单号" },
-        { "name": "单据类型" },
-        { "name": "移入仓库" },
-        { "name": "移入库位" },
-        { "name": "已完成件数" },
-        { "name": "计划执行日期" },
-        { "name": "制单人" },
-        { "name": "制单时间" },
-        { "name": "备注" }
+        {
+          "name": "单据状态"
+        },
+        {
+          "name": "移库单号"
+        },
+        {
+          "name": "单据类型"
+        },
+        {
+          "name": "移入仓库"
+        },
+        {
+          "name": "移入库位"
+        },
+        {
+          "name": "已完成件数"
+        },
+        {
+          "name": "计划执行日期"
+        },
+        {
+          "name": "制单人"
+        },
+        {
+          "name": "制单时间"
+        },
+        {
+          "name": "备注"
+        }
       ],
       "hasEdit": true,
       "hasDetail": true,
@@ -24422,12 +24742,30 @@ window.WMS_PAGE_CONFIGS = {
             "submitter": "张三",
             "formTitle": "库内转移检查确认表",
             "fields": [
-              ["检查时间", "2026-08-05 08:30"],
-              ["检查人员", "张三"],
-              ["检查结果", "合格"],
-              ["外观状态", "正常"],
-              ["阀门状态", "正常"],
-              ["备注", "—"]
+              [
+                "检查时间",
+                "2026-08-05 08:30"
+              ],
+              [
+                "检查人员",
+                "张三"
+              ],
+              [
+                "检查结果",
+                "合格"
+              ],
+              [
+                "外观状态",
+                "正常"
+              ],
+              [
+                "阀门状态",
+                "正常"
+              ],
+              [
+                "备注",
+                "—"
+              ]
             ]
           },
           {
@@ -24436,11 +24774,26 @@ window.WMS_PAGE_CONFIGS = {
             "submitter": "李四",
             "formTitle": "上架核对表",
             "fields": [
-              ["核对时间", "2026-08-05 09:10"],
-              ["核对人员", "李四"],
-              ["核对结果", "合格"],
-              ["目标库位确认", "已确认"],
-              ["备注", "—"]
+              [
+                "核对时间",
+                "2026-08-05 09:10"
+              ],
+              [
+                "核对人员",
+                "李四"
+              ],
+              [
+                "核对结果",
+                "合格"
+              ],
+              [
+                "目标库位确认",
+                "已确认"
+              ],
+              [
+                "备注",
+                "—"
+              ]
             ]
           }
         ]
@@ -32398,43 +32751,144 @@ window.WMS_PAGE_CONFIGS = {
         "流水码拆分"
       ],
       "tabs": [
-        { "name": "tab1", "label": "条码拆分单" },
-        { "name": "tab2", "label": "条码拆分流水" }
+        {
+          "name": "tab1",
+          "label": "条码拆分单"
+        },
+        {
+          "name": "tab2",
+          "label": "条码拆分流水"
+        }
       ],
       "tabViews": [
         {
           "name": "tab1",
           "label": "条码拆分单",
           "queryFields": [
-            { "name": "拆分单号", "type": "input" },
-            { "name": "主条码号", "type": "input" },
-            { "name": "物料信息", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "拆分单号",
+              "type": "input"
+            },
+            {
+              "name": "主条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料信息",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["拆分单号", "主条码号", "物料信息"],
-          "queryMore": ["物料批号", "操作时间"],
+          "queryDefault": [
+            "拆分单号",
+            "主条码号",
+            "物料信息"
+          ],
+          "queryMore": [
+            "物料批号",
+            "操作时间"
+          ],
           "toolbar": [
-            { "name": "新增", "type": "primary", "desc": "" },
-            { "name": "导出", "type": "default", "desc": "" }
+            {
+              "name": "新增",
+              "type": "primary",
+              "desc": ""
+            },
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": ""
+            }
           ],
           "columns": [
-            { "field": "拆分单号", "title": "拆分单号", "width": 140, "slot": "link" },
-            { "field": "主条码号", "title": "主条码号", "width": 150 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "包装规格", "title": "包装规格", "width": 120 },
-            { "field": "供应商信息", "title": "供应商信息", "width": 120 },
-            { "field": "物料批号", "title": "物料批号", "width": 110 },
-            { "field": "生产日期", "title": "生产日期", "width": 110 },
-            { "field": "有效期", "title": "有效期", "width": 90 },
-            { "field": "失效日期", "title": "失效日期", "width": 110 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "本次拆出数量", "title": "本次拆出数量", "width": 110 },
-            { "field": "本次拆分条码个数", "title": "本次拆分条码个数", "width": 120 },
-            { "field": "拆出后剩余数量", "title": "拆出后剩余数量", "width": 120 },
-            { "field": "备注", "title": "备注", "width": 120 },
-            { "field": "操作时间", "title": "操作时间", "width": 160 },
-            { "field": "操作人", "title": "操作人", "width": 100 }
+            {
+              "field": "拆分单号",
+              "title": "拆分单号",
+              "width": 140,
+              "slot": "link"
+            },
+            {
+              "field": "主条码号",
+              "title": "主条码号",
+              "width": 150
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "供应商信息",
+              "title": "供应商信息",
+              "width": 120
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 110
+            },
+            {
+              "field": "生产日期",
+              "title": "生产日期",
+              "width": 110
+            },
+            {
+              "field": "有效期",
+              "title": "有效期",
+              "width": 90
+            },
+            {
+              "field": "失效日期",
+              "title": "失效日期",
+              "width": 110
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "本次拆出数量",
+              "title": "本次拆出数量",
+              "width": 110
+            },
+            {
+              "field": "本次拆分条码个数",
+              "title": "本次拆分条码个数",
+              "width": 120
+            },
+            {
+              "field": "拆出后剩余数量",
+              "title": "拆出后剩余数量",
+              "width": 120
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 120
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
           ],
           "rowOps": []
         },
@@ -32442,33 +32896,120 @@ window.WMS_PAGE_CONFIGS = {
           "name": "tab2",
           "label": "条码拆分流水",
           "queryFields": [
-            { "name": "拆分后条码号", "type": "input" },
-            { "name": "拆分单号", "type": "input" },
-            { "name": "主条码号", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "拆分后条码号",
+              "type": "input"
+            },
+            {
+              "name": "拆分单号",
+              "type": "input"
+            },
+            {
+              "name": "主条码号",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["拆分后条码号", "拆分单号", "主条码号"],
-          "queryMore": ["物料批号", "操作时间"],
+          "queryDefault": [
+            "拆分后条码号",
+            "拆分单号",
+            "主条码号"
+          ],
+          "queryMore": [
+            "物料批号",
+            "操作时间"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": ""
+            }
           ],
           "columns": [
-            { "field": "拆分后条码号", "title": "拆分后条码号", "width": 150 },
-            { "field": "物料信息", "title": "物料信息", "width": 220 },
-            { "field": "包装规格", "title": "包装规格", "width": 120 },
-            { "field": "供应商信息", "title": "供应商信息", "width": 120 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "建档数量", "title": "建档数量", "width": 100 },
-            { "field": "物料批号", "title": "物料批号", "width": 110 },
-            { "field": "生产日期", "title": "生产日期", "width": 110 },
-            { "field": "有效期", "title": "有效期", "width": 90 },
-            { "field": "失效日期", "title": "失效日期", "width": 110 },
-            { "field": "备注", "title": "备注", "width": 120 },
-            { "field": "拆分单号", "title": "拆分单号", "width": 140, "slot": "link" },
-            { "field": "主条码号", "title": "主条码号", "width": 150 },
-            { "field": "操作时间", "title": "操作时间", "width": 160 },
-            { "field": "操作人", "title": "操作人", "width": 100 }
+            {
+              "field": "拆分后条码号",
+              "title": "拆分后条码号",
+              "width": 150
+            },
+            {
+              "field": "物料信息",
+              "title": "物料信息",
+              "width": 220
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 120
+            },
+            {
+              "field": "供应商信息",
+              "title": "供应商信息",
+              "width": 120
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "建档数量",
+              "title": "建档数量",
+              "width": 100
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 110
+            },
+            {
+              "field": "生产日期",
+              "title": "生产日期",
+              "width": 110
+            },
+            {
+              "field": "有效期",
+              "title": "有效期",
+              "width": 90
+            },
+            {
+              "field": "失效日期",
+              "title": "失效日期",
+              "width": 110
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 120
+            },
+            {
+              "field": "拆分单号",
+              "title": "拆分单号",
+              "width": 140,
+              "slot": "link"
+            },
+            {
+              "field": "主条码号",
+              "title": "主条码号",
+              "width": 150
+            },
+            {
+              "field": "操作时间",
+              "title": "操作时间",
+              "width": 160
+            },
+            {
+              "field": "操作人",
+              "title": "操作人",
+              "width": 100
+            }
           ],
           "rowOps": []
         }
@@ -32510,37 +33051,95 @@ window.WMS_PAGE_CONFIGS = {
       ],
       "formBarcodeTip": "提交后，被拆分条码剩余数量若=0，该条码将自动报废",
       "detailFields": [
-        { "name": "拆分单号" },
-        { "name": "主条码号" },
-        { "name": "物料信息" },
-        { "name": "包装规格" },
-        { "name": "供应商信息" },
-        { "name": "物料批号" },
-        { "name": "生产日期" },
-        { "name": "有效期" },
-        { "name": "失效日期" },
-        { "name": "库存单位" },
-        { "name": "本次拆出数量" },
-        { "name": "本次拆分条码个数" },
-        { "name": "拆出后剩余数量" },
-        { "name": "备注" },
-        { "name": "操作时间" },
-        { "name": "操作人" }
+        {
+          "name": "拆分单号"
+        },
+        {
+          "name": "主条码号"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "包装规格"
+        },
+        {
+          "name": "供应商信息"
+        },
+        {
+          "name": "物料批号"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "失效日期"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "本次拆出数量"
+        },
+        {
+          "name": "本次拆分条码个数"
+        },
+        {
+          "name": "拆出后剩余数量"
+        },
+        {
+          "name": "备注"
+        },
+        {
+          "name": "操作时间"
+        },
+        {
+          "name": "操作人"
+        }
       ],
       "detailLineFields": [
-        { "name": "拆分后条码号" },
-        { "name": "物料信息" },
-        { "name": "包装规格" },
-        { "name": "供应商信息" },
-        { "name": "库存单位" },
-        { "name": "建档数量" },
-        { "name": "物料批号" },
-        { "name": "生产日期" },
-        { "name": "有效期" },
-        { "name": "失效日期" },
-        { "name": "备注" },
-        { "name": "操作时间" },
-        { "name": "操作人" }
+        {
+          "name": "拆分后条码号"
+        },
+        {
+          "name": "物料信息"
+        },
+        {
+          "name": "包装规格"
+        },
+        {
+          "name": "供应商信息"
+        },
+        {
+          "name": "库存单位"
+        },
+        {
+          "name": "建档数量"
+        },
+        {
+          "name": "物料批号"
+        },
+        {
+          "name": "生产日期"
+        },
+        {
+          "name": "有效期"
+        },
+        {
+          "name": "失效日期"
+        },
+        {
+          "name": "备注"
+        },
+        {
+          "name": "操作时间"
+        },
+        {
+          "name": "操作人"
+        }
       ],
       "detailLineTitle": "拆分子条码",
       "hasEdit": false,
@@ -32645,7 +33244,7 @@ window.WMS_PAGE_CONFIGS = {
         }
       ]
     },
-        "bc-serial-merge": {
+    "bc-serial-merge": {
       "id": "bc-serial-merge",
       "title": "流水码合并",
       "groups": [
@@ -33269,43 +33868,195 @@ window.WMS_PAGE_CONFIGS = {
           "name": "main",
           "label": "",
           "queryFields": [
-            { "name": "条码号", "type": "input" },
-            { "name": "使用状态", "type": "select", "options": ["在用", "冻结"] },
-            { "name": "库存状态", "type": "select", "options": ["初始化", "仓库", "厂外", "线边仓"] },
-            { "name": "存储位置", "type": "input" },
-            { "name": "物料编码", "type": "input" },
-            { "name": "物料名称", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "包装规格", "type": "select", "options": ["吨袋", "钢瓶", "储罐", "200L标准桶", "1000L吨袋", "标准箱"] },
-            { "name": "绑定状态", "type": "select", "options": ["已绑定", "未绑定"] },
-            { "name": "失效日期", "type": "daterange" }
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "使用状态",
+              "type": "select",
+              "options": [
+                "在用",
+                "冻结"
+              ]
+            },
+            {
+              "name": "库存状态",
+              "type": "select",
+              "options": [
+                "初始化",
+                "仓库",
+                "厂外",
+                "线边仓"
+              ]
+            },
+            {
+              "name": "存储位置",
+              "type": "input"
+            },
+            {
+              "name": "物料编码",
+              "type": "input"
+            },
+            {
+              "name": "物料名称",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "包装规格",
+              "type": "select",
+              "options": [
+                "吨袋",
+                "钢瓶",
+                "储罐",
+                "200L标准桶",
+                "1000L吨袋",
+                "标准箱"
+              ]
+            },
+            {
+              "name": "绑定状态",
+              "type": "select",
+              "options": [
+                "已绑定",
+                "未绑定"
+              ]
+            },
+            {
+              "name": "失效日期",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["条码号", "使用状态", "库存状态", "存储位置", "物料编码"],
-          "queryMore": ["物料名称", "物料批号", "包装规格", "绑定状态", "失效日期"],
+          "queryDefault": [
+            "条码号",
+            "使用状态",
+            "库存状态",
+            "存储位置",
+            "物料编码"
+          ],
+          "queryMore": [
+            "物料名称",
+            "物料批号",
+            "包装规格",
+            "绑定状态",
+            "失效日期"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选的超期待报废流水码" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选的超期待报废流水码"
+            }
           ],
           "columns": [
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "使用状态", "title": "使用状态", "width": 90, "slot": "tag" },
-            { "field": "库存状态", "title": "库存状态", "width": 90, "slot": "tag" },
-            { "field": "存储位置", "title": "存储位置", "width": 130 },
-            { "field": "物料编码", "title": "物料编码", "width": 120 },
-            { "field": "物料名称", "title": "物料名称", "width": 140 },
-            { "field": "物料规格", "title": "物料规格", "width": 130 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "当前数量", "title": "当前数量", "width": 90 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "包装规格", "title": "包装规格", "width": 110 },
-            { "field": "供应商名称", "title": "供应商名称", "width": 130 },
-            { "field": "生产厂家", "title": "生产厂家", "width": 130 },
-            { "field": "生产日期", "title": "生产日期", "width": 110 },
-            { "field": "有效期", "title": "有效期", "width": 90 },
-            { "field": "失效日期", "title": "失效日期", "width": 120, "slot": "expire_warn" },
-            { "field": "绑定状态", "title": "绑定状态", "width": 90, "slot": "tag" },
-            { "field": "当前绑定外包材", "title": "当前绑定外包材", "width": 140 },
-            { "field": "最新操作人", "title": "最新操作人", "width": 90 },
-            { "field": "最新操作时间", "title": "最新操作时间", "width": 150 }
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "使用状态",
+              "title": "使用状态",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "库存状态",
+              "title": "库存状态",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "存储位置",
+              "title": "存储位置",
+              "width": 130
+            },
+            {
+              "field": "物料编码",
+              "title": "物料编码",
+              "width": 120
+            },
+            {
+              "field": "物料名称",
+              "title": "物料名称",
+              "width": 140
+            },
+            {
+              "field": "物料规格",
+              "title": "物料规格",
+              "width": 130
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "当前数量",
+              "title": "当前数量",
+              "width": 90
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 110
+            },
+            {
+              "field": "供应商名称",
+              "title": "供应商名称",
+              "width": 130
+            },
+            {
+              "field": "生产厂家",
+              "title": "生产厂家",
+              "width": 130
+            },
+            {
+              "field": "生产日期",
+              "title": "生产日期",
+              "width": 110
+            },
+            {
+              "field": "有效期",
+              "title": "有效期",
+              "width": 90
+            },
+            {
+              "field": "失效日期",
+              "title": "失效日期",
+              "width": 120,
+              "slot": "expire_warn"
+            },
+            {
+              "field": "绑定状态",
+              "title": "绑定状态",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "当前绑定外包材",
+              "title": "当前绑定外包材",
+              "width": 140
+            },
+            {
+              "field": "最新操作人",
+              "title": "最新操作人",
+              "width": 90
+            },
+            {
+              "field": "最新操作时间",
+              "title": "最新操作时间",
+              "width": 150
+            }
           ],
           "rowOps": []
         }
@@ -33659,40 +34410,164 @@ window.WMS_PAGE_CONFIGS = {
           "name": "main",
           "label": "",
           "queryFields": [
-            { "name": "条码号", "type": "input" },
-            { "name": "库存状态", "type": "select", "options": ["仓库", "线边仓", "厂外", "初始化"] },
-            { "name": "包装规格", "type": "select", "options": ["吨袋", "钢瓶", "储罐", "桶装", "200L标准桶", "1000L吨袋", "标准箱"] },
-            { "name": "存储位置", "type": "input" },
-            { "name": "物料编码", "type": "input" },
-            { "name": "物料名称", "type": "input" },
-            { "name": "物料批号", "type": "input" },
-            { "name": "操作时间", "type": "daterange" }
+            {
+              "name": "条码号",
+              "type": "input"
+            },
+            {
+              "name": "库存状态",
+              "type": "select",
+              "options": [
+                "仓库",
+                "线边仓",
+                "厂外",
+                "初始化"
+              ]
+            },
+            {
+              "name": "包装规格",
+              "type": "select",
+              "options": [
+                "吨袋",
+                "钢瓶",
+                "储罐",
+                "桶装",
+                "200L标准桶",
+                "1000L吨袋",
+                "标准箱"
+              ]
+            },
+            {
+              "name": "存储位置",
+              "type": "input"
+            },
+            {
+              "name": "物料编码",
+              "type": "input"
+            },
+            {
+              "name": "物料名称",
+              "type": "input"
+            },
+            {
+              "name": "物料批号",
+              "type": "input"
+            },
+            {
+              "name": "操作时间",
+              "type": "daterange"
+            }
           ],
-          "queryDefault": ["条码号", "库存状态", "包装规格", "存储位置", "物料编码"],
-          "queryMore": ["物料名称", "物料批号", "操作时间"],
+          "queryDefault": [
+            "条码号",
+            "库存状态",
+            "包装规格",
+            "存储位置",
+            "物料编码"
+          ],
+          "queryMore": [
+            "物料名称",
+            "物料批号",
+            "操作时间"
+          ],
           "toolbar": [
-            { "name": "导出", "type": "default", "desc": "导出当前筛选或勾选的冻结中流水码" }
+            {
+              "name": "导出",
+              "type": "default",
+              "desc": "导出当前筛选或勾选的冻结中流水码"
+            }
           ],
           "columns": [
-            { "field": "条码号", "title": "条码号", "width": 160 },
-            { "field": "库存状态", "title": "库存状态", "width": 90, "slot": "tag" },
-            { "field": "存储位置", "title": "存储位置", "width": 130 },
-            { "field": "物料编码", "title": "物料编码", "width": 120 },
-            { "field": "物料名称", "title": "物料名称", "width": 140 },
-            { "field": "规格型号", "title": "规格型号", "width": 130 },
-            { "field": "物料批号", "title": "物料批号", "width": 120 },
-            { "field": "当前数量", "title": "当前数量", "width": 90 },
-            { "field": "库存单位", "title": "库存单位", "width": 80 },
-            { "field": "包装规格", "title": "包装规格", "width": 110 },
-            { "field": "绑定状态", "title": "绑定状态", "width": 90, "slot": "tag" },
-            { "field": "当前绑定外包材", "title": "当前绑定外包材", "width": 140 },
-            { "field": "备注", "title": "备注", "width": 150 },
-            { "field": "最新操作人", "title": "最新操作人", "width": 90 },
-            { "field": "最新操作时间", "title": "最新操作时间", "width": 150 },
-            { "field": "_actions", "title": "操作", "width": 80, "fixed": "right", "slot": "row_actions" }
+            {
+              "field": "条码号",
+              "title": "条码号",
+              "width": 160
+            },
+            {
+              "field": "库存状态",
+              "title": "库存状态",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "存储位置",
+              "title": "存储位置",
+              "width": 130
+            },
+            {
+              "field": "物料编码",
+              "title": "物料编码",
+              "width": 120
+            },
+            {
+              "field": "物料名称",
+              "title": "物料名称",
+              "width": 140
+            },
+            {
+              "field": "规格型号",
+              "title": "规格型号",
+              "width": 130
+            },
+            {
+              "field": "物料批号",
+              "title": "物料批号",
+              "width": 120
+            },
+            {
+              "field": "当前数量",
+              "title": "当前数量",
+              "width": 90
+            },
+            {
+              "field": "库存单位",
+              "title": "库存单位",
+              "width": 80
+            },
+            {
+              "field": "包装规格",
+              "title": "包装规格",
+              "width": 110
+            },
+            {
+              "field": "绑定状态",
+              "title": "绑定状态",
+              "width": 90,
+              "slot": "tag"
+            },
+            {
+              "field": "当前绑定外包材",
+              "title": "当前绑定外包材",
+              "width": 140
+            },
+            {
+              "field": "备注",
+              "title": "备注",
+              "width": 150
+            },
+            {
+              "field": "最新操作人",
+              "title": "最新操作人",
+              "width": 90
+            },
+            {
+              "field": "最新操作时间",
+              "title": "最新操作时间",
+              "width": 150
+            },
+            {
+              "field": "_actions",
+              "title": "操作",
+              "width": 80,
+              "fixed": "right",
+              "slot": "row_actions"
+            }
           ],
           "rowOps": [
-            { "name": "详情", "desc": "只读查看本行流水码全字段档案信息" }
+            {
+              "name": "详情",
+              "desc": "只读查看本行流水码全字段档案信息"
+            }
           ]
         }
       ],

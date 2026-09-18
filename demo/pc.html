@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>思特瑞 WMS Demo</title>
 <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/style.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.10.23/lib/style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-table@4.12.0/lib/style.css" />
 <style>
 
 [v-cloak]{display:none}
@@ -2425,14 +2425,14 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
-<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4/lib/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vxe-table@4/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xe-utils@4.0.0/dist/xe-utils.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.10.23/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-table@4.12.0/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.4.0"></script>
-<script src="./js/page-configs.js?v=1.4.5"></script>
-<script src="./js/mock-rows.js?v=1.4.5"></script>
+<script src="./js/page-configs.js?v=1.4.22"></script>
+<script src="./js/mock-rows.js?v=1.4.22"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/page-prd-notes.js?v=1.4.5"></script>
+<script src="./js/page-prd-notes.js?v=1.4.22"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -6316,6 +6316,10 @@ const app = createApp({
         if(f.name==='关联发货单') return !(formModel['关联运单'] && formModel['关联运单']!=='—');
         return false;
       }
+      if(pageId.value==='wh-direct-xfer'){
+        if(f.name==='关联发货单') return !(formModel['关联运单'] && formModel['关联运单']!=='—');
+        return false;
+      }
       if(isLoadPage()){
         if(f.name==='关联单号') return !(formModel['关联仓库业务'] && formModel['关联仓库业务']!=='—');
         if(f.name==='关联发货单') return !(formModel['关联运单'] && formModel['关联运单']!=='—');
@@ -6335,6 +6339,9 @@ const app = createApp({
         if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
       }
       if(pageId.value==='wh-other-in' || pageId.value==='wh-other-out'){
+        if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
+      }
+      if(pageId.value==='wh-direct-xfer'){
         if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
       }
       if(isLoadPage()){
@@ -6602,6 +6609,14 @@ const app = createApp({
         if(f.name==='关联运单'){
           formModel['关联发货单'] = '';
           ['承运商','车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{ formModel[k] = ''; });
+        } else if(f.name==='关联发货单'){
+          formModel['关联发货单'] = '';
+        }
+      }
+      if(pageId.value==='wh-direct-xfer'){
+        if(f.name==='关联运单'){
+          formModel['关联发货单'] = '';
+          ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{ formModel[k] = ''; });
         } else if(f.name==='关联发货单'){
           formModel['关联发货单'] = '';
         }
@@ -7292,10 +7307,10 @@ const app = createApp({
       if(isCsWhPage() && f && f.name==='客户名称'){
         return !!(formModel['关联销售订单'] && formModel['关联销售订单']!=='—');
       }
-      if((isWhNoticePage() || isCsWhPage()) && f && ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].includes(f.name)){
+      if((isWhNoticePage() || isCsWhPage() || pageId.value==='wh-direct-xfer' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out') && f && ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].includes(f.name)){
         return !!(formModel['关联运单'] && formModel['关联运单']!=='—');
       }
-      if((isWhNoticePage() || isCsWhPage()) && f && f.name==='承运商'){
+      if((isWhNoticePage() || isCsWhPage() || pageId.value==='wh-direct-xfer' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out') && f && f.name==='承运商'){
         return !!(formModel['关联运单'] && formModel['关联运单']!=='—');
       }
       if(!f || !f.lockWhenLinked) return false;
@@ -7869,7 +7884,7 @@ const app = createApp({
         all = wrapPickerModuleRows('lg-dispatch', (MOCK['lg-dispatch']||{}).main||[], '编号', '物料信息');
       } else if(t.includes('发货单') || t==='关联发货单'){
         let ships = (MOCK['lg-ship']||{}).main||[];
-        const shipByWay = isWhNoticePage() || isCsWhPage() || pageId.value==='wh-so-preout' || pageId.value==='wh-so-ship' || pageId.value==='wh-so-ret' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out' || isLoadPage();
+        const shipByWay = isWhNoticePage() || isCsWhPage() || pageId.value==='wh-so-preout' || pageId.value==='wh-so-ship' || pageId.value==='wh-so-ret' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out' || pageId.value==='wh-direct-xfer' || isLoadPage();
         if(shipByWay && formModel['关联运单'] && formModel['关联运单']!=='—'){
           ships = shipsOfWaybill(formModel['关联运单']);
         }
@@ -7904,6 +7919,10 @@ const app = createApp({
           const open = ways.filter(w=> w['状态']!=='已关闭');
           const want = pageId.value==='wh-other-in' ? '其他入库' : '其他出库';
           const byBiz = open.filter(w=> String(w['仓库业务类型']||'')===want);
+          ways = byBiz.length ? byBiz : open;
+        } else if(pageId.value==='wh-direct-xfer'){
+          const open = ways.filter(w=> w['状态']!=='已关闭');
+          const byBiz = open.filter(w=> String(w['仓库业务类型']||'')==='直接调拨');
           ways = byBiz.length ? byBiz : open;
         } else if(isLoadPage()){
           ways = ways.filter(w=> w['状态']!=='已关闭');
@@ -9162,6 +9181,16 @@ const app = createApp({
         formModel['关联发货单'] = '';
         ['承运商','车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{ formModel[k] = ''; });
         formLineRows.value = [];
+      }
+      if(pageId.value==='wh-direct-xfer' && formMode.value==='add'){
+        const d = new Date();
+        const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        formModel['单据类型'] = formModel['单据类型'] || dictFirst('单据类型','tab1') || '直接调拨申请单';
+        formModel['计划执行日期'] = formModel['计划执行日期'] || ymd;
+        formModel['单号'] = formModel['单号'] || '系统自动生成';
+        formModel['关联运单'] = '';
+        formModel['关联发货单'] = '';
+        ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{ formModel[k] = ''; });
       }
       if(pageId.value==='wh-so-prep' && formMode.value==='add'){
         const d = new Date();
@@ -13780,8 +13809,19 @@ const app = createApp({
           payload['客户名称'] = dash(formModel['客户名称']);
         }
         if(pid==='wh-direct-xfer'){
+          const phone = String(formModel['司机电话']||'').trim();
+          if(phone && phone!=='—' && !/^1\d{10}$/.test(phone)){ ElMessage.warning('请输入正确的 11 位手机号码'); return; }
+          const idCard = String(formModel['司机身份证号']||'').trim();
+          if(idCard && idCard!=='—' && !/^\d{17}[\dXx]$/.test(idCard)){ ElMessage.warning('请输入正确的 18 位身份证号'); return; }
           payload['调出仓库'] = formModel['调出仓库']||'';
           payload['调入仓库'] = formModel['调入仓库']||'';
+          payload['关联运单'] = dash(formModel['关联运单']);
+          payload['关联发货单'] = dash(formModel['关联发货单']);
+          payload['车牌号'] = dash(formModel['车牌号']);
+          payload['车挂号'] = dash(formModel['车挂号']);
+          payload['司机姓名'] = dash(formModel['司机姓名']);
+          payload['司机电话'] = dash(formModel['司机电话']);
+          payload['司机身份证号'] = dash(formModel['司机身份证号']);
         }
         if(isAdd){
           const d = new Date();
@@ -13869,6 +13909,10 @@ const app = createApp({
           const mode = String(r['管理方式']||'');
           return mode && mode!=='—' && !mode.includes('条码');
         })){ ElMessage.warning('其他入库仅允许条码管理物料'); return; }
+        const phoneOthIn = String(formModel['司机电话']||'').trim();
+        if(phoneOthIn && phoneOthIn!=='—' && !/^1\d{10}$/.test(phoneOthIn)){ ElMessage.warning('请输入正确的 11 位手机号码'); return; }
+        const idCardOthIn = String(formModel['司机身份证号']||'').trim();
+        if(idCardOthIn && idCardOthIn!=='—' && !/^\d{17}[\dXx]$/.test(idCardOthIn)){ ElMessage.warning('请输入正确的 18 位身份证号'); return; }
         const list = ((MOCK['wh-other-in'] = MOCK['wh-other-in'] || {}).tab1 = (MOCK['wh-other-in'].tab1 || []));
         const dash = v => (v && String(v).trim() && String(v).trim()!=='—') ? String(v).trim() : '—';
         const matSummary = formLineRows.value.map(r=> r['物料信息']).filter(Boolean).join('；') || '—';
@@ -13931,6 +13975,10 @@ const app = createApp({
           const mode = String(r['管理方式']||'');
           return mode && mode!=='—' && !mode.includes('条码');
         })){ ElMessage.warning('其他出库仅允许条码管理物料'); return; }
+        const phoneOthOut = String(formModel['司机电话']||'').trim();
+        if(phoneOthOut && phoneOthOut!=='—' && !/^1\d{10}$/.test(phoneOthOut)){ ElMessage.warning('请输入正确的 11 位手机号码'); return; }
+        const idCardOthOut = String(formModel['司机身份证号']||'').trim();
+        if(idCardOthOut && idCardOthOut!=='—' && !/^\d{17}[\dXx]$/.test(idCardOthOut)){ ElMessage.warning('请输入正确的 18 位身份证号'); return; }
         const list = ((MOCK['wh-other-out'] = MOCK['wh-other-out'] || {}).tab1 = (MOCK['wh-other-out'].tab1 || []));
         const dash = v => (v && String(v).trim() && String(v).trim()!=='—') ? String(v).trim() : '—';
         const matSummary = formLineRows.value.map(r=> r['物料信息']).filter(Boolean).join('；') || '—';
@@ -14988,7 +15036,7 @@ const app = createApp({
         }
       } else if(t==='关联运单' || t==='关联运单号'){
         formModel['关联运单'] = codeOf(row.编码 || row['运单号'] || '') || (row.编码 || row['运单号'] || '');
-        if(isWhNoticePage() || isCsWhPage() || pageId.value==='wh-so-preout' || pageId.value==='wh-so-ship' || pageId.value==='wh-so-ret' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out' || isLoadPage()){
+        if(isWhNoticePage() || isCsWhPage() || pageId.value==='wh-so-preout' || pageId.value==='wh-so-ship' || pageId.value==='wh-so-ret' || pageId.value==='wh-other-in' || pageId.value==='wh-other-out' || pageId.value==='wh-direct-xfer' || isLoadPage()){
           const way = findWaybillByNo(formModel['关联运单']) || row;
           fillPoInCarrierFromWaybill(way);
           const tip = formModel['关联发货单']

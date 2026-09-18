@@ -1634,20 +1634,13 @@ body.remarks-open .demo-scope-tip{display:none}
                       <option v-for="s in othShipOpts" :key="s" :value="s">{{ s }}</option>
                     </select>
                   </div>
-                  <div class="field" v-if="!othForm.waybillNo">
-                    <label>车辆与司机</label>
-                    <div style="display:flex;gap:8px;">
-                      <button type="button" class="btn-sm" @click="openOthVehiclePicker">选择车辆与司机</button>
-                      <button type="button" class="btn-sm" v-if="othForm.plate" @click="clearOthVehicle">清空</button>
-                    </div>
-                    <p class="hint" style="margin:6px 0 0">承运信息只读带入；有运单时由运单带出，无运单时点选车辆与司机（对齐销售出入库）</p>
-                  </div>
-                  <div class="field"><label>承运商</label><input :value="othForm.carrier || '—'" readonly /></div>
-                  <div class="field"><label>车牌号</label><input :value="othForm.plate || '—'" readonly /></div>
-                  <div class="field"><label>车挂号</label><input :value="othForm.trailer || '—'" readonly /></div>
-                  <div class="field"><label>司机姓名</label><input :value="othForm.driver || '—'" readonly /></div>
-                  <div class="field"><label>司机电话</label><input :value="othForm.phone || '—'" readonly /></div>
-                  <div class="field"><label>司机身份证号</label><input :value="maskIdCardApp(othForm.driverId) || '—'" readonly /></div>
+                  <div class="field"><label>承运商</label><input v-model="othForm.carrier" :readonly="!!othForm.waybillNo" :placeholder="othForm.waybillNo ? '' : '未选运单时可手录'" /></div>
+                  <div class="field"><label>车牌号</label><input v-model="othForm.plate" :readonly="!!othForm.waybillNo" :placeholder="othForm.waybillNo ? '' : '未选运单时可手录'" /></div>
+                  <div class="field"><label>车挂号</label><input v-model="othForm.trailer" :readonly="!!othForm.waybillNo" placeholder="无挂车填 —" /></div>
+                  <div class="field"><label>司机姓名</label><input v-model="othForm.driver" :readonly="!!othForm.waybillNo" /></div>
+                  <div class="field"><label>司机电话</label><input v-model="othForm.phone" :readonly="!!othForm.waybillNo" placeholder="11位手机号" /></div>
+                  <div class="field"><label>司机身份证号</label><input v-model="othForm.driverId" :readonly="!!othForm.waybillNo" placeholder="18位身份证" /></div>
+                  <p class="hint" style="margin:0 0 8px">有运单时承运信息只读带出；无运单时可手动填写（对齐直接调拨 / 采购入库）</p>
                 </div>
                 <div class="m-group__title" style="display:flex;justify-content:space-between;align-items:center">
                   <span>物料明细（{{ (othForm.lines||[]).length }} 行）</span>
@@ -4787,12 +4780,12 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.4.0"></script>
+<script src="./js/demo-announcements.js?v=1.4.22"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/mock-rows.js?v=1.4.0"></script>
 <script src="./js/demo-store.js?v=1.3.347"></script>
-<script src="./js/app-configs.js?v=1.4.0"></script>
-<script src="./js/page-prd-notes.js?v=1.4.0"></script>
+<script src="./js/app-configs.js?v=1.4.22"></script>
+<script src="./js/page-prd-notes.js?v=1.4.22"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -9259,6 +9252,13 @@ createApp({
           out.partner = String(pc['客供信息']).trim();
           out.supplier = out.partner;
         }
+      }
+      if (pageId === 'wh-direct-xfer') {
+        out.fromWh = pc['调出仓库'] || '';
+        out.toWh = pc['调入仓库'] || '';
+        out.partner = out.fromWh || out.partner;
+        out.refNo = out.toWh || out.refNo;
+        out.isLoadingRequired = pc['是否需要装卸货'] || '是';
       }
       // 无 _lines 时不要写 lines:[]，避免冲掉 APP 种子明细
       if (lines.length) out.lines = lines;
@@ -15265,6 +15265,18 @@ createApp({
       if ((othForm.lines || []).some((ln) => !(Number(ln.planQty) > 0))) {
         ElementPlus.ElMessage.error('请正确填写计划数量');
         return;
+      }
+      if (!othForm.waybillNo) {
+        const phone = String(othForm.phone || '').trim();
+        if (phone && !/^1\d{10}$/.test(phone)) {
+          ElementPlus.ElMessage.error('请输入正确的 11 位手机号码');
+          return;
+        }
+        const idCard = String(othForm.driverId || '').trim();
+        if (idCard && !/^\d{17}[\dXx]$/.test(idCard)) {
+          ElementPlus.ElMessage.error('请输入正确的 18 位身份证号');
+          return;
+        }
       }
       const docsKey = flowMeta.value.docsKey || flowId.value;
       const list = (CFG.docsMap && CFG.docsMap[docsKey]) || [];

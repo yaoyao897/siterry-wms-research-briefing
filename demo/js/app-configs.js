@@ -5994,6 +5994,13 @@ window.APP_CFG = (function () {
       planDate: '2026-08-01',
       docType: '直接调拨申请单',
       remark: '厂内短驳调拨',
+      waybillNo: '—',
+      logisticsNo: '—',
+      plate: '川C·短驳01',
+      trailer: '—',
+      driver: '厂内司机',
+      phone: '13700001111',
+      driverId: '510104199201011234',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
         {
@@ -6012,6 +6019,13 @@ window.APP_CFG = (function () {
       planDate: '2026-08-02',
       docType: '直接调拨申请单',
       remark: '—',
+      waybillNo: 'YD202609180001',
+      logisticsNo: 'FHD202609180001',
+      plate: '川A·DB001',
+      trailer: '川A·DB挂',
+      driver: '调拨司机',
+      phone: '13800138088',
+      driverId: '510101199001018888',
       materialSummary: 'RM-Li2CO3-BG / 电池级碳酸锂 / Li2CO3≥99.5% / 锂盐原料',
       lines: [
         {
@@ -6034,6 +6048,13 @@ window.APP_CFG = (function () {
       planDate: '2026-08-01',
       docType: '直接调拨申请单',
       remark: '备品备件仓间调拨',
+      waybillNo: '—',
+      logisticsNo: '—',
+      plate: '—',
+      trailer: '—',
+      driver: '—',
+      phone: '—',
+      driverId: '—',
       materialSummary: 'SP-BRG-6205 / 轴承（6205） / P5级 / 备品备件',
       lines: [
         {
@@ -6052,6 +6073,13 @@ window.APP_CFG = (function () {
       planDate: '2026-08-02',
       docType: '直接调拨申请单',
       remark: '—',
+      waybillNo: 'YD202609180002',
+      logisticsNo: 'FHD202609180002',
+      plate: '川B·DB002',
+      trailer: '—',
+      driver: '短驳司机',
+      phone: '13900139088',
+      driverId: '510107199203158888',
       materialSummary: 'SP-SEAL-NBR / 丁腈密封圈 / φ50 / 低值易耗',
       lines: [
         {
