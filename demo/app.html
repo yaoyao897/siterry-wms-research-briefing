@@ -493,10 +493,10 @@ body.remarks-open .demo-scope-tip{display:none}
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
-            <a href="./app.html" class="on">APP</a>
+            <a href="./思特瑞app.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -6412,7 +6412,19 @@ createApp({
       if (!n) return false;
       if (['已签收', '已完成', '已关闭'].includes(n.status)) return false;
       if (n.status === '运输中' || n.status === '发运中') return true;
-      return (n.loads || []).some((p) => p && p.status === '已确认');
+      if ((n.loads || []).some((p) => p && p.status === '已确认')) return true;
+      // STORE 回退：列表 hydrate 冲掉内存态时，仍按已落库进度显示入口
+      if (STORE && n.id) {
+        const hit = STORE.getDoc(n.id);
+        const st = hit && (STORE.STATUS_TO_APP[hit.status] || hit.status);
+        if (st === '运输中' || st === '发运中') return true;
+        const loads = n.loads || [];
+        if (loads.some((p) => {
+          const pt = p && STORE.getPoint(n.id, p.id);
+          return pt && pt.status === '已确认';
+        })) return true;
+      }
+      return false;
     });
     const wayProcFields = computed(() => {
       const name = processTab.value || '';
@@ -8929,6 +8941,18 @@ createApp({
       const m = String(qtyStr || '').match(/[\d.]+\s*(.+)$/);
       return m ? m[1].trim() : 'KG';
     }
+    function waybillStatusRank(st) {
+      const order = ['待派车', '待运输', '待发运', '待运送', '运输中', '发运中', '已签收', '已完成', '已关闭'];
+      const i = order.indexOf(String(st || ''));
+      return i < 0 ? 0 : i;
+    }
+    function waybillHasAppProgress(doc) {
+      if (!doc) return false;
+      if (waybillStatusRank(doc.status) >= waybillStatusRank('运输中')) return true;
+      const loads = doc.loads || [];
+      const unloads = doc.unloads || [];
+      return loads.some((p) => p && p.status === '已确认') || unloads.some((p) => p && p.status === '已确认');
+    }
     function syncWaybillStatusFromPoints(doc) {
       if (!doc) return doc;
       const loads = doc.loads || [];
@@ -8940,6 +8964,10 @@ createApp({
         doc.status = '已签收';
       } else if (anyLoadDone && ['待派车', '待运输', '待发运', '待运送'].includes(doc.status)) {
         doc.status = '运输中';
+      }
+      // 状态已是运输中但装货点被 PC hydrate 冲回「待确认」时，补回已确认，保证在途入口可见
+      if (['运输中', '发运中'].includes(doc.status) && loads.length && !anyLoadDone) {
+        loads.forEach((p) => { if (p) p.status = '已确认'; });
       }
       return doc;
     }
@@ -9103,12 +9131,18 @@ createApp({
         if (!mapped) return;
         const hit = byId.get(mapped.id);
         if (hit) {
-          const keepLoads = hit.loads && hit.loads.length && !hit.fromPc;
-          const keepUnloads = hit.unloads && hit.unloads.length && !hit.fromPc;
+          // 已提货/在途的 APP 进度不可被 PC hydrate 冲回「待运输/待确认」（否则底部「更新在途信息」消失）
+          const keepProgress = waybillHasAppProgress(hit);
+          const keepLoads = !!(hit.loads && hit.loads.length && (keepProgress || !hit.fromPc));
+          const keepUnloads = !!(hit.unloads && hit.unloads.length && (keepProgress || !hit.fromPc));
+          const prevStatus = hit.status;
           Object.assign(hit, mapped, {
             loads: keepLoads ? hit.loads : mapped.loads,
             unloads: keepUnloads ? hit.unloads : mapped.unloads,
           });
+          if (waybillStatusRank(prevStatus) > waybillStatusRank(hit.status)) {
+            hit.status = prevStatus;
+          }
           hit.fromPc = true;
           if (STORE) STORE.overlayAppDoc(hit);
           syncWaybillStatusFromPoints(hit);

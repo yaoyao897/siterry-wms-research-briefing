@@ -2,8 +2,16 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-18",
-    latestVersion: "v1.4.22",
+    latestVersion: "v1.4.23",
     notes: [
+    {
+      id: "enroute-hydrate-v1423",
+      title: "v1.4.23 · APP 运单在途更新入口修复",
+      level: "info",
+      date: "2026-09-20",
+      body: "提货完成后执行页底部应显示「更新在途信息」。已修复 PC 运单 hydrate 冲掉 APP 进度导致按钮消失的问题，请强制刷新后验证。"
+    },
+
     {
     "id": "oth-transport-xfer-align-v1422",
     "title": "v1.4.22 · 其他出入库运输口径对齐直接调拨",
@@ -1823,6 +1831,15 @@
       ]
     },
     updates: [
+    {
+      version: "v1.4.23",
+      date: "2026-09-20",
+      terminal: "APP",
+      module: "运单 · 在途更新入口",
+      type: "[Fix]",
+      summary: "修复 PC hydrate 冲回待运输导致「更新在途信息」按钮消失；保留 APP 提货/在途进度"
+    },
+
   {
     "version": "v1.4.22",
     "date": "2026-09-18",
