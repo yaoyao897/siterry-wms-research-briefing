@@ -795,7 +795,7 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
         </el-breadcrumb>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html" class="on">PC</a>
             <a href="./app.html">APP</a>
@@ -2005,10 +2005,9 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
             </el-form-item>
           </template>
           <el-form-item v-else-if="splitShowPreDoc" label="前置关联单据">
-            <el-input v-model="splitForm.前置关联单据" readonly placeholder="请选择销售出库单（选填）">
+            <el-input v-model="splitForm.前置关联单据" readonly placeholder="请选择前置关联单据（必填）">
               <template #append>
                 <el-button @click="openSplitPicker('前置关联单据')">选</el-button>
-                <el-button v-if="splitForm.前置关联单据" @click="splitForm.前置关联单据=''">清</el-button>
               </template>
             </el-input>
           </el-form-item>
@@ -2429,8 +2428,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.10.23/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4.12.0/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.4.0"></script>
-<script src="./js/page-configs.js?v=1.4.32"></script>
-<script src="./js/mock-rows.js?v=1.4.32"></script>
+<script src="./js/page-configs.js?v=1.4.33"></script>
+<script src="./js/mock-rows.js?v=1.4.33"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/page-prd-notes.js?v=1.4.22"></script>
 <script src="./js/remarks-markdown.js"></script>
@@ -3057,8 +3056,10 @@ const app = createApp({
         if(id==='wh-os-issue' || id==='wh-os-ret-mat') return '选择关联委外加工单后点击新增挑选发料原料';
         return '选择关联委外加工单后自动带入物料，或点击新增挑选订单内物料';
       }
-      if(id==='wh-po-in' || id==='wh-po-ret') return '选择关联采购订单后自动带入物料，或点击新增挑选订单内物料';
-      if(['wh-so-ship','wh-so-ret','wh-so-preout'].includes(id)) return '选择关联发货单后自动带入物料，或点击新增挑选物料';
+      if(id==='wh-po-ret') return '请选择来源采购入库单后按入库实绩带入物料，或点击新增挑选物料';
+      if(id==='wh-po-in') return '选择关联采购订单后自动带入物料，或点击新增挑选订单内物料';
+      if(id==='wh-so-ret') return '请选择关联销售出库单后按出库实绩带入物料，或点击新增挑选物料';
+      if(['wh-so-ship','wh-so-preout'].includes(id)) return '选择关联发货单后自动带入物料，或点击新增挑选物料';
       return '暂无数据';
     });
     const formLineRows = ref([{ _i:1 }, { _i:2 }]);
@@ -3281,7 +3282,7 @@ const app = createApp({
         if(f.name==='采购订单') return whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）';
         if(f.name==='关联销售备货单') return whBiz==='销售发货' || whBiz==='销售预出货';
         if(f.name==='关联销售预出货单') return whBiz==='销售发货';
-        if(f.name==='前置关联单据') return whBiz==='销售退货';
+        if(f.name==='前置关联单据') return whBiz==='销售退货' || whBiz==='采购退料';
         if(f.name==='订单号'){
           const ot = formModel['订单类型'] || '';
           return !!ot && ot!=='无';
@@ -3329,6 +3330,10 @@ const app = createApp({
         return biz==='销售发货' && formModel['配送类型']==='直发业务（贸易）';
       }
       if(pageId.value==='lg-dispatch' && (f.name==='订单类型' || f.name==='订单号') && dispatchNeedsOrderNo()) return true;
+      if(pageId.value==='lg-dispatch' && f.name==='前置关联单据'){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        return biz==='销售退货' || biz==='采购退料';
+      }
       if(pageId.value==='wh-prod-issue' && f.name==='领至线边仓'){
         return true;
       }
@@ -4874,6 +4879,7 @@ const app = createApp({
     function dispatchPreDocKind(bizOverride){
       const biz = bizOverride || formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
       if(biz==='销售退货') return 'so-ret-pre';
+      if(biz==='采购退料') return 'po-ret-pre';
       return '';
     }
     function completedSoOutboundRows(soCode){
@@ -4894,6 +4900,71 @@ const app = createApp({
           规格: '销售出库单'
         };
       });
+    }
+    function completedPoInboundRows(poCode){
+      let rows = (((MOCK['wh-po-in']||{}).tab2)||[]).filter(r=> r['单据状态']==='已完成');
+      const po = codeOf(poCode);
+      if(po) rows = rows.filter(r=> codeOf(r['关联采购订单'])===po);
+      return rows;
+    }
+    function wrapPoInboundPickerRows(rows){
+      return (rows || []).map(r=>{
+        const wrapped = wrapPickerModuleRows('wh-po-in', [r], '入库单号', '物料信息', 'tab2')[0];
+        return {
+          ...wrapped,
+          名称: (wrapped.名称 || r['物料信息'] || '') + ' / 采购入库单',
+          规格: '采购入库单'
+        };
+      });
+    }
+    function findPoInNotice(inRow){
+      if(!inRow) return {};
+      const noticeNo = inRow['关联收料通知单号'] || '';
+      return (((MOCK['wh-po-in']||{}).tab1)||[]).find(r=> r['单号']===noticeNo) || {};
+    }
+    function applyCgrkToPoRetForm(inRow){
+      if(pageId.value!=='wh-po-ret' || !inRow) return false;
+      const notice = findPoInNotice(inRow);
+      let srcLines = Array.isArray(notice._lines) && notice._lines.length ? notice._lines : null;
+      if(!srcLines){
+        const inNo = codeOf(inRow['入库单号'] || inRow.编码);
+        const flows = (((MOCK['wh-po-in']||{}).tab3)||[]).filter(r=> codeOf(r['入库单号'])===inNo);
+        if(flows.length){
+          srcLines = flows.map(f=>({
+            物料信息: f['物料信息'],
+            批号: f['物料批号'] || '',
+            库存单位: f['库存单位'] || 'KG',
+            管理方式: (String(f['档案类型']||'').includes('流水') ? '条码管理' : '计数管理'),
+            计划件数: '1',
+            计划数量: f['总数量'] || inRow['已完成数量'] || '1',
+            备注: f['备注'] || ''
+          }));
+        }
+      }
+      if(!srcLines){
+        srcLines = [{
+          物料信息: inRow['物料信息'],
+          批号: '',
+          库存单位: inRow['库存单位'] || 'KG',
+          管理方式: '条码管理',
+          计划件数: inRow['已完成件数'] || '1',
+          计划数量: inRow['已完成数量'] || '1.000',
+          备注: ''
+        }];
+      }
+      formLineRows.value = ensureLineNos(srcLines.map((r,i)=> normalizePoRetFormLine({
+        行状态: '待执行',
+        物料信息: r['物料信息'] || inRow['物料信息'],
+        批号: (r['批号'] && r['批号']!=='—') ? r['批号'] : '',
+        库存单位: r['库存单位'] || inRow['库存单位'] || 'KG',
+        管理方式: r['管理方式'] || '条码管理',
+        计划件数: String(r['计划件数'] || r['已完成件数'] || inRow['已完成件数'] || ''),
+        计划数量: String(r['已完成数量'] || r['计划数量'] || inRow['已完成数量'] || '1.000'),
+        已完成数量: '0.000',
+        未完成数量: String(r['已完成数量'] || r['计划数量'] || inRow['已完成数量'] || '1.000'),
+        备注: r['备注'] || ''
+      }, i+1)));
+      return true;
     }
     function normalizeDispatchSoShipPreDocs(row){
       const src = row || {};
@@ -4970,10 +5041,10 @@ const app = createApp({
       if(dispatchOrderOptionalBiz(biz)) return false;
       return !!dispatchOrderTypeForBiz(biz);
     });
-    const splitShowPreDoc = computed(()=> splitBizOf()==='销售退货');
+    const splitShowPreDoc = computed(()=> { const b=splitBizOf(); return b==='销售退货' || b==='采购退料'; });
     const splitShowSoShipPreDocs = computed(()=> splitBizOf()==='销售发货');
     const splitShowSoPreoutPrepDoc = computed(()=> splitBizOf()==='销售预出货');
-    const splitPreDocRequired = computed(()=> false);
+    const splitPreDocRequired = computed(()=> splitShowPreDoc.value);
     const splitShowPo = computed(()=>{
       const dt = (splitRow.value && splitRow.value['配送类型']) || '';
       return dt==='直发业务（贸易）' || dt==='供应商直送';
@@ -4989,7 +5060,7 @@ const app = createApp({
       if(title==='订单号' && (!splitForm.订单类型 || splitForm.订单类型==='无')){
         ElMessage.warning('请先选择订单类型'); return;
       }
-      if(title==='前置关联单据' && splitBizOf()!=='销售退货'){
+      if(title==='前置关联单据' && !['销售退货','采购退料'].includes(splitBizOf())){
         ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return;
       }
       if(title==='关联销售预出货单' && splitBizOf()!=='销售发货'){
@@ -5024,7 +5095,27 @@ const app = createApp({
       }
       if(kind==='so-ret-pre'){
         const hit = completedSoOutboundRows().find(r=> codeOf(r['出库单号'])===c);
-        if(hit) return [toLine(hit, 0)];
+        if(hit){
+          const notice = findSoOutNotice(hit);
+          const lines = Array.isArray(notice._lines) && notice._lines.length ? notice._lines : [hit];
+          return lines.map((r,i)=> toLine({
+            ...r,
+            计划数量: r['已完成数量'] || r['计划数量'] || hit['已完成数量'],
+            批号: r['批号'] || ''
+          }, i));
+        }
+      }
+      if(kind==='po-ret-pre'){
+        const hit = completedPoInboundRows().find(r=> codeOf(r['入库单号'])===c);
+        if(hit){
+          const notice = findPoInNotice(hit);
+          const lines = Array.isArray(notice._lines) && notice._lines.length ? notice._lines : [hit];
+          return lines.map((r,i)=> toLine({
+            ...r,
+            计划数量: r['已完成数量'] || r['计划数量'] || hit['已完成数量'],
+            单位: r['库存单位'] || hit['库存单位'] || r['单位']
+          }, i));
+        }
       }
       return [];
     }
@@ -5320,6 +5411,7 @@ const app = createApp({
       } else if(meta.pageId==='wh-po-ret'){
         Object.assign(base, {
           关联采购订单: poCode||ordCode||'—', 供应商名称: partyName,
+          来源采购入库单: codeOf(ship['前置关联单据']) || '—',
           ...carrier
         });
       } else if(meta.pageId.startsWith('wh-os')){
@@ -5331,7 +5423,7 @@ const app = createApp({
         Object.assign(base, {
           关联销售订单: ship['订单号']||'—',
           客户名称: partyName || '—',
-          关联销售出库单: '—',
+          关联销售出库单: codeOf(ship['前置关联单据']) || '—',
           退货原因: '—',
           车牌号: plate,
           车挂号: (way && way['车挂号'] && way['车挂号']!=='—') ? String(way['车挂号']) : '—',
@@ -6255,7 +6347,8 @@ const app = createApp({
       let mats = poMatsOf(code);
       if(pageId.value==='wh-po-ret'){
         poMatPool.value = mats.map(m=>({...m}));
-        formLineRows.value = ensureLineNos(buildPoInFormLines(mats, supplier).map((r,i)=> normalizePoRetFormLine(r, i+1)));
+        formModel['来源采购入库单'] = '';
+        formLineRows.value = [];
       } else {
         poMatPool.value = mats.map(m=>({...m}));
         formLineRows.value = ensureLineNos(buildPoInFormLines(mats, supplier));
@@ -6435,7 +6528,10 @@ const app = createApp({
         if(f.name==='关联运单' && isFormPickerDisabled(f)) return isLoadPage() ? '请先选择关联单号' : (isOsPoPage() ? '请先选择关联委外加工单' : '请先选择关联采购订单');
         if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
       }
-      if(pageId.value==='lg-dispatch' && f && f.name==='前置关联单据') return '请选择销售出库单（选填）';
+      if(pageId.value==='lg-dispatch' && f && f.name==='前置关联单据'){
+        const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+        return biz==='采购退料' ? '请选择已完成采购入库单（必填）' : '请选择已完成销售出库单（必填）';
+      }
       return '请点击选择';
     }
     function stocktakeSelectedWarehouses(text){
@@ -7887,7 +7983,13 @@ const app = createApp({
         } else if(kind==='so-ret-pre'){
           const so = codeOf(splitPickerMode.value ? splitForm.订单号 : formModel['订单号']);
           all = wrapSoOutboundPickerRows(completedSoOutboundRows(so));
+        } else if(kind==='po-ret-pre'){
+          const po = codeOf(splitPickerMode.value ? splitForm.订单号 : formModel['订单号']);
+          all = wrapPoInboundPickerRows(completedPoInboundRows(po));
         }
+      } else if(t==='来源采购入库单' && pageId.value==='wh-po-ret'){
+        const po = codeOf(formModel['关联采购订单']);
+        all = wrapPoInboundPickerRows(completedPoInboundRows(po));
       } else if(t==='采购订单' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         all = wrapPickerModuleRows('po', tradeDirectPos(), '采购订单号', '供应商名称');
         if(!all.length){
@@ -9347,8 +9449,10 @@ const app = createApp({
           单号: '系统自动生成',
           单据状态: '待执行',
           单据类型: dictFirst('单据类型','tab1') || '标准采购退料',
-          计划执行日期: ymd
+          计划执行日期: ymd,
+          来源采购入库单: ''
         });
+        formLineRows.value = [];
       }
       if(isOsPoPage() && formMode.value==='add'){
         const meta = osNoticeMeta();
@@ -11015,6 +11119,10 @@ const app = createApp({
         if(!splitForm.订单号){ ElMessage.warning('请选择订单号'); return; }
       }
       if(splitShowPo.value && !splitForm.采购订单){ ElMessage.warning('直发业务（贸易）请选择采购订单'); return; }
+      if(splitShowPreDoc.value && !String(splitForm.前置关联单据||'').trim()){
+        ElMessage.warning(splitBizOf()==='采购退料' ? '请选择已完成采购入库单（必填）' : '请选择已完成销售出库单（必填）');
+        return;
+      }
       const lines = splitLines.value || [];
       if(!lines.length){ ElMessage.warning('拆分数量或信息存在错误，请检查'); return; }
       const byMat = new Map();
@@ -12920,6 +13028,10 @@ const app = createApp({
           if(!formModel['订单号']){ ElMessage.warning('请选择订单号'); return; }
         }
         if(whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）' && !formModel['采购订单']){ ElMessage.warning('直发业务（贸易）请选择采购订单'); return; }
+        if((whBiz==='销售退货' || whBiz==='采购退料') && !String(formModel['前置关联单据']||'').trim()){
+          ElMessage.warning(whBiz==='采购退料' ? '请选择已完成采购入库单（必填）' : '请选择已完成销售出库单（必填）');
+          return;
+        }
         const list = ((MOCK['lg-dispatch'] = MOCK['lg-dispatch'] || {}).main = (MOCK['lg-dispatch'].main || []));
         const matInfo = formLineRows.value.map(r=> r['物料信息']).filter(Boolean).join('；');
         const qtySum = formLineRows.value.reduce((s,r)=> s + (Number(r['需求数量'])||0), 0);
@@ -12937,7 +13049,7 @@ const app = createApp({
           订单号: (orderType && orderType!=='无') ? (formModel['订单号']||'') : '',
           关联销售备货单: (whBiz==='销售发货' || whBiz==='销售预出货') ? (formModel['关联销售备货单']||'') : '',
           关联销售预出货单: whBiz==='销售发货' ? (formModel['关联销售预出货单']||'') : '',
-          前置关联单据: whBiz==='销售退货' ? (formModel['前置关联单据']||'') : '',
+          前置关联单据: (whBiz==='销售退货' || whBiz==='采购退料') ? (formModel['前置关联单据']||'') : '',
           采购订单: (whBiz==='销售发货' && formModel['配送类型']==='直发业务（贸易）') ? (formModel['采购订单']||'') : '',
           合同号: formModel['合同号']||lookupContractNo(orderType, formModel['订单号']),
           车型要求: formModel['车型要求']||'',
@@ -13310,6 +13422,9 @@ const app = createApp({
       if(pageId.value==='wh-so-ret'){
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
         if(!String(formModel['关联销售订单']||'').trim()){ ElMessage.warning('请选择关联销售订单'); return; }
+        if(!String(formModel['关联销售出库单']||'').trim() || formModel['关联销售出库单']==='—'){
+          ElMessage.warning('请选择关联销售出库单'); return;
+        }
         if(!(formLineRows.value||[]).length){ ElMessage.warning('请至少添加一行物料明细'); return; }
         if(formLineRows.value.some(r=> !r['物料信息'])){ ElMessage.warning('请选择物料信息'); return; }
         if(formLineRows.value.some(r=> !(Number(r['计划数量'])>0))){ ElMessage.warning('计划数量必须大于 0'); return; }
@@ -13611,6 +13726,9 @@ const app = createApp({
       if(pageId.value==='wh-po-ret'){
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
         if(!formModel['关联采购订单']){ ElMessage.warning('请选择关联采购订单'); return; }
+        if(!String(formModel['来源采购入库单']||'').trim() || formModel['来源采购入库单']==='—'){
+          ElMessage.warning('请选择来源采购入库单'); return;
+        }
         if(!formModel['供应商名称']){ ElMessage.warning('请选择供应商名称'); return; }
         if(!(formLineRows.value||[]).length){ ElMessage.warning('请至少添加一行物料明细'); return; }
         if(formLineRows.value.some(r=> !r['物料信息'])){ ElMessage.warning('请完善物料信息'); return; }
@@ -13650,6 +13768,7 @@ const app = createApp({
           物料信息: matInfo,
           备注: dash(formModel['备注']),
           关联采购订单: formModel['关联采购订单']||'',
+          来源采购入库单: dash(formModel['来源采购入库单']),
           供应商名称: formModel['供应商名称']||'',
           关联运单: dash(formModel['关联运单']),
           关联发货单: dash(formModel['关联发货单']),
@@ -14765,7 +14884,7 @@ const app = createApp({
       if(title==='订单号' && !splitPickerMode.value && (!formModel['订单类型'] || formModel['订单类型']==='无')){ ElMessage.warning('请先选择订单类型'); return; }
       if(title==='前置关联单据' && pageId.value==='lg-dispatch' && !splitPickerMode.value){
         const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
-        if(biz!=='销售退货'){ ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return; }
+        if(!['销售退货','采购退料'].includes(biz)){ ElMessage.warning('当前关联仓储业务无需选择前置关联单据'); return; }
       }
       if(title==='关联销售预出货单' && pageId.value==='lg-dispatch' && !splitPickerMode.value){
         const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
@@ -14919,6 +15038,10 @@ const app = createApp({
           if(dispatchOrderOptionalBiz(biz)){
             // 受托收/退料：选订单仅作追溯，不带入物料（物料在明细中手动挑选）
             ElMessage.success('已关联订单：'+formModel['订单号']+'（不自动带入物料）');
+          } else if(biz==='销售退货' || biz==='采购退料'){
+            formModel['前置关联单据'] = '';
+            formLineRows.value = [];
+            ElMessage.success('已选择订单：'+formModel['订单号']+'（请选择前置关联单据带入物料）');
           } else {
             formLineRows.value = dispatchLinesFromOrder(formModel['订单类型'], row.编码);
             ElMessage.success('已选择订单并带入物料：'+formModel['订单号']);
@@ -14926,10 +15049,41 @@ const app = createApp({
         } else {
           ElMessage.success('已选择订单号：'+formModel['订单号']);
         }
+      } else if(t==='来源采购入库单' && pageId.value==='wh-po-ret'){
+        const inNo = row.编码 || row['入库单号'] || codeOf(label);
+        const hit = completedPoInboundRows().find(r=> codeOf(r['入库单号'])===codeOf(inNo)) || row;
+        if(hit['单据状态'] && hit['单据状态']!=='已完成'){
+          ElMessage.warning('仅可选择「已完成」的采购入库单'); return;
+        }
+        const notice = findPoInNotice(hit);
+        const poNo = codeOf(hit['关联采购订单'] || notice['关联采购订单'] || '');
+        const curPo = codeOf(formModel['关联采购订单']);
+        if(curPo && poNo && curPo!==poNo){
+          ElMessage.warning('来源入库单与已选采购订单不一致'); return;
+        }
+        if(poNo){
+          const po = poOrderOf(poNo) || {};
+          const supplier = po['供应商名称'] || hit['供应商名称'] || notice['供应商名称'] || formModel['供应商名称'] || '';
+          formModel['关联采购订单'] = poNo + (supplier ? (' / ' + supplier) : '');
+          formModel['供应商名称'] = supplier;
+          if(po['预计到货日期']) formModel['计划执行日期'] = po['预计到货日期'];
+          poMatPool.value = poMatsOf(poNo).map(m=>({...m}));
+          clearPoInWaybillChain();
+        }
+        formModel['来源采购入库单'] = inNo;
+        applyCgrkToPoRetForm(hit);
+        if(notice && notice['关联运单'] && notice['关联运单']!=='—'){
+          formModel['关联运单'] = notice['关联运单'];
+          formModel['关联发货单'] = notice['关联发货单'] || formModel['关联发货单'] || '—';
+          ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{
+            if(notice[k] && notice[k]!=='—') formModel[k] = notice[k];
+          });
+        }
+        ElMessage.success('已选择来源采购入库单并按实绩带入物料：'+inNo);
       } else if(t==='前置关联单据' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         if(splitPickerMode.value){
           const kind = dispatchPreDocKind(splitBizOf());
-          const docLabel = row.规格 || '销售出库单';
+          const docLabel = row.规格 || (kind==='po-ret-pre' ? '采购入库单' : '销售出库单');
           splitForm.前置关联单据 = (row.编码||'') + ' / ' + docLabel;
           const lots = dispatchLinesFromPreDoc(kind, row.编码);
           if(lots.length && (splitLines.value||[]).length){
@@ -14943,8 +15097,33 @@ const app = createApp({
           return;
         }
         const kind = dispatchPreDocKind();
-        const docLabel = row.规格 || '销售出库单';
+        const docLabel = row.规格 || (kind==='po-ret-pre' ? '采购入库单' : '销售出库单');
         formModel['前置关联单据'] = (row.编码||'') + ' / ' + docLabel;
+        if(kind==='po-ret-pre'){
+          const hit = completedPoInboundRows().find(r=> codeOf(r['入库单号'])===codeOf(row.编码)) || row;
+          const notice = findPoInNotice(hit);
+          const poNo = codeOf(hit['关联采购订单'] || notice['关联采购订单'] || '');
+          const curPo = codeOf(formModel['订单号']);
+          if(curPo && poNo && curPo!==poNo){ ElMessage.warning('前置入库单与已选采购订单不一致'); return; }
+          if(poNo){
+            const po = poOrderOf(poNo) || {};
+            formModel['订单类型'] = '采购订单';
+            formModel['订单号'] = poNo + (po['供应商名称'] ? (' / ' + po['供应商名称']) : (hit['供应商名称'] ? (' / ' + hit['供应商名称']) : ''));
+            formModel['合同号'] = po['合同号'] || lookupContractNo('采购订单', poNo);
+          }
+        } else if(kind==='so-ret-pre'){
+          const hit = completedSoOutboundRows().find(r=> codeOf(r['出库单号'])===codeOf(row.编码)) || row;
+          const notice = findSoOutNotice(hit);
+          const soNo = codeOf(hit['关联销售订单'] || notice['关联销售订单'] || '');
+          const curSo = codeOf(formModel['订单号']);
+          if(curSo && soNo && curSo!==soNo){ ElMessage.warning('前置出库单与已选销售订单不一致'); return; }
+          if(soNo){
+            const so = soOrderOf(soNo) || {};
+            formModel['订单类型'] = '销售订单';
+            formModel['订单号'] = soNo + (so['客户名称'] ? (' / ' + so['客户名称']) : (hit['客户名称'] ? (' / ' + hit['客户名称']) : ''));
+            formModel['合同号'] = so['合同号'] || lookupContractNo('销售订单', soNo);
+          }
+        }
         const lines = dispatchLinesFromPreDoc(kind, row.编码);
         if(lines.length) formLineRows.value = lines;
         ElMessage.success('已选择前置关联单据并带入物料：'+formModel['前置关联单据']);
@@ -15238,20 +15417,25 @@ const app = createApp({
         if(pageId.value==='wh-so-ship') formModel['关联销售预出货单'] = '';
         if(pageId.value==='wh-so-ret') formModel['关联销售出库单'] = '';
         ['车牌号','车挂号','司机姓名','司机电话','司机身份证号'].forEach(k=>{ formModel[k] = ''; });
-        formLineRows.value = soLinesAsForm(soNo).map((r,i)=>({
-          _i: i+1,
-          行状态: '待执行',
-          物料信息: r['物料信息'] || matInfoText(r),
-          批号: '',
-          库存单位: r['销售单位'] || r['库存单位'] || matUnit(r,'so'),
-          管理方式: ((matListRow(codeOf(r['物料信息']||r))||{})['管理方式']) || '条码管理',
-          计划件数: String(r['计划件数'] || '10'),
-          计划数量: String(r['计划数量'] || '10.000'),
-          已完成数量: '0.000',
-          未完成数量: String(r['计划数量'] || '10.000'),
-          备注: r['备注'] || ''
-        }));
-        ElMessage.success('已选择销售订单并带入客户与物料：'+formModel['关联销售订单']);
+        if(pageId.value==='wh-so-ret'){
+          formLineRows.value = [];
+          ElMessage.success('已选择销售订单：'+formModel['关联销售订单']+'（请选择关联销售出库单带入物料）');
+        } else {
+          formLineRows.value = soLinesAsForm(soNo).map((r,i)=>({
+            _i: i+1,
+            行状态: '待执行',
+            物料信息: r['物料信息'] || matInfoText(r),
+            批号: '',
+            库存单位: r['销售单位'] || r['库存单位'] || matUnit(r,'so'),
+            管理方式: ((matListRow(codeOf(r['物料信息']||r))||{})['管理方式']) || '条码管理',
+            计划件数: String(r['计划件数'] || '10'),
+            计划数量: String(r['计划数量'] || '10.000'),
+            已完成数量: '0.000',
+            未完成数量: String(r['计划数量'] || '10.000'),
+            备注: r['备注'] || ''
+          }));
+          ElMessage.success('已选择销售订单并带入客户与物料：'+formModel['关联销售订单']);
+        }
       } else if(t==='关联销售预出货单' && (pageId.value==='wh-so-ship' || pageId.value==='lg-dispatch' || splitPickerMode.value)){
         const outNo = row.编码 || row['出库单号'] || label;
         if(row['单据状态'] && row['单据状态']!=='已完成'){

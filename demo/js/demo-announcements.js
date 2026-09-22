@@ -2,8 +2,15 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-22",
-    latestVersion: "v1.4.32",
+    latestVersion: "v1.4.33",
     notes: [
+    {
+      id: "ret-l2-predoc-v1433",
+      title: "v1.4.33 · 退料/退货必填关联上游 L2 执行单",
+      level: "info",
+      date: "2026-09-22",
+      body: "采购退料须选已完成入库单 CGRK 按实绩带行；销售退货「关联销售出库单」改为必填；派车前置关联单据在销售退货/采购退料均必填并透传建通知。强制刷新后生效。"
+    },
     {
       id: "dispatch-os-ret-goods-v1432",
       title: "v1.4.32 · 派车发货业务补齐委外退货",

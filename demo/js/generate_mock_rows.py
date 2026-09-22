@@ -84,8 +84,8 @@ MODULE_TABS: dict[str, list[str]] = {
     "lg-kpi-plan": ["main"],
     "lg-kpi-record": ["main"],
     "bc-tank-hist": ["main"],
-    "bc-serial-split": ["main"],
-    "bc-serial-merge": ["main"],
+    "bc-serial-split": ["tab1", "tab2"],
+    "bc-serial-merge": ["tab1", "tab2"],
     "bc-outer-split": ["main"],
     "bc-scrap-list": ["main"],
     "bc-scrap-proc": ["tab1", "tab2"],
@@ -410,11 +410,11 @@ def apply_so_wwpo(data: dict) -> None:
         return {
             "物料编码": "RM-Li2CO3-BG",
             "物料信息": mat_info("RM-Li2CO3-BG"),
-            "发料单位": "KG",
+            "采购单位": "KG",
             "计划件数": "5",
             "计划数量": "500",
-            "已发料数量": "0",
-            "未发料数量": "500",
+            "已入库数量": "0",
+            "未入库数量": "500",
             "行状态": "待执行",
             "备注": "—",
             "行号": n,
@@ -964,7 +964,7 @@ def apply_qc_ledger(data: dict) -> None:
                     "_autoFromPoIn": True,
                     "检验单号": f"QC{notice_no[-10:]}{str(line.get('行号', seq)).replace('-', '')}",
                     "关联单号": notice_no,
-                    "检验类型": "来料检验",
+                    "检验类型": "采购来料检",
                     "物料信息": line.get("物料信息", mat_info("RM-Li2CO3-BG")),
                     "批次号": batch,
                     "物料批次号": batch,
@@ -973,18 +973,85 @@ def apply_qc_ledger(data: dict) -> None:
                     "报检人": CREATORS[seq % len(CREATORS)],
                     "检验日期": f"2026-08-10 {9 + (seq % 8):02d}:30" if seq % 3 else "",
                     "质检员": CREATORS[(seq + 1) % len(CREATORS)] if seq % 3 else "",
-                    "检验判定": QC_JUDGMENTS[seq % len(QC_JUDGMENTS)],
+                    "检验结果": QC_JUDGMENTS[seq % len(QC_JUDGMENTS)],
                     "备注": "采购入库自动生成",
                 }
             )
             seq += 1
 
+    def _first_notice_line(page_id: str) -> tuple[str, str, str]:
+        rows = (data.get(page_id) or {}).get("tab1") or []
+        if not rows:
+            return "", mat_info("RM-Li2CO3-BG"), "20260801001"
+        notice = rows[0]
+        notice_no = str(notice.get("单号") or "")
+        lines = notice.get("_lines") or []
+        line = lines[0] if lines else {}
+        mat = line.get("物料信息") or notice.get("物料信息") or mat_info("RM-Li2CO3-BG")
+        batch = str(line.get("批号") or "20260801001")
+        return notice_no, mat, batch
+
+    wwst_no, wwst_mat, wwst_batch = _first_notice_line("wh-os-recv")
+    stst_no, stst_mat, stst_batch = _first_notice_line("wh-cs-recv")
+    scrk_no, scrk_mat, scrk_batch = _first_notice_line("wh-prod-in")
+
     manual_rows = [
+        {
+            "id": "auto-os-1",
+            "_autoFromOsRecv": True,
+            "检验单号": "QC260801WWST01",
+            "关联单号": wwst_no or "WWST202608010001",
+            "检验类型": "委外收货检",
+            "物料信息": wwst_mat,
+            "批次号": wwst_batch,
+            "物料批次号": wwst_batch,
+            "抽样数量": "50",
+            "报检时间": "2026-08-15 09:00",
+            "报检人": "李敏",
+            "检验日期": "2026-08-15 11:20",
+            "质检员": "陈伟",
+            "检验结果": "合格",
+            "备注": f"委外收货自动生成（关联 {wwst_no or 'WWST'}）",
+        },
+        {
+            "id": "auto-cs-1",
+            "_autoFromCsRecv": True,
+            "检验单号": "QC260801STST01",
+            "关联单号": stst_no or "STST202608010001",
+            "检验类型": "受托收料检",
+            "物料信息": stst_mat,
+            "批次号": stst_batch,
+            "物料批次号": stst_batch,
+            "抽样数量": "80",
+            "报检时间": "2026-08-16 10:00",
+            "报检人": "陈伟",
+            "检验日期": "",
+            "质检员": "",
+            "检验结果": "",
+            "备注": f"受托收料自动生成（关联 {stst_no or 'STST'}）",
+        },
+        {
+            "id": "manual-prod-1",
+            "_autoFromProdIn": True,
+            "检验单号": "QC260801SCRK01",
+            "关联单号": scrk_no or "SCRKSQ202608010001",
+            "检验类型": "生产成品检",
+            "物料信息": scrk_mat,
+            "批次号": scrk_batch,
+            "物料批次号": scrk_batch,
+            "抽样数量": "80",
+            "报检时间": "2026-08-11 14:00",
+            "报检人": "张三",
+            "检验日期": "2026-08-11 16:45",
+            "质检员": "王强",
+            "检验结果": "不合格",
+            "备注": f"生产入库申请单报检（关联 {scrk_no or 'SCRKSQ'}）",
+        },
         {
             "id": "manual-1",
             "检验单号": "QC2026081101",
-            "关联单号": "INV20260811",
-            "检验类型": "库内检验",
+            "关联单号": "—",
+            "检验类型": "库内检",
             "物料信息": mat_info("RM-LiOH-BG"),
             "批次号": "20260811001",
             "物料批次号": "20260811001",
@@ -993,30 +1060,14 @@ def apply_qc_ledger(data: dict) -> None:
             "报检人": "王五",
             "检验日期": "",
             "质检员": "",
-            "检验判定": "待判定",
-            "备注": "库内复检",
-        },
-        {
-            "id": "manual-2",
-            "检验单号": "QC2026081102",
-            "关联单号": "SCRK20260811001",
-            "检验类型": "成品检验",
-            "物料信息": mat_info("FG-Li2CO3-BG"),
-            "批次号": "20260811002",
-            "物料批次号": "20260811002",
-            "抽样数量": "80",
-            "报检时间": "2026-08-11 14:00",
-            "报检人": "张三",
-            "检验日期": "2026-08-11 16:45",
-            "质检员": "王强",
-            "检验判定": "不合格",
-            "备注": "水分超标",
+            "检验结果": "",
+            "备注": "库内抽检（无关联单号）",
         },
         {
             "id": "manual-3",
             "检验单号": "QC2026081103",
-            "关联单号": "INV20260812",
-            "检验类型": "库内检验",
+            "关联单号": "—",
+            "检验类型": "库内检",
             "物料信息": mat_info("RM-NMP"),
             "批次号": "20260812001",
             "物料批次号": "20260812001",
@@ -1025,21 +1076,21 @@ def apply_qc_ledger(data: dict) -> None:
             "报检人": "李敏",
             "检验日期": "2026-08-12 14:10",
             "质检员": "李敏",
-            "检验判定": "合格",
-            "备注": "—",
+            "检验结果": "合格",
+            "备注": "库内复检（无关联单号）",
         },
     ]
 
     merged = auto_rows + manual_rows
     # Ensure judgment coverage
     for j, judgment in enumerate(QC_JUDGMENTS):
-        if not any(r.get("检验判定") == judgment for r in merged):
+        if not any(r.get("检验结果") == judgment for r in merged):
             merged.append(
                 {
                     **copy.deepcopy(manual_rows[0]),
                     "id": f"coverage-{j}",
                     "检验单号": f"QC202608119{j}",
-                    "检验判定": judgment,
+                    "检验结果": judgment,
                 }
             )
 
@@ -1050,7 +1101,7 @@ def apply_qc_ledger(data: dict) -> None:
                 "id": f"extra-{i}",
                 "检验单号": f"QC20260812{i:02d}",
                 "关联单号": NOTICE_NO,
-                "检验类型": "来料检验",
+                "检验类型": "采购来料检",
                 "物料信息": mat_info("RM-Li2CO3-BG"),
                 "批次号": f"20260812{i:03d}",
                 "物料批次号": f"20260812{i:03d}",
@@ -1059,7 +1110,7 @@ def apply_qc_ledger(data: dict) -> None:
                 "报检人": CREATORS[i % len(CREATORS)],
                 "检验日期": f"2026-08-12 {10 + i}:00",
                 "质检员": CREATORS[(i + 2) % len(CREATORS)],
-                "检验判定": QC_JUDGMENTS[i % len(QC_JUDGMENTS)],
+                "检验结果": QC_JUDGMENTS[i % len(QC_JUDGMENTS)],
                 "备注": "—",
             }
         )

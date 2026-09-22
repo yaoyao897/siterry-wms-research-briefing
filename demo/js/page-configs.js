@@ -8708,6 +8708,10 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
+              "name": "来源采购入库单",
+              "type": "input"
+            },
+            {
               "name": "单据类型",
               "type": "select",
               "options": [
@@ -8739,6 +8743,7 @@ window.WMS_PAGE_CONFIGS = {
             "供应商名称"
           ],
           "queryMore": [
+            "来源采购入库单",
             "单据类型",
             "关联运单",
             "关联发货单",
@@ -9286,6 +9291,7 @@ window.WMS_PAGE_CONFIGS = {
         "计划执行日期",
         "备注",
         "关联采购订单",
+        "来源采购入库单",
         "供应商名称",
         "关联运单",
         "关联发货单",
@@ -9490,13 +9496,19 @@ window.WMS_PAGE_CONFIGS = {
               "name": "关联采购订单",
               "type": "picker",
               "required": true,
-              "ctrl": "弹窗选择采购订单；选后自动带出供应商名称及物料，并解除关联运单置灰"
+              "ctrl": "弹窗选择采购订单；选后自动带出供应商名称并解除关联运单置灰；清空时同步清空来源采购入库单与物料"
+            },
+            {
+              "name": "来源采购入库单",
+              "type": "picker",
+              "required": true,
+              "ctrl": "必填；弹窗选择已完成 L2 采购入库单 CGRK；可按 PO 过滤；选后按入库实绩覆盖物料明细"
             },
             {
               "name": "供应商名称",
               "type": "readonly",
               "required": true,
-              "ctrl": "选采购订单后自动带入，只读"
+              "ctrl": "选采购订单/入库单后自动带入，只读"
             },
             {
               "name": "计划执行日期",
@@ -9570,6 +9582,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据类型",
             "是否需要装卸货",
             "关联采购订单",
+            "来源采购入库单",
             "供应商名称",
             "计划执行日期",
             "备注",
@@ -20333,7 +20346,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "关联销售订单",
               "type": "picker",
               "required": true,
-              "ctrl": "必填；选后带出客户名称与订单物料，并解除关联运单置灰"
+              "ctrl": "必填；选后带出客户名称、解除关联运单置灰；不按订单带物料行（须选出库单覆盖带入）"
             },
             {
               "name": "客户名称",
@@ -20350,8 +20363,8 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联销售出库单",
               "type": "picker",
-              "required": false,
-              "ctrl": "选填；选后联动带出订单/客户与出库物料明细"
+              "required": true,
+              "ctrl": "必填；选后联动带出订单/客户，并按出库实绩覆盖物料明细"
             },
             {
               "name": "ERP单据号",
@@ -29100,8 +29113,8 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "前置关联单据",
               "type": "picker",
-              "required": false,
-              "ctrl": "仅关联仓储业务=销售退货时显示；可选已完成的 L2 销售出库单（CKFH/CKYC 等 tab2 执行单，选填）；选中后带入原出库物料，未选可手录物料；销售发货已拆分为备货单/预出货单两字段"
+              "required": true,
+              "ctrl": "关联仓储业务=销售退货或采购退料时显示且必填；销售退货选已完成 CKFH/CKYC；采购退料选已完成 CGRK；按实绩覆盖带入物料"
             },
             {
               "name": "采购订单",

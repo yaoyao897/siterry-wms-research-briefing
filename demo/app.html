@@ -493,7 +493,7 @@ body.remarks-open .demo-scope-tip{display:none}
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../">返回总览</a>
+          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
             <a href="./app.html" class="on">APP</a>
@@ -1066,9 +1066,9 @@ body.remarks-open .demo-scope-tip{display:none}
                       </select>
                     </div>
                     <div class="field" v-if="isSoRmaDoc">
-                      <label>关联销售出库单</label>
+                      <label><span class="req">*</span>关联销售出库单</label>
                       <select v-model="poInForm.shipOutNo" @change="onPoInShipOutChange">
-                        <option value="">请选择已完成出库单 CKFH/CKYC（选填）</option>
+                        <option value="">请选择已完成出库单 CKFH/CKYC（必填）</option>
                         <option v-for="p in poInShipOutOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.customer || p.soNo || '' }}</option>
                       </select>
                     </div>
@@ -1091,6 +1091,13 @@ body.remarks-open .demo-scope-tip{display:none}
                     <select v-model="poInForm.poNo" @change="onPoInPoChange">
                       <option value="">{{ isTrustPartyDoc ? '请选择销售订单（选填）' : (isSoSalesDoc ? '请选择销售订单' : (isOsWwpoDoc ? '请选择委外加工单' : '请选择采购订单')) }}</option>
                       <option v-for="p in poInSelectablePos" :key="p.code" :value="p.code">{{ p.code }} · {{ p.supplier || p.name }}</option>
+                    </select>
+                  </div>
+                  <div class="field" v-if="isPoRetDoc">
+                    <label><span class="req">*</span>来源采购入库单</label>
+                    <select v-model="poInForm.sourceInNo" @change="onPoInSourceInChange">
+                      <option value="">请选择已完成采购入库单 CGRK（必填）</option>
+                      <option v-for="p in poInSourceInOptions" :key="p.code" :value="p.code">{{ p.code }} · {{ p.supplier || p.poNo || '' }}</option>
                     </select>
                   </div>
                   <div class="field">
@@ -4787,12 +4794,12 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.4.31"></script>
+<script src="./js/demo-announcements.js?v=1.4.33"></script>
 <script src="./js/dict-catalog.js"></script>
-<script src="./js/mock-rows.js?v=1.4.0"></script>
+<script src="./js/mock-rows.js?v=1.4.33"></script>
 <script src="./js/demo-store.js?v=1.3.347"></script>
 <script src="./js/app-configs.js?v=1.4.22"></script>
-<script src="./js/page-prd-notes.js?v=1.4.22"></script>
+<script src="./js/page-prd-notes.js?v=1.4.33"></script>
 <script src="./js/remarks-markdown.js"></script>
 <script type="module" src="./js/remarks-mermaid-init.js"></script>
 <script src="./js/remarks-mermaid.js?v=1.4.0"></script>
@@ -5902,6 +5909,31 @@ createApp({
       }
       return rows.filter((x) => x.code);
     });
+    /** 采购退料 · 已完成采购入库单 CGRK */
+    const poInSourceInOptions = computed(() => {
+      storeTick.value;
+      if (!isPoRetDoc.value) return [];
+      const soCode = (v) => String(v || '').split(/\s*\/\s*/)[0].trim();
+      let rows = (((window.WMS_MOCK_ROWS || {})['wh-po-in'] || {}).tab2 || [])
+        .filter((r) => String(r['单据状态'] || '') === '已完成')
+        .map((r) => ({
+          code: r['入库单号'],
+          supplier: r['供应商名称'] || '',
+          poNo: soCode(r['关联采购订单']),
+          noticeNo: r['关联收料通知单号'] || '',
+          matInfo: r['物料信息'] || '',
+          qty: r['已完成数量'] || '0',
+          pcs: r['已完成件数'] || '0',
+          unit: r['库存单位'] || 'KG',
+          waybillNo: r['关联运单'] || '',
+          logisticsNo: r['关联发货单'] || '',
+        })).filter((x) => x.code);
+      if (poInForm.poNo) {
+        const filtered = rows.filter((r) => r.poNo === poInForm.poNo);
+        if (filtered.length) rows = filtered;
+      }
+      return rows;
+    });
     const poInVehiclePickerVisible = ref(false);
     const poInVehiclePickerKw = ref('');
     const filteredPoInVehicleOptions = computed(() => {
@@ -6367,6 +6399,77 @@ createApp({
         }];
       }
       ElementPlus.ElMessage.success('已选择销售出库单：' + out.code);
+    }
+    function onPoInSourceInChange() {
+      if (!isPoRetDoc.value) return;
+      const hit = (poInSourceInOptions.value || []).find((p) => p.code === poInForm.sourceInNo);
+      if (!hit) return;
+      if (hit.poNo) {
+        const cur = String(poInForm.poNo || '').trim();
+        if (cur && cur !== hit.poNo) {
+          ElementPlus.ElMessage.error('来源入库单与已选采购订单不一致');
+          poInForm.sourceInNo = '';
+          return;
+        }
+        if (!cur) {
+          poInForm.poNo = hit.poNo;
+          const po = (refOrderOptions.value || []).find(p => p.code === hit.poNo);
+          poInForm.supplier = hit.supplier || (po && (po.supplier || po.name)) || poInForm.supplier;
+        } else if (hit.supplier) {
+          poInForm.supplier = hit.supplier;
+        }
+      } else if (hit.supplier) {
+        poInForm.supplier = hit.supplier;
+      }
+      if (hit.waybillNo) {
+        poInForm.waybillNo = hit.waybillNo;
+        poInForm.logisticsNo = hit.logisticsNo || '';
+        const w = (CFG.waybillOptions || []).find((x) => x.code === hit.waybillNo);
+        if (w) {
+          poInForm.plate = w.plate || '';
+          poInForm.trailer = w.trailer || '—';
+          poInForm.driver = w.driver || '';
+          poInForm.phone = w.phone || '';
+          poInForm.driverId = w.driverId || '';
+        }
+      }
+      const noticeNo = hit.noticeNo;
+      if (noticeNo) {
+        const tab1 = ((window.WMS_MOCK_ROWS || {})['wh-po-in'] || {}).tab1 || [];
+        const notice = tab1.find((r) => String(r['单号'] || '') === noticeNo);
+        if (notice && Array.isArray(notice._lines) && notice._lines.length) {
+          const zeroPcs = isPoRetCount.value;
+          poInForm.lines = notice._lines.map((ln) => {
+            const parts = parseMatInfoParts(ln['物料信息']);
+            const qty = Number(ln['已完成数量'] != null ? ln['已完成数量'] : ln['计划数量']) || Number(hit.qty) || 0;
+            const pcs = zeroPcs ? 0 : (Number(ln['计划件数']) || Number(hit.pcs) || 0);
+            return {
+              code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+              unit: ln['库存单位'] || hit.unit || 'KG',
+              planPcs: pcs, planQty: qty || Number(hit.qty) || 1,
+              lot: String(ln['批号'] || '').trim() === '—' ? '' : String(ln['批号'] || '').trim(),
+              manageMode: ln['管理方式'] || (zeroPcs ? '计数管理' : '条码管理'),
+              remark: '', status: '待执行', doneQty: 0,
+              remainQty: qty || Number(hit.qty) || 1, remainPcs: pcs,
+            };
+          });
+          ElementPlus.ElMessage.success('已选择来源入库单并按实绩带入物料：' + hit.code);
+          return;
+        }
+      }
+      if (hit.matInfo) {
+        const parts = parseMatInfoParts(hit.matInfo);
+        const zeroPcs = isPoRetCount.value;
+        const qty = Number(hit.qty) || 1;
+        const pcs = zeroPcs ? 0 : (Number(hit.pcs) || 0);
+        poInForm.lines = [{
+          code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+          unit: hit.unit || 'KG', planPcs: pcs, planQty: qty, lot: '',
+          manageMode: zeroPcs ? '计数管理' : '条码管理',
+          remark: '', status: '待执行', doneQty: 0, remainQty: qty, remainPcs: pcs,
+        }];
+      }
+      ElementPlus.ElMessage.success('已选择来源采购入库单：' + hit.code);
     }
     function maskIdCardApp(id) {
       const s = String(id || '').trim();
@@ -13871,7 +13974,7 @@ createApp({
           id: '', poNo: '', supplier: '', docType: defaultNoticeDocType(), planDate: todayYmd(),
           erpNo: '', remark: '', waybillNo: '', logisticsNo: '', plate: '', trailer: '',
           driver: '', phone: '', driverId: '', isLoadingRequired: '是',
-          stockNo: '', preoutNo: '', shipOutNo: '', returnReason: '', lines: [],
+          stockNo: '', preoutNo: '', shipOutNo: '', sourceInNo: '', returnReason: '', lines: [],
         });
       }
       view.value = 'po-in-form';
@@ -13884,6 +13987,7 @@ createApp({
     function onPoInPoChange() {
       const po = (refOrderOptions.value || []).find(p => p.code === poInForm.poNo);
       clearPoInCarrierFields();
+      if (isPoRetDoc.value) poInForm.sourceInNo = '';
       if (isSoPcAlignedForm.value) {
         if (isSoShipDoc.value) poInForm.preoutNo = '';
         if (isSoRmaDoc.value) poInForm.shipOutNo = '';
@@ -13914,6 +14018,19 @@ createApp({
       if (isTrustPartyDoc.value) {
         poInForm.lines = [];
         ElementPlus.ElMessage.success('已关联销售订单并带出客户名称');
+        return;
+      }
+      // 销售退货：选 SO 不带行，须选出库单覆盖
+      if (isSoRmaDoc.value) {
+        poInForm.lines = [];
+        ElementPlus.ElMessage.success('已关联销售订单（请选择关联销售出库单带入物料）');
+        return;
+      }
+      // 采购退料：选 PO 不带行，须选来源入库单覆盖
+      if (isPoRetDoc.value) {
+        poInForm.sourceInNo = '';
+        poInForm.lines = [];
+        ElementPlus.ElMessage.success('已关联采购订单（请选择来源采购入库单带入物料）');
         return;
       }
       const makerName = poInForm.supplier;
@@ -14084,6 +14201,14 @@ createApp({
         ElementPlus.ElMessage.error((isSoSalesDoc.value) ? '请选择关联销售订单' : (isOsWwpoDoc.value ? '请选择关联委外加工单' : '请选择关联采购订单'));
         return;
       }
+      if (isSoRmaDoc.value && !String(poInForm.shipOutNo || '').trim()) {
+        ElementPlus.ElMessage.error('请选择关联销售出库单');
+        return;
+      }
+      if (isPoRetDoc.value && !String(poInForm.sourceInNo || '').trim()) {
+        ElementPlus.ElMessage.error('请选择来源采购入库单');
+        return;
+      }
       if (isTrustPartyDoc.value && !String(poInForm.supplier || '').trim()) {
         ElementPlus.ElMessage.error('请填写客户名称');
         return;
@@ -14167,6 +14292,7 @@ createApp({
         prepNoticeNo: poInForm.stockNo || '',
         preoutNo: poInForm.preoutNo || '',
         shipOutNo: poInForm.shipOutNo || '',
+        sourceInNo: poInForm.sourceInNo || '',
         returnReason: poInForm.returnReason || '',
         materialSummary: summary,
         packSpec: isInTankDoc.value ? '槽车散装/储罐' : (isCountFlow ? '计数/无包材' : '吨袋+托架'),
@@ -16905,6 +17031,7 @@ createApp({
         备注: n.remark || '—',
         ERP单据号: '—',
         关联采购订单: n.refNo || n.poNo || '—',
+        来源采购入库单: n.sourceInNo || '—',
         供应商名称: n.partner || n.supplier || '—',
         关联运单: n.waybillNo || '—',
         关联发货单: n.logisticsNo || '—',
@@ -20837,9 +20964,9 @@ createApp({
       openProdRetForm, backProdRetForm, onProdRetSclckChange, removeProdRetFormLine, saveProdRetNotice,
       prodPickFormMode, prodPickForm, prodPickMatPickerVisible, prodPickMatPickerKw, moOptions, filteredProdPickMatOptions, prodPickMatPickerTitle, isProdPickMatAlreadyAdded,
       prodRetFormMode, prodRetForm, sclckOptions,
-      openPoInNoticeForm, backPoInNoticeForm, onPoInPoChange, onPoInWaybillChange, onPoInPrepChange, onPoInPreoutOutChange, onPoInLogisticsChange, onPoInShipOutChange,
+      openPoInNoticeForm, backPoInNoticeForm, onPoInPoChange, onPoInWaybillChange, onPoInPrepChange, onPoInPreoutOutChange, onPoInLogisticsChange, onPoInShipOutChange, onPoInSourceInChange,
       openPoInVehiclePicker, selectPoInVehicle, clearPoInVehicle, openPoInLotPicker, selectPoInLot, clearPoInLineLot,
-      poInPrepOptions, poInPreoutOutOptions, poInShipOutOptions, poInVehiclePickerVisible, poInVehiclePickerKw, filteredPoInVehicleOptions,
+      poInPrepOptions, poInPreoutOutOptions, poInShipOutOptions, poInSourceInOptions, poInVehiclePickerVisible, poInVehiclePickerKw, filteredPoInVehicleOptions,
       poInLotPickerVisible, poInLotPickerKw, filteredPoInLotOptions, isSoPcAlignedForm,
       openXferForm, backXferForm, openXferMatPicker, selectXferMat, removeXferFormLine, saveXferNotice,
       openXferLotPicker, selectXferLot, clearXferLineLot, onXferWaybillChange, xferWaybillOpts, xferShipOpts,
