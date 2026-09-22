@@ -2,8 +2,15 @@
 (function (global) {
   const DEMO_ANNOUNCEMENTS = {
     updatedAt: "2026-09-22",
-    latestVersion: "v1.4.31",
+    latestVersion: "v1.4.32",
     notes: [
+    {
+      id: "dispatch-os-ret-goods-v1432",
+      title: "v1.4.32 · 派车发货业务补齐委外退货",
+      level: "info",
+      date: "2026-09-22",
+      body: "用车类型=发货时关联仓储业务候选补齐「委外退货」（对齐矩阵：不良成品退回加工厂）。强制刷新后生效。"
+    },
     {
       id: "trust-order-optional-v1431",
       title: "v1.4.31 · 受托收/退料订单选填不带物料",

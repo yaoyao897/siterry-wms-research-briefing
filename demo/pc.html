@@ -2429,8 +2429,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.10.23/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4.12.0/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.4.0"></script>
-<script src="./js/page-configs.js?v=1.4.31"></script>
-<script src="./js/mock-rows.js?v=1.4.31"></script>
+<script src="./js/page-configs.js?v=1.4.32"></script>
+<script src="./js/mock-rows.js?v=1.4.32"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/page-prd-notes.js?v=1.4.22"></script>
 <script src="./js/remarks-markdown.js"></script>
@@ -2974,7 +2974,7 @@ const app = createApp({
     const mergeShipRows = ref([]);
     const VEHICLE_OPTS = ['发货','提货','设备发运','厂内/园区倒短运输','物资转运','其他'];
     const WH_BIZ_BY_VEHICLE = {
-      '发货': ['销售发货','销售预出货','采购退料','委外发料','受托退料','其他出库'],
+      '发货': ['销售发货','销售预出货','采购退料','委外发料','委外退货','受托退料','其他出库'],
       '提货': ['采购入库','销售退货','委外收货','受托收料','委外退料','其他入库'],
       '厂内/园区倒短运输': ['直接调拨','库内转移'],
       '设备发运': ['无','其他出库','其他入库'],
