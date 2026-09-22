@@ -1178,8 +1178,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
               <el-option label="不合格" value="不合格"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="检验员" required>
-            <el-input v-model="qcInspectForm.检验员" placeholder="请输入"></el-input>
+          <el-form-item label="检验员">
+            <el-input v-model="qcInspectForm.检验员" placeholder="请输入（选填）"></el-input>
           </el-form-item>
           <el-form-item label="检验日期" required>
             <el-date-picker v-model="qcInspectForm.检验日期" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="选择日期时间" style="width:100%"></el-date-picker>
@@ -2429,8 +2429,8 @@ body.remarks-open .query-area__actions,body.remarks-open .query-card__actions{
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.10.23/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4.12.0/lib/index.umd.min.js"></script>
 <script src="./js/demo-announcements.js?v=1.4.0"></script>
-<script src="./js/page-configs.js?v=1.4.22"></script>
-<script src="./js/mock-rows.js?v=1.4.22"></script>
+<script src="./js/page-configs.js?v=1.4.31"></script>
+<script src="./js/mock-rows.js?v=1.4.31"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/page-prd-notes.js?v=1.4.22"></script>
 <script src="./js/remarks-markdown.js"></script>
@@ -2511,7 +2511,57 @@ const DictTypeTreeNodes = {
 const CFG = window.WMS_PAGE_CONFIGS || { menu:[], pages:{} };
 const MOCK = window.WMS_MOCK_ROWS || {};
 const STORE = window.WMS_DEMO_STORE;
+const MOCK_SEED_QC = JSON.parse(JSON.stringify(((MOCK['qc-ledger'] || {}).main) || []));
 if(STORE) STORE.hydrateMock(MOCK);
+(function migrateQcLedgerClosedLoop(){
+  /** 旧口径 / 断链关联单 / 未检却有质检员 / 缺物料批次号 → 重建或就地纠正，与新增口径一致 */
+  const bag = (MOCK['qc-ledger'] = MOCK['qc-ledger'] || {});
+  const list = Array.isArray(bag.main) ? bag.main : [];
+  const obsoleteType = /^(来料检验|过程检验|成品检验|委外检验|留样复测)$/;
+  const typePrefix = {
+    '采购来料检': 'CGST',
+    '委外收货检': 'WWST',
+    '受托收料检': 'STST',
+    '生产成品检': 'SCRKSQ',
+  };
+  const broken = !list.length || list.some(r=>{
+    const t = String(r && r['检验类型'] || '').trim();
+    const no = String(r && r['关联单号'] || '').trim();
+    const lot = String(r && (r['物料批次号'] || r['批次号']) || '').trim();
+    const res = String(r && r['检验结果'] || '').trim();
+    const insp = String(r && r['质检员'] || '').trim();
+    const idate = String(r && r['检验日期'] || '').trim();
+    if(obsoleteType.test(t)) return true;
+    if(/^BAT\d+$/i.test(lot)) return true; // 旧 Mock 占位批次 BAT01…，与新增物料批次号口径不一致
+    if(t === '库内检') return !!(no && no !== '—');
+    const pfx = typePrefix[t];
+    if(pfx && no && no !== '—' && !no.startsWith(pfx)) return true;
+    if((!res || res === '—' || res === '-') && (insp || idate)) return true; // 未检不应有质检员/检验日期
+    return false;
+  });
+  if(broken && MOCK_SEED_QC.length){
+    bag.main = JSON.parse(JSON.stringify(MOCK_SEED_QC));
+    bag._seedRev = 3;
+    if(STORE && STORE.saveMock) STORE.saveMock(MOCK);
+    return;
+  }
+  let changed = false;
+  list.forEach(r=>{
+    const lot = String(r['物料批次号'] || r['批次号'] || '').trim();
+    if(lot && r['物料批次号'] !== lot){ r['物料批次号'] = lot; changed = true; }
+    if(lot && r['批次号'] !== lot){ r['批次号'] = lot; changed = true; }
+    const res = String(r['检验结果'] || '').trim();
+    if(!res || res === '—' || res === '-'){
+      if(r['质检员']){ r['质检员'] = ''; changed = true; }
+      if(r['检验日期']){ r['检验日期'] = ''; changed = true; }
+      if(r['检验结果'] === '—' || r['检验结果'] === '-'){ r['检验结果'] = ''; changed = true; }
+    }
+  });
+  if(changed){
+    bag._seedRev = 3;
+    if(STORE && STORE.saveMock) STORE.saveMock(MOCK);
+  }
+})();
 (function normalizeSerialArchInspectStatus(){
   const list = ((MOCK['serial-arch'] || {}).main || []);
   if(!list.length) return;
@@ -3002,7 +3052,7 @@ const app = createApp({
       if(id==='wh-load') return '选择关联单号后自动带入物料，或点击新增挑选物料';
       if(id==='wh-insp-scheme') return '请点击新增选择关联仓库';
       if(id==='wh-prod-in') return '选择关联生产订单后自动带入物料，或点击新增挑选物料';
-      if(isCsWhPage()) return '选择关联发货单后自动带入物料，或点击新增挑选物料';
+      if(isCsWhPage()) return '关联销售订单选填（不带物料）；选择关联发货单后自动带入物料，或点击新增挑选物料';
       if(isOsPoPage()){
         if(id==='wh-os-issue' || id==='wh-os-ret-mat') return '选择关联委外加工单后点击新增挑选发料原料';
         return '选择关联委外加工单后自动带入物料，或点击新增挑选订单内物料';
@@ -3263,6 +3313,9 @@ const app = createApp({
       if(pageId.value==='bc-freeze' && f.name==='冻结单号' && formMode.value==='add') return false;
       if(pageId.value==='bc-unfreeze' && f.name==='解除单号' && formMode.value==='add') return false;
       if(pageId.value==='bc-scrap-proc' && f.name==='工单号' && formMode.value==='add') return false;
+      if(pageId.value==='qc-ledger' && f.name==='关联单号'){
+        return !isQcLedgerStockInsp(formModel['检验类型']);
+      }
       return true;
     }
     function isFormFieldRequired(f){
@@ -4382,13 +4435,16 @@ const app = createApp({
       });
       return prefix + String(max + 1).padStart(2,'0');
     }
-    /** 采购收料通知单保存后：每行物料自动生成一条来料检验台账（物料与批号一一对应） */
-    function syncQcLedgerFromPoInNotice(noticeNo, lines){
+    /** 收料类通知单保存后：每行物料自动生成一条检验台账（采购来料/委外收货/受托收料） */
+    function syncQcLedgerFromNotice(noticeNo, lines, opts){
       const no = String(noticeNo||'').trim();
       if(!no || !(lines||[]).length) return;
+      const qcType = (opts && opts.qcType) || '采购来料检';
+      const autoKey = (opts && opts.autoKey) || '_autoFromNotice';
+      const idPrefix = (opts && opts.idPrefix) || 'qc-notice';
       const bag = (MOCK['qc-ledger'] = MOCK['qc-ledger'] || {});
       const list = (bag.main = bag.main || []);
-      const kept = list.filter(r=> !(r._autoFromPoIn && String(r['关联单号']||'')===no));
+      const kept = list.filter(r=> !(r[autoKey] && String(r['关联单号']||'')===no));
       const d = new Date();
       const pad = n => String(n).padStart(2,'0');
       const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -4396,25 +4452,46 @@ const app = createApp({
         const lot = String(r['批号']||'').trim();
         const mat = String(r['物料信息']||'').trim() || '—';
         return {
-          id: 'qc-poin-' + no + '-' + (i+1) + '-' + Date.now(),
+          id: idPrefix + '-' + no + '-' + (i+1) + '-' + Date.now(),
           检验单号: nextQcInspectNo(),
           关联单号: no,
-          检验类型: '来料检验',
+          检验类型: qcType,
           物料信息: mat,
           批次号: lot,
           物料批次号: lot,
           抽样数量: '0',
+          检验结果: '',
           报检时间: now,
           报检人: '张三',
           检验日期: '',
           质检员: '',
-          检验判定: '待判定',
           备注: '—',
-          _autoFromPoIn: true,
-          _poInLineId: r.id || ('L' + (i+1))
+          [autoKey]: true,
+          _srcLineId: r.id || ('L' + (i+1))
         };
       });
       bag.main = newRows.concat(kept);
+    }
+    function syncQcLedgerFromPoInNotice(noticeNo, lines){
+      syncQcLedgerFromNotice(noticeNo, lines, { qcType:'采购来料检', autoKey:'_autoFromPoIn', idPrefix:'qc-poin' });
+    }
+    function syncQcLedgerFromOsRecvNotice(noticeNo, lines){
+      syncQcLedgerFromNotice(noticeNo, lines, { qcType:'委外收货检', autoKey:'_autoFromOsRecv', idPrefix:'qc-osrecv' });
+    }
+    function syncQcLedgerFromCsRecvNotice(noticeNo, lines){
+      syncQcLedgerFromNotice(noticeNo, lines, { qcType:'受托收料检', autoKey:'_autoFromCsRecv', idPrefix:'qc-csrecv' });
+    }
+    function qcLedgerRefMeta(qcType){
+      const t = String(qcType||'').trim();
+      if(t==='采购来料检' || t==='来料检验') return { pageId:'wh-po-in', tab:'tab1', noKey:'单号', nameKey:'供应商名称', label:'采购收料通知单' };
+      if(t==='委外收货检') return { pageId:'wh-os-recv', tab:'tab1', noKey:'单号', nameKey:'供应商名称', label:'委外收货通知单' };
+      if(t==='受托收料检') return { pageId:'wh-cs-recv', tab:'tab1', noKey:'单号', nameKey:'客户名称', label:'受托收料通知单' };
+      if(t==='生产成品检' || t==='成品检验') return { pageId:'wh-prod-in', tab:'tab1', noKey:'单号', nameKey:'物料信息', label:'生产入库申请单' };
+      return null;
+    }
+    function isQcLedgerStockInsp(qcType){
+      const t = String(qcType||'').trim();
+      return t==='库内检' || t==='库内检验';
     }
     function syncSoStatusFromLines(order){
       const lines = order._lines||[];
@@ -4675,7 +4752,7 @@ const app = createApp({
       return ops;
     }
     function isDetailTagField(name){
-      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='循环方式' || name==='启用状态' || name==='使用状态' || name==='库存状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定' || name==='ERP对接状态' || name==='流水状态';
+      return name==='审核状态' || name==='状态' || name==='订单状态' || name==='计划状态' || name==='单据状态' || name==='备货状态' || name==='出门条状态' || name==='检查结果' || name==='逾期状态' || name==='签收状态' || name==='运单状态' || name==='结算状态' || name==='司机确认状态' || name==='收货确认状态' || name==='复核状态' || name==='评定结果' || name==='检验结果' || name==='循环方式' || name==='启用状态' || name==='使用状态' || name==='库存状态' || name==='事件等级' || name==='处理状态' || name==='初步责任判定' || name==='ERP对接状态' || name==='流水状态';
     }
     function detailFieldLabel(f){
       const name = f?.name || f || '';
@@ -4730,8 +4807,14 @@ const app = createApp({
     function dispatchOrderTypeForBiz(biz){
       return DISPATCH_ORDER_BY_BIZ[String(biz||'').trim()] || '';
     }
+    /** 受托收/退料：订单类型仍默认销售订单，但订单号选填且选单不带物料 */
+    function dispatchOrderOptionalBiz(biz){
+      const b = String(biz||'').trim();
+      return b==='受托收料' || b==='受托退料';
+    }
     function dispatchNeedsOrderNo(){
       const biz = (formModel && (formModel['关联仓储业务'] || formModel['仓库业务类型'])) || '';
+      if(dispatchOrderOptionalBiz(biz)) return false;
       return !!dispatchOrderTypeForBiz(biz);
     }
     function syncDispatchDeliveryTypeByBiz(){
@@ -4882,7 +4965,11 @@ const app = createApp({
     function splitBizOf(){
       return (splitRow.value && (splitRow.value['关联仓储业务'] || splitRow.value['仓库业务类型'] || resolveWhBizType(splitRow.value))) || '';
     }
-    const splitNeedsOrder = computed(()=> !!dispatchOrderTypeForBiz(splitBizOf()));
+    const splitNeedsOrder = computed(()=>{
+      const biz = splitBizOf();
+      if(dispatchOrderOptionalBiz(biz)) return false;
+      return !!dispatchOrderTypeForBiz(biz);
+    });
     const splitShowPreDoc = computed(()=> splitBizOf()==='销售退货');
     const splitShowSoShipPreDocs = computed(()=> splitBizOf()==='销售发货');
     const splitShowSoPreoutPrepDoc = computed(()=> splitBizOf()==='销售预出货');
@@ -5326,6 +5413,8 @@ const app = createApp({
       }
       list.unshift(base);
       if(meta.pageId==='wh-po-in') syncQcLedgerFromPoInNotice(base[meta.noKey], base._lines);
+      if(meta.pageId==='wh-os-recv') syncQcLedgerFromOsRecvNotice(base[meta.noKey], base._lines);
+      if(meta.pageId==='wh-cs-recv') syncQcLedgerFromCsRecvNotice(base[meta.noKey], base._lines);
     }
     function overlayShipByWaybill(row){
       if(!row) return row;
@@ -5664,6 +5753,8 @@ const app = createApp({
           const partyName = String(s['订单号']||'').split(/\s*\/\s*/)[1]?.trim() || existing['供应商名称'] || existing['客户名称'] || '';
           fillNoticeLineDefaults(existing, s, partyName);
           if(meta.pageId==='wh-po-in') syncQcLedgerFromPoInNotice(existing[meta.noKey], existing._lines);
+          if(meta.pageId==='wh-os-recv') syncQcLedgerFromOsRecvNotice(existing[meta.noKey], existing._lines);
+          if(meta.pageId==='wh-cs-recv') syncQcLedgerFromCsRecvNotice(existing[meta.noKey], existing._lines);
         } else {
           createWarehouseNoticeFromShip(s, wayNo, noticeNo, whBiz);
         }
@@ -6098,16 +6189,6 @@ const app = createApp({
       }
       return [];
     }
-    /** 储罐类液体物料（硫酸/液碱等）入库后不支持采购退料 */
-    function isPoRetTankMat(src){
-      const code = codeOf((src && (src.编码 || src['物料编码'] || src.code || src['物料信息'])) || src || '');
-      if(['RM-H2SO4','RM-NaOH','RM-HCl'].includes(code)) return true;
-      const mr = matListRow(code) || (src && typeof src==='object' ? src : null) || {};
-      const kind = String(mr['物料种类'] || mr.种类 || mr.kind || '');
-      if(kind.includes('液体')) return true;
-      const blob = [mr['物料名称']||mr.名称||'', mr['备注']||'', mr['物料规格']||''].join('');
-      return /浓硫酸|液碱|盐酸|槽车|储罐/.test(blob) && kind.includes('危化');
-    }
     function normalizePoRetFormLine(r, i){
       const mode = String((r && r['管理方式']) || '').trim();
       const isCount = mode.includes('计数');
@@ -6173,15 +6254,8 @@ const app = createApp({
       if(po['预计到货日期']) formModel['计划执行日期'] = po['预计到货日期'];
       let mats = poMatsOf(code);
       if(pageId.value==='wh-po-ret'){
-        const all = mats.map(m=>({...m}));
-        mats = all.filter(m=> !isPoRetTankMat(m));
-        poMatPool.value = mats;
+        poMatPool.value = mats.map(m=>({...m}));
         formLineRows.value = ensureLineNos(buildPoInFormLines(mats, supplier).map((r,i)=> normalizePoRetFormLine(r, i+1)));
-        if(all.length && !mats.length){
-          ElMessage.warning('该采购订单仅含储罐类液体物料，不支持采购退料');
-        } else if(all.length > mats.length){
-          ElMessage.info('已自动排除储罐类液体物料（入库后不支持退料）');
-        }
       } else {
         poMatPool.value = mats.map(m=>({...m}));
         formLineRows.value = ensureLineNos(buildPoInFormLines(mats, supplier));
@@ -6270,7 +6344,6 @@ const app = createApp({
         }
       } else {
         let pool = poMatsOf(refCode);
-        if(pageId.value==='wh-po-ret') pool = pool.filter(m=> !isPoRetTankMat(m));
         poMatPool.value = pool;
       }
     }
@@ -6325,6 +6398,10 @@ const app = createApp({
         if(f.name==='关联发货单') return !(formModel['关联运单'] && formModel['关联运单']!=='—');
         return false;
       }
+      if(pageId.value==='qc-ledger'){
+        if(f.name==='关联单号') return isQcLedgerStockInsp(formModel['检验类型']);
+        return false;
+      }
       if(!isWhNoticePage()) return false;
       if(f.name==='关联运单') return !(formModel[whNoticeRefField()] && formModel[whNoticeRefField()]!=='—');
       if(f.name==='关联发货单') return !(formModel['关联运单'] && formModel['关联运单']!=='—');
@@ -6347,6 +6424,12 @@ const app = createApp({
       if(isLoadPage()){
         if(f.name==='关联单号' && isFormPickerDisabled(f)) return '请先选择关联仓库业务';
         if(f.name==='关联发货单' && isFormPickerDisabled(f)) return '请先选择关联运单';
+      }
+      if(pageId.value==='qc-ledger' && f && f.name==='关联单号'){
+        if(isQcLedgerStockInsp(formModel['检验类型'])) return '库内检无需选择关联单号';
+        const meta = qcLedgerRefMeta(formModel['检验类型']);
+        if(!meta) return '请先选择检验类型';
+        return '请选择' + meta.label;
       }
       if(isWhNoticePage()){
         if(f.name==='关联运单' && isFormPickerDisabled(f)) return isLoadPage() ? '请先选择关联单号' : (isOsPoPage() ? '请先选择关联委外加工单' : '请先选择关联采购订单');
@@ -7960,11 +8043,25 @@ const app = createApp({
             return { ...r, 编码: code, 名称: name, _pickerPageId: meta.pageId, _pickerTab: meta.tab, _pickerCodeField: meta.noKey, _loadBizMeta: meta };
           });
         }
+      } else if(t.includes('关联单号') && pageId.value==='qc-ledger'){
+        const meta = qcLedgerRefMeta(formModel['检验类型']);
+        if(meta){
+          const list = ((MOCK[meta.pageId]||{})[meta.tab]||[])
+            .filter(r=> ['待执行','执行中','已完成'].includes(String(r['单据状态']||'')));
+          all = list.map(r=>{
+            const code = r[meta.noKey] || '';
+            const name = (meta.nameKey && r[meta.nameKey]) ? r[meta.nameKey] : (r['物料信息'] || code);
+            return { ...r, 编码: code, 名称: name, 检验类型: formModel['检验类型'], _pickerPageId: meta.pageId, _pickerTab: meta.tab, _pickerCodeField: meta.noKey };
+          });
+        } else {
+          all = [];
+        }
       } else if(t.includes('关联单号')){
         all = [
-          { 编码:'PO20260801', 名称:'采购入库关联单', 检验类型:'来料检验', 备注:'—' },
-          { 编码:'WO20260802', 名称:'库内抽检关联单', 检验类型:'库内检验', 备注:'—' },
-          { 编码:'CGRK20260803', 名称:'成品入库关联单', 检验类型:'成品检验', 备注:'—' },
+          { 编码:'CGST202608010001', 名称:'采购收料通知单', 检验类型:'采购来料检', 备注:'—' },
+          { 编码:'WWST202608010001', 名称:'委外收货通知单', 检验类型:'委外收货检', 备注:'—' },
+          { 编码:'STST202608010001', 名称:'受托收料通知单', 检验类型:'受托收料检', 备注:'—' },
+          { 编码:'SCRKSQ202608010001', 名称:'生产入库申请单', 检验类型:'生产成品检', 备注:'—' },
         ];
       } else if(t==='拣货流水码'){
         const matCode = codeOf((detailRow.value||{})['物料信息']);
@@ -8069,7 +8166,6 @@ const app = createApp({
       } else if(t.includes('物料') && ['wh-po-in','wh-po-ret','wh-os-recv','wh-os-ret-goods'].includes(pageId.value) && String(formModel[whNoticeRefField()]||'').trim() && formModel[whNoticeRefField()]!=='—'){
         const pool = poMatPool.value || [];
         all = pool.filter(m=>{
-          if(pageId.value==='wh-po-ret' && isPoRetTankMat(m)) return false;
           return true;
         }).map(m=>{
           const full = matListRow(m.编码 || m['物料编码']);
@@ -9080,11 +9176,10 @@ const app = createApp({
         const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         Object.assign(formModel, {
           检验单号: `QC${ymd}01`,
-          检验类型: '来料检验',
+          检验类型: '采购来料检',
           抽样数量: '0',
           报检时间: now,
-          报检人: '张三',
-          检验判定: '待判定'
+          报检人: '张三'
         });
       }
       if(pageId.value==='vehicle' && formMode.value==='add'){
@@ -10240,7 +10335,6 @@ const app = createApp({
               }
             } else {
               let pool = poMatsOf(refCode);
-              if(pageId.value==='wh-po-ret') pool = pool.filter(m=> !isPoRetTankMat(m));
               poMatPool.value = pool;
             }
           }
@@ -10381,7 +10475,7 @@ const app = createApp({
         if(pageId.value==='qc-ledger'){
           Object.assign(formModel, {
             检验单号: row['检验单号']||'',
-            检验类型: row['检验类型']||'来料检验',
+            检验类型: row['检验类型']||'采购来料检',
             关联单号: row['关联单号']||'',
             物料信息: row['物料信息']||'',
             物料批次号: row['物料批次号']||row['批次号']||'',
@@ -10516,7 +10610,7 @@ const app = createApp({
         const d = new Date();
         const pad = n => String(n).padStart(2,'0');
         const now = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        const judged = ['合格','不合格'].includes(row['检验判定']) ? row['检验判定'] : '';
+        const judged = ['合格','不合格'].includes(row['检验结果']||row['检验判定']) ? (row['检验结果']||row['检验判定']) : '';
         Object.assign(qcInspectForm, {
           检验结果: judged,
           检验员: row['质检员'] || '张三',
@@ -13521,7 +13615,6 @@ const app = createApp({
         if(!(formLineRows.value||[]).length){ ElMessage.warning('请至少添加一行物料明细'); return; }
         if(formLineRows.value.some(r=> !r['物料信息'])){ ElMessage.warning('请完善物料信息'); return; }
         if(formLineRows.value.some(r=> !(Number(r['计划数量'])>0))){ ElMessage.warning('计划数量必须为大于 0 的正数'); return; }
-        if(formLineRows.value.some(r=> isPoRetTankMat(r))){ ElMessage.warning('储罐类液体物料不支持采购退料，请移除后重试'); return; }
         if(!assertPoRetLineMatLotUnique(formLineRows.value)) return;
         const phone = String(formModel['司机电话']||'').trim();
         if(phone && phone!=='—' && !/^1\d{10}$/.test(phone)){
@@ -13649,6 +13742,10 @@ const app = createApp({
           if(cur['单据状态']!=='待执行'){ ElMessage.warning('仅「待执行」状态可编辑'); return; }
           Object.assign(cur, payload, { id: cur.id, 单号: cur['单号'], 单据状态: cur['单据状态'] });
         }
+        if(pageId.value==='wh-os-recv'){
+          const savedNo = isAdd ? payload.单号 : (formModel['单号'] || payload.单号);
+          syncQcLedgerFromOsRecvNotice(savedNo, payload._lines);
+        }
         formVisible.value=false;
         bumpStore();
         ElMessage.success(appendAutoPushLoadNotice(isAdd ? (meta.label + '创建成功') : (meta.label + '修改成功'), payload, isAdd));
@@ -13674,7 +13771,9 @@ const app = createApp({
       if(isCsWhPage()){
         const meta = csNoticeMeta();
         if(!formModel['单据类型']){ ElMessage.warning('请选择单据类型'); return; }
-        if(!String(formModel['关联销售订单']||'').trim()){ ElMessage.warning('请选择关联销售订单'); return; }
+        if(!String(formModel['客户名称']||'').trim() || formModel['客户名称']==='—'){
+          ElMessage.warning('请选择客户名称'); return;
+        }
         const phone = String(formModel['司机电话']||'').trim();
         if(phone && phone!=='—' && !/^1\d{10}$/.test(phone)){ ElMessage.warning('请输入有效的 11 位司机手机号码'); return; }
         const idc = String(formModel['司机身份证号']||'').trim();
@@ -13727,19 +13826,23 @@ const app = createApp({
           }))
         };
         const prefix = (meta && meta.prefix) || 'STST';
+        let savedCsNo = '';
         if(isAdd){
           const d = new Date();
           const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
           const sameDay = list.filter(r=> String(r['单号']||'').startsWith(prefix+ymd));
           payload.id = pid + '-' + Date.now();
           payload.单号 = prefix + ymd + String(sameDay.length + 1).padStart(4,'0');
+          savedCsNo = payload.单号;
           list.unshift(payload);
         } else {
           const cur = list.find(r=> r.id===formModel._editId || r['单号']===formModel['单号']);
           if(!cur){ ElMessage.warning('未找到待编辑'+(meta && meta.label || '通知单')); return; }
           if(cur['单据状态']!=='待执行'){ ElMessage.warning('仅「待执行」状态可编辑'); return; }
+          savedCsNo = cur['单号'];
           Object.assign(cur, payload, { id: cur.id, 单号: cur['单号'], 单据状态: cur['单据状态'] });
         }
+        if(isCsRecvPage()) syncQcLedgerFromCsRecvNotice(savedCsNo, payload._lines);
         formVisible.value=false;
         bumpStore();
         ElMessage.success(appendAutoPushLoadNotice(isAdd ? ((meta && meta.label || '通知单') + '创建成功') : '保存成功', payload, isAdd));
@@ -14455,6 +14558,56 @@ const app = createApp({
         ElMessage.success(isAdd ? '移库通知单已创建' : '移库通知单已保存');
         return;
       }
+      if(pageId.value==='qc-ledger'){
+        if(!formModel['检验类型']){ ElMessage.warning('请选择检验类型'); return; }
+        if(!String(formModel['物料信息']||'').trim()){ ElMessage.warning('请选择物料信息'); return; }
+        if(!String(formModel['物料批次号']||'').trim()){ ElMessage.warning('请填写物料批次号'); return; }
+        if(!formModel['报检时间']){ ElMessage.warning('请选择报检时间'); return; }
+        if(!String(formModel['报检人']||'').trim()){ ElMessage.warning('请填写报检人'); return; }
+        if(!isQcLedgerStockInsp(formModel['检验类型']) && !String(formModel['关联单号']||'').trim()){
+          // 关联单号选填：手工报检可不选；仅库内检强制清空
+        }
+        const bag = (MOCK['qc-ledger'] = MOCK['qc-ledger'] || {});
+        const list = (bag.main = bag.main || []);
+        const isAdd = formMode.value==='add' || formMode.value==='copy';
+        const lot = String(formModel['物料批次号']||'').trim();
+        const refNo = isQcLedgerStockInsp(formModel['检验类型']) ? '' : String(formModel['关联单号']||'').trim();
+        const payload = {
+          检验类型: formModel['检验类型'],
+          关联单号: refNo || '—',
+          物料信息: formModel['物料信息'],
+          批次号: lot,
+          物料批次号: lot,
+          抽样数量: String(formModel['抽样数量'] ?? '0'),
+          报检时间: formModel['报检时间'],
+          报检人: formModel['报检人'],
+          检验日期: '',
+          质检员: '',
+          检验结果: '',
+          备注: '—'
+        };
+        if(isAdd){
+          payload.id = 'qc-' + Date.now();
+          payload.检验单号 = nextQcInspectNo();
+          list.unshift(payload);
+        } else {
+          const cur = list.find(r=> r.id===formModel._editId || r['检验单号']===formModel['检验单号']);
+          if(!cur){ ElMessage.warning('未找到待编辑检验台账'); return; }
+          Object.assign(cur, payload, {
+            id: cur.id,
+            检验单号: cur['检验单号'],
+            检验日期: cur['检验日期'] || '',
+            质检员: cur['质检员'] || '',
+            检验结果: ['合格','不合格'].includes(cur['检验结果']||cur['检验判定']) ? (cur['检验结果']||cur['检验判定']) : '',
+            备注: cur['备注'] || '—'
+          });
+          delete cur['检验判定'];
+        }
+        formVisible.value=false;
+        bumpStore();
+        ElMessage.success(isAdd ? '检验报检已新增' : '检验报检已保存');
+        return;
+      }
       formVisible.value=false;
       ElMessage.success(formMode.value==='add'?'新增成功':'保存成功');
     }
@@ -14466,10 +14619,10 @@ const app = createApp({
     }
     function onQcInspectSave(){
       if(!qcInspectForm.检验结果){ ElMessage.warning('请选择检验结果'); return; }
-      if(!qcInspectForm.检验员){ ElMessage.warning('请填写检验员'); return; }
       if(!qcInspectForm.检验日期){ ElMessage.warning('请选择检验日期'); return; }
       if(qcInspectRow.value){
-        qcInspectRow.value['检验判定'] = qcInspectForm.检验结果;
+        qcInspectRow.value['检验结果'] = qcInspectForm.检验结果;
+        delete qcInspectRow.value['检验判定'];
         qcInspectRow.value['质检员'] = qcInspectForm.检验员;
         qcInspectRow.value['检验日期'] = qcInspectForm.检验日期;
         if(qcInspectForm.检验备注) qcInspectRow.value['备注'] = qcInspectForm.检验备注;
@@ -14573,6 +14726,10 @@ const app = createApp({
           pruneProdIssueMatsByPickType();
         }
       }
+      if(pageId.value==='qc-ledger' && f && f.name==='检验类型'){
+        formModel['关联单号'] = '';
+        if(isQcLedgerStockInsp(formModel['检验类型'])) formModel['关联单号'] = '';
+      }
       if(pageId.value==='wh-stocktake' && f && f.name==='盘点方式'){
         pruneStocktakeMatsByMode();
       }
@@ -14621,6 +14778,14 @@ const app = createApp({
       if(pageId.value==='wh-stocktake' && (title==='物料信息' || (title||'').includes('物料')) && !formModel['盘点方式']){
         ElMessage.warning('请先选择盘点方式'); return;
       }
+      if(pageId.value==='qc-ledger' && title==='关联单号'){
+        if(isQcLedgerStockInsp(formModel['检验类型'])){
+          ElMessage.warning('库内检无需选择关联单号'); return;
+        }
+        if(!qcLedgerRefMeta(formModel['检验类型'])){
+          ElMessage.warning('请先选择检验类型'); return;
+        }
+      }
       if(isLoadPage()){
         if(title==='关联单号' && !(formModel['关联仓库业务'] && formModel['关联仓库业务']!=='—')){
           ElMessage.warning('请先选择关联仓库业务'); return;
@@ -14644,9 +14809,7 @@ const app = createApp({
         }
       }
       if(isCsWhPage()){
-        if(title==='关联运单' && !(formModel['关联销售订单'] && formModel['关联销售订单']!=='—')){
-          ElMessage.warning('请先选择关联销售订单'); return;
-        }
+        // 关联销售订单选填：运单不依赖 SO；发货单仍依赖运单
         if(title==='关联发货单' && !(formModel['关联运单'] && formModel['关联运单']!=='—')){
           ElMessage.warning('请先选择关联运单'); return;
         }
@@ -14752,9 +14915,17 @@ const app = createApp({
         formModel['订单号'] = (row.编码||'') + ' / ' + (row.名称||'');
         formModel['合同号'] = row['合同号'] || row.规格 || lookupContractNo(formModel['订单类型'], row.编码);
         if(pageId.value==='lg-dispatch'){
-          formLineRows.value = dispatchLinesFromOrder(formModel['订单类型'], row.编码);
+          const biz = formModel['关联仓储业务'] || formModel['仓库业务类型'] || '';
+          if(dispatchOrderOptionalBiz(biz)){
+            // 受托收/退料：选订单仅作追溯，不带入物料（物料在明细中手动挑选）
+            ElMessage.success('已关联订单：'+formModel['订单号']+'（不自动带入物料）');
+          } else {
+            formLineRows.value = dispatchLinesFromOrder(formModel['订单类型'], row.编码);
+            ElMessage.success('已选择订单并带入物料：'+formModel['订单号']);
+          }
+        } else {
+          ElMessage.success('已选择订单号：'+formModel['订单号']);
         }
-        ElMessage.success(pageId.value==='lg-dispatch' ? ('已选择订单并带入物料：'+formModel['订单号']) : ('已选择订单号：'+formModel['订单号']));
       } else if(t==='前置关联单据' && (pageId.value==='lg-dispatch' || splitPickerMode.value)){
         if(splitPickerMode.value){
           const kind = dispatchPreDocKind(splitBizOf());
@@ -15200,8 +15371,11 @@ const app = createApp({
         formModel['盘点仓库'] = rows.map(r=> r['仓库名称'] || r.名称 || r.编码).filter(Boolean).join('、');
         applyStocktakeMatFilter(formModel._stockMatCodes || []);
         ElMessage.success('已选择盘点仓库：'+formModel['盘点仓库']+'，已按范围刷新库存/条码详情');
-      } else if(t==='往来单位' || t==='委托方' || t==='委托方名称'){
+      } else if(t==='往来单位' || t==='委托方' || t==='委托方名称' || t==='客户名称'){
         formModel[t] = row.名称 || row['客户名称'] || row['供应商名称'] || label;
+        if(isCsWhPage() && t==='客户名称' && isCsRecvPage()){
+          formLineRows.value.forEach(r=>{ if(r && !String(r['生产厂家']||'').trim()) r['生产厂家'] = formModel['客户名称']; });
+        }
         ElMessage.success('已选择'+t+'：'+formModel[t]);
       } else if(t==='调出仓库' || t==='调入仓库'){
         const code = row['仓库编码'] || row.编码 || '';
@@ -15413,17 +15587,15 @@ const app = createApp({
           const rows = (pickerSelected.value||[]).length ? pickerSelected.value : (row ? [row] : []);
           if(!rows.length){ ElMessage.warning('请至少选择一条物料'); return; }
           const addMats = [];
-          let skippedTank = 0;
           if(pageId.value==='wh-po-in' || pageId.value==='wh-po-ret'){
             rows.forEach(m=>{
               const code = m.编码 || codeOf(m['物料信息']||m);
               if(!code) return;
               const pool = (poMatPool.value||[]).find(p=> (p.编码||codeOf(p['物料信息']))===code) || m;
-              if(pageId.value==='wh-po-ret' && isPoRetTankMat(pool)){ skippedTank++; return; }
               addMats.push(pool);
             });
             if(!addMats.length){
-              ElMessage.warning(skippedTank ? '储罐类液体物料不支持采购退料' : '请选择有效物料');
+              ElMessage.warning('请选择有效物料');
               return;
             }
           } else {
@@ -15533,6 +15705,15 @@ const app = createApp({
         const meta = row._loadBizMeta || loadWhBizMeta(formModel['关联仓库业务']);
         applyLoadSrcNotice(row, meta);
         ElMessage.success('已选择关联单号并带入客供、运力与物料明细：'+formModel['关联单号']);
+      } else if(t.includes('关联单号') && pageId.value==='qc-ledger'){
+        formModel['关联单号'] = row.编码 || label;
+        const lines = row._lines || [];
+        if(lines.length){
+          const first = lines[0];
+          if(first['物料信息']) formModel['物料信息'] = first['物料信息'];
+          if(first['批号']) formModel['物料批次号'] = first['批号'];
+        }
+        ElMessage.success('已选择关联单号：'+formModel['关联单号']);
       } else if(t.includes('关联单号')){
         formModel['关联单号'] = row.编码 || label;
         ElMessage.success('已选择关联单号：'+formModel['关联单号']);

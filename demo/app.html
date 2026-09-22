@@ -493,10 +493,10 @@ body.remarks-open .demo-scope-tip{display:none}
         <div style="font-size:13px;color:#8C8C8C">{{ headerHint }}</div>
         <div class="app-header__actions">
           <div class="demo-scope-tip">该原型方案仅用于核对模块字段和按钮交互的基础功能，不支持功能交互和业务逻辑实现</div>
-          <a class="back-overview" href="../../05-项目资料/03-交付文件/资料缓存/思特瑞WMS_项目总览（更新中）.html">返回总览</a>
+          <a class="back-overview" href="../">返回总览</a>
           <div class="mode-switch">
             <a href="./pc.html">PC</a>
-            <a href="./思特瑞app.html" class="on">APP</a>
+            <a href="./app.html" class="on">APP</a>
           </div>
           <button type="button" class="sync-chip" title="PC/APP 同源联动" @click="resetDemoStore">重置</button>
           <button type="button" class="announce-bell" :class="{ unread: announceUnread }" @click="openAnnounce" :title="'版本公告 ' + announceLatest">
@@ -1087,13 +1087,20 @@ body.remarks-open .demo-scope-tip{display:none}
                   </template>
                   <template v-else>
                   <div class="field">
-                    <label><span class="req">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '关联销售订单' : (isOsWwpoDoc ? '关联委外加工单' : '关联采购订单') }}</label>
+                    <label><span class="req" v-if="!isTrustPartyDoc">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '关联销售订单' : (isOsWwpoDoc ? '关联委外加工单' : '关联采购订单') }}</label>
                     <select v-model="poInForm.poNo" @change="onPoInPoChange">
-                      <option value="">{{ (isTrustPartyDoc || isSoSalesDoc) ? '请选择销售订单' : (isOsWwpoDoc ? '请选择委外加工单' : '请选择采购订单') }}</option>
+                      <option value="">{{ isTrustPartyDoc ? '请选择销售订单（选填）' : (isSoSalesDoc ? '请选择销售订单' : (isOsWwpoDoc ? '请选择委外加工单' : '请选择采购订单')) }}</option>
                       <option v-for="p in poInSelectablePos" :key="p.code" :value="p.code">{{ p.code }} · {{ p.supplier || p.name }}</option>
                     </select>
                   </div>
-                  <div class="field"><label><span class="req">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '客户名称' : '供应商名称' }}</label><input v-model="poInForm.supplier" readonly /></div>
+                  <div class="field">
+                    <label><span class="req">*</span>{{ (isTrustPartyDoc || isSoSalesDoc) ? '客户名称' : '供应商名称' }}</label>
+                    <input v-if="isTrustPartyDoc && !poInForm.poNo" v-model="poInForm.supplier" list="trust-customer-list" placeholder="未选订单时手工填写或点选客户" />
+                    <datalist v-if="isTrustPartyDoc && !poInForm.poNo" id="trust-customer-list">
+                      <option v-for="c in trustCustomerNames" :key="c" :value="c"></option>
+                    </datalist>
+                    <input v-else v-model="poInForm.supplier" readonly />
+                  </div>
                   <div class="field">
                     <label><span class="req">*</span>单据类型</label>
                     <select v-model="poInForm.docType">
@@ -1120,8 +1127,8 @@ body.remarks-open .demo-scope-tip{display:none}
                   <div class="sec__title">派车与承运信息</div>
                   <div class="field">
                     <label>关联运单</label>
-                    <select v-model="poInForm.waybillNo" :disabled="!poInForm.poNo" @change="onPoInWaybillChange">
-                      <option value="">{{ poInForm.poNo ? '请选择运单（选填）' : ((isTrustPartyDoc || isSoSalesDoc) ? '请先选择销售订单' : (isOsWwpoDoc ? '请先选择委外加工单' : '请先选择采购订单')) }}</option>
+                    <select v-model="poInForm.waybillNo" :disabled="!isTrustPartyDoc && !poInForm.poNo" @change="onPoInWaybillChange">
+                      <option value="">{{ (isTrustPartyDoc || poInForm.poNo) ? '请选择运单（选填）' : ((isSoSalesDoc) ? '请先选择销售订单' : (isOsWwpoDoc ? '请先选择委外加工单' : '请先选择采购订单')) }}</option>
                       <option v-for="w in poInWaybillOpts" :key="w.code" :value="w.code">{{ w.code }}</option>
                     </select>
                   </div>
@@ -1175,7 +1182,7 @@ body.remarks-open .demo-scope-tip{display:none}
                   </template>
                   <div class="field" style="padding:0"><label>明细备注</label><input v-model="ln.remark" placeholder="选填" /></div>
                 </div>
-                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ (isTrustPartyDoc || isSoSalesDoc) ? '请选择销售订单或添加物料' : ((isOsIssueDoc || isOsRetDoc) ? '请选择委外加工单后点击新增挑选原料物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料')) }}</p>
+                <p v-if="!(poInForm.lines||[]).length" class="hint" style="text-align:center">{{ isTrustPartyDoc ? '关联销售订单选填（不带物料）；点击新增挑选物料，或选择发货单带入' : ((isSoSalesDoc) ? '请选择销售订单或添加物料' : ((isOsIssueDoc || isOsRetDoc) ? '请选择委外加工单后点击新增挑选原料物料' : (isOsWwpoDoc ? '请选择委外加工单或添加物料' : '请选择采购订单或添加物料'))) }}</p>
               </div>
               <div class="m-footer" style="display:flex;gap:10px">
                 <button type="button" class="btn-ghost" style="flex:1" @click="backPoInNoticeForm">取消</button>
@@ -4780,7 +4787,7 @@ body.remarks-open .demo-scope-tip{display:none}
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://unpkg.com/element-plus"></script>
 <script src="https://unpkg.com/element-plus/dist/locale/zh-cn.min.js"></script>
-<script src="./js/demo-announcements.js?v=1.4.22"></script>
+<script src="./js/demo-announcements.js?v=1.4.31"></script>
 <script src="./js/dict-catalog.js"></script>
 <script src="./js/mock-rows.js?v=1.4.0"></script>
 <script src="./js/demo-store.js?v=1.3.347"></script>
@@ -5785,18 +5792,31 @@ createApp({
     });
     const poInWaybillOpts = computed(() => {
       const all = CFG.waybillOptions || [];
-      if (!poInForm.poNo) return [];
       const wantBiz = isTrustRetDoc.value ? '受托退料'
         : (isTrustRecvDoc.value ? '受托收料'
         : (isSoShipDoc.value ? '销售发货'
         : (isSoPreoutDoc.value ? '销售预出货'
         : (isSoRmaDoc.value ? '销售退货'
         : (isOsIssueDoc.value ? '委外发料' : (isOsRmaDoc.value ? '委外退货' : (isOsRetDoc.value ? '委外退料' : (isOsRecvDoc.value ? '委外收货' : (isPoRetDoc.value ? '采购退料' : (isPoInDoc.value ? '采购入库' : ''))))))))));
+      // 受托：订单选填，无 SO 时按业务类型列运单；有 SO 时优先按 poHint 过滤
+      if (isTrustPartyDoc.value) {
+        let list = all.filter(w => !wantBiz || !w.bizType || w.bizType === wantBiz);
+        if (poInForm.poNo) {
+          const byPo = list.filter(w => w.poHint === poInForm.poNo);
+          if (byPo.length) list = byPo;
+        }
+        return list;
+      }
+      if (!poInForm.poNo) return [];
       return all.filter(w => {
         if (w.poHint !== poInForm.poNo) return false;
         if (wantBiz && w.bizType && w.bizType !== wantBiz) return false;
         return true;
       });
+    });
+    const trustCustomerNames = computed(() => {
+      const rows = ((window.WMS_MOCK_ROWS || {}).customer || {}).main || [];
+      return rows.filter(c => c['启用状态'] === '启用').map(c => c['客户名称']).filter(Boolean);
     });
     const poInShipOpts = computed(() => {
       const w = (CFG.waybillOptions || []).find(x => x.code === poInForm.waybillNo);
@@ -6141,14 +6161,142 @@ createApp({
       }
       ElementPlus.ElMessage.success('已选择预出货出库单：' + out.code);
     }
-    function onPoInLogisticsChange() {
-      if (!isSoShipDoc.value || !poInForm.logisticsNo) return;
-      // 发货：选定发货单后按订单重载明细、批号留空（无发货单物料明细 Mock 时的对齐口径）
-      const so = (soOptions || []).find((p) => p.code === poInForm.poNo);
-      if (so) {
-        fillPoInLinesFromSo(so);
-        ElementPlus.ElMessage.success('已按发货单关联订单带入物料（批号留空）');
+    /** 从发货单解析物料行并覆盖 poInForm.lines（对齐 PC applyShipMats*） */
+    function applyShipMatsToPoInForm(shipOrNo, opts) {
+      opts = opts || {};
+      const ship = (shipOrNo && typeof shipOrNo === 'object') ? shipOrNo : shipRowByNo(shipOrNo);
+      if (!ship) {
+        if (opts.clearIfEmpty !== false) poInForm.lines = [];
+        return false;
       }
+      const zeroPcs = !!opts.zeroPcs;
+      const leaveLotEmpty = !!opts.leaveLotEmpty;
+      let mats = Array.isArray(ship._lines) ? ship._lines.slice() : [];
+      if (!mats.length) {
+        const info = String(ship['物料信息'] || '').trim();
+        if (info && info !== '—') {
+          mats = [{
+            物料信息: info,
+            发货数量: ship['发货数量'],
+            单位: ship['单位'] || 'KG',
+            批号: ship['批号'] || '',
+            行号: '10',
+            行备注: '',
+          }];
+        }
+      }
+      if (!mats.length) {
+        if (opts.clearIfEmpty !== false) poInForm.lines = [];
+        return false;
+      }
+      const makerName = poInForm.supplier || '';
+      poInForm.lines = mats.map((ln, i) => {
+        const parts = parseMatInfoParts(ln['物料信息'] || [ln['物料编码'], ln['物料名称'], ln['物料规格'], ln['物料种类']].filter(Boolean).join(' / '));
+        const qty = Number(ln['发货数量'] != null ? ln['发货数量'] : (ln['计划数量'] || 0)) || 0;
+        const mode = String(ln['管理方式'] || (zeroPcs || countMatCodes.value.has(parts.code) ? '计数管理' : '条码管理'));
+        const isCount = /计数|罐区/.test(mode) || zeroPcs;
+        const pcs = isCount ? 0 : (Number(ln['计划件数']) || (qty > 0 ? Math.max(1, Math.round(qty)) : 1));
+        const lotRaw = String(ln['批号'] || '').trim();
+        const lot = leaveLotEmpty ? '' : ((!lotRaw || lotRaw === '—') ? '' : lotRaw);
+        const needExtra = isOsRecvDoc.value || isOsRmaDoc.value || isTrustRecvDoc.value;
+        return {
+          code: parts.code, name: parts.name, spec: parts.spec, kind: parts.kind,
+          unit: ln['单位'] || ln['采购单位'] || ln['库存单位'] || 'KG',
+          planPcs: pcs, planQty: qty || 1,
+          lot: lot,
+          manageMode: isCount ? '计数管理' : '条码管理',
+          prodDate: needExtra && isOsRecvDoc.value ? todayYmd() : '',
+          validMonths: needExtra && isOsRecvDoc.value ? (ln.validMonths || 12) : '',
+          maker: needExtra && (isOsRecvDoc.value || isTrustRecvDoc.value) ? makerName : '',
+          remark: (ln['行备注'] && ln['行备注'] !== '—') ? ln['行备注'] : (ln['备注'] || ''),
+          medium: ln.medium || '',
+          status: '待执行', doneQty: 0, remainQty: qty || 1, remainPcs: pcs,
+          lineNo: ln['行号'] || '',
+        };
+      });
+      return true;
+    }
+    function applyOsRawShipMatsToPoInForm(shipOrNo) {
+      return applyShipMatsToPoInForm(shipOrNo, {
+        zeroPcs: isOsIssueCount.value || isOsRetCount.value,
+        leaveLotEmpty: false,
+      });
+    }
+    /** 委外收货/退货：清空发货单后回填加工单成品行（对齐 PC restoreOsNoticeLinesFromWwpo） */
+    function restorePoInLinesFromWwpo() {
+      if (!(isOsRecvDoc.value || isOsRmaDoc.value)) return;
+      const po = (refOrderOptions.value || []).find(p => p.code === poInForm.poNo);
+      if (!po) { poInForm.lines = []; return; }
+      let srcLines = (po.lines || []).slice();
+      if (isOsRecvCount.value || isOsRmaCount.value) {
+        const codes = countMatCodes.value;
+        srcLines = srcLines.filter(l => codes.has(l.code) || !(Number(l.planPcs) > 0));
+      }
+      if (isOsRecvTank.value) {
+        srcLines = srcLines.filter(l => l.medium || ['MAT-L001', 'MAT-L002', 'RM-H2SO4', 'RM-NaOH', 'RM-HCl'].includes(l.code));
+      }
+      const zeroPcs = isOsRecvCount.value || isOsRmaCount.value || isOsRecvTank.value;
+      const leaveLotEmpty = isOsRmaCount.value;
+      const makerName = poInForm.supplier || '';
+      poInForm.lines = srcLines.map((ln, i) => ({
+        code: ln.code, name: ln.name, spec: ln.spec, kind: ln.kind, unit: ln.unit,
+        planPcs: zeroPcs ? 0 : ln.planPcs, planQty: ln.planQty,
+        lot: leaveLotEmpty ? (ln.lot || '') : genLotNo(i + 1),
+        manageMode: zeroPcs ? '计数管理' : (ln.manageMode || '条码管理'),
+        prodDate: isOsRecvDoc.value ? todayYmd() : '',
+        validMonths: isOsRecvDoc.value ? (ln.validMonths || 12) : '',
+        maker: isOsRecvDoc.value ? makerName : '',
+        remark: '', medium: ln.medium || '',
+        status: '待执行', doneQty: 0, remainQty: ln.planQty,
+        remainPcs: zeroPcs ? 0 : ln.planPcs,
+      }));
+    }
+    function onPoInLogisticsChange() {
+      // 委外发料/退料：发货单覆盖原料行；清空则清空明细（不回填加工单）
+      if (isOsIssueDoc.value || isOsRetDoc.value) {
+        if (!poInForm.logisticsNo) { poInForm.lines = []; return; }
+        if (applyShipMatsToPoInForm(poInForm.logisticsNo, { zeroPcs: isOsIssueCount.value || isOsRetCount.value })) {
+          ElementPlus.ElMessage.success('已按发货单带入原料明细');
+        }
+        return;
+      }
+      // 委外收货/退货：发货单覆盖成品行；清空则回填加工单成品行
+      if (isOsRecvDoc.value || isOsRmaDoc.value) {
+        if (!poInForm.logisticsNo) {
+          restorePoInLinesFromWwpo();
+          return;
+        }
+        if (applyShipMatsToPoInForm(poInForm.logisticsNo, {
+          zeroPcs: isOsRecvCount.value || isOsRmaCount.value || isOsRecvTank.value,
+          leaveLotEmpty: isOsRmaDoc.value,
+        })) {
+          ElementPlus.ElMessage.success('已按发货单带入物料明细');
+        }
+        return;
+      }
+      // 受托收/退料：发货单覆盖；清空则清空明细（不回填销售订单）
+      if (isTrustPartyDoc.value) {
+        if (!poInForm.logisticsNo) { poInForm.lines = []; return; }
+        if (applyShipMatsToPoInForm(poInForm.logisticsNo, {
+          zeroPcs: isTrustRecvCount.value || isTrustRetCount.value || isTrustRecvTank.value,
+          leaveLotEmpty: isTrustRetDoc.value,
+        })) {
+          ElementPlus.ElMessage.success('已按发货单带入物料明细');
+        }
+        return;
+      }
+      // 销售发货：发货单物料覆盖，批号留空（对齐 PC applyShipMatsToSoShipForm）
+      if (isSoShipDoc.value) {
+        if (!poInForm.logisticsNo) return;
+        if (applyShipMatsToPoInForm(poInForm.logisticsNo, {
+          zeroPcs: isSoShipCount.value,
+          leaveLotEmpty: true,
+        })) {
+          ElementPlus.ElMessage.success('已按发货单带入物料明细（批号留空）');
+        }
+        return;
+      }
+      // 销售预出货/退货：选发货单不改明细（对齐 PC，仅写头）
     }
     function onPoInShipOutChange() {
       if (!isSoRmaDoc.value) return;
@@ -13756,8 +13904,16 @@ createApp({
       if (!isSoPcAlignedForm.value || !poInForm.planDate) {
         poInForm.planDate = po.planDate || todayYmd();
       }
+      // 委外发料/退料：仅带入加工厂信息，不带入加工单成品/原料行（对齐 PC）
       if (isOsIssueDoc.value || isOsRetDoc.value) {
         poInForm.lines = [];
+        ElementPlus.ElMessage.success('已关联委外加工单并带入加工厂信息');
+        return;
+      }
+      // 受托收/退料：仅带入客户名称，不带入销售订单物料行（对齐 PC）；明细由发货单覆盖或手工新增
+      if (isTrustPartyDoc.value) {
+        poInForm.lines = [];
+        ElementPlus.ElMessage.success('已关联销售订单并带出客户名称');
         return;
       }
       const makerName = poInForm.supplier;
@@ -13793,6 +13949,9 @@ createApp({
         poInForm.driver = '';
         poInForm.phone = '';
         poInForm.driverId = '';
+        // 清空运单 → 清空发货单；按模块处理明细（对齐 PC）
+        if (isOsIssueDoc.value || isOsRetDoc.value || isTrustPartyDoc.value) poInForm.lines = [];
+        else if (isOsRecvDoc.value || isOsRmaDoc.value) restorePoInLinesFromWwpo();
         return;
       }
       poInForm.logisticsNo = (w.ships && w.ships.length === 1) ? w.ships[0] : '';
@@ -13801,6 +13960,26 @@ createApp({
       poInForm.driver = w.driver || '';
       poInForm.phone = w.phone || '';
       poInForm.driverId = w.driverId || '';
+      if (poInForm.logisticsNo) {
+        if (isOsIssueDoc.value || isOsRetDoc.value) {
+          applyShipMatsToPoInForm(poInForm.logisticsNo, { zeroPcs: isOsIssueCount.value || isOsRetCount.value });
+        } else if (isOsRecvDoc.value || isOsRmaDoc.value) {
+          applyShipMatsToPoInForm(poInForm.logisticsNo, {
+            zeroPcs: isOsRecvCount.value || isOsRmaCount.value || isOsRecvTank.value,
+            leaveLotEmpty: isOsRmaDoc.value,
+          });
+        } else if (isTrustPartyDoc.value) {
+          applyShipMatsToPoInForm(poInForm.logisticsNo, {
+            zeroPcs: isTrustRecvCount.value || isTrustRetCount.value || isTrustRecvTank.value,
+            leaveLotEmpty: isTrustRetDoc.value,
+          });
+        } else if (isSoShipDoc.value) {
+          applyShipMatsToPoInForm(poInForm.logisticsNo, { zeroPcs: isSoShipCount.value, leaveLotEmpty: true });
+        }
+      } else {
+        if (isOsIssueDoc.value || isOsRetDoc.value || isTrustPartyDoc.value) poInForm.lines = [];
+        else if (isOsRecvDoc.value || isOsRmaDoc.value) restorePoInLinesFromWwpo();
+      }
     }
     function addPoInFormLine() {
       openPoInMatPicker();
@@ -13901,8 +14080,12 @@ createApp({
         ElementPlus.ElMessage.error('请选择单据类型');
         return;
       }
-      if (!poInForm.poNo) {
-        ElementPlus.ElMessage.error((isTrustPartyDoc.value || isSoSalesDoc.value) ? '请选择关联销售订单' : (isOsWwpoDoc.value ? '请选择关联委外加工单' : '请选择关联采购订单'));
+      if (!poInForm.poNo && !isTrustPartyDoc.value) {
+        ElementPlus.ElMessage.error((isSoSalesDoc.value) ? '请选择关联销售订单' : (isOsWwpoDoc.value ? '请选择关联委外加工单' : '请选择关联采购订单'));
+        return;
+      }
+      if (isTrustPartyDoc.value && !String(poInForm.supplier || '').trim()) {
+        ElementPlus.ElMessage.error('请填写客户名称');
         return;
       }
       // 销售预出货/发货：计划执行日期选填（对齐 PC）；其他通知单仍必填
@@ -14023,7 +14206,7 @@ createApp({
         if (!hit) { ElementPlus.ElMessage.error('保存失败：单据不存在'); return; }
         Object.assign(hit, payload, { id: poInForm.id, status: hit.status || '待执行' });
         if (isSoSalesDoc.value) syncSalesNotice(hit);
-        else if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
+        else if (isTrustPartyDoc.value) syncTrustNoticeToPc(hit);
         else if (isOsIssueDoc.value) syncOsIssueNoticeToPc(hit);
         else if (isOsRmaDoc.value) syncOsRmaNoticeToPc(hit);
         else if (isOsRecvDoc.value) syncOsRecvNoticeToPc(hit);
@@ -14043,7 +14226,7 @@ createApp({
         list.unshift(created);
         if (STORE) STORE.setDocStatus(id, '待执行', { source: 'APP', action: 'create-notice' });
         if (isSoSalesDoc.value) syncSalesNotice(created);
-        else if (isTrustPartyDoc.value) { /* APP Demo 暂不同步 PC 受托收/退料 */ }
+        else if (isTrustPartyDoc.value) syncTrustNoticeToPc(created);
         else if (isOsIssueDoc.value) syncOsIssueNoticeToPc(created);
         else if (isOsRmaDoc.value) syncOsRmaNoticeToPc(created);
         else if (isOsRecvDoc.value) syncOsRecvNoticeToPc(created);
@@ -15473,7 +15656,61 @@ createApp({
         })),
       });
     }
-    function syncOsIssueNoticeToPc(n) {
+    function syncTrustNoticeToPc(n) {
+      if (!n) return;
+      const pageKey = isTrustRetDoc.value ? 'wh-cs-ret' : 'wh-cs-recv';
+      const MOCK = window.WMS_MOCK_ROWS;
+      if (!MOCK) return;
+      const page = (MOCK[pageKey] = MOCK[pageKey] || {});
+      const tab1 = (page.tab1 = page.tab1 || []);
+      const isCount = isTrustRecvCount.value || isTrustRetCount.value || (n.lines || []).some(ln => ln.manageMode === '计数管理');
+      const noticeRow = {
+        单号: n.id,
+        单据状态: n.status || '待执行',
+        单据类型: n.docType || (isTrustRetDoc.value ? '标准受托退料' : '标准受托收料'),
+        计划执行日期: n.planDate || '',
+        物料信息: n.materialSummary || '—',
+        备注: n.remark || '—',
+        ERP单据号: n.erpNo || '—',
+        关联销售订单: n.refNo || n.poNo || '—',
+        客户名称: n.partner || n.supplier || '—',
+        关联运单: n.waybillNo || '—',
+        关联发货单: n.logisticsNo || '—',
+        包装规格: n.packSpec || (isCount ? '计数/无包材' : '—'),
+        车牌号: n.plate || '—',
+        车挂号: n.trailer || '—',
+        司机姓名: n.driver || '—',
+        司机电话: n.phone || '—',
+        司机身份证号: n.driverId || '—',
+        _lines: (n.lines || []).map((ln) => ({
+          id: n.id + '-l' + ln.lineNo,
+          行状态: ln.status || '待执行',
+          物料信息: [ln.code, ln.name, ln.spec, ln.kind].filter(Boolean).join(' / '),
+          库存单位: ln.unit || (isCount ? '个' : 'KG'),
+          管理方式: ln.manageMode || (isCount ? '计数管理' : '条码管理'),
+          计划件数: isCount || isTrustRecvTank.value ? '—' : String(ln.planPcs || 0),
+          计划数量: Number(ln.planQty || 0).toFixed(2),
+          已完成数量: Number(ln.doneQty || 0).toFixed(2),
+          未完成数量: Number(ln.remainQty || 0).toFixed(2),
+          批号: ln.lot || '—',
+          生产日期: ln.prodDate || '',
+          有效期: ln.validMonths != null && ln.validMonths !== '' ? String(ln.validMonths) : '',
+          生产厂家: ln.maker || '',
+          备注: ln.remark || '—',
+        })),
+      };
+      const idx = tab1.findIndex((r) => String(r['单号'] || '') === n.id);
+      if (idx >= 0) tab1[idx] = Object.assign({}, tab1[idx], noticeRow);
+      else {
+        noticeRow.id = String(tab1.length + 1);
+        tab1.unshift(noticeRow);
+      }
+      try {
+        if (STORE && STORE.saveMock) STORE.saveMock(MOCK);
+        else if (STORE && STORE.persistMock) STORE.persistMock(MOCK);
+      } catch (e) { /* ignore */ }
+    }
+        function syncOsIssueNoticeToPc(n) {
       if (!n || !STORE || !STORE.upsertWhOsIssueFromApp) return;
       const noticeRow = {
         单号: n.id,
@@ -20588,7 +20825,7 @@ createApp({
       announceUnread, announceOpen, openAnnounce, onAnnounceClosed, announceTab, announceKw, announceTerminal, announceProgressKw, announceProgressSide, announceProgressDev, announceNotes, announceProgressSummary, announceLatest, announceHeadline, announceUpdateCount, filteredAnnounceUpdates, filteredAnnounceProgress, dismissAnnounce,
       scanQtySum, tankQtySum, lotDetailSum, innerQtySum, allLinesDone, splitRemain, mergeRemain,
       statusTag, gatepassStatusTag, gatepassDisplayLines, maskPhoneApp, gatepassPlateText, waybillSecondaryDriverText, gatepassLotQtyText, gatepassLineInfo, gatepassLinePcs, gatepassLineQty, gatepassMatStats, openGatepassDetail, scanGatepass, toast, goHome, openStub, openModule, onMenuSelect, maskIdCardApp,
-      poOptions, poInSelectablePos, tankArchOptions, poInFormMode, poInForm, poInWaybillOpts, poInShipOpts, noticeDocTypeOptions, pickTypeOptions, isSparePickType,
+      poOptions, poInSelectablePos, tankArchOptions, poInFormMode, poInForm, poInWaybillOpts, poInShipOpts, trustCustomerNames, noticeDocTypeOptions, pickTypeOptions, isSparePickType,
       poInMatPickerVisible, poInMatPickerKw, filteredPoInMatOptions,
       openProdPickForm, backProdPickForm, onProdPickMoChange, onProdPickTypeChange, openProdPickMatPicker, selectProdPickMat, removeProdPickFormLine, saveProdPickNotice,
       prodInFormMode, prodInForm, prodInMoOptions, prodInBizTypeOptions, prepNoticeOptions, prodInMatPickerVisible, prodInMatPickerKw, filteredProdInMatOptions,

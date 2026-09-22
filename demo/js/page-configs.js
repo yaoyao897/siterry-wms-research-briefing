@@ -7793,6 +7793,11 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
+            },
+            {
               "field": "计划执行日期",
               "title": "计划执行日期",
               "width": 120
@@ -8306,6 +8311,7 @@ window.WMS_PAGE_CONFIGS = {
         "单据状态",
         "单号",
         "单据类型",
+            "是否需要装卸货",
         "计划执行日期",
         "备注",
         "关联采购订单",
@@ -8618,6 +8624,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联采购订单",
             "供应商名称",
             "计划执行日期",
@@ -8776,6 +8783,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -9270,6 +9282,7 @@ window.WMS_PAGE_CONFIGS = {
         "单据状态",
         "单号",
         "单据类型",
+            "是否需要装卸货",
         "计划执行日期",
         "备注",
         "关联采购订单",
@@ -9555,6 +9568,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联采购订单",
             "供应商名称",
             "计划执行日期",
@@ -9706,6 +9720,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -10440,6 +10459,16 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
+              "name": "是否需要装卸货",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ],
+              "defaultValue": "是",
+              "required": true
+            },
+            {
               "name": "关联委外加工单",
               "type": "picker",
               "required": true,
@@ -10521,6 +10550,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联委外加工单",
             "供应商名称",
             "计划执行日期",
@@ -10671,6 +10701,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -11231,6 +11266,10 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
+          "name": "是否需要装卸货",
+          "spec": "是 / 否"
+        },
+        {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
         },
@@ -11427,6 +11466,16 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
+              "name": "是否需要装卸货",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ],
+              "defaultValue": "是",
+              "required": true
+            },
+            {
               "name": "关联委外加工单",
               "type": "picker",
               "required": true,
@@ -11508,6 +11557,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联委外加工单",
             "供应商名称",
             "计划执行日期",
@@ -11658,6 +11708,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -12434,6 +12489,16 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
+              "name": "是否需要装卸货",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ],
+              "defaultValue": "是",
+              "required": true
+            },
+            {
               "name": "关联委外加工单",
               "type": "picker",
               "required": true,
@@ -12515,6 +12580,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联委外加工单",
             "供应商名称",
             "计划执行日期",
@@ -12668,6 +12734,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -13228,6 +13299,10 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
+          "name": "是否需要装卸货",
+          "spec": "是 / 否"
+        },
+        {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
         },
@@ -13430,6 +13505,16 @@ window.WMS_PAGE_CONFIGS = {
               ]
             },
             {
+              "name": "是否需要装卸货",
+              "type": "select",
+              "options": [
+                "是",
+                "否"
+              ],
+              "defaultValue": "是",
+              "required": true
+            },
+            {
               "name": "关联委外加工单",
               "type": "picker",
               "required": true,
@@ -13511,6 +13596,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联委外加工单",
             "供应商名称",
             "计划执行日期",
@@ -13641,6 +13727,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "领料类型",
@@ -14053,6 +14144,10 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
+          "name": "是否需要装卸货",
+          "spec": "是 / 否"
+        },
+        {
           "name": "领料类型",
           "spec": "生产领料 / 备品备件领料"
         },
@@ -14339,6 +14434,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -14761,6 +14861,10 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
+          "name": "是否需要装卸货",
+          "spec": "是 / 否"
+        },
+        {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
         },
@@ -15042,6 +15146,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -15496,6 +15605,10 @@ window.WMS_PAGE_CONFIGS = {
           "spec": "文本"
         },
         {
+          "name": "是否需要装卸货",
+          "spec": "是 / 否"
+        },
+        {
           "name": "计划执行日期",
           "spec": "`YYYY-MM-DD`"
         },
@@ -15846,6 +15959,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 140
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -16346,6 +16464,7 @@ window.WMS_PAGE_CONFIGS = {
         "单据状态",
         "单号",
         "单据类型",
+            "是否需要装卸货",
         "计划执行日期",
         "关联销售订单",
         "客户名称",
@@ -16575,14 +16694,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联销售订单",
               "type": "picker",
-              "required": true,
-              "ctrl": "必填；选择生效的客户委托加工销售订单；选后自动带出客户名称并解锁运单"
+              "required": false,
+              "ctrl": "选填；选择客户委托加工销售订单后自动带出客户名称，不带入订单物料明细"
             },
             {
               "name": "客户名称",
-              "type": "readonly",
+              "type": "picker",
               "required": true,
-              "ctrl": "选销售订单后自动带入，只读锁定不可改"
+              "ctrl": "选销售订单后自动带入并锁定；未选订单时可弹窗选择客户档案"
             },
             {
               "name": "计划执行日期",
@@ -16654,6 +16773,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联销售订单",
             "客户名称",
             "计划执行日期",
@@ -16807,6 +16927,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 140
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -17271,6 +17396,7 @@ window.WMS_PAGE_CONFIGS = {
         "单据状态",
         "单号",
         "单据类型",
+            "是否需要装卸货",
         "计划执行日期",
         "关联销售订单",
         "客户名称",
@@ -17466,14 +17592,14 @@ window.WMS_PAGE_CONFIGS = {
             {
               "name": "关联销售订单",
               "type": "picker",
-              "required": true,
-              "ctrl": "必填；选择生效的客户委托加工销售订单；选后自动带出客户名称并解锁运单"
+              "required": false,
+              "ctrl": "选填；选择客户委托加工销售订单后自动带出客户名称，不带入订单物料明细"
             },
             {
               "name": "客户名称",
-              "type": "readonly",
+              "type": "picker",
               "required": true,
-              "ctrl": "选销售订单后自动带入，只读锁定不可改"
+              "ctrl": "选销售订单后自动带入并锁定；未选订单时可弹窗选择客户档案"
             },
             {
               "name": "计划执行日期",
@@ -17545,6 +17671,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联销售订单",
             "客户名称",
             "计划执行日期",
@@ -18078,6 +18205,11 @@ window.WMS_PAGE_CONFIGS = {
               "width": 120
             },
             {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
+            },
+            {
               "field": "计划执行日期",
               "title": "计划执行日期",
               "width": 120
@@ -18580,6 +18712,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联销售订单",
             "客户名称",
             "计划执行日期",
@@ -18917,6 +19050,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 110
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -19452,6 +19590,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联销售订单",
             "客户名称",
             "计划执行日期",
@@ -19751,6 +19890,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 110
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -20292,6 +20436,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "关联销售订单",
             "客户名称",
             "计划执行日期",
@@ -20621,6 +20766,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "入库方向",
@@ -21229,6 +21379,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "入库方向",
             "计划执行日期",
             "领至线边仓",
@@ -21577,6 +21728,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 120
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "出库方向",
@@ -22186,6 +22342,7 @@ window.WMS_PAGE_CONFIGS = {
             "单据状态",
             "单号",
             "单据类型",
+            "是否需要装卸货",
             "出库方向",
             "计划执行日期",
             "领至线边仓",
@@ -23552,6 +23709,11 @@ window.WMS_PAGE_CONFIGS = {
               "field": "单据类型",
               "title": "单据类型",
               "width": 140
+            },
+            {
+              "field": "是否需要装卸货",
+              "title": "是否需要装卸货",
+              "width": 130
             },
             {
               "field": "计划执行日期",
@@ -28920,7 +29082,7 @@ window.WMS_PAGE_CONFIGS = {
               "name": "订单号",
               "type": "picker",
               "required": false,
-              "ctrl": "条件必填：矩阵要求关联订单时必填；随订单类型过滤；选中后带入合同号及物料行"
+              "ctrl": "条件必填：矩阵要求关联订单时必填（受托收/退料选填且选单不带物料）；随订单类型过滤；选中后带入合同号，非受托业务带入物料行"
             },
             {
               "name": "关联销售备货单",
@@ -35325,9 +35487,11 @@ window.WMS_PAGE_CONFIGS = {
               "name": "检验类型",
               "type": "select",
               "options": [
-                "来料检验",
-                "成品检验",
-                "库内检验"
+                "采购来料检",
+                "委外收货检",
+                "受托收料检",
+                "生产成品检",
+                "库内检"
               ]
             },
             {
@@ -35335,17 +35499,16 @@ window.WMS_PAGE_CONFIGS = {
               "type": "input"
             },
             {
-              "name": "批次号",
+              "name": "物料批次号",
               "type": "input"
             },
             {
-              "name": "检验判定",
+              "name": "检验结果",
               "type": "select",
               "options": [
                 "全部",
                 "合格",
-                "不合格",
-                "待判定"
+                "不合格"
               ]
             },
             {
@@ -35368,12 +35531,12 @@ window.WMS_PAGE_CONFIGS = {
           "queryDefault": [
             "检验单号",
             "物料信息",
-            "检验判定"
+            "检验结果"
           ],
           "queryMore": [
             "关联单号",
             "检验类型",
-            "批次号",
+            "物料批次号",
             "报检人",
             "报检时间",
             "质检员",
@@ -35405,7 +35568,7 @@ window.WMS_PAGE_CONFIGS = {
             {
               "field": "检验类型",
               "title": "检验类型",
-              "width": 100
+              "width": 110
             },
             {
               "field": "物料信息",
@@ -35413,8 +35576,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 220
             },
             {
-              "field": "批次号",
-              "title": "批次号",
+              "field": "物料批次号",
+              "title": "物料批次号",
               "width": 120
             },
             {
@@ -35438,8 +35601,8 @@ window.WMS_PAGE_CONFIGS = {
               "width": 90
             },
             {
-              "field": "检验判定",
-              "title": "检验判定",
+              "field": "检验结果",
+              "title": "检验结果",
               "width": 90,
               "slot": "tag"
             },
@@ -35454,11 +35617,11 @@ window.WMS_PAGE_CONFIGS = {
           "rowOps": [
             {
               "name": "编辑",
-              "desc": "编辑报检信息（不含检验判定）"
+              "desc": "编辑报检信息（不含检验结果）"
             },
             {
               "name": "检验",
-              "desc": "打开检验执行弹窗，录入检验判定、检验员与检验日期"
+              "desc": "打开检验执行弹窗，录入检验结果、检验员与检验日期"
             }
           ]
         }
@@ -35476,16 +35639,18 @@ window.WMS_PAGE_CONFIGS = {
           "required": true,
           "ctrl": "下拉选择",
           "options": [
-            "来料检验",
-            "成品检验",
-            "库内检验"
+            "采购来料检",
+            "委外收货检",
+            "受托收料检",
+            "生产成品检",
+            "库内检"
           ]
         },
         {
           "name": "关联单号",
           "type": "picker",
           "required": false,
-          "ctrl": "弹窗选择"
+          "ctrl": "弹窗选择（按检验类型过滤对应通知单/申请单；库内检不选）"
         },
         {
           "name": "物料信息",
@@ -35542,7 +35707,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "物料信息"
         },
         {
-          "name": "批次号"
+          "name": "物料批次号"
         },
         {
           "name": "抽样数量"
@@ -35560,7 +35725,7 @@ window.WMS_PAGE_CONFIGS = {
           "name": "质检员"
         },
         {
-          "name": "检验判定"
+          "name": "检验结果"
         },
         {
           "name": "备注"
